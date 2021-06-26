@@ -1,0 +1,20 @@
+version: "3.3"
+services:
+  frontend:
+    image: node:lts-alpine3.13
+    container_name: frontend
+    volumes:
+      - ./app/frontend:/frontend
+    ports:
+      - 3000:3000
+    entrypoint: sh -c "while true; do sleep 1; done" #npm --prefix /frontend run dev
+
+  backend:
+    build: ./app/backend
+    image: backend
+    container_name: backend
+    volumes:
+      - ./app/backend:/backend
+    ports:
+      - 3001:3001
+    entrypoint: sh -c "while true; do sleep 1; done" #sh -c "nest start -w"

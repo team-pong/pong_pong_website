@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "module": "commonjs",
+    "target": "es6",
+    "lib": [
+      "es2015",
+      "es2017",
+      "dom"
+    ],
+    "jsx": "react-jsx"
+  },
+  "awesomeTypescriptLoaderOptions": {
+    "useTranspileModule": true
+  },
+  "include": [ "./src/**/*", "server.ts" ],
+  "exclude": [ "./node_modules" ]
+}
