@@ -11,10 +11,9 @@ services:
 
   backend:
     build: ./app/backend
-    image: backend
     container_name: backend
     volumes:
-      - ./app/backend:/backend
+      - ./app/backend/src:/backend/src
     ports:
       - 3001:3001
-    entrypoint: sh -c "while true; do sleep 1; done" #sh -c "nest start -w"
+    entrypoint: sh -c "./node_modules/@nestjs/cli/bin/nest.js start -w"
