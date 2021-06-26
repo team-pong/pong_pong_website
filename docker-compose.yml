@@ -17,3 +17,10 @@ services:
     ports:
       - 3001:3001
     entrypoint: sh -c "./node_modules/@nestjs/cli/bin/nest.js start -w"
+  
+  db:
+    build: ./app/db
+    container_name: db
+    ports:
+      - 5432:5432
+    entrypoint: sh -c "while true; do sleep 1; done;" #pg_ctl -D . -l logfile start
