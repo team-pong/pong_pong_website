@@ -22,8 +22,8 @@ module.exports = {
         enforce: 'pre',
         use: 'source-map-loader'
       },
-      { 
-        test: /\.tsx?$/, 
+      {
+        test: /\.tsx?$/,
         loader: 'ts-loader'
       },
       {
@@ -34,9 +34,10 @@ module.exports = {
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
-    historyApiFallback: true, //고민할 필요가 있음
+    historyApiFallback: true,
     host: 'frontend',
     port: 3000,
+    public: "0.0.0.0:3000"
   },
   plugins: [
     new SourceMapDevToolPlugin({
