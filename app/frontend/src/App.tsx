@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import {Login, MainPage} from './component/index'
 import '/src/App.css'
 
 function NotFound() {
@@ -11,7 +12,9 @@ const App = (): JSX.Element => {
   return (
         <BrowserRouter>
           <Switch>
-            <Route component={NotFound}/>
+            <Route exact path="/" component={Login} />
+            <Route path="/mainpage" component={MainPage} />
+            <Route component={NotFound} />
           </Switch>
         </BrowserRouter>
   );

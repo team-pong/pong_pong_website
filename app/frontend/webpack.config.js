@@ -12,7 +12,7 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, '/dist'),
-    publicPath: '.',
+    publicPath: '/',
     filename: 'app.js'
   },
   module: {
@@ -31,6 +31,12 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader'],
       }
     ]
+  },
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    historyApiFallback: true, //고민할 필요가 있음
+    host: 'frontend',
+    port: 3000,
   },
   plugins: [
     new SourceMapDevToolPlugin({
