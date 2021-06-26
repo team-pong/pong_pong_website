@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { LoginCodeDto } from './dto/login-token-dto';
 import { CLIENT_ID, CLIENT_SECRET } from './config/config.json';
 import axios, { AxiosResponse } from 'axios';
-const qs = require('querystring')
+const qs = require('querystring');
 
 
 @Injectable()
@@ -18,17 +18,7 @@ export class AppService {
     console.log(`code ${code}`)
     const getTokenUrl: string = "https://api.intra.42.fr/oauth/token";
     const redirectUrl: string = "http://127.0.0.1:3000/mainpage"
-    const options = {
-      uri: getTokenUrl,
-      method: 'POST',
-      qs: {
-        grant_type: type,
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        code: code,
-        redirect_uri: redirectUrl
-      },
-    };
+    const getUserUrl: string = "https://api.intra.42.fr/oauth/token/info";
     const requestBody = {
       grant_type: type,
         client_id: CLIENT_ID,
@@ -43,10 +33,23 @@ export class AppService {
     }
     axios.post(getTokenUrl, qs.stringify(requestBody), config)
       .then(result => {
-        console.log(result);
+        console.log("post success")
+        const { access_token } = result.data;
+        console.log(access_token)
+        const data = axios.get(getUserUrl, {
+          headers: {
+            'Authorization': `Bearer ${access_token}`
+          }
+        })
+        .then(result => {
+          console.log(result.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
       })
       .catch((err) => {
-        console.log(err);
+        console.log("post error");
       })
     // const { access_token } = response.data;
     // console.log(response.data);
