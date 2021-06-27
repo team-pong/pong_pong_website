@@ -16,29 +16,5 @@ export class AppController {
   public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto) {
     console.log("post inside");
     const user = await this.appService.getUserInfo(loginCodeDto);
-
-  }
-
-  @Post('oauth')
-  oauth_post(@Body() data) {
-    return data.code;
-  }
-
-  @Get('oauth')
-  oauth() {
-    const client = new Client({
-      user: 'pong_admin',
-      host: 'db',
-      database: 'pong_db',
-      password: '1234',
-      port: 5432,
-    });
-
-    client.connect();
-
-    client.query('SELECT NOW()', (err, res) => {
-      console.log(err, res)
-      client.end()
-    })
   }
 }

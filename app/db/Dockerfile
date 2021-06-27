@@ -8,10 +8,8 @@ RUN chown postgres:postgres postgres
 USER postgres
 RUN initdb postgres
 
-# DB 실행
+# DB 설정 (IP 열어주기, postgres 실행, PONG_DB 및 관리자 생성)
 WORKDIR /postgres
 COPY ./init-user-db.sh /postgres/
 
-# 관리자 계정 생성
-# 관리저 권한 설정
 EXPOSE 5432
