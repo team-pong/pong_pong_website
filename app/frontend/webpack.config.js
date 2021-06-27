@@ -1,7 +1,6 @@
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { SourceMapDevToolPlugin } = require("webpack");
 
 module.exports = {
@@ -28,7 +27,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        use: ['style-loader', 'css-loader'],
       }
     ]
   },
@@ -45,8 +44,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html'
-    }),
-    new MiniCssExtractPlugin({ filename: 'app.css' })
+    })
   ],
   optimization: {
     minimizer: [new TerserPlugin({ extractComments: false })],
