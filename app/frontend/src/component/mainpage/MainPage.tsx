@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import NavBar from './navbar/NavBar'
 
 const MainPage = (): JSX.Element => {
 
@@ -12,11 +13,13 @@ const MainPage = (): JSX.Element => {
       },
       body: JSON.stringify({ code: searchParams.get('code') })
     }
-    fetch('http://localhost:3001/api/oauth', fetchOption);
+    fetch('http://localhost:3001/api/oauth', fetchOption)
   }, []);
 
   return (
-    <h1>main</h1>
+    <>
+      <h1>main</h1>
+    </>
   );
 }
 
