@@ -16,6 +16,7 @@ services:
   backend:
     build: ./app/backend
     container_name: backend
+		env_file: ./docker.env
     volumes:
       - ./app/backend/src:/backend/src
     ports:
@@ -25,6 +26,7 @@ services:
   db:
     build: ./app/db
     container_name: db
+		env_file: ./docker.env
     ports:
       - 5432:5432
     entrypoint: sh -c "/postgres/init-user-db.sh; while true; do sleep 1; done;" #pg_ctl -D . -l logfile start
