@@ -2,7 +2,7 @@ import "/src/css/NavBar.css";
 
 interface navBarProps {
   avartarImgUrl: string,
-  friends: { name: string, state: string }[]
+  friends: { name: string, state: string, avatarURL: string }[]
 }
 
 const NavBar = (props: navBarProps): JSX.Element => {
@@ -33,7 +33,7 @@ const NavBar = (props: navBarProps): JSX.Element => {
       </div >
       <div id="sidemenu">
         <ul>
-          {props.friends.map((friend, i: number) => <li key={i}>{friend.name}/{friend.state}</li>)}
+          {props.friends.map((friend, i: number) => <li key={i}><img src={friend.avatarURL} /> {friend.name}/{friend.state}</li>)}
         </ul>
         <img src="./public/config.png" alt="Config" onClick={() => console.log('config')} />
       </div>

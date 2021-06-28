@@ -55,7 +55,31 @@
   justify-content: space-between;
 }
 
-#sidemenu img {
+#sidemenu ul {
+  margin: 0;
+  padding: 0;
+}
+
+#sidemenu ul li {
+  display: block;
+  padding: 5px;
+  border-bottom: 1px solid #d6d6d6;
+}
+
+#sidemenu ul li:hover {
+  background-color: #a1a1a1;
+}
+
+#sidemenu ul li img { /* avatar img */
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+#sidemenu img { /* config img */
   width: 50px;
   height: 50px;
   border-radius: 50%;

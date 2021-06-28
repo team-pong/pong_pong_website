@@ -5,19 +5,24 @@ const MainPage = (): JSX.Element => {
 
   const testFriendList = [{
     name: 'yochoi',
-    state: 'offline'
+    state: 'offline',
+    avatarURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4wTCccEStV8jOZqrPoK2JmQqsqchyKHmqWg&usqp=CAU'
   }, {
     name: 'hna',
-    state: 'online'
+    state: 'online',
+    avatarURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuYl9UexgW-fdwSnrL4h_2vx76d9xcVHILbg&usqp=CAU'
   }, {
     name: 'jinwkim',
-    state: 'online'
+    state: 'online',
+    avatarURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCmI4xQp3fosLJ0Lupjbva7yB-3Av56W3YIw&usqp=CAU'
   }, {
     name: 'jinbkim',
-    state: 'offline'
+    state: 'offline',
+    avatarURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwfTqvgexFFa4mwKdD0yZ0q79b1851t3emTA&usqp=CAU'
   }, {
     name: 'donglee',
-    state: 'online'
+    state: 'online',
+    avatarURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgn9sQDMA33M2ARHpG_e_T0o6gtaop2XAFvA&usqp=CAU'
   }]
 
   useEffect(() => {
