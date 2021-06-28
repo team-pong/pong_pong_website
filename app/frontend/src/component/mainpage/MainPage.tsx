@@ -21,16 +21,25 @@ const MainPage = (): JSX.Element => {
   }]
 
   useEffect(() => {
-    let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
-    const fetchOption = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({ code: searchParams.get('code') })
+
+    const postAuthCodeToBackend = async () => {
+      let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
+      const fetchOption = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ code: searchParams.get('code') })
+      }
+      let res = await fetch('http://localhost:3001/api/oauth', fetchOption)
     }
-    fetch('http://localhost:3001/api/oauth', fetchOption)
+
+    try {
+      postAuthCodeToBackend();
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
 
   return (
