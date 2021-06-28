@@ -1,5 +1,53 @@
-#avatar {
+.navbar {
   display: flex;
-  justify-content: right;
-  background-color: black;
+  justify-content: space-between;
+  background-color: #f1f1f1;
+  margin: 0;
+  padding: 0;
+  height: 56px;
+}
+
+.navbar ul {
+  margin: 0;
+  padding: 0;
+}
+
+.navbar ul li {
+  display: inline;
+  list-style: none;
+}
+
+.navbar ul li a {
+  display: inline-block;
+  padding: 17px;
+  text-decoration: none;
+}
+
+.navbar ul li a:hover {
+  transition-duration: 0.4s;
+  background-color: #4bb14e;
+  color: white;
+}
+
+.navbar img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding:3px;
+  margin-right: 3px;
+}
+
+.navbar img:hover {
+  transition-duration: 0.4s;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+#sidemenu {
+  height: calc(100% - 56px);
+  width: 0;
+  position: fixed;
+  top: 56px;
+  right: 0;
+  background-color: #f1f1f1;
+  transition-duration: 0.6s;
 }

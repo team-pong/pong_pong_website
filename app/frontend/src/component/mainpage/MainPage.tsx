@@ -3,6 +3,23 @@ import NavBar from './navbar/NavBar'
 
 const MainPage = (): JSX.Element => {
 
+  const testFriendList = [{
+    name: 'yochoi',
+    state: 'offline'
+  }, {
+    name: 'hna',
+    state: 'online'
+  }, {
+    name: 'jinwkim',
+    state: 'online'
+  }, {
+    name: 'jinbkim',
+    state: 'offline'
+  }, {
+    name: 'donglee',
+    state: 'online'
+  }]
+
   useEffect(() => {
     let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
     const fetchOption = {
@@ -18,6 +35,9 @@ const MainPage = (): JSX.Element => {
 
   return (
     <>
+      <NavBar
+        avartarImgUrl="https://static.coindesk.com/wp-content/uploads/2021/04/dogecoin.jpg"
+        friends={testFriendList} />
       <h1>main</h1>
     </>
   );
