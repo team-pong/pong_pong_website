@@ -35,6 +35,7 @@ const NavBar = (props: navBarProps): JSX.Element => {
         <ul>
           {props.friends.map((friend, i: number) => <li key={i}>{friend.name}/{friend.state}</li>)}
         </ul>
+        <img src="./public/config.png" alt="Config" onClick={() => console.log('config')} />
       </div>
     </>
   );
