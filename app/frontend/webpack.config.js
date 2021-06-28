@@ -1,6 +1,7 @@
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 const { SourceMapDevToolPlugin } = require("webpack");
 
 module.exports = {
@@ -11,7 +12,6 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, '/dist'),
-    publicPath: '/',
     filename: 'app.js'
   },
   module: {
@@ -44,7 +44,12 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html'
-    })
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: "public", to: "public" },
+      ],
+    }),
   ],
   optimization: {
     minimizer: [new TerserPlugin({ extractComments: false })],
