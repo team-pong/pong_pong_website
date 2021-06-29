@@ -1,4 +1,4 @@
-import "/src/css/Login.css";
+import "/src/scss/Login.scss";
 
 const Login = (): JSX.Element => {
   const UID: string = `1cbdbdbda9ab3cee5773541a19177fa2ae63ae10751dcf3c40466d9a1f0e3f9f`;

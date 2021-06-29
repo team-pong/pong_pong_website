@@ -1,4 +1,4 @@
-import "/src/css/NavBar.css";
+import "/src/scss/NavBar.scss";
 
 interface navBarProps {
   avartarImgUrl: string,
