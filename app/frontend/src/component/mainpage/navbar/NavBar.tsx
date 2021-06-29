@@ -1,4 +1,4 @@
-import {MouseEvent} from "react";
+import {MouseEvent, useState} from "react";
 import "/src/scss/NavBar.scss";
 
 interface navBarProps {
@@ -7,6 +7,8 @@ interface navBarProps {
 }
 
 const NavBar = (props: navBarProps): JSX.Element => {
+
+  let targetUser = "";
 
   const openSideMenu = () => {
     document.getElementById("sidemenu").style.width = "250px";
@@ -22,13 +24,27 @@ const NavBar = (props: navBarProps): JSX.Element => {
     else closeSideMenu();
   };
 
-  const showFriendContextMenu = (e: MouseEvent) => {
+  const showFriendContextMenu = (e: MouseEvent, target: string) => {
     const contextMenu = document.getElementById('friendcontextmenu');
     //왜 쿼리실렉터는 style이 안되는데?
-    
-    contextMenu.style.display = 'block';
-    contextMenu.style.top = e.pageY + 'px';
-    contextMenu.style.left = e.pageX + 'px';
+    targetUser = target;
+    //마치 state인것처럼 클릭했을 때 그 클릭한 친구의 이름을 가져오기 위함
+    if (contextMenu.style.display === 'none' || !contextMenu.style.display) {
+      contextMenu.style.display = 'block';
+      contextMenu.style.top = e.pageY + 'px';
+      contextMenu.style.left = e.pageX + 'px';
+    } else {
+      contextMenu.style.display = 'none';
+      targetUser = "";
+    }
+  }
+
+  const sendMessage = (e: MouseEvent) => {
+    console.log('sendMessage', targetUser);
+  }
+
+  const deleteFriend = (e: MouseEvent) => {
+    console.log('deleteFriend', targetUser);
   }
 
   return (
@@ -44,14 +60,14 @@ const NavBar = (props: navBarProps): JSX.Element => {
       <div id="sidemenu">
         <ul id="friendlist">
           {props.friends.map((friend, i: number) => (
-            <li onClick={showFriendContextMenu} key={i}>
+            <li onClick={(e) => showFriendContextMenu(e, friend.name)} key={i}>
               <img src={friend.avatarURL} /> {friend.name}/{friend.state}
             </li>
           ))}
         </ul>
         <ul id="friendcontextmenu">
-          <li>DM</li>
-          <li>DELETE</li>
+          <li onClick={sendMessage}>DM</li>
+          <li onClick={deleteFriend}>DELETE</li>
         </ul>
         <img src="./public/config.png" alt="Config" onClick={() => console.log('config')} />
       </div>
