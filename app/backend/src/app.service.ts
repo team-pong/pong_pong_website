@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { LoginCodeDto } from './dto/login-token-dto';
 import axios, { AxiosResponse } from 'axios';
 import { Client } from 'pg';
+import { request, response } from 'express';
 const qs = require('querystring');
 
 const client = new Client({
@@ -9,7 +10,7 @@ const client = new Client({
 	host: process.env.PG_HOST,
 	database: process.env.PG_PONG_DB,
 	password: process.env.PG_PONG_PW,
-	port: process.env.PG_PORT,
+	port: +process.env.PG_PORT,
 });
 
 @Injectable()
@@ -27,8 +28,7 @@ export class AppService {
     const { access_token } = result.data;
     
     const data = await getInfo(access_token)
-		saveInfo(data.data);
-
+    saveInfo(data.data);
     // console.log(usual_full_name)
     // const { access_token } = response.data;
     // console.log(response.data);
@@ -38,7 +38,7 @@ export class AppService {
 export async function saveInfo(info) {
 	client.connect();
 	// if DB에 존재하지 않는 사용자면 저장 후 세션생성, 아니면 그냥 세션 생성
-	client.query('INSERT INTO users(user_id, user_image_url) VALUES($1, $2);', 
+	client.query('INSERT INTO users(user_id, avatar_url) VALUES($1, $2);', 
 		[info.login, info.image_url], 
 		(err, res) => {
 			console.log(err, res)
@@ -48,7 +48,7 @@ export async function saveInfo(info) {
 
 export async function getInfo(access_token) {
   const getUserUrl: string = "https://api.intra.42.fr/v2/me";
-	console.log(access_token);
+	// console.log(access_token);
   return axios.get(getUserUrl, {
     headers: {
       'Authorization': `Bearer ${access_token}`
