@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { LoginCodeDto } from './dto/login-token-dto';
-import { CLIENT_ID, CLIENT_SECRET } from './config/config.json';
 import axios, { AxiosResponse } from 'axios';
 import { Client } from 'pg';
 const qs = require('querystring');
@@ -49,6 +48,7 @@ export async function saveInfo(info) {
 
 export async function getInfo(access_token) {
   const getUserUrl: string = "https://api.intra.42.fr/v2/me";
+	console.log(access_token);
   return axios.get(getUserUrl, {
     headers: {
       'Authorization': `Bearer ${access_token}`
@@ -63,8 +63,8 @@ export async function getToken(loginCodeDto) {
   const redirectUrl: string = "http://127.0.0.1:3000/mainpage"
   const requestBody = {
     grant_type: type,
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
+      client_id: process.env.CLIENT_ID,
+      client_secret: process.env.CLIENT_SECRET,
       code: code,
       redirect_uri: redirectUrl
   };
