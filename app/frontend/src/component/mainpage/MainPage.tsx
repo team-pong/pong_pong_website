@@ -37,7 +37,8 @@ const MainPage = (): JSX.Element => {
         },
         body: JSON.stringify({ code: searchParams.get('code') })
       }
-      let res = await fetch('http://localhost:3001/api/oauth', fetchOption)
+      let res = await fetch('http://localhost:3001/api/oauth', fetchOption);
+      
     }
 
     try {
