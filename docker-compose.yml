@@ -18,7 +18,7 @@ services:
     container_name: backend
     env_file: ./docker.env
     volumes:
-      - ./app/backend/src:/backend/src
+      - ./app/backend:/backend
     ports:
       - 3001:3001
     entrypoint: sh -c "./node_modules/@nestjs/cli/bin/nest.js start -w"
