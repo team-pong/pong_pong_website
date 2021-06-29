@@ -49,7 +49,7 @@
   justify-content: space-between;
   white-space: nowrap;
   overflow: hidden;
-  ul {
+  #friendlist {
     margin: 0;
     padding: 0;
     li {
@@ -74,6 +74,19 @@
       user-select: none;
     }
   }
+  #friendcontextmenu {
+    margin: 0;
+    padding: 0;
+    display: none;
+    position: fixed;
+    background-color: #adb3ad;
+    border: 1px solid rgb(58, 55, 55);
+    // box-shadow: 0 0 1px 2px lightgrey
+    li {
+      list-style: none;
+    }
+  }
+
   img { /* config img */
     width: 50px;
     height: 50px;
