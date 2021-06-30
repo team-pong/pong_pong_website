@@ -3,7 +3,6 @@ services:
   frontend:
     image: node:lts-alpine3.13
     container_name: frontend
-    env_file: ./docker.env
     volumes:
       - ./app/frontend:/frontend
     working_dir: /frontend
