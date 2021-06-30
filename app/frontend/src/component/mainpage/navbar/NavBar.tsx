@@ -1,4 +1,4 @@
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import "/src/scss/NavBar.scss";
 
 interface navBarProps {
@@ -46,6 +46,19 @@ const NavBar = (props: navBarProps): JSX.Element => {
   const deleteFriend = (e: MouseEvent) => {
     console.log('deleteFriend', targetUser);
   }
+
+  const detectOutsideOfSideMenu = (event: any) => {
+    if (!document.getElementById("sidemenu").contains(event.target)) {
+      closeSideMenu();
+      document.getElementById('friendcontextmenu').style.display = "none";
+      targetUser = "";
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener("mousedown", detectOutsideOfSideMenu);
+    return () => document.removeEventListener("mousedown", detectOutsideOfSideMenu);
+  }, []);
 
   return (
     <>
