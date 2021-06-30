@@ -1,4 +1,4 @@
-import {MouseEvent, useState} from "react";
+import { MouseEvent, useState } from "react";
 import "/src/scss/NavBar.scss";
 
 interface navBarProps {
@@ -56,7 +56,7 @@ const NavBar = (props: navBarProps): JSX.Element => {
           <li><a href="">Chat</a></li>
         </ul>
         <img src={props.avartarImgUrl} alt="Avatar" onClick={controllSideMenu} />
-      </div > 
+      </div >
       <div id="sidemenu">
         <ul id="friendlist">
           {props.friends.map((friend, i: number) => (
