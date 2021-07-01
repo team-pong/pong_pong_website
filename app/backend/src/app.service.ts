@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { LoginCodeDto } from './dto/login-token-dto';
 import axios, { AxiosResponse } from 'axios';
 import { Client } from 'pg';
-import { request, response } from 'express';
+import { request, response, Request, Response } from 'express';
 const qs = require('querystring');
 
 const client = new Client({
@@ -21,19 +21,21 @@ export class AppService {
 
 
   public async getUserInfo(loginCodeDto: LoginCodeDto) {
-    // 42api로 해당 코드를 전송하고 토큰 만들어서 반환함
-    
-    
+    // 1. 프론트에서 받은 코드에 우리의 API ID, SECRET, REDIRECT_URL 등을 포함해서 42api에 토큰 발급을 요청한다.
     const result = await getToken(loginCodeDto)
-    const { access_token } = result.data;
+    const { access_token } = result.data
     
+		// 2. 토큰을 가지고 42api에 유저 정보를 요청한다.
     const data = await getInfo(access_token)
+		// 3. 42 api에서 받은 유저 정보를 DB에 저장한다.
     saveInfo(data.data);
+		
     // console.log(usual_full_name)
     // const { access_token } = response.data;
     // console.log(response.data);
   }
 }
+
 
 export async function saveInfo(info) {
 	client.connect();
@@ -46,6 +48,7 @@ export async function saveInfo(info) {
 	})
 }
 
+
 export async function getInfo(access_token) {
   const getUserUrl: string = "https://api.intra.42.fr/v2/me";
 	// console.log(access_token);
@@ -55,6 +58,7 @@ export async function getInfo(access_token) {
     }
   });
 }
+
 
 export async function getToken(loginCodeDto) {
   const { code } = loginCodeDto;

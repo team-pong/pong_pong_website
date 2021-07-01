@@ -1,7 +1,7 @@
-import { Controller, Get, Body, Post } from '@nestjs/common';
+import { Controller, Get, Body, Post, Res, Req } from '@nestjs/common';
 import { AppService } from './app.service';
-import { Client } from 'pg';
 import { LoginCodeDto } from './dto/login-token-dto';
+import { Request, Response } from 'express';
 
 @Controller()
 export class AppController {
@@ -13,8 +13,18 @@ export class AppController {
   }
 
   @Post("/api/oauth/")
-  public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto) {
+  public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
     console.log("post inside");
     const user = await this.appService.getUserInfo(loginCodeDto);
+    response.cookie('sessionId', request.sessionID);
+    response.send();
+    console.log('login ok: sessionId sended -> ID: ', request.sessionID);
+  }
+
+  @Get("cookie")
+  cookie(@Res({ passthrough: true }) response: Response) {
+    response.cookie('key_test', 'value_test');
+    response.send("cookie send");
+    return ('hi');
   }
 }
