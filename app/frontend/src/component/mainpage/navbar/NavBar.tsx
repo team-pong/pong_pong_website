@@ -9,19 +9,14 @@ interface navBarProps {
 const NavBar = (props: navBarProps): JSX.Element => {
 
   let targetUser = "";
-
-  const openSideMenu = () => {
-    document.getElementById("sidemenu").style.width = "250px";
-  };
-
-  const closeSideMenu = () => {
-    document.getElementById("sidemenu").style.width = "0px";
-  };
-
+  
   const controllSideMenu = () => {
     const isOpen: boolean = document.getElementById("sidemenu").style.width === "250px" ? true : false;
-    if (!isOpen) openSideMenu();
-    else closeSideMenu();
+    if (!isOpen) {
+      document.getElementById("sidemenu").style.width = "250px";
+    } else {
+      document.getElementById("sidemenu").style.width = "0px";
+    }
   };
 
   const showFriendContextMenu = (e: MouseEvent, target: string) => {
@@ -48,8 +43,9 @@ const NavBar = (props: navBarProps): JSX.Element => {
   }
 
   const detectOutsideOfSideMenu = (event: any) => {
-    if (!document.getElementById("sidemenu").contains(event.target)) {
-      closeSideMenu();
+    if (!document.getElementById("sidemenu").contains(event.target)
+    && !document.getElementById("avartarImg").contains(event.target)) {
+      document.getElementById("sidemenu").style.width = "0px";
       document.getElementById('friendcontextmenu').style.display = "none";
       targetUser = "";
     }
@@ -68,7 +64,7 @@ const NavBar = (props: navBarProps): JSX.Element => {
           <li><a href="">History</a></li>
           <li><a href="">Chat</a></li>
         </ul>
-        <img src={props.avartarImgUrl} alt="Avatar" onClick={controllSideMenu} />
+        <img src={props.avartarImgUrl} id="avartarImg" alt="Avatar" onClick={controllSideMenu} />
       </div >
       <div id="sidemenu">
         <ul id="friendlist">
