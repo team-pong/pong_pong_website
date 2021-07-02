@@ -34,6 +34,14 @@ export class AppService {
     // const { access_token } = response.data;
     // console.log(response.data);
   }
+
+  getUser(id: string){
+    client.connect();
+    client.query(`SELECT * FROM users WHERE user_id='${id}';`, (err, res) => {
+      console.log(res.rows);
+      return (res.rows);
+    });
+  }
 }
 
 

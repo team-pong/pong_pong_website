@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Post, Res, Req } from '@nestjs/common';
+import { Controller, Get, Body, Post, Res, Req, Param, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 import { LoginCodeDto } from './dto/login-token-dto';
 import { Request, Response } from 'express';
@@ -26,5 +26,10 @@ export class AppController {
     response.cookie('key_test', 'value_test');
     response.send("cookie send");
     return ('hi');
+  }
+
+  @Get('/info/')
+  getUser(@Query('user_id') id: string){
+    return this.appService.getUser(id);
   }
 }
