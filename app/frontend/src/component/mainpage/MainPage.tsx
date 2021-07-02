@@ -27,17 +27,20 @@ const MainPage = (): JSX.Element => {
 
   useEffect(() => {
 
-    const postAuthCodeToBackend = async () => {
+    const postAuthCodeToBackend = async  () => {
       let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
-      const fetchOption = {
+      const fetchHeader = new Headers();
+      fetchHeader.append('Content-Type', 'application/json');
+      fetchHeader.append('Accept', 'application/json');
+      const fetchOption: any = {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
+        headers: fetchHeader,
+        origin: "http://127.0.0.1:3000",
+        credentials: 'include',
         body: JSON.stringify({ code: searchParams.get('code') })
       }
-      let res = await fetch('http://localhost:3001/api/oauth', fetchOption);
+      await fetch('http://localhost:3001/api/oauth', fetchOption)
+      await fetch('http://localhost:3001/cookie', {credentials: 'include'} as any);
     }
 
     try {

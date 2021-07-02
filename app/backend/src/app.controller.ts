@@ -16,7 +16,11 @@ export class AppController {
   public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
     console.log("post inside");
     const user = await this.appService.getUserInfo(loginCodeDto);
-    response.cookie('sessionId', request.sessionID);
+    response.cookie('sessionId', request.sessionID, {
+      sameSite: 'none',
+      httpOnly: true,
+      secure: true
+    });
     response.send();
     console.log('login ok: sessionId sended -> ID: ', request.sessionID);
   }
