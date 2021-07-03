@@ -9,15 +9,8 @@ interface navBarProps {
 const NavBar = (props: navBarProps): JSX.Element => {
 
   let targetUser = "";
-  
-  const controllSideMenu = () => {
-    const isOpen: boolean = document.getElementById("sidemenu").style.width === "250px" ? true : false;
-    if (!isOpen) {
-      document.getElementById("sidemenu").style.width = "250px";
-    } else {
-      document.getElementById("sidemenu").style.width = "0px";
-    }
-  };
+
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
 
   const showFriendContextMenu = (e: MouseEvent, target: string) => {
     const contextMenu = document.getElementById('friendcontextmenu');
@@ -52,6 +45,11 @@ const NavBar = (props: navBarProps): JSX.Element => {
   }
 
   useEffect(() => {
+    if (isSideMenuOpen) document.getElementById("sidemenu").style.width = "250px";
+    else document.getElementById("sidemenu").style.width = "0px";
+  }, [isSideMenuOpen]);
+
+  useEffect(() => {
     document.addEventListener("mousedown", detectOutsideOfSideMenu);
     return () => document.removeEventListener("mousedown", detectOutsideOfSideMenu);
   }, []);
@@ -64,7 +62,7 @@ const NavBar = (props: navBarProps): JSX.Element => {
           <li><a href="">History</a></li>
           <li><a href="">Chat</a></li>
         </ul>
-        <img src={props.avartarImgUrl} id="avartarImg" alt="Avatar" onClick={controllSideMenu} />
+        <img src={props.avartarImgUrl} id="avartarImg" alt="Avatar" onClick={() => setIsSideMenuOpen(!isSideMenuOpen)} />
       </div >
       <div id="sidemenu">
         <ul id="friendlist">
