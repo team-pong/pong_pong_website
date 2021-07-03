@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
-import {Login, MainPage} from './component/index'
+import {Login, MainPage} from './component/componentIDX'
 import '/src/App.scss'
 
 function NotFound() {
