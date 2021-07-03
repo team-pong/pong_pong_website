@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import Modal from './modal/Modal'
+import { Modal } from '../componentIDX'
 import NavBar from './navbar/NavBar'
-import {testFriendList} from './dummyData'
+import { testFriendList } from './dummyData'
 
 const MainPage = (): JSX.Element => {
 
@@ -9,7 +9,7 @@ const MainPage = (): JSX.Element => {
 
   useEffect(() => {
 
-    const postAuthCodeToBackend = async  () => {
+    const postAuthCodeToBackend = async () => {
       let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
       const fetchHeader = new Headers();
       fetchHeader.append('Content-Type', 'application/json');
@@ -22,7 +22,7 @@ const MainPage = (): JSX.Element => {
         body: JSON.stringify({ code: searchParams.get('code') })
       }
       await fetch('http://localhost:3001/api/oauth', fetchOption)
-      await fetch('http://localhost:3001/cookie', {credentials: 'include'} as any);
+      await fetch('http://localhost:3001/cookie', { credentials: 'include' } as any);
     }
 
     try {
@@ -38,7 +38,7 @@ const MainPage = (): JSX.Element => {
         avartarImgUrl="https://static.coindesk.com/wp-content/uploads/2021/04/dogecoin.jpg"
         friends={testFriendList} />
       <button onClick={() => setModalDisplay(!modalDisplay)}>모달 display test</button>
-      <Modal content={() => <h1>content</h1>} display={modalDisplay} handleClose={() => setModalDisplay(false)}/>
+      <Modal content={() => <h1>content</h1>} display={modalDisplay} handleClose={() => setModalDisplay(false)} />
     </>
   );
 }

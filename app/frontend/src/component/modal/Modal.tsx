@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import "/src/scss/Modal.scss";
 
 interface modalProps {
@@ -22,7 +22,7 @@ const Modal = (props: modalProps): JSX.Element => {
   return (
     <div className={"modal " + display}>
       <div className="modal content">
-        <img src="./public/closeWindow.png" onClick={props.handleClose} alt="close"/>
+        <img src="./public/closeWindow.png" onClick={props.handleClose} alt="close" />
         {props.content({})}
       </div>
     </div>
