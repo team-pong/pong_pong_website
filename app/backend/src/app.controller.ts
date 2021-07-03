@@ -9,22 +9,18 @@ export class AppController {
 
   @Post("/api/oauth/")
   public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
-    console.log("post inside");
-    const user = await this.appService.login(loginCodeDto, request);
-    response.cookie('sessionID', request.sessionID, {
-      sameSite: 'none',
-      httpOnly: true,
-      secure: true
-    });
-    console.log("before response send");
-    response.send();
-    console.log("after response send");
+    try {
+      console.log("post inside");
+      await this.appService.login(loginCodeDto, request, response);
+    } catch (err){
+      console.log("get42UserInfo Err: ", err);
+    }
   }
 
   @Get("cookie")
   cookie(@Res({ passthrough: true }) response: Response) {
     response.cookie('key_test', 'value_test');
-    response.send("cookie send");
+    // response.send("cookie send");
     return ('hi');
   }
 

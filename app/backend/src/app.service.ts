@@ -1,8 +1,10 @@
 import { Injectable, Res } from '@nestjs/common';
 import { LoginCodeDto } from './dto/login-token-dto';
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosResponse, AxiosError } from 'axios';
 import { Client } from 'pg';
 import { request, response, Request, Response } from 'express';
+import { Session, SessionData } from 'express-session';
+import { rejects } from 'assert';
 const qs = require('querystring');
 
 const client = new Client({
@@ -20,22 +22,33 @@ export class AppService {
    * @author hna
    * @param[in] loginCodeDto Body로 들어온 code
    * @param[in] req Request 객체
-   * @brief loginCode를 받아 42api에서 토큰발급 -> 유저 정보 조회 및 저장 (회원가입) -> 세션 저장
-   * @todo 42api에서 토큰 발급 실패시 에러처리
-   * @todo 유저 정보가 이미 데이터베이스에 있는경우 저장하지 않도록 해야함
+   * @param[in] res Response 객체
+   * @brief 유저 로그인시 세션 생성
+   * @detail 1. LoginCode를 받아 42api에서 토큰발급 
+   * @       2. 토큰으로 유저 정보 조회
+   * @       3. 유저 id와 avatar_url을 DB에 저장
+   * @       4. 세션을 저장하고 응답 쿠키에 세션 아이디를 기록
+   * @todo 함수 정리
    */
-  public async login(loginCodeDto: LoginCodeDto, req: Request) {
-    // 1. 프론트에서 받은 코드에 우리의 API ID, SECRET, REDIRECT_URL 등을 포함해서 42api에 토큰 발급을 요청한다.
-    const result = await getToken(loginCodeDto)
-    const { access_token } = result.data
-    
-		// 2. 토큰을 가지고 42api에 유저 정보를 요청한다.
-    const data = await getInfo(access_token)
-		// 3. 42 api에서 받은 유저 정보를 DB에 저장한다.
-    saveInfo(data.data);
-    // 4. 세션을 DB에 저장.
-    req.session.userid = data.data.login;
-    req.session.save();
+  public async login(loginCodeDto: LoginCodeDto, req: Request, res: Response) {
+    try {
+      const result = await getToken(loginCodeDto)
+      const { access_token } = result.data;
+      const { data } = await getInfo(access_token)
+      saveInfo(data.login, data.image_url)
+      saveSession(req.session, data.login, access_token);
+      setSessionCookie(res, req.sessionID);
+    } catch (err: any | AxiosError) {
+      if (axios.isAxiosError(err)) {
+        console.log("42api error:", err.response.statusText);
+        res.statusCode = err.response.status;
+        res.statusMessage = err.response.statusText;
+        res.json(err.response.data);
+      }
+      else {
+        console.log("login error:", err);
+      }
+    }
   }
 
   getUser(id: string){
@@ -49,23 +62,50 @@ export class AppService {
 
 /*!
  * @author hna
- * @param[in] 42api response 데이터 (유저 정보)
- * @brief 유저 정보를 Postgresql에 저장. 
- * @todo 유저 정보가 이미 데이터베이스에 있는경우 저장하지 않도록 해야함
- * @todo ㄴ 중복키 불가하도록 설정
+ * @brief id와 토큰값을 Session 객체의 속성에 추가하고 Postgres의 session 테이블에 저장.
+ * @warning 세션 객체에 새로운 값을 추가하는 경우 main.ts 에서 SessionData 인터페이스에 먼저 추가해야함
  */
-export async function saveInfo(info) {
-	client.connect();
-	client.query(
-    'INSERT INTO users(user_id, avatar_url) VALUES($1, $2);', 
-		[info.login, info.image_url], 
-		(err, res) => {
-			console.log(err, res)
-			client.end()
-	})
+export async function saveSession(session: Session & Partial<SessionData>, id: string, token: string) {
+  session.userid = id;
+  session.token = token;
+  session.save(); 
 }
 
-export async function getInfo(access_token) {
+/*!
+ * @author hna
+ * @brief sessionID를 응답 쿠키에 추가한다
+ */
+function setSessionCookie(res: Response, sessionID: string) {
+  res.cookie('sessionID', sessionID, {
+    sameSite: 'none',
+    httpOnly: true,
+    secure: true,
+  })
+}
+
+/*!
+ * @author hna
+ * @brief 유저 정보를 DB에 저장한다
+ * @todo id를 가지고 테이블에 이미 있는지 확인해야하고, 중복키 에러가 뜨지 않도록 해야함
+ */
+export async function saveInfo(id: string, avatar_url: string) {
+  try {
+    await client.connect();
+    client.query(
+      'INSERT INTO users(user_id, avatar_url) VALUES($1, $2);', 
+      [id, avatar_url], 
+      (err, res) => {
+        client.end()
+        if (err){
+          console.log("INSERT Query Error:", err.message);
+        };
+    })
+  } catch (err) {
+    console.log('pg connect error:', err);
+  }
+}
+
+export async function getInfo(access_token: string) {
   const getUserUrl = "https://api.intra.42.fr/v2/me";
   return axios.get(getUserUrl, {
     headers: {
@@ -74,7 +114,7 @@ export async function getInfo(access_token) {
   });
 }
 
-export async function getToken(loginCodeDto) {
+export async function getToken(loginCodeDto: LoginCodeDto) {
   const { code } = loginCodeDto;
   const type = "authorization_code";
   const getTokenUrl = "https://api.intra.42.fr/oauth/token";
@@ -91,5 +131,5 @@ export async function getToken(loginCodeDto) {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   }
-  return axios.post(getTokenUrl, qs.stringify(requestBody), config)
+  return axios.post(getTokenUrl, qs.stringify(requestBody), config);
 }
