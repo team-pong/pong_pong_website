@@ -1,32 +1,11 @@
 import { useState, useEffect } from "react";
 import Modal from './modal/Modal'
 import NavBar from './navbar/NavBar'
+import {testFriendList} from './dummyData'
 
 const MainPage = (): JSX.Element => {
 
   const [modalDisplay, setModalDisplay] = useState(false);
-
-  const testFriendList = [{
-    name: 'yochoi',
-    state: 'offline',
-    avatarURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4wTCccEStV8jOZqrPoK2JmQqsqchyKHmqWg&usqp=CAU'
-  }, {
-    name: 'hna',
-    state: 'online',
-    avatarURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSuYl9UexgW-fdwSnrL4h_2vx76d9xcVHILbg&usqp=CAU'
-  }, {
-    name: 'jinwkim',
-    state: 'online',
-    avatarURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCmI4xQp3fosLJ0Lupjbva7yB-3Av56W3YIw&usqp=CAU'
-  }, {
-    name: 'jinbkim',
-    state: 'offline',
-    avatarURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwfTqvgexFFa4mwKdD0yZ0q79b1851t3emTA&usqp=CAU'
-  }, {
-    name: 'donglee',
-    state: 'online',
-    avatarURL: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgn9sQDMA33M2ARHpG_e_T0o6gtaop2XAFvA&usqp=CAU'
-  }]
 
   useEffect(() => {
 
