@@ -6,9 +6,10 @@ import { Client } from 'pg';
 
 declare module 'express-session' {
   export interface SessionData {
-    userid: string;
+    userid: string,
+    token: string,
   }
-}
+};
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
