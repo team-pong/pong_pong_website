@@ -1,7 +1,10 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import Modal from './modal/Modal'
 import NavBar from './navbar/NavBar'
 
 const MainPage = (): JSX.Element => {
+
+  const [modalDisplay, setModalDisplay] = useState(false);
 
   const testFriendList = [{
     name: 'yochoi',
@@ -55,7 +58,8 @@ const MainPage = (): JSX.Element => {
       <NavBar
         avartarImgUrl="https://static.coindesk.com/wp-content/uploads/2021/04/dogecoin.jpg"
         friends={testFriendList} />
-      <h1>main</h1>
+      <button onClick={() => setModalDisplay(!modalDisplay)}>모달 display test</button>
+      <Modal content={() => <h1>content</h1>} display={modalDisplay} handleClose={() => setModalDisplay(false)}/>
     </>
   );
 }
