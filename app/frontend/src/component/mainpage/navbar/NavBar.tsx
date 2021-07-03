@@ -37,8 +37,8 @@ const NavBar = (props: navBarProps): JSX.Element => {
 
   const detectOutsideOfSideMenu = (event: any) => {
     if (!document.getElementById("sidemenu").contains(event.target)
-    && !document.getElementById("avartarImg").contains(event.target)) {
-      document.getElementById("sidemenu").style.width = "0px";
+      && !document.getElementById("avartarImg").contains(event.target)) {
+      setIsSideMenuOpen(false);
       document.getElementById('friendcontextmenu').style.display = "none";
       targetUser = "";
     }
