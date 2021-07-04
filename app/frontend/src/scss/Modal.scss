@@ -10,16 +10,15 @@
     margin: 0;
     padding: 0;
     background-color: white;
-    border: 1px solid black;
     top: 50%;
     left: 50%;
     width: 80%;
     height: 80%;
     transform: translate(-50%,-50%);
     img {
-      float: right;
-      width: 20px;
-      height: 20px;
+      margin-left: calc(100% - 30px) !important;
+      width: 30px !important;
+      height: 30px !important;
     }
   }
 }

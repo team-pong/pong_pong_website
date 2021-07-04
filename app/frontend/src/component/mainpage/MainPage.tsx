@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Modal } from '../componentIDX'
+import { Modal } from '../modal/Modal'
 import NavBar from './navbar/NavBar'
 import { testFriendList } from './dummyData'
 

@@ -1,6 +1,8 @@
 import { FC } from 'react';
 import "/src/scss/Modal.scss";
 
+import ConfigContent from './content/ConfigContent'
+
 interface modalProps {
   content: FC,
   display: boolean,
@@ -29,4 +31,4 @@ const Modal = (props: modalProps): JSX.Element => {
   );
 }
 
-export default Modal;
+export { Modal, ConfigContent };

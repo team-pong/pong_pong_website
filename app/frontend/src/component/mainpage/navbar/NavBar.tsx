@@ -1,4 +1,5 @@
 import { MouseEvent, useEffect, useState } from "react";
+import { Modal, ConfigContent } from "../../modal/Modal";
 import "/src/scss/NavBar.scss";
 
 interface navBarProps {
@@ -11,6 +12,7 @@ const NavBar = (props: navBarProps): JSX.Element => {
   let targetUser = "";
 
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
+  const [isConfigOpen, setIsConfigOpen] = useState(false);
 
   const showFriendContextMenu = (e: MouseEvent, target: string) => {
     const contextMenu = document.getElementById('friendcontextmenu');
@@ -76,7 +78,8 @@ const NavBar = (props: navBarProps): JSX.Element => {
           <li onClick={sendMessage}>DM</li>
           <li onClick={deleteFriend}>DELETE</li>
         </ul>
-        <img src="./public/config.png" alt="Config" onClick={() => console.log('config')} />
+        <img src="./public/config.png" alt="Config" onClick={() => setIsConfigOpen(true)} />
+        <Modal content={ConfigContent} display={isConfigOpen} handleClose={() => setIsConfigOpen(false)} />
       </div>
     </>
   );
