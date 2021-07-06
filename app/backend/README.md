@@ -1,73 +1,84 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# Database 구조
+<details>
+<summary>펼치기</summary>
+<div markdown="1">
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+users
+|user_id|nick|avatar_url|
+|-----|---|---|
+||||
 
-## Description
+achievements
+|user_id|achievement|
+|-----|---|
+|||
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+match
+|winner_id|loser_id|type|
+|-----|---|---|
+|||
 
-## Installation
+chat
+|channel_id|owner_id|type|passwd|
+|-----|---|---|---|
 
-```bash
-$ npm install
-```
+stat
+|user_id|games|win|lose|ladder_level|
+|-----|---|---|---|---|
 
-## Running the app
+ban
+|channel_id|user_id|
+|-----|---|
 
-```bash
-# development
-$ npm run start
+admin
+|channel_id|user_id|
+|-----|---|
 
-# watch mode
-$ npm run start:dev
+mute
+|channel_id|user_id|
+|-----|---|
 
-# production mode
-$ npm run start:prod
-```
+friend
+|user_id|friend_id|status|
+|-----|---|---|
 
-## Test
+</div>
+</details>
 
-```bash
-# unit tests
-$ npm run test
+# Backend API
 
-# e2e tests
-$ npm run test:e2e
+## 유저 정보
+|url|method|description|request|response|
+|------|---|---|----|----|
+|/api/oauth|POST|유저 로그인|`{code: string}`|empty|
+|/users/info|GET|유저 조회|empty|`{user_id: string, nickname: string, avatar_url: string}`|
+|/users/info|POST|유저 수정|`{user_id: string, nickname: string, avatar_url: string}`|empty|
+|/users/info|DELETE|유저 제거|empty|`{user_id: string, nickname: string, avatar_url: string}`|
 
-# test coverage
-$ npm run test:cov
-```
+<details>
+<summary>구현 예정</summary>
+<div markdown="1">
 
-## Support
+## 친구 
+|url|method|description|request|response|
+|------|---|---|----|----|
+|/users/friends|GET|친구 조회|empty|`[{friend_id: string, status: online \| offline \| in_game}, ...]`|
+|/users/friends|POST|친구 추가|`{friend_id: string}`|empty|
+|/users/friends|DELETE|친구 제거|`{friend_id: string}`|empty|
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 채팅
+|url|method|description|request|response|
+|------|---|---|----|----|
+|/chat/join|GET|채팅 참여|`{channel_id: string}`||
+|/chat/ban|GET|밴 목록 조회|`{channel_id: string}`|`[user_id, ...]`|
+|/chat/ban|POST|밴 추가|`{channel_id: string, user_id: string}`||
 
-## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 게임
+|url|method|description|request|response|
+|------|---|---|----|----|
+|/users/history|GET|전적 조회|empty|`{user_id: string, total: number, win: number, lose: number, ladder_lebel: number}`|
 
-## License
-
-Nest is [MIT licensed](LICENSE).
+</div>
+</details>

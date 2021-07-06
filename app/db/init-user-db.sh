@@ -10,7 +10,7 @@ psql <<- EOSQL
 		\c $PG_PONG_DB;
 
 		CREATE TABLE users (user_id varchar(50) PRIMARY KEY, nick varchar(50), avatar_url varchar(50));
-		CREATE TABLE achivements (user_id varchar(50), achivement varchar(50));
+		CREATE TABLE achievements (user_id varchar(50), achievement varchar(50));
 		CREATE TABLE match (winner_id varchar(50), loser_id varchar(50), type varchar(50));
 		CREATE TABLE chat (channel_id varchar(50), owner_id varchar(50), type varchar(50), passwd varchar(50));
 		CREATE TABLE stat (user_id varchar(50), games varchar(50), win_game varchar(50), loss_game varchar(50), ladder_level varchar(50));
