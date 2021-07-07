@@ -5,8 +5,6 @@ import { testFriendList } from './dummyData'
 
 const MainPage = (): JSX.Element => {
 
-  const [modalDisplay, setModalDisplay] = useState(false);
-
   useEffect(() => {
 
     const postAuthCodeToBackend = async () => {
@@ -37,8 +35,6 @@ const MainPage = (): JSX.Element => {
       <NavBar
         avartarImgUrl="https://static.coindesk.com/wp-content/uploads/2021/04/dogecoin.jpg"
         friends={testFriendList} />
-      <button onClick={() => setModalDisplay(!modalDisplay)}>모달 display test</button>
-      <Modal content={() => <h1>content</h1>} display={modalDisplay} handleClose={() => setModalDisplay(false)} />
     </>
   );
 }
