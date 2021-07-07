@@ -41,7 +41,7 @@ const pgStoreConfig = {
       secret: 'pong-secret',
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 60 * 1000 }
+      cookie: { maxAge: 60 * 1000, sameSite: "strict", httpOnly: true}
     }),
   );
 
