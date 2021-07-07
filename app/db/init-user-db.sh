@@ -27,9 +27,9 @@ psql <<- EOSQL
     GRANT ALL PRIVILEGES ON TABLE ban TO $PG_PONG_ADMIN;
     GRANT ALL PRIVILEGES ON TABLE admin TO $PG_PONG_ADMIN;
     GRANT ALL PRIVILEGES ON TABLE mute TO $PG_PONG_ADMIN;
-    GRANT ALL PRIVILEGES ON TABLE ban TO $PG_PONG_ADMIN;
+    GRANT ALL PRIVILEGES ON TABLE friend TO $PG_PONG_ADMIN;
 
-    INSERT INTO users VALUES('1', '2', '3');
+    INSERT INTO users VALUES('jinbkim', '2', '3');
 EOSQL
 
 psql pong_db <<- EOSQL
@@ -43,4 +43,7 @@ psql pong_db <<- EOSQL
     ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
     CREATE INDEX "IDX_session_expire" ON "session" ("expire");
     GRANT ALL PRIVILEGES ON TABLE session TO pong_session_admin;
+
+    GRANT ALL PRIVILEGES ON TABLE session TO $PG_PONG_ADMIN;
+    INSERT INTO session VALUES('aWc_hLPG45FjcdE8n-zQsz94U9387Wmq', '{"cookie":{"originalMaxAge":60000,"expires":"2021-07-07T02:01:06.262Z","httpOnly":true,"path":"/"},"user_id":"jinbkim","token":"249acf26dfac0ec74cdceca2c4dc3f3cc8d9f4e1d523cf688da5cca09a39a5bb"}', '2021-07-08 02:01:07');
 EOSQL

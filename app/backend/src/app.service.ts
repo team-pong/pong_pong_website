@@ -7,13 +7,23 @@ import { Session, SessionData } from 'express-session';
 import { rejects } from 'assert';
 const qs = require('querystring');
 
-const client = new Client({
+// const client = new Client({
+// 	user: process.env.PG_PONG_ADMIN,
+// 	host: process.env.PG_HOST,
+// 	database: process.env.PG_PONG_DB,
+// 	password: process.env.PG_PONG_PW,
+// 	port: +process.env.PG_PORT,
+// });
+
+const db = {
 	user: process.env.PG_PONG_ADMIN,
 	host: process.env.PG_HOST,
 	database: process.env.PG_PONG_DB,
 	password: process.env.PG_PONG_PW,
 	port: +process.env.PG_PORT,
-});
+};
+
+const client = new Client(db);
 
 @Injectable()
 export class AppService {
@@ -51,11 +61,68 @@ export class AppService {
     }
   }
 
-  getUser(id: string){
+ /*!
+  * @author jinbkim
+  * @param[in] sessionID 8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92 같은 세션 아이디
+  * @return { user_id: 'jinbkim', nick: '3', avatar_url: '4' } 같은 유저 객체
+  * @brief 세션 아이디를 인자로 받아 해당하는 유저 객체를 반환
+  */
+  fetchUser(sessionID: string) {
+    const client = new Client(db);
     client.connect();
-    client.query(`SELECT * FROM users WHERE user_id='${id}';`, (err, res) => {
-      console.log(res.rows);
-      return (res.rows);
+    // 세션아이디로 세션 얻기
+    client.query(`SELECT * FROM session WHERE sid='${sessionID}'`, (err1, res1) => {
+      // 세션안에 있는 user_id로 유저 객체 얻기
+      client.query(`SELECT * FROM users WHERE user_id='${res1.rows[0].sess.user_id}'`, (err2, res2) => {
+        client.end();
+        console.log('=== fetchUser ===');
+        console.log(res2.rows[0]);
+        return res2.rows[0];
+      });
+    });
+  }
+
+ /*!
+  * @author jinbkim
+  * @param[in] userData 수정될 정보를 가진 유저 객체
+  * @brief 
+  *   인자로 받은 유저 객체로 유저 정보 수정
+  *   user_id는 변하지 않는다고 가정함
+  */
+  updateUser(userData) {
+    const client = new Client(db);
+    client.connect();
+    console.log('=== updateUser ===');
+    console.log(userData);
+    // 인자로 받은 유저 객체로 유저 정보 수정
+    client.query(`UPDATE users SET nick='${userData.nick}', avatar_url='${userData.avatar_url}' WHERE user_id='${userData.user_id}';`, (err, res) => {
+      client.end();
+    });
+  }
+
+ /*!
+  * @author jinbkim
+  * @param[in] sessionID 8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92 같은 세션 아이디
+  * @return { user_id: 'jinbkim', nick: '3', avatar_url: '4' } 삭제된 유저 객체
+  * @brief 유저 삭제
+  */
+  deleteUser(sessionID: string) {
+    let deletedUser;  // 삭제될 유저
+    const client = new Client(db);
+    client.connect();
+    // 세션아이디로 세션 얻기
+    client.query(`SELECT * FROM session WHERE sid='${sessionID}'`, (err1, res1) => {
+      // 세션안에 있는 user_id로 유저 객체 얻기
+      client.query(`SELECT * FROM users WHERE user_id='${res1.rows[0].sess.user_id}'`, (err2, res2) => {
+        deletedUser = res2.rows[0];
+        // 유저 삭제
+        client.query(`DELETE FROM users WHERE user_id='${res1.rows[0].sess.user_id}'`, (err3, res3) => {
+          client.end();
+          console.log('=== deleteUser ===');
+          console.log(deletedUser);
+          return deletedUser;
+        });
+      });
     });
   }
 }
