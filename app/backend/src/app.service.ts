@@ -5,7 +5,6 @@ import { Client } from 'pg';
 import { request, response, Request, Response } from 'express';
 import { Session, SessionData } from 'express-session';
 import { rejects } from 'assert';
-import { connect } from 'http2';
 const qs = require('querystring');
 
 // const client = new Client({
@@ -15,7 +14,6 @@ const qs = require('querystring');
 // 	password: process.env.PG_PONG_PW,
 // 	port: +process.env.PG_PORT,
 // });
-
 const db = {
 	user: process.env.PG_PONG_ADMIN,
 	host: process.env.PG_HOST,
