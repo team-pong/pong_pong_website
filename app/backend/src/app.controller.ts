@@ -1,7 +1,8 @@
-import { Controller, Get, Body, Post, Res, Req, Param, Query } from '@nestjs/common';
+import { Controller, Get, Body, Post, Res, Req, Param, Query, Delete } from '@nestjs/common';
 import { AppService } from './app.service';
 import { LoginCodeDto } from './dto/login-token-dto';
 import { Request, Response } from 'express';
+import { Cookie } from 'cookiejar';
 
 @Controller()
 export class AppController {
@@ -24,8 +25,21 @@ export class AppController {
     return ('hi');
   }
 
-  @Get('/info/')
-  getUser(@Query('user_id') id: string){
-    return this.appService.getUser(id);
+  // request.headers['set-cookie'][0] : 'sessionID=8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92; Path=/; HttpOnly; Secure; SameSite=None' 
+  // request.headers['set-cookie'][0].split(";")[0] : 'sessionID=8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92
+  // request.headers['set-cookie'][0].split(";")[0].split("=")[1] : 8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92
+  @Get('/users/info')
+  fetchUser(@Req() request: Request) {
+    return this.appService.fetchUser(request.headers['set-cookie'][0].split(";")[0].split("=")[1]);
+  }
+
+  @Post('/users/info')
+  updateUser(@Body() userData) {
+    this.appService.updateUser(userData);
+  }
+
+  @Delete('/users/info')
+  deleteUser(@Req() request: Request) {
+    return this.appService.deleteUser(request.headers['set-cookie'][0].split(";")[0].split("=")[1]);
   }
 }
