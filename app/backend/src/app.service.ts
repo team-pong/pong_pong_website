@@ -14,7 +14,6 @@ const qs = require('querystring');
 // 	password: process.env.PG_PONG_PW,
 // 	port: +process.env.PG_PORT,
 // });
-
 const db = {
 	user: process.env.PG_PONG_ADMIN,
 	host: process.env.PG_HOST,
@@ -45,9 +44,8 @@ export class AppService {
       const result = await getToken(loginCodeDto)
       const { access_token } = result.data;
       const { data } = await getInfo(access_token)
-      saveInfo(data.login, data.image_url)
-      saveSession(req.session, data.login, access_token);
-      setSessionCookie(res, req.sessionID);
+      await saveInfo(data.login, data.image_url)
+      await saveSession(req.session, data.login, access_token);
     } catch (err: any | AxiosError) {
       if (axios.isAxiosError(err)) {
         console.log("42api error:", err.response.statusText);
@@ -71,9 +69,10 @@ export class AppService {
     const client = new Client(db);
     client.connect();
     // 세션아이디로 세션 얻기
-    client.query(`SELECT * FROM session WHERE sid='${sessionID}'`, (err1, res1) => {
+    client.query(`SELECT * FROM session WHERE sid='${sessionID}';`, (err1, res1) => {
+      console.log(res1.rows[0]);
       // 세션안에 있는 user_id로 유저 객체 얻기
-      client.query(`SELECT * FROM users WHERE user_id='${res1.rows[0].sess.user_id}'`, (err2, res2) => {
+      client.query(`SELECT * FROM users WHERE user_id='${res1.rows[0].sess.userid}';`, (err2, res2) => {
         client.end();
         console.log('=== fetchUser ===');
         console.log(res2.rows[0]);

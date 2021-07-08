@@ -21,7 +21,6 @@ export class AppController {
   @Get("cookie")
   cookie(@Res({ passthrough: true }) response: Response) {
     response.cookie('key_test', 'value_test');
-    // response.send("cookie send");
     return ('hi');
   }
 
@@ -30,9 +29,10 @@ export class AppController {
   // request.headers['set-cookie'][0].split(";")[0].split("=")[1] : 8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92
   @Get('/users/info')
   fetchUser(@Req() request: Request) {
-    return this.appService.fetchUser(request.headers['set-cookie'][0].split(";")[0].split("=")[1]);
+    return this.appService.fetchUser(request.sessionID);
   }
 
+  
   @Post('/users/info')
   updateUser(@Body() userData) {
     this.appService.updateUser(userData);
