@@ -23,8 +23,7 @@ const MainPage = (): JSX.Element => {
         credentials: 'include',
         body: JSON.stringify({ code: searchParams.get('code') })
       }
-      await fetch('http://localhost:3001/api/oauth', fetchOption)
-      await fetch('http://localhost:3001/cookie', { credentials: 'include' } as any);
+      await fetch('http://127.0.0.1:3001/api/oauth', fetchOption)
     }
 
     try {
