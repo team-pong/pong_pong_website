@@ -1,0 +1,19 @@
+$sizeofNavBar: 56px;
+$sizeofGameButton: 59px;
+#record {
+  display: inline-block;
+  text-align: center;
+  width: 50%;
+  height: calc(100vh - #{$sizeofGameButton} - #{$sizeofNavBar});
+}
+#chat {
+  display: inline-block;
+  text-align: center;
+  width: 50%;
+  height: calc(100vh - #{$sizeofGameButton} - #{$sizeofNavBar});
+}
+#game {
+  display: block;
+  text-align: center;
+  width: 100%;
+}
