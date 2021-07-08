@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Modal } from '../modal/Modal'
 import NavBar from './navbar/NavBar'
+import EasyFetch from './../../utils/EasyFetch';
 import { testFriendList } from './dummyData'
 
 const MainPage = (): JSX.Element => {
@@ -11,17 +12,8 @@ const MainPage = (): JSX.Element => {
 
     const postAuthCodeToBackend = async () => {
       let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
-      const fetchHeader = new Headers();
-      fetchHeader.append('Content-Type', 'application/json');
-      fetchHeader.append('Accept', 'application/json');
-      const fetchOption: any = {
-        method: 'POST',
-        headers: fetchHeader,
-        origin: "http://127.0.0.1:3000",
-        credentials: 'include',
-        body: JSON.stringify({ code: searchParams.get('code') })
-      }
-      await fetch('http://127.0.0.1:3001/api/oauth', fetchOption)
+      const easyfetch = new EasyFetch('http://127.0.0.1:3001/api/oauth', 'POST');
+      await easyfetch.fetch({code: searchParams.get('code')});
     }
 
     try {
