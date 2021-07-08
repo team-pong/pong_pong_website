@@ -59,6 +59,24 @@ export class AppService {
     }
   }
 
+  public async sessionValidCheck(sessionID: string, response: Response) {
+    try {
+      const client = new Client(db);
+      await client.connect();
+      client.query(`SELECT * FROM session WHERE sid='${sessionID}';`, (err1, res1) => {
+        client.end()
+        if (res1.rowCount == 0) {
+          response.json({response: "invalid"});
+        }
+        else {
+          response.json({response: "ok"});
+        }
+      });
+    } catch (err) {
+      console.log("session Valid Check service error: ", err);
+    }
+  }
+
  /*!
   * @author jinbkim
   * @param[in] sessionID 8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92 같은 세션 아이디

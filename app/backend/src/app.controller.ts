@@ -18,6 +18,11 @@ export class AppController {
     }
   }
 
+  @Get("/auth/valid")
+  isValidSession(@Req() request: Request, @Res() response: Response) {
+    return this.appService.sessionValidCheck(request.sessionID, response);
+  }
+
   @Get("cookie")
   cookie(@Res({ passthrough: true }) response: Response) {
     response.cookie('key_test', 'value_test');
