@@ -93,8 +93,8 @@ const NavBar = (props: navBarProps): JSX.Element => {
           ))}
         </ul>
         <ul id="friendcontextmenu">
-          <li onClick={sendMessage}>DM</li>
-          <li onClick={deleteFriend}>DELETE</li>
+          <li onClick={sendMessage}>메세지보내기</li>
+          <li onClick={deleteFriend}>친구삭제</li>
         </ul>
         <img
           src="./public/config.png"
