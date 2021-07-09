@@ -1,0 +1,44 @@
+$sizeofNavBar: 56px;
+$sizeofGameButton: 70px;
+#record {
+  display: inline-block;
+  text-align: center;
+  width: 40%;
+  margin-top: 2%;
+  margin-left: 9%;
+  margin-right: 1%;
+  height: calc(90vh - #{$sizeofGameButton} - #{$sizeofNavBar});
+  background-color: #5BBEFF;
+  border-radius: 12px;
+  &:hover {
+    background-color: #4497ce;
+  }
+}
+#chat {
+  display: inline-block;
+  text-align: center;
+  width: 40%;
+  margin-top: 2%;
+  margin-left: 1%;
+  margin-right: 9%;
+  height: calc(90vh - #{$sizeofGameButton} - #{$sizeofNavBar});
+  background-color: #51E68D;
+  border-radius: 12px;
+  &:hover {
+    background-color: #40c576;
+  }
+}
+#game {
+  display: block;
+  text-align: center;
+  width: 82%;
+  margin-left: 9%;
+  margin-right: 9%;
+  margin-top: 1%;
+  height: $sizeofGameButton;
+  background-color: #8450E8;
+  border-radius: 12px;
+  &:hover {
+    background-color: #7243ca;
+  }
+}
