@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import React, { FC } from 'react';
 import "/src/scss/Modal.scss";
 
 import ConfigContent from './content/ConfigContent'
@@ -38,10 +38,18 @@ interface modalPros {
 }
 
 const Modal: FC<modalPros> = ({content, closer}): JSX.Element => {
+
+  const detectOutsideOfModal = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (e.target === e.currentTarget) {
+      closer();
+    }
+  }
+
   return (
-    <div id="modal">
+    <div id="modal" onClick={detectOutsideOfModal}>
       <div id="content">
-        <img src="./public/closeWindow.png" onClick={closer}alt="close" />
+        <img src="./public/closeWindow.png" onClick={closer} alt="close" />
         {content({})}
       </div>
     </div>
