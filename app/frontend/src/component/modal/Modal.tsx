@@ -3,32 +3,49 @@ import "/src/scss/Modal.scss";
 
 import ConfigContent from './content/ConfigContent'
 
-interface modalProps {
+/*!
+ * @author yochoi
+ * @brief display 에 맞춰 Modal 컴포넌트를 마운트, 언마운트 해주는 FC
+ * @param[in] content: Modal 안에 들어갈 FC
+ * @param[in] display: Modal 의 display 여부
+ * @param[in] closer: Modal 의 상위 컴포넌트에서 display를 제어해줄 함수
+ */
+
+interface modalControllerProps {
   content: FC,
   display: boolean,
-  handleClose: () => void
+  closer: () => void
 };
+
+const ModalController: FC<modalControllerProps> = ({content, display, closer}): JSX.Element => {
+  if (display) {
+    return <Modal content={content} closer={closer}/>;
+  } else {
+    return <></>;
+  }
+}
 
 /*!
  * @author yochoi
- * @brief 함수 컴포넌트를 모달 형태로 띄워주는 컴포넌트
- * @param[in] props.content 모달 안에 들어갈 함수형 컴포넌트
- * @param[in] props.display 모달을 display 할지 여부, 상위 컴포넌트에서 State로 컨트롤 해야함
- * @param[in] props.handleClose 상위 컴포넌트의 modalDisplay State를 컨트롤 해줄 함수
+ * @brief FC를 Modal 형태로 띄워주는 컴포넌트
+ * @param[in] content: Modal 안에 들어갈 함수형 컴포넌트
+ * @param[in] closer: Modal 의 상위 컴포넌트에서 display를 제어해줄 함수
  */
 
-const Modal = (props: modalProps): JSX.Element => {
+interface modalPros {
+  content: FC,
+  closer: () => void
+}
 
-  const display: string = `${props.display ? 'display-block' : 'display-none'}`;
-
+const Modal: FC<modalPros> = ({content, closer}): JSX.Element => {
   return (
-    <div className={"modal " + display}>
-      <div className="modal content">
-        <img src="./public/closeWindow.png" onClick={props.handleClose} alt="close" />
-        {props.content({})}
+    <div id="modal">
+      <div id="content">
+        <img src="./public/closeWindow.png" onClick={closer}alt="close" />
+        {content({})}
       </div>
     </div>
   );
 }
 
-export { Modal, ConfigContent };
+export { ModalController, ConfigContent };

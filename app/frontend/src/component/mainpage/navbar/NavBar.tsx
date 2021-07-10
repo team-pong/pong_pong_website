@@ -1,5 +1,5 @@
 import { MouseEvent, useEffect, useState } from "react";
-import { Modal, ConfigContent } from "../../modal/Modal";
+import { ModalController, ConfigContent } from "../../modal/Modal";
 import "/src/scss/NavBar.scss";
 
 interface navBarProps {
@@ -101,10 +101,10 @@ const NavBar = (props: navBarProps): JSX.Element => {
           alt="Config"
           onClick={() => setIsConfigOpen(true)}
         />
-        <Modal
+        <ModalController
           content={ConfigContent}
           display={isConfigOpen}
-          handleClose={() => setIsConfigOpen(false)}
+          closer={() => setIsConfigOpen(false)}
         />
       </div>
     </nav>
