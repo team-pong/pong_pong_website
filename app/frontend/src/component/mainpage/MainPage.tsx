@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Modal } from '../modal/Modal'
+import { ModalController } from '../modal/Modal'
 import NavBar from './navbar/NavBar'
 import '/src/scss/MainPage.scss'
 import EasyFetch from './../../utils/EasyFetch';
@@ -40,9 +40,9 @@ const MainPage = (): JSX.Element => {
       <button id="game" onClick={() => setIsGameOpen(true)}>
         <img src="https://img.icons8.com/ios/50/000000/head-to-head.png"/>
       </button>
-      <Modal content={() => <h1>Record</h1>} display={isRecordOpen} handleClose={() => setIsRecordOpen(false)}/>
-      <Modal content={() => <h1>Chat</h1>} display={isChatOpen} handleClose={() => setIsChatOpen(false)}/>
-      <Modal content={() => <h1>Game</h1>} display={isGameOpen} handleClose={() => setIsGameOpen(false)}/>
+      <ModalController content={() => <h1>Record</h1>} display={isRecordOpen} closer={() => setIsRecordOpen(false)}/>
+      <ModalController content={() => <h1>Chat</h1>} display={isChatOpen} closer={() => setIsChatOpen(false)}/>
+      <ModalController content={() => <h1>Game</h1>} display={isGameOpen} closer={() => setIsGameOpen(false)}/>
     </>
   );
 }
