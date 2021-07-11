@@ -40,7 +40,6 @@ const NavBar = (props: navBarProps): JSX.Element => {
 
   //semantic tag <nav> 사용함
   return (
-<<<<<<< HEAD
     <nav className="menu">
       <header className="avatar">
         <img id="avartarImg" src={props.avartarImgUrl} alt="Avatar" />
@@ -52,53 +51,11 @@ const NavBar = (props: navBarProps): JSX.Element => {
         <li onClick={() => setIsConfigOpen(true)} className="icon-match-game"><span>Match Game</span></li>
         <li onClick={() => setIsConfigOpen(true)} className="icon-settings"><span>Settings</span></li>
       </ul>
-      <Modal 
+      <ModalController 
         content={ConfigContent}
         display={isConfigOpen}
-        handleClose={() => setIsConfigOpen(false)}/>
-=======
-    <nav>
-      <div className="navbar">
-        <ul>
-          <li><a href="">Match Making</a></li>
-          <li><a href="">History</a></li>
-          <li><a href="">Chat</a></li>
-        </ul>
-        <img
-          src={props.avartarImgUrl}
-          id="avartarImg"
-          alt="Avatar"
-          onClick={() => setIsSideMenuOpen(!isSideMenuOpen)}
-        />
-      </div>
-      <div id="sidemenu">
-        <ul id="friendlist">
-          {props.friends.map((friend, i: number) => (
-            <li
-              id={`friend-list-${friend.name}`}
-              onClick={(e) => showFriendContextMenu(e, friend.name)}
-              key={friend.name}
-            >
-              <img src={friend.avatarURL} /> {friend.name}/{friend.state}
-            </li>
-          ))}
-        </ul>
-        <ul id="friendcontextmenu">
-          <li onClick={sendMessage}>메세지보내기</li>
-          <li onClick={deleteFriend}>친구삭제</li>
-        </ul>
-        <img
-          src="./public/config.png"
-          alt="Config"
-          onClick={() => setIsConfigOpen(true)}
-        />
-        <ModalController
-          content={ConfigContent}
-          display={isConfigOpen}
-          closer={() => setIsConfigOpen(false)}
-        />
-      </div>
->>>>>>> f74b32f044814a97e7b63915fd14be310b45ff43
+        closer={() => setIsConfigOpen(false)}
+      />
     </nav>
   );
 };

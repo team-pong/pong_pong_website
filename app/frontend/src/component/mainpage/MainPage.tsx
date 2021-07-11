@@ -31,7 +31,6 @@ const MainPage = (): JSX.Element => {
       <NavBar
         avartarImgUrl="https://static.coindesk.com/wp-content/uploads/2021/04/dogecoin.jpg"
         friends={testFriendList} />
-<<<<<<< HEAD
       <main>
         <div id="button-container">
           <div className="buttons" id="record" onClick={() => setIsRecordOpen(true)}>
@@ -47,24 +46,10 @@ const MainPage = (): JSX.Element => {
             <span>To match a new game, click me!</span>
           </div>
         </div>
-        <Modal content={() => <h1>Record</h1>} display={isRecordOpen} handleClose={() => setIsRecordOpen(false)}/>
-        <Modal content={() => <h1>Chat</h1>} display={isChatOpen} handleClose={() => setIsChatOpen(false)}/>
-        <Modal content={() => <h1>Game</h1>} display={isGameOpen} handleClose={() => setIsGameOpen(false)}/>
+        <ModalController content={() => <h1>Record</h1>} display={isRecordOpen} closer={() => setIsRecordOpen(false)}/>
+        <ModalController content={() => <h1>Chat</h1>} display={isChatOpen} closer={() => setIsChatOpen(false)}/>
+        <ModalController content={() => <h1>Game</h1>} display={isGameOpen} closer={() => setIsGameOpen(false)}/>
       </main>
-=======
-      <button id="record" onClick={() => setIsRecordOpen(true)}>
-        <img src="https://img.icons8.com/ios/50/000000/-scoreboard-.png"/>
-      </button>
-      <button id="chat" onClick={() => setIsChatOpen(true)}>
-        <img src="https://img.icons8.com/ios/50/000000/chat--v1.png"/>
-      </button>
-      <button id="game" onClick={() => setIsGameOpen(true)}>
-        <img src="https://img.icons8.com/ios/50/000000/head-to-head.png"/>
-      </button>
-      <ModalController content={() => <h1>Record</h1>} display={isRecordOpen} closer={() => setIsRecordOpen(false)}/>
-      <ModalController content={() => <h1>Chat</h1>} display={isChatOpen} closer={() => setIsChatOpen(false)}/>
-      <ModalController content={() => <h1>Game</h1>} display={isGameOpen} closer={() => setIsGameOpen(false)}/>
->>>>>>> f74b32f044814a97e7b63915fd14be310b45ff43
     </>
   );
 }
