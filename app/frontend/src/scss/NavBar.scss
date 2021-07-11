@@ -5,7 +5,6 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 5;
   outline: none;
 
   .avatar {
@@ -107,9 +106,10 @@
         background-position: center center;
         background-size: 30px auto;
         position: relative;
+        margin-top: 20px;
+        padding: 0.8em;
 
         span {
-          //display:none;
           opacity: 0;
           position: absolute;
           background: rgba(0, 0, 0, 0.5);
@@ -118,7 +118,7 @@
           top: 50%;
           left: 90px - 10px;
           transform: translate3d(-15px, -50%, 0);
-          transition: all 0.15s ease-in-out;
+          transition: all 0.25s ease-in-out;
 
           &:before {
             content: "";

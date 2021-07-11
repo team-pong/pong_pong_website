@@ -1,24 +1,29 @@
 import { useState, useEffect } from "react";
-import { ModalController } from '../modal/Modal'
+import { ModalController, ConfigContent } from '../modal/Modal'
 import NavBar from './navbar/NavBar'
 import '/src/scss/MainPage.scss'
 import EasyFetch from './../../utils/EasyFetch';
 import { testFriendList } from './dummyData'
+
+/*!
+ * @author yochoi, donglee
+ * @brief NavBar를 상시 보이게 하고 Record, Match-game, Chat 모달 버튼이 있는 메인페이지
+ */
 
 const MainPage = (): JSX.Element => {
 
   const [isRecordOpen, setIsRecordOpen] = useState(false); // 전적 모달을 위한 State
   const [isChatOpen, setIsChatOpen] = useState(false); // 채팅 모달을 위한 State
   const [isGameOpen, setIsGameOpen] = useState(false); // 게임, 매치메이킹 모달을 위한 State
+  const [isConfigOpen, setIsConfigOpen] = useState(false);
 
   useEffect(() => {
-
     const postAuthCodeToBackend = async () => {
       let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
       const easyfetch = new EasyFetch('http://127.0.0.1:3001/api/oauth', 'POST');
       await easyfetch.fetch({code: searchParams.get('code')});
     }
-
+    
     try {
       postAuthCodeToBackend();
     } catch (error) {
@@ -30,7 +35,11 @@ const MainPage = (): JSX.Element => {
     <>
       <NavBar
         avartarImgUrl="https://static.coindesk.com/wp-content/uploads/2021/04/dogecoin.jpg"
-        friends={testFriendList} />
+        friends={testFriendList}
+        setIsRecordOpen={setIsRecordOpen}
+        setIsGameOpen={setIsGameOpen}
+        setIsConfigOpen={setIsConfigOpen}
+      />
       <main>
         <div id="button-container">
           <div className="buttons" id="record" onClick={() => setIsRecordOpen(true)}>
@@ -49,6 +58,7 @@ const MainPage = (): JSX.Element => {
         <ModalController content={() => <h1>Record</h1>} display={isRecordOpen} closer={() => setIsRecordOpen(false)}/>
         <ModalController content={() => <h1>Chat</h1>} display={isChatOpen} closer={() => setIsChatOpen(false)}/>
         <ModalController content={() => <h1>Game</h1>} display={isGameOpen} closer={() => setIsGameOpen(false)}/>
+        <ModalController content={ConfigContent} display={isConfigOpen} closer={() => setIsConfigOpen(false)}/>
       </main>
     </>
   );

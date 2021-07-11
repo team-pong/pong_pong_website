@@ -7,14 +7,13 @@ body{
 }
 
 main{
-	// position:flex;
 	height:100vh;
 	#button-container {
 		display: flex;
 		margin-left: 240px;
 		#record {
 			margin-left: 30px;
-		}
+		} 
 		#game {
 			margin-right: 30px;
 		}
