@@ -31,18 +31,25 @@ const MainPage = (): JSX.Element => {
       <NavBar
         avartarImgUrl="https://static.coindesk.com/wp-content/uploads/2021/04/dogecoin.jpg"
         friends={testFriendList} />
-      <button id="record" onClick={() => setIsRecordOpen(true)}>
-        <img src="https://img.icons8.com/ios/50/000000/-scoreboard-.png"/>
-      </button>
-      <button id="chat" onClick={() => setIsChatOpen(true)}>
-        <img src="https://img.icons8.com/ios/50/000000/chat--v1.png"/>
-      </button>
-      <button id="game" onClick={() => setIsGameOpen(true)}>
-        <img src="https://img.icons8.com/ios/50/000000/head-to-head.png"/>
-      </button>
-      <Modal content={() => <h1>Record</h1>} display={isRecordOpen} handleClose={() => setIsRecordOpen(false)}/>
-      <Modal content={() => <h1>Chat</h1>} display={isChatOpen} handleClose={() => setIsChatOpen(false)}/>
-      <Modal content={() => <h1>Game</h1>} display={isGameOpen} handleClose={() => setIsGameOpen(false)}/>
+      <main>
+        <div id="button-container">
+          <div className="buttons" id="record" onClick={() => setIsRecordOpen(true)}>
+            Record
+            <span>To see the records of game, click me!</span>
+          </div>
+          <div className="buttons" id="chat" onClick={() => setIsChatOpen(true)}>
+            Chat
+            <span>To start a chatting with friends, click me!</span>
+          </div>
+          <div className="buttons" id="game" onClick={() => setIsGameOpen(true)}>
+            Game
+            <span>To match a new game, click me!</span>
+          </div>
+        </div>
+        <Modal content={() => <h1>Record</h1>} display={isRecordOpen} handleClose={() => setIsRecordOpen(false)}/>
+        <Modal content={() => <h1>Chat</h1>} display={isChatOpen} handleClose={() => setIsChatOpen(false)}/>
+        <Modal content={() => <h1>Game</h1>} display={isGameOpen} handleClose={() => setIsGameOpen(false)}/>
+      </main>
     </>
   );
 }
