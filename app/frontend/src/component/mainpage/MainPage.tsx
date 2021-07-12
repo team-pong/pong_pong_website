@@ -56,7 +56,7 @@ const MainPage = (): JSX.Element => {
           </div>
         </div>
         <ModalController content={() => <h1>Record</h1>} display={isRecordOpen} closer={() => setIsRecordOpen(false)}/>
-        <ModalController content={() => <h1>Chat</h1>} display={isChatOpen} closer={() => setIsChatOpen(false)}/>
+        <ModalController content={ChatContent} display={isChatOpen} closer={() => setIsChatOpen(false)}/>
         <ModalController content={() => <h1>Game</h1>} display={isGameOpen} closer={() => setIsGameOpen(false)}/>
         <ModalController content={ConfigContent} display={isConfigOpen} closer={() => setIsConfigOpen(false)}/>
       </main>
