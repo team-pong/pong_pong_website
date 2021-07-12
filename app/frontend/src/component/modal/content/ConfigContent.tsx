@@ -3,9 +3,9 @@
  * @brief Modal 안에 들어갈 config content
  */
 
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 
-const ConfigContent = (): JSX.Element => {
+const ConfigContent: FC = (): JSX.Element => {
 
   const [imageURL, setImageURL] = useState("");
   const [nickName, setNickName] = useState("");
