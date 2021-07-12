@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import "/src/scss/Modal.scss";
 
+import ChatContent from './content/ChatContent';
 import ConfigContent from './content/ConfigContent'
 
 /*!
@@ -56,4 +57,4 @@ const Modal: FC<modalPros> = ({content, closer}): JSX.Element => {
   );
 }
 
-export { ModalController, ConfigContent };
+export { ModalController, ChatContent, ConfigContent };
