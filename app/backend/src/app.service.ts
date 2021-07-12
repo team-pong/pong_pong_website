@@ -59,6 +59,14 @@ export class AppService {
     }
   }
 
+  /*!
+   * @author hna
+   * @param[in] sessionID 문자열 세션 아이디
+   * @param[in] response 세션 검증 결과를 담아서 보낼 response 객체
+   * @param[out] {response: "invalid"} | {response: "ok"}
+   * @brief 입력받은 세션 ID가 유효한지 체크해서 Body에 결과를 담는다
+   * @detail DB의 session 테이블에 해당 sid가 있는지 확인한다. 
+   */
   public async sessionValidCheck(sessionID: string, response: Response) {
     try {
       const client = new Client(db);

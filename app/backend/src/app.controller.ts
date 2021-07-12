@@ -23,12 +23,6 @@ export class AppController {
     return this.appService.sessionValidCheck(request.sessionID, response);
   }
 
-  @Get("cookie")
-  cookie(@Res({ passthrough: true }) response: Response) {
-    response.cookie('key_test', 'value_test');
-    return ('hi');
-  }
-
   // request.headers['set-cookie'][0] : 'sessionID=8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92; Path=/; HttpOnly; Secure; SameSite=None' 
   // request.headers['set-cookie'][0].split(";")[0] : 'sessionID=8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92
   // request.headers['set-cookie'][0].split(";")[0].split("=")[1] : 8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92
