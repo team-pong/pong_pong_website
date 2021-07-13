@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from "react";
 import "/src/scss/Modal.scss";
 
-import ConfigContent from './content/ConfigContent'
+import ConfigContent from "./content/ConfigContent";
 
 /*!
  * @author yochoi
@@ -12,18 +12,22 @@ import ConfigContent from './content/ConfigContent'
  */
 
 interface modalControllerProps {
-  content: FC,
-  display: boolean,
-  closer: () => void
-};
+  content: FC;
+  display: boolean;
+  closer: () => void;
+}
 
-const ModalController: FC<modalControllerProps> = ({content, display, closer}): JSX.Element => {
+const ModalController: FC<modalControllerProps> = ({
+  content,
+  display,
+  closer,
+}): JSX.Element => {
   if (display) {
-    return <Modal content={content} closer={closer}/>;
+    return <Modal content={content} closer={closer} />;
   } else {
     return <></>;
   }
-}
+};
 
 /*!
  * @author yochoi
@@ -33,18 +37,56 @@ const ModalController: FC<modalControllerProps> = ({content, display, closer}): 
  */
 
 interface modalPros {
-  content: FC,
-  closer: () => void
+  content: FC;
+  closer: () => void;
 }
 
-const Modal: FC<modalPros> = ({content, closer}): JSX.Element => {
-
+const Modal: FC<modalPros> = ({ content, closer }): JSX.Element => {
   const detectOutsideOfModal = (e: React.MouseEvent) => {
     e.preventDefault();
     if (e.target === e.currentTarget) {
       closer();
     }
-  }
+  };
+
+  /*!
+  * @author donglee
+  * @brief 모달 컴포넌트 활성화시 ESC 키 누르면 컴포넌트가 닫힘
+  */
+  const detectESC = (e: KeyboardEvent) => {
+    console.log("key!!");
+    if (e.key === "Escape") {
+      closer();
+    }
+  };
+
+  // document.addEventListener("keyup", detectESC);
+
+  /*!
+  * @author donglee
+  * @brief 모달 컴포넌트 style만 바꿔주는 animation 함수
+  */
+  const showAnimatedModal = () => {
+    const modal = document.getElementById("modal");
+    const content = document.getElementById("content");
+
+    modal.style.opacity = "1";
+    modal.style.transition = "all 300ms ease-in-out";
+    content.style.opacity = "1";
+    content.style.transition =
+      "opacity 250ms 500ms ease, transform 350ms 500ms ease";
+    content.style.transform = "scale(1)";
+  };
+
+  useEffect(() => {
+    showAnimatedModal();
+    
+    // document.addEventListener("keyup", detectESC);
+    // return document.removeEventListener("keyup", detectESC);
+    /* 이벤트리스너를 지워줘야 하는데 어떻게 하면 좋을까?
+      그리고 애니메이션 사라지는것도 구현하고 싶은데?
+    */
+  }, []);
 
   return (
     <div id="modal" onClick={detectOutsideOfModal}>
@@ -54,6 +96,6 @@ const Modal: FC<modalPros> = ({content, closer}): JSX.Element => {
       </div>
     </div>
   );
-}
+};
 
 export { ModalController, ConfigContent };
