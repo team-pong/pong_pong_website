@@ -55,13 +55,10 @@ const Modal: FC<modalPros> = ({ content, closer }): JSX.Element => {
   * @brief 모달 컴포넌트 활성화시 ESC 키 누르면 컴포넌트가 닫힘
   */
   const detectESC = (e: KeyboardEvent) => {
-    console.log("key!!");
     if (e.key === "Escape") {
       closer();
     }
   };
-
-  // document.addEventListener("keyup", detectESC);
 
   /*!
   * @author donglee
@@ -81,12 +78,8 @@ const Modal: FC<modalPros> = ({ content, closer }): JSX.Element => {
 
   useEffect(() => {
     showAnimatedModal();
-    
-    // document.addEventListener("keyup", detectESC);
-    // return document.removeEventListener("keyup", detectESC);
-    /* 이벤트리스너를 지워줘야 하는데 어떻게 하면 좋을까?
-      그리고 애니메이션 사라지는것도 구현하고 싶은데?
-    */
+    document.addEventListener("keyup", detectESC);
+    return () => document.removeEventListener("keyup", detectESC);
   }, []);
 
   return (
