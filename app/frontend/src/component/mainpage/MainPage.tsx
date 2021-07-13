@@ -43,16 +43,16 @@ const MainPage = (): JSX.Element => {
       <main>
         <div id="button-container">
           <div className="buttons" id="record" onClick={() => setIsRecordOpen(true)}>
-            Record
-            <span>To see the records of game, click me!</span>
+            전적
+            <span>게임 전적을 보려면 누르세요!</span>
           </div>
           <div className="buttons" id="chat" onClick={() => setIsChatOpen(true)}>
-            Chat
-            <span>To start a chatting with friends, click me!</span>
+            채팅
+            <span>친구와 채팅을 하려면 누르세요!</span>
           </div>
           <div className="buttons" id="game" onClick={() => setIsGameOpen(true)}>
-            Game
-            <span>To match a new game, click me!</span>
+            게임
+            <span>게임을 하려면 누르세요!</span>
           </div>
         </div>
         <ModalController content={() => <h1>Record</h1>} display={isRecordOpen} closer={() => setIsRecordOpen(false)}/>
