@@ -60,10 +60,10 @@ const NavBar = (props: navBarProps): JSX.Element => {
         <h2>DomHardy</h2>
       </header>
       <ul>
-        <li onClick={() => props.setIsConfigOpen(true)} className="icon-users"><span>친구</span></li>
-        <li onClick={() => props.setIsRecordOpen(true)} className="icon-record"><span>전적</span></li>
-        <li onClick={() => props.setIsGameOpen(true)} className="icon-match-game"><span>게임하기</span></li>
-        <li onClick={() => props.setIsConfigOpen(true)} className="icon-settings"><span>설정</span></li>
+        <li onClick={() => props.setIsConfigOpen(true)} className="icon-users"><img src="./public/users.svg"/><span>친구</span></li>
+        <li onClick={() => props.setIsRecordOpen(true)} className="icon-record"><img src="./public/line-graph.svg"/><span>전적</span></li>
+        <li onClick={() => props.setIsGameOpen(true)} className="icon-match-game"><img src="./public/controller-play.svg"/><span>게임하기</span></li>
+        <li onClick={() => props.setIsConfigOpen(true)} className="icon-settings"><img src="./public/tools.svg"/><span>설정</span></li>
       </ul>
     </nav>
   );
