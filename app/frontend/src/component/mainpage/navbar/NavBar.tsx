@@ -1,5 +1,77 @@
-import { MouseEvent } from "react";
+import { MouseEvent, FC, useState } from "react";
 import "/src/scss/NavBar.scss";
+
+/*!
+ * @author yochoi
+ * @brief props 로 x, y 좌표를 받아 해당 위치에 context menu를 띄우는 컴포넌트
+ * @param[in] x context menu의 x 좌표
+ * @param[in] y context menu의 y 좌표
+ */
+
+interface contextMenuProps {
+  target: string,
+  x: number,
+  y: number
+}
+
+const ContextMenu: FC<contextMenuProps> = ({target, x, y}): JSX.Element => {
+  return (
+    <ul id="context-menu" style={{ top: y, left: x, }}>
+      <li onClick={() => console.log(`message to ${target}`)}>메세지 보내기</li>
+      <li onClick={() => console.log(`delete ${target}`)}>친구 삭제하기</li>
+    </ul>
+  );
+}
+
+/*!
+ * @author yochoi
+ * @brief friend list 를 div로 감싸 반환하는 FC
+ * @param[in] friends friend 객체의 배열
+ */
+
+interface friend {
+  name: string,
+  state: string,
+  avatarURL: string
+}
+
+interface friendListProps {
+  friends: friend[]
+}
+
+const FriendList: FC<friendListProps> = (props): JSX.Element => {
+
+  const [contextMenuInfo, setContextMenuInfo] = useState<{isOpen: boolean, target: string, xPos: number, yPos: number}>({
+    isOpen: false,
+    target: "",
+    xPos: 0,
+    yPos: 0
+  });
+
+  const friendOnClick = (e: MouseEvent, target: string) => {
+    setContextMenuInfo({
+      isOpen: !contextMenuInfo.isOpen,
+      target: target,
+      xPos: e.pageX,
+      yPos: e.pageY
+    });
+  }
+
+  const friendListGenerator = (friend: friend, keyIdx: number) => {
+    return (
+      <div className="friend" key={keyIdx} onClick={(e) => friendOnClick(e, friend.name)}>
+        <img src={friend.avatarURL}/>{friend.name}
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {props.friends.map(friendListGenerator)}
+      {contextMenuInfo.isOpen ? <ContextMenu target={contextMenuInfo.target} x={contextMenuInfo.xPos} y={contextMenuInfo.yPos}/> : <></>}
+    </>
+  );
+}
 
 /*!
  * @author donglee
@@ -23,36 +95,9 @@ interface navBarProps {
 }
 
 const NavBar = (props: navBarProps): JSX.Element => {
-  let targetUser = "";
 
-  /* LEGACY: 컨텍스트 메뉴를 나중에 활용할 때 쓰일 코드 일단 주석처리 */
-  
-  // const showFriendContextMenu = (e: MouseEvent, target: string) => {
-  //   const contextMenu = document.getElementById("friendcontextmenu");
+  const [isFriendListOpen, setIsFriendListOpen] = useState(false);
 
-  //   targetUser = target;
-  //   if (contextMenu.style.display === "none" || !contextMenu.style.display) {
-  //     contextMenu.style.display = "block";
-  //     contextMenu.style.top = e.pageY + "px";
-  //     contextMenu.style.left = e.pageX + "px";
-  //     document.getElementById("sidemenu").style.overflow = "hidden";
-  //   } else {
-  //     contextMenu.style.display = "none";
-  //     document.getElementById("sidemenu").style.removeProperty("overflow");
-  //     targetUser = "";
-  //   }
-  // };
-
-  // const sendMessage = (e: MouseEvent) => {
-  //   console.log("sendMessage", targetUser);
-  // };
-
-  // const deleteFriend = (e: MouseEvent) => {
-  //   console.log("deleteFriend", targetUser);
-  // };
-
-  //semantic tag <nav> 사용함
-  //TODO: Users 클릭시 친구 목록이 보여야 함. 테스트용으로 Config 모달 뜨게 해 놓음.
   return (
     <nav className="menu">
       <header className="avatar">
@@ -60,7 +105,8 @@ const NavBar = (props: navBarProps): JSX.Element => {
         <h2>DomHardy</h2>
       </header>
       <ul>
-        <li onClick={() => props.setIsConfigOpen(true)} className="icon-users"><img src="./public/users.svg"/><span>친구</span></li>
+        <li onClick={() => setIsFriendListOpen(!isFriendListOpen)} className="icon-users"><img src="./public/users.svg"/><span>친구</span></li>
+        {isFriendListOpen ? <FriendList friends={props.friends}/> : <></>}
         <li onClick={() => props.setIsRecordOpen(true)} className="icon-record"><img src="./public/line-graph.svg"/><span>전적</span></li>
         <li onClick={() => props.setIsGameOpen(true)} className="icon-match-game"><img src="./public/controller-play.svg"/><span>게임하기</span></li>
         <li onClick={() => props.setIsConfigOpen(true)} className="icon-settings"><img src="./public/tools.svg"/><span>설정</span></li>
