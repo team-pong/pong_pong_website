@@ -1,4 +1,4 @@
-import { MouseEvent } from "react";
+import React, { MouseEvent, SyntheticEvent } from "react";
 import "/src/scss/NavBar.scss";
 
 /*!
@@ -24,6 +24,17 @@ interface navBarProps {
 
 const NavBar = (props: navBarProps): JSX.Element => {
   let targetUser = "";
+
+  const showAddFriend = (e: MouseEvent) => {
+    e.stopPropagation();  //icon-plus 클릭시 모달창까지 뜨는 것 방지 
+    /*TODO: input화면 보이게 하는 코드 */
+    document.getElementById("input-add-friend").style.transform = "scale(1)";
+  };
+
+  const addFriend = (e: SyntheticEvent) => {
+    e.preventDefault(); //페이지 새로고침 예방
+    /* submit button이 있어야될듯 */
+  };
 
   /* LEGACY: 컨텍스트 메뉴를 나중에 활용할 때 쓰일 코드 일단 주석처리 */
   
@@ -60,10 +71,26 @@ const NavBar = (props: navBarProps): JSX.Element => {
         <h2>DomHardy</h2>
       </header>
       <ul>
-        <li onClick={() => props.setIsConfigOpen(true)} className="icon-users"><img src="./public/users.svg"/><span>친구</span></li>
-        <li onClick={() => props.setIsRecordOpen(true)} className="icon-record"><img src="./public/line-graph.svg"/><span>전적</span></li>
-        <li onClick={() => props.setIsGameOpen(true)} className="icon-match-game"><img src="./public/controller-play.svg"/><span>게임하기</span></li>
-        <li onClick={() => props.setIsConfigOpen(true)} className="icon-settings"><img src="./public/tools.svg"/><span>설정</span></li>
+        <li onClick={() => props.setIsConfigOpen(true)}>
+          <img src="./public/users.svg"/>
+          <span>친구</span>
+          <img id="icon-plus" onClick={showAddFriend} src="./public/plus.svg"/>
+          <form onSubmit={addFriend}>
+            <input id="input-add-friend" type="type" onClick={(e: MouseEvent) => e.stopPropagation()} required placeholder="추가할 닉네임을 입력하세요" />
+          </form>
+        </li>
+        <li onClick={() => props.setIsRecordOpen(true)}>
+          <img src="./public/line-graph.svg"/>
+          <span>전적</span>
+        </li>
+        <li onClick={() => props.setIsGameOpen(true)}>
+          <img src="./public/controller-play.svg"/>
+          <span>게임하기</span>
+        </li>
+        <li onClick={() => props.setIsConfigOpen(true)}>
+          <img src="./public/tools.svg"/>
+          <span>설정</span>
+        </li>
       </ul>
     </nav>
   );
