@@ -1,4 +1,4 @@
-import { MouseEvent, FC, useState } from "react";
+import { MouseEvent, FC, useState, useEffect } from "react";
 import "/src/scss/NavBar.scss";
 
 /*!
@@ -64,6 +64,32 @@ const FriendList: FC<friendListProps> = (props): JSX.Element => {
       </div>
     );
   };
+
+  useEffect(() => {
+    const detectOutSide = (e: any) => {
+      if (!document.getElementById("context-menu")) return;
+      if (!document.getElementById("context-menu").contains(e.target)) setContextMenuInfo({
+        isOpen: false,
+        target: "",
+        xPos: 0,
+        yPos: 0
+      })
+    }
+    const detectESC = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setContextMenuInfo({
+        isOpen: false,
+        target: "",
+        xPos: 0,
+        yPos: 0
+      })
+    };
+    addEventListener("keyup", detectESC);
+    addEventListener("mousedown", detectOutSide);
+    return (() => {
+      removeEventListener("keyup", detectESC);
+      removeEventListener("mousedown", detectOutSide);
+    });
+  }, []);
 
   return (
     <>
