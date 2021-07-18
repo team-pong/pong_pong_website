@@ -1,103 +1,6 @@
-import { MouseEvent, FC, useState, useEffect } from "react";
+import { FC, useState } from "react";
+import FriendList from "./friendlist/FriendList";
 import "/src/scss/NavBar.scss";
-
-/*!
- * @author yochoi
- * @brief props 로 x, y 좌표를 받아 해당 위치에 context menu를 띄우는 컴포넌트
- * @param[in] x context menu의 x 좌표
- * @param[in] y context menu의 y 좌표
- */
-
-interface contextMenuProps {
-  target: string,
-  x: number,
-  y: number
-}
-
-const ContextMenu: FC<contextMenuProps> = ({target, x, y}): JSX.Element => {
-  return (
-    <ul id="context-menu" style={{ top: y, left: x, }}>
-      <li onClick={() => console.log(`message to ${target}`)}>메세지 보내기</li>
-      <li onClick={() => console.log(`delete ${target}`)}>친구 삭제하기</li>
-    </ul>
-  );
-}
-
-/*!
- * @author yochoi
- * @brief friend list 를 div로 감싸 반환하는 FC
- * @param[in] friends friend 객체의 배열
- */
-
-interface friend {
-  name: string,
-  state: string,
-  avatarURL: string
-}
-
-interface friendListProps {
-  friends: friend[]
-}
-
-const FriendList: FC<friendListProps> = (props): JSX.Element => {
-
-  const [contextMenuInfo, setContextMenuInfo] = useState<{isOpen: boolean, target: string, xPos: number, yPos: number}>({
-    isOpen: false,
-    target: "",
-    xPos: 0,
-    yPos: 0
-  });
-
-  const friendOnClick = (e: MouseEvent, target: string) => {
-    setContextMenuInfo({
-      isOpen: !contextMenuInfo.isOpen,
-      target: target,
-      xPos: e.pageX,
-      yPos: e.pageY
-    });
-  }
-
-  const friendListGenerator = (friend: friend, keyIdx: number) => {
-    return (
-      <div className="friend" key={keyIdx} onClick={(e) => friendOnClick(e, friend.name)}>
-        <img src={friend.avatarURL}/>{friend.name}
-      </div>
-    );
-  };
-
-  useEffect(() => {
-    const detectOutSide = (e: any) => {
-      if (!document.getElementById("context-menu")) return;
-      if (!document.getElementById("context-menu").contains(e.target)) setContextMenuInfo({
-        isOpen: false,
-        target: "",
-        xPos: 0,
-        yPos: 0
-      })
-    }
-    const detectESC = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setContextMenuInfo({
-        isOpen: false,
-        target: "",
-        xPos: 0,
-        yPos: 0
-      })
-    };
-    addEventListener("keyup", detectESC);
-    addEventListener("mousedown", detectOutSide);
-    return (() => {
-      removeEventListener("keyup", detectESC);
-      removeEventListener("mousedown", detectOutSide);
-    });
-  }, []);
-
-  return (
-    <>
-      {props.friends.map(friendListGenerator)}
-      {contextMenuInfo.isOpen ? <ContextMenu target={contextMenuInfo.target} x={contextMenuInfo.xPos} y={contextMenuInfo.yPos}/> : <></>}
-    </>
-  );
-}
 
 /*!
  * @author donglee
@@ -120,7 +23,7 @@ interface navBarProps {
   setIsConfigOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NavBar = (props: navBarProps): JSX.Element => {
+const NavBar: FC<navBarProps> = (props): JSX.Element => {
 
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
 
