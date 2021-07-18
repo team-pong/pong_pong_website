@@ -56,6 +56,11 @@ friend
 |/users/info|POST|유저 수정|`{user_id: string, nickname: string, avatar_url: string}`|empty|
 |/users/info|DELETE|유저 제거|empty|`{user_id: string, nickname: string, avatar_url: string}`|
 
+## 세션 검증
+|url|method|description|request|response|
+|------|---|---|----|----|
+|/auth/valid|GET|세션 검증|`cookie: {connect.sid: string}`|`{response: "ok" | "invalid"}`|
+
 <details>
 <summary>구현 예정</summary>
 <div markdown="1">

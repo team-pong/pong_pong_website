@@ -18,10 +18,9 @@ export class AppController {
     }
   }
 
-  @Get("cookie")
-  cookie(@Res({ passthrough: true }) response: Response) {
-    response.cookie('key_test', 'value_test');
-    return ('hi');
+  @Get("/auth/valid")
+  isValidSession(@Req() request: Request, @Res() response: Response) {
+    return this.appService.sessionValidCheck(request.sessionID, response);
   }
 
   // request.headers['set-cookie'][0] : 'sessionID=8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92; Path=/; HttpOnly; Secure; SameSite=None' 
