@@ -59,7 +59,7 @@ friend
 ## 세션 검증
 |url|method|description|request|response|
 |------|---|---|----|----|
-|/auth/valid|GET|세션 검증|`cookie: {connect.sid: string}`|`{response: "ok" | "invalid"}`|
+|/auth/valid|GET|세션 검증|`cookie: {connect.sid: string}`|`{response: "ok" \| "invalid"}`|
 
 <details>
 <summary>구현 예정</summary>
