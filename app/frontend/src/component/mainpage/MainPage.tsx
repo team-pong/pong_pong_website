@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { ModalController, ChatContent, ConfigContent } from '../modal/Modal'
 import NavBar from './navbar/NavBar'
 import '/src/scss/MainPage.scss'
-import EasyFetch from './../../utils/EasyFetch';
 import { testFriendList } from './dummyData'
+import verifyLogin from "../../utils/verifyLogin";
 
 /*!
  * @author yochoi, donglee
@@ -15,21 +15,19 @@ const MainPage = (): JSX.Element => {
   const [isRecordOpen, setIsRecordOpen] = useState(false); // 전적 모달을 위한 State
   const [isChatOpen, setIsChatOpen] = useState(false); // 채팅 모달을 위한 State
   const [isGameOpen, setIsGameOpen] = useState(false); // 게임, 매치메이킹 모달을 위한 State
-  const [isConfigOpen, setIsConfigOpen] = useState(false);
+  const [isConfigOpen, setIsConfigOpen] = useState(false); // 설정 모달을 위한 State
 
   useEffect(() => {
-    const postAuthCodeToBackend = async () => {
-      let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
-      const easyfetch = new EasyFetch('http://127.0.0.1:3001/api/oauth', 'POST');
-      await easyfetch.fetch({code: searchParams.get('code')});
-    }
-    
     try {
-      postAuthCodeToBackend();
+      let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
+      verifyLogin(new URLSearchParams(window.location.search).get('code'))
+      .then(res => {
+        if (!res) window.location.href = "http://127.0.0.1:3000/"
+      });
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  });
 
   return (
     <>
