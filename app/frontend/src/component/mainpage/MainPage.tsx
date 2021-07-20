@@ -19,8 +19,9 @@ const MainPage = (): JSX.Element => {
 
   useEffect(() => {
     try {
-      let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
-      verifyLogin(new URLSearchParams(window.location.search).get('code'))
+      let accessCode: string = new URLSearchParams(window.location.search).get('code');
+      window.history.pushState({}, document.title, "/" + "mainpage");
+      verifyLogin(accessCode)
       .then(res => {
         if (!res) window.location.href = "http://127.0.0.1:3000/"
       });
