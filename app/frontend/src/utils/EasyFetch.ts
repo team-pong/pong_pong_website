@@ -16,7 +16,8 @@ class EasyFetch {
     this.method = method || 'GET';
   }
 
-  fetch(body: Object, header?: Object): Promise<Response> {
+  fetch(body?: Object, header?: Object): Promise<Response> {
+    if (!body) body = {};
     if (!header) {
       header = {
         'Content-Type': 'application/json',
@@ -26,10 +27,9 @@ class EasyFetch {
     const fetchOption: any = {
       method: this.method,
       headers: header,
-      origin: "http://127.0.0.1:3000",
       credentials: 'include',
-      body: JSON.stringify(body)
     }
+    if (this.method !== 'GET') fetchOption.body = JSON.stringify(body);
     return fetch(this.targetURL, fetchOption);
   }
 }
