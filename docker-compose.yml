@@ -28,9 +28,13 @@ services:
       && ./node_modules/@nestjs/cli/bin/nest.js start -w"
 
   db:
-    build: ./app/db
+    image: postgres:13.3-alpine
     container_name: db
+    user: postgres
     env_file: ./docker.env
+    volumes:
+      - ./app/db:/db
+    working_dir: /db
     ports:
       - 5432:5432
-    entrypoint: sh -c "/postgres/init-user-db.sh; while true; do sleep 1; done;" #pg_ctl -D . -l logfile start
+    entrypoint: sh -c "/db/init-user-db.sh; while true; do sleep 1; done;"
