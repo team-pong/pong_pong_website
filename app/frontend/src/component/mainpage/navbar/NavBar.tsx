@@ -36,6 +36,7 @@ const NavBar: FC<navBarProps> = (props): JSX.Element => {
 
   const addFriend = (e: SyntheticEvent) => {
     e.preventDefault(); //페이지 새로고침 예방
+    console.log("submit!");
     /* submit button이 있어야될듯 */
   };
 
