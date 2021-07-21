@@ -1,6 +1,11 @@
-echo "host    all             all             0.0.0.0/0               trust" >> ./pg_hba.conf
+mkdir postgres
+chown postgres:postgres postgres
 
-pg_ctl -D . -l logfile start;
+# @brief postgres 디렉토리 초기화
+# @todo 1. postgres 폴더가 비어있는 경우에만 아래 스크립트가 실행되도록 바꿔야함
+initdb /db/postgres;
+echo 'host    all             all             0.0.0.0/0               trust' >> /db/postgres/pg_hba.conf
+pg_ctl -D /db/postgres -l logfile start;
 
 psql <<- EOSQL
     CREATE USER $PG_PONG_ADMIN WITH PASSWORD '$PG_PONG_PW';
@@ -28,22 +33,19 @@ psql <<- EOSQL
     GRANT ALL PRIVILEGES ON TABLE admin TO $PG_PONG_ADMIN;
     GRANT ALL PRIVILEGES ON TABLE mute TO $PG_PONG_ADMIN;
     GRANT ALL PRIVILEGES ON TABLE friend TO $PG_PONG_ADMIN;
-
-    INSERT INTO users VALUES('jinbkim', '2', '3');
 EOSQL
 
 psql pong_db <<- EOSQL
     CREATE USER pong_session_admin WITH PASSWORD '1234';
-    CREATE TABLE "session" (
-      "sid" varchar NOT NULL COLLATE "default",
-            "sess" json NOT NULL,
-            "expire" timestamp(6) NOT NULL
+    CREATE TABLE session (
+      sid varchar NOT NULL COLLATE "default",
+      sess json NOT NULL,
+      expire timestamp(6) NOT NULL
     )
     WITH (OIDS=FALSE);
-    ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
-    CREATE INDEX "IDX_session_expire" ON "session" ("expire");
+    ALTER TABLE session ADD CONSTRAINT session_pkey PRIMARY KEY (sid) NOT DEFERRABLE INITIALLY IMMEDIATE;
+    CREATE INDEX IDX_session_expire ON session (expire);
     GRANT ALL PRIVILEGES ON TABLE session TO pong_session_admin;
 
     GRANT ALL PRIVILEGES ON TABLE session TO $PG_PONG_ADMIN;
-    INSERT INTO session VALUES('aWc_hLPG45FjcdE8n-zQsz94U9387Wmq', '{"cookie":{"originalMaxAge":60000,"expires":"2021-07-07T02:01:06.262Z","httpOnly":true,"path":"/"},"user_id":"jinbkim","token":"249acf26dfac0ec74cdceca2c4dc3f3cc8d9f4e1d523cf688da5cca09a39a5bb"}', '2021-07-08 02:01:07');
 EOSQL

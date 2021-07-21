@@ -59,6 +59,40 @@ export class AppService {
     }
   }
 
+  /*!
+   * @author hna
+   * @param[in] sessionID 문자열 세션 아이디
+   * @param[in] response 세션 검증 결과를 담아서 보낼 response 객체
+   * @param[out] {response: "invalid"} | {response: "ok"}
+   * @brief 입력받은 세션 ID와 토큰이 유효한지 체크해서 Body에 결과를 담는다
+   * @detail 1. 세션ID는 DB의 session 테이블에 해당 sid가 있는지 확인한다.
+   *         2. 토큰은 42api에 토큰정보 조회를 요청한다.
+   */
+  public async sessionValidCheck(sessionID: string, response: Response) {
+    try {
+      const client = new Client(db);
+      await client.connect();
+      const res = await client.query(`SELECT * FROM session WHERE sid='${sessionID}';`);
+      if (res.rowCount == 0)
+        response.json({response: "invalid"});
+      else {
+        const token = res.rows[0].sess.token;
+        const res2 = await axios.get('https://api.intra.42.fr/oauth/token/info', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res2.status == 200)
+          response.json({response: "ok"});
+        else
+          response.json({response: "invalid"});
+      }
+      await client.end();
+    } catch(err) {
+      console.log("valid check error:", err);
+    }
+  }
+
  /*!
   * @author jinbkim
   * @param[in] sessionID 8zTfJcpx3_FEyv0BEKlr99vGy1A6VN92 같은 세션 아이디
