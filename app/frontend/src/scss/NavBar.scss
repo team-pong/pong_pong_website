@@ -1,19 +1,16 @@
 .menu {
   //scroll bar custom design
-  ::-webkit-scrollbar-track
-  {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0);
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
     background-color: #5bc995;
   }
-  
-  ::-webkit-scrollbar
-  {
+
+  ::-webkit-scrollbar {
     width: 6px;
     background-color: #5bc995;
   }
-  
-  ::-webkit-scrollbar-thumb
-  {
+
+  ::-webkit-scrollbar-thumb {
     background-color: #4daa7e;
   }
 
@@ -57,7 +54,7 @@
 
     //scroll bar가 friend list에만 적용되게 하는 컨테이너
     #friendListContainer {
-      max-height: 350px;
+      max-height: 370px;
       overflow-y: scroll;
     }
 
@@ -80,8 +77,8 @@
       margin: 0;
       padding: 2px 0;
       position: fixed;
-      background: #5bc995;
-      border: 1px solid rgba(0,0,0,.2);
+      background: #4ba37a;
+      border: 1px solid rgba(0, 0, 0, 0.2);
       box-shadow: 0 2px 5px rgb(0 0 0 / 15%);
       font-size: 13px;
       outline: 0;
@@ -121,43 +118,72 @@
           opacity: 0.6;
         }
       }
-      // span {
-      //   opacity: 0;
-      //   position: absolute;
-      //   background: rgba(0, 0, 0, 0.5);
-      //   padding: 0.2em 0.5em;
-      //   border-radius: 4px;
-      //   top: 50%;
-      //   left: 90px - 10px;
-      //   transform: translate3d(-15px, -50%, 0);
-      //   transition: all 0.25s ease-in-out;
-
-      //   &:before {
-      //     content: "";
-      //     width: 0;
-      //     height: 0;
-      //     position: absolute;
-      //     top: 50%;
-      //     left: -5px;
-      //     border-top: 5px solid transparent;
-      //     border-bottom: 5px solid transparent;
-      //     border-right: 5px solid rgba(0, 0, 0, 0.5);
-      //     transform: translateY(-50%);
-      //   }
-      // }
 
       #input-add-friend {
-        position: absolute;
-        width: 13em;
-        height: 2em;
-        top: 28.3%;
-        left: 110%;
-        transform: scale(0);
-        background: rgba(0, 0, 0, 0.5);
-        padding: 0.2em 0.5em;
-        border-radius: 4px;
-        /* 뭔가 다른 공간에 숨겨놨다가 
-        오른쪽에서 나오는 것 같은 효과를 내는 것 같다 */
+        width: 100%;
+        padding: 8px 13px;
+        line-height: 25px;
+        font-size: 8px;
+        font-weight: 500;
+        font-family: inherit;
+        border-radius: 6px;
+        -webkit-appearance: none;
+        color: #99a3ba;
+        border: 1px solid #cdd9ed;
+        background: #fff;
+        transition: border 0.3s ease;
+
+        &::placeholder {
+          color: #cbd1dc;
+        }
+
+        &:focus {
+          outline: none;
+          border-color: #bdc2ca;
+        }
+      }
+
+      #form-add-friend {
+        position: relative;
+        display: flex;
+        width: 100%;
+        margin-top: 10px;
+        & > button,
+        #input-add-friend {
+          white-space: nowrap;
+          &:not(:first-child):not(:last-child) {
+            border-radius: 0;
+          }
+          &:first-child {
+            border-radius: 6px 0 0 6px;
+          }
+          &:last-child {
+            border-radius: 0 6px 6px 0;
+          }
+          &:not(:first-child) {
+            margin-left: -1px;
+          }
+        }
+        #input-add-friend {
+          position: relative;
+          flex: 1 1 auto;
+          width: 1%;
+        }
+        & > button {
+          text-align: center;
+          padding: 8px 12px;
+          font-size: 13px;
+          line-height: 25px;
+          color: #99a3ba;
+          background: #eef4ff;
+          border: 1px solid #cdd9ed;
+          transition: background 0.3s ease, border 0.3s ease, color 0.3s ease;
+        }
+        & > button:hover {
+          color: #6d7483;
+          background: #88c3f3;
+          border-color: #bdc2ca;
+        }
       }
 
       &:hover {
@@ -281,7 +307,7 @@
     box-shadow: 0 0 0 100em rgba(0, 0, 0, 0);
     transform: translate3d(-230px, 0, 0);
     transition: all 0.3s ease-in-out;
-    
+
     .avatar {
       h2 {
         font-size: 1em;

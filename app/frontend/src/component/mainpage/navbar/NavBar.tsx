@@ -1,5 +1,6 @@
 import React, { MouseEvent, SyntheticEvent } from "react";
 import { FC, useState } from "react";
+import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
 import "/src/scss/NavBar.scss";
 
@@ -27,18 +28,7 @@ interface navBarProps {
 const NavBar: FC<navBarProps> = (props): JSX.Element => {
 
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
-  
-  const showAddFriend = (e: MouseEvent) => {
-    e.stopPropagation();  //icon-plus 클릭시 모달창까지 뜨는 것 방지 
-    /*TODO: input화면 보이게 하는 코드 */
-    document.getElementById("input-add-friend").style.transform = "scale(1)";
-  };
-
-  const addFriend = (e: SyntheticEvent) => {
-    e.preventDefault(); //페이지 새로고침 예방
-    console.log("submit!");
-    /* submit button이 있어야될듯 */
-  };
+  const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
 
   return (
     <nav className="menu">
@@ -47,18 +37,17 @@ const NavBar: FC<navBarProps> = (props): JSX.Element => {
         <h2>DomHardy</h2>
       </header>
       <ul>
-        <li onClick={() => setIsFriendListOpen(!isFriendListOpen)}>
+        <li id="nav-friend" onClick={() => setIsFriendListOpen(!isFriendListOpen)}>
           <img src="./public/users.svg"/>
           <span>친구</span>
-          <img id="icon-plus" onClick={showAddFriend} src="./public/plus.svg"/>
-          <form onSubmit={addFriend}>
-            <input 
-              id="input-add-friend"
-              type="type"
-              onClick={(e: MouseEvent) => e.stopPropagation()}
-              required
-              placeholder="추가할 닉네임을 입력하세요" />
-          </form>
+          <img 
+            id="icon-plus"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsAddFriendOpen(!isAddFriendOpen);
+            }}
+            src="./public/plus.svg"/>
+          {isAddFriendOpen ? <AddFriend setState={setIsAddFriendOpen}/> : <></>}
         </li>
         {isFriendListOpen ? <FriendList friends={props.friends}/> : <></>}
         <li onClick={() => props.setIsRecordOpen(true)}><img src="./public/line-graph.svg"/><span>전적</span></li>
