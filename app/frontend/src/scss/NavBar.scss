@@ -1,4 +1,22 @@
 .menu {
+  //scroll bar custom design
+  ::-webkit-scrollbar-track
+  {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0);
+    background-color: #5bc995;
+  }
+  
+  ::-webkit-scrollbar
+  {
+    width: 6px;
+    background-color: #5bc995;
+  }
+  
+  ::-webkit-scrollbar-thumb
+  {
+    background-color: #4daa7e;
+  }
+
   background: #5bc995;
   color: #fff;
   height: 100vh;
@@ -7,8 +25,6 @@
   top: 0;
   left: 0;
   outline: none;
-  // overflow ì†ì„±ì„ ì—†ì• ì•¼ì§€ë§Œ media ì ìš©ì´ ë˜ëŠ” ë²„ê·¸ ìˆìŒ
-  overflow: auto;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
@@ -38,6 +54,12 @@
     list-style: none;
     padding: 0.5em 0;
     margin: 0;
+
+    //scroll bar°¡ friend list¿¡¸¸ Àû¿ëµÇ°Ô ÇÏ´Â ÄÁÅ×ÀÌ³Ê
+    #friendListContainer {
+      max-height: 350px;
+      overflow-y: scroll;
+    }
 
     .friend {
       padding-top: 5px;
