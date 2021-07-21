@@ -49,7 +49,7 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
 
 	useEffect(() => {
 		document.getElementById("input-add-friend").focus();
-		
+
 		addEventListener("keyup", detectESC);
 		addEventListener("mousedown", detectOutside);
 		return (() => {
@@ -68,7 +68,7 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
         placeholder="추가할 닉네임을 입력하세요"
 				value={nicknameToFind}
 				onChange={(e: React.FormEvent<HTMLInputElement>) => setNicknameToFind(e.currentTarget.value)} />
-			<button id="submitButton" onClick={(e: React.MouseEvent<HTMLElement>) => {e.stopPropagation()}}>검색</button>
+			<button id="submitButton" onClick={(e: React.MouseEvent<HTMLElement>) => {e.stopPropagation()}}>추가</button>
     </form>
   );
 }
