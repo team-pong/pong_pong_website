@@ -7,6 +7,13 @@
   top: 0;
   left: 0;
   outline: none;
+  // overflow 속성을 없애야지만 media 적용이 되는 버그 있음
+  overflow: auto;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
 
   .avatar {
     background: rgba(0, 0, 0, 0.1);
@@ -31,6 +38,42 @@
     list-style: none;
     padding: 0.5em 0;
     margin: 0;
+
+    .friend {
+      padding-top: 5px;
+      padding-left: calc(0.5em + 23px);
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+      img {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        vertical-align: middle;
+        margin-right: 5px;
+      }
+    }
+
+    #context-menu {
+      margin: 0;
+      padding: 2px 0;
+      position: fixed;
+      background: #5bc995;
+      border: 1px solid rgba(0,0,0,.2);
+      box-shadow: 0 2px 5px rgb(0 0 0 / 15%);
+      font-size: 13px;
+      outline: 0;
+      max-width: 250px;
+      min-width: 125px;
+      li {
+        text-align: -webkit-match-parent;
+        padding: 6px 12px;
+        list-style: none;
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
 
     li {
       padding: 0.5em 1em 0.5em 1em;
@@ -97,6 +140,19 @@
     }
 
     ul {
+      .friend {
+        padding: 1px;
+        text-align: center;
+        img {
+          display: none;
+        }
+      }
+      #context-menu {
+        li {
+          margin: 0;
+          padding: 6px 12px;
+        }
+      }
       li {
         height: 90px/1.5;
         position: relative;
