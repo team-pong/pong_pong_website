@@ -1,4 +1,3 @@
-import React, { MouseEvent, SyntheticEvent } from "react";
 import { FC, useState } from "react";
 import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
