@@ -1,4 +1,19 @@
 .menu {
+  //scroll bar custom design
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+    background-color: #5bc995;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    background-color: #5bc995;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #4daa7e;
+  }
+
   background: #5bc995;
   color: #fff;
   height: 100vh;
@@ -7,8 +22,6 @@
   top: 0;
   left: 0;
   outline: none;
-  // overflow ì†ì„±ì„ ì—†ì• ì•¼ì§€ë§Œ media ì ìš©ì´ ë˜ëŠ” ë²„ê·¸ ìžˆìŒ
-  overflow: auto;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
@@ -39,6 +52,12 @@
     padding: 0.5em 0;
     margin: 0;
 
+    //scroll bar°¡ friend list¿¡¸¸ Àû¿ëµÇ°Ô ÇÏ´Â ÄÁÅ×ÀÌ³Ê
+    #friendListContainer {
+      max-height: 370px;
+      overflow-y: scroll;
+    }
+
     .friend {
       padding-top: 5px;
       padding-left: calc(0.5em + 23px);
@@ -58,8 +77,8 @@
       margin: 0;
       padding: 2px 0;
       position: fixed;
-      background: #5bc995;
-      border: 1px solid rgba(0,0,0,.2);
+      background: #4ba37a;
+      border: 1px solid rgba(0, 0, 0, 0.2);
       box-shadow: 0 2px 5px rgb(0 0 0 / 15%);
       font-size: 13px;
       outline: 0;
@@ -91,6 +110,80 @@
         width: 23px;
         height: 23px;
         margin-right: 10px;
+      }
+
+      #icon-plus {
+        right: 0%;
+        &:hover {
+          opacity: 0.6;
+        }
+      }
+
+      #input-add-friend {
+        width: 100%;
+        padding: 8px 13px;
+        line-height: 25px;
+        font-size: 8px;
+        font-weight: 500;
+        font-family: inherit;
+        border-radius: 6px;
+        -webkit-appearance: none;
+        color: #99a3ba;
+        border: 1px solid #cdd9ed;
+        background: #fff;
+        transition: border 0.3s ease;
+
+        &::placeholder {
+          color: #cbd1dc;
+        }
+
+        &:focus {
+          outline: none;
+          border-color: #bdc2ca;
+        }
+      }
+
+      #form-add-friend {
+        position: relative;
+        display: flex;
+        width: 100%;
+        margin-top: 10px;
+        & > button,
+        #input-add-friend {
+          white-space: nowrap;
+          &:not(:first-child):not(:last-child) {
+            border-radius: 0;
+          }
+          &:first-child {
+            border-radius: 6px 0 0 6px;
+          }
+          &:last-child {
+            border-radius: 0 6px 6px 0;
+          }
+          &:not(:first-child) {
+            margin-left: -1px;
+          }
+        }
+        #input-add-friend {
+          position: relative;
+          flex: 1 1 auto;
+          width: 1%;
+        }
+        & > button {
+          text-align: center;
+          padding: 8px 12px;
+          font-size: 13px;
+          line-height: 25px;
+          color: #99a3ba;
+          background: #eef4ff;
+          border: 1px solid #cdd9ed;
+          transition: background 0.3s ease, border 0.3s ease, color 0.3s ease;
+        }
+        & > button:hover {
+          color: #6d7483;
+          background: #88c3f3;
+          border-color: #bdc2ca;
+        }
       }
 
       &:hover {
@@ -164,6 +257,10 @@
           left: 37%;
         }
 
+        #icon-plus {
+          opacity: 0;
+        }
+
         span {
           opacity: 0;
           position: absolute;
@@ -210,7 +307,7 @@
     box-shadow: 0 0 0 100em rgba(0, 0, 0, 0);
     transform: translate3d(-230px, 0, 0);
     transition: all 0.3s ease-in-out;
-    
+
     .avatar {
       h2 {
         font-size: 1em;

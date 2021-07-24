@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
 import "/src/scss/NavBar.scss";
 
@@ -26,6 +27,7 @@ interface navBarProps {
 const NavBar: FC<navBarProps> = (props): JSX.Element => {
 
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
+  const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
 
   return (
     <nav className="menu">
@@ -34,11 +36,22 @@ const NavBar: FC<navBarProps> = (props): JSX.Element => {
         <h2>DomHardy</h2>
       </header>
       <ul>
-        <li onClick={() => setIsFriendListOpen(!isFriendListOpen)} className="icon-users"><img src="./public/users.svg"/><span>친구</span></li>
+        <li id="nav-friend" onClick={() => setIsFriendListOpen(!isFriendListOpen)}>
+          <img src="./public/users.svg"/>
+          <span>친구</span>
+          <img 
+            id="icon-plus"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsAddFriendOpen(!isAddFriendOpen);
+            }}
+            src="./public/plus.svg"/>
+          {isAddFriendOpen ? <AddFriend setState={setIsAddFriendOpen}/> : <></>}
+        </li>
         {isFriendListOpen ? <FriendList friends={props.friends}/> : <></>}
-        <li onClick={() => props.setIsRecordOpen(true)} className="icon-record"><img src="./public/line-graph.svg"/><span>전적</span></li>
-        <li onClick={() => props.setIsGameOpen(true)} className="icon-match-game"><img src="./public/controller-play.svg"/><span>게임하기</span></li>
-        <li onClick={() => props.setIsConfigOpen(true)} className="icon-settings"><img src="./public/tools.svg"/><span>설정</span></li>
+        <li onClick={() => props.setIsRecordOpen(true)}><img src="./public/line-graph.svg"/><span>전적</span></li>
+        <li onClick={() => props.setIsGameOpen(true)}><img src="./public/controller-play.svg"/><span>게임하기</span></li>
+        <li onClick={() => props.setIsConfigOpen(true)}><img src="./public/tools.svg"/><span>설정</span></li>
       </ul>
     </nav>
   );
