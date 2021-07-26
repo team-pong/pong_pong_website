@@ -18,13 +18,17 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync",
+    "schema:drop": "ts-node ./node_modules/typeorm/cli.js schema:drop",
+    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed"
   },
   "dependencies": {
     "@nestjs/common": "^7.6.15",
     "@nestjs/config": "^0.6.3",
     "@nestjs/core": "^7.6.15",
     "@nestjs/platform-express": "^7.6.15",
+    "@nestjs/typeorm": "^8.0.1",
     "@types/connect-pg-simple": "^4.2.3",
     "class-validator": "0.13.1",
     "connect-pg-simple": "^6.2.1",
@@ -34,8 +38,9 @@
     "pg": "^8.6.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^6.6.6",
-    "typeorm": "^0.2.34"
+    "rxjs": "^7.2.0",
+    "typeorm": "^0.2.34",
+    "typeorm-seeding": "^1.6.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.6.0",
