@@ -19,7 +19,16 @@ import { SessionModule } from './session/session.module';
   imports: [
     ConfigModule.forRoot(),
 		TypeOrmModule.forRoot(ormconfig),
-    AchivementsModule, UsersModule, MatchModule, ChatModule, BanModule, AdminModule, MuteModule, FriendModule, DmStoreModule, SessionModule],
+    AchivementsModule, 
+    UsersModule, 
+    MatchModule, 
+    ChatModule, 
+    BanModule, 
+    AdminModule, 
+    MuteModule, 
+    FriendModule, 
+    DmStoreModule, 
+    SessionModule],
   controllers: [AppController],
   providers: [AppService],
 })
