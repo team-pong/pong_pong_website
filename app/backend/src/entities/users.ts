@@ -8,5 +8,14 @@ export class Users{
 	nick: string;
 	@Column()
 	avatar_url: string;
-
+	@Column()
+	total_games: number;
+	@Column()
+	win_games: number;
+    @Column()
+    loss_games: number;
+    @Column()
+    ladder_level: number;
+	@Column()
+	status: string;
 }

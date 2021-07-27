@@ -1,17 +1,15 @@
 import { Entity, PrimaryGeneratedColumn, PrimaryColumn, OneToOne, JoinColumn, Column } from 'typeorm';
 
 @Entity()
-export class Stat{
+export class Users{
 	@PrimaryGeneratedColumn()
 	id: number;
-    @Column()
-    user_id: number;
 	@Column()
-	games: number;
+	sender_id: number;
 	@Column()
-	win_game: number;
+	receiver_id: number;
     @Column()
-    loss_game: number;
-    @Column()
-    ladder_level: number;
+    content: string;
+	@Column()
+	time: Date;
 }

@@ -5,6 +5,8 @@ export class Chat{
 	@PrimaryGeneratedColumn()
 	channel_id: number;
 	@Column()
+	title: string;
+	@Column()
 	owner_id: number;
 	@Column()
 	type: string;

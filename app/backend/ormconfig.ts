@@ -8,7 +8,6 @@ import { Friend } from './src/entities/friend'
 import { Match } from './src/entities/match'
 import { Mute } from './src/entities/mute'
 import { Session } from './src/entities/session'
-import { Stat } from './src/entities/stat'
 import { Users } from './src/entities/users'
 
 dotenv.config();
@@ -28,7 +27,6 @@ const config: TypeOrmModuleOptions = {
     Match,
     Mute,
     Session,
-    Stat,
     Users
   ],
   migrations: [__dirname + '/src/migrations/*.ts'],

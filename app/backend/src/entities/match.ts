@@ -12,4 +12,10 @@ export class Match{
 	type: string;
     @CreateDateColumn()
     createdAt: Date;
+	@Column()
+	winner_score: number;
+	@Column()
+	loser_score: number;	
+	@Column()
+	time: Date;
 }
