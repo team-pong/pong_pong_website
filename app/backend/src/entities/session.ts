@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, PrimaryColumn, OneToOne, JoinColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, PrimaryColumn, OneToOne, JoinColumn, Column, Timestamp } from 'typeorm';
 
 @Entity()
 export class Session{
@@ -6,6 +6,6 @@ export class Session{
 	sid: string;
 	@Column()
 	session: string;
-    @Column()
-    expire: Date;
+  @Column({type: "timestamp", precision: 6})
+	expire: Date;
 }

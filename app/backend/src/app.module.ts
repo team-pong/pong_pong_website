@@ -13,12 +13,13 @@ import { AdminModule } from './admin/admin.module';
 import { MuteModule } from './mute/mute.module';
 import { FriendModule } from './friend/friend.module';
 import { DmStoreModule } from './dm-store/dm-store.module';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
 		TypeOrmModule.forRoot(ormconfig),
-    AchivementsModule, UsersModule, MatchModule, ChatModule, BanModule, AdminModule, MuteModule, FriendModule, DmStoreModule],
+    AchivementsModule, UsersModule, MatchModule, ChatModule, BanModule, AdminModule, MuteModule, FriendModule, DmStoreModule, SessionModule],
   controllers: [AppController],
   providers: [AppService],
 })
