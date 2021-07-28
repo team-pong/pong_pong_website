@@ -21,7 +21,7 @@ export class AdminService {
     if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널 이라면
       return false;
     await this.adminRepo.save({user_id: user_id, channel_id: channel_id})
-      return true;
+    return true;
   }
 
   async readAdmin(channel_id: number){

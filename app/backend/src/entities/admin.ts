@@ -4,6 +4,6 @@ import { Entity, PrimaryGeneratedColumn, PrimaryColumn, OneToOne, JoinColumn, Co
 export class Admin{
 	@PrimaryColumn()
 	user_id: string;
-	@Column({default: 0})
+	@Column()
 	channel_id: number;
 }

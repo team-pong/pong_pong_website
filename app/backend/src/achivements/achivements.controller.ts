@@ -34,6 +34,7 @@ export class AchivementsController {
   }
   
   // 한 유저의 칭호 모두 삭제
+  @ApiResponse({ type: boolean, description: '칭호 삭제 성공시 true, 실패시 false' })
   @ApiBody({ type: AcievementDto3, description: '모든 칭호를 삭제할 유저아이디' })
   @Delete('all')
   deleteAllAchievements(@Body() b: AcievementDto3){

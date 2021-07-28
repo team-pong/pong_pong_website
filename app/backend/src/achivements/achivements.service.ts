@@ -29,12 +29,17 @@ export class AchivementsService {
   }
 
   async deleteAchievements(user_id: string, achievement:string){
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      return false;
     if (await this.achievementRepo.count({ user_id: user_id,  achievement: achievement}) === 0)  // 유저가 해당 칭호를 가지고 있지 않다면 
       return false;
     this.achievementRepo.delete({ user_id: user_id,  achievement: achievement});
     return true;
   }
   async deleteAllAchievements(user_id: string){
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      return false;
     await this.achievementRepo.delete({user_id: user_id});
+    return true;
   }
 }
