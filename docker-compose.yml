@@ -24,6 +24,8 @@ services:
       - 3001:3001
     entrypoint: >
       sh -c "npm install
+      && npm run schema:sync
+      && npm run seed:run
       && npm run build
       && ./node_modules/@nestjs/cli/bin/nest.js start -w"
 
