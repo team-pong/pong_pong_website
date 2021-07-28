@@ -5,9 +5,7 @@ export class Friend{
 	@PrimaryGeneratedColumn()
 	id: number;
 	@Column()
-	user_id: number;
+	user_id: string;
 	@Column()
-	friend_id: number;
-	@Column()
-	status: boolean;
+	friend_id: string;
 }

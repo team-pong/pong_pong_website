@@ -7,5 +7,5 @@ export class Mute{
 	@Column()
 	channel_id: number;
 	@Column()
-	user_id: number;
+	user_id: string;
 }

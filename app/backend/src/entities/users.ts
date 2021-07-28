@@ -2,20 +2,20 @@ import { Entity, PrimaryGeneratedColumn, PrimaryColumn, OneToOne, JoinColumn, Co
 
 @Entity()
 export class Users{
-	@PrimaryGeneratedColumn()
-	user_id: number;
+	@PrimaryColumn()
+	user_id: string;
 	@Column()
 	nick: string;
 	@Column()
 	avatar_url: string;
-	@Column()
+	@Column({default: 0})
 	total_games: number;
-	@Column()
+	@Column({default: 0})
 	win_games: number;
-    @Column()
-    loss_games: number;
-    @Column()
-    ladder_level: number;
-	@Column()
+  @Column({default: 0})
+  loss_games: number;
+  @Column({default: 1000})
+  ladder_level: number;
+	@Column({default: 'off'})
 	status: string;
 }

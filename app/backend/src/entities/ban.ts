@@ -7,5 +7,5 @@ export class Ban{
 	@Column()
 	channel_id: number;
 	@Column()
-	user_id: number;
+	user_id: string;
 }

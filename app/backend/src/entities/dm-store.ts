@@ -1,15 +1,15 @@
 import { Entity, PrimaryGeneratedColumn, PrimaryColumn, OneToOne, JoinColumn, Column } from 'typeorm';
 
 @Entity()
-export class Users{
+export class DmStore{
 	@PrimaryGeneratedColumn()
 	id: number;
 	@Column()
-	sender_id: number;
+	sender_id: string;
 	@Column()
-	receiver_id: number;
-    @Column()
-    content: string;
+	receiver_id: string;
+  @Column()
+  content: string;
 	@Column()
 	time: Date;
 }

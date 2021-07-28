@@ -2,10 +2,8 @@ import { Entity, PrimaryGeneratedColumn, PrimaryColumn, OneToOne, JoinColumn, Co
 
 @Entity()
 export class Admin{
-	@PrimaryGeneratedColumn()
-	id: number;
-	@Column()
+	@PrimaryColumn()
+	user_id: string;
+	@Column({default: 0})
 	channel_id: number;
-	@Column()
-	user_id: number;
 }

@@ -7,7 +7,7 @@ export class Chat{
 	@Column()
 	title: string;
 	@Column()
-	owner_id: number;
+	owner_id: string;
 	@Column()
 	type: string;
 	@Column()
