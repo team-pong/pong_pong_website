@@ -33,7 +33,7 @@ export class AchivementsController {
     return this.achivementsService.deleteAchievements(b.user_id, b.achievement);
   }
   
-  // 유저 칭호 모두 삭제
+  // 한 유저의 칭호 모두 삭제
   @ApiBody({ type: AcievementDto3, description: '모든 칭호를 삭제할 유저아이디' })
   @Delete('all')
   deleteAllAchievements(@Body() b: AcievementDto3){

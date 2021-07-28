@@ -19,7 +19,7 @@ export class createInitialData implements Seeder {
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(Chat)
-			.values([{title: '아무나', owner_id: 'jinbkim', type: 'public', passwd: ''}, {title: '놀사람', owner_id: 'donglee', type: 'private', passwd: ''}, {title: '구함', owner_id: 'hna', type: 'proteced', passwd:'1234'}])
+			.values([{title: '아무나', owner_id: 'jinbkim', type: 'public', passwd: '', max_people: 5}, {title: '놀사람', owner_id: 'donglee', type: 'private', passwd: '', max_people: 10}, {title: '구함', owner_id: 'hna', type: 'proteced', passwd:'1234', max_people: 15}])
 			.execute();
 	}
 }

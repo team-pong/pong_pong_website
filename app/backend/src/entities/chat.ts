@@ -12,4 +12,6 @@ export class Chat{
 	type: string;
 	@Column()
 	passwd: string;
+	@Column()
+	max_people: number;
 }
