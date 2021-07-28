@@ -5,7 +5,7 @@ export class Ban{
 	@PrimaryGeneratedColumn()
 	id: number;
 	@Column()
-	channel_id: number;
+	user_id: string;
 	@Column()
-	user_id: number;
+	channel_id: number;
 }

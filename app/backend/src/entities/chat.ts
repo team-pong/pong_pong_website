@@ -7,9 +7,11 @@ export class Chat{
 	@Column()
 	title: string;
 	@Column()
-	owner_id: number;
+	owner_id: string;
 	@Column()
 	type: string;
 	@Column()
 	passwd: string;
+	@Column()
+	max_people: number;
 }

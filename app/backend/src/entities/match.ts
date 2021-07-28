@@ -5,17 +5,17 @@ export class Match{
 	@PrimaryGeneratedColumn()
 	id: number;
 	@Column()
-	winner_id: number;
+	winner_id: string;
 	@Column()
-	loser_id: number;
-	@Column()
-	type: string;
-    @CreateDateColumn()
-    createdAt: Date;
+	loser_id: string;
 	@Column()
 	winner_score: number;
 	@Column()
 	loser_score: number;	
+	@Column()
+	type: string;
+  @CreateDateColumn()
+  createdAt: Date;
 	@Column()
 	time: Date;
 }
