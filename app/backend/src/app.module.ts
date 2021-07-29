@@ -30,7 +30,8 @@ import { ChatUsersModule } from './chat-users/chat-users.module';
     FriendModule, 
     DmStoreModule, 
     SessionModule,
-    ChatUsersModule],
+    ChatUsersModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
