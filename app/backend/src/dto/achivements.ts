@@ -19,7 +19,7 @@ export class AcievementDto2{
 		example: `['난무조건이겨', '타락파워전사']`,
 		description: '칭호(문자열) 배열',
 	})
-	public achievement: string[];
+	public achievements: string[];
 }
 
 export class AcievementDto3{

@@ -26,12 +26,11 @@ export class BanService {
 
   async readBan(channel_id: number){
     const channel = await this.banRepo.find({channel_id: channel_id});  // 해당 채널 검색
-    let bans: Array<string> = [];
+    let bans = { bans: Array<string>() }
     for(var i in channel)
-      bans[i] = channel[i].user_id;
+      bans.bans[i] = channel[i].user_id;
     return bans;
   }
-
   async isBan(user_id: string, channel_id: number){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
       return false;

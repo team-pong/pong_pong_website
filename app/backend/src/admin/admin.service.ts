@@ -26,12 +26,11 @@ export class AdminService {
 
   async readAdmin(channel_id: number){
     const channel = await this.adminRepo.find({channel_id: channel_id});  // 해당 채널 검색
-    let admins: Array<string> = [];
+    let admins = { admins: Array<string>() }
     for(var i in channel)
-      admins[i] = channel[i].user_id;
+      admins.admins[i] = channel[i].user_id;
     return admins;
   }
-
   async isAdmin(user_id: string, channel_id: number){
     if (await this.adminRepo.count({user_id: user_id, channel_id: channel_id}))
       return true;

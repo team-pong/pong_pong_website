@@ -22,9 +22,9 @@ export class AchivementsService {
 
   async readAchievements(user_id: string){
     const user = await this.achievementRepo.find({user_id: user_id});  // 해당 유저 찾기
-    let achievements: Array<string> = [];
+    let achievements = { achievements: Array<string>() } 
     for(var i in user)
-      achievements[i] = user[i].achievement;
+      achievements.achievements[i] = user[i].achievement;
     return achievements;
   }
 

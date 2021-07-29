@@ -19,7 +19,7 @@ export class BanDto2{
 		example: `[jinbkim, donglee]`,
 		description: '유저아이디 배열',
 	})
-	public user_ids: string[];
+	public bans: string[];
 }
 
 export class BanDto3{
