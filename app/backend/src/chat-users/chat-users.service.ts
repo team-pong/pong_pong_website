@@ -28,10 +28,10 @@ export class ChatUsersService {
 
   async readChatUsers(channel_id: number){
     const users = await this.chatUsersRepo.find({channel_id: channel_id});  // 해당 채널의 유저들 검색
-    let chatUsers = { chatUsers: Array<string>() };
+    let chatUsersList = { chatUsersList: Array<string>() };
     for(var i in users)
-      chatUsers.chatUsers[i] = users[i].user_id;
-    return chatUsers;
+      chatUsersList.chatUsersList[i] = users[i].user_id;
+    return chatUsersList;
   }
 
   async deleteChatUsers(user_id: string, channel_id: number){

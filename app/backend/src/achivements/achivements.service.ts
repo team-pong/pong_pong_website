@@ -22,10 +22,10 @@ export class AchivementsService {
 
   async readAchievements(user_id: string){
     const user = await this.achievementRepo.find({user_id: user_id});  // 해당 유저 찾기
-    let achievements = { achievements: Array<string>() } 
+    let achievementsList = { achievementsList: Array<string>() } 
     for(var i in user)
-      achievements.achievements[i] = user[i].achievement;
-    return achievements;
+      achievementsList.achievementsList[i] = user[i].achievement;
+    return achievementsList;
   }
 
   async deleteAchievements(user_id: string, achievement:string){
