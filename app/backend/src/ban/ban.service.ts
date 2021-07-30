@@ -41,7 +41,7 @@ export class BanService {
     const banTime = ban[0].createdAt;
     banTime.setSeconds(banTime.getSeconds() + 60);
     if (banTime < new Date()){  // ban 당한지 60초가 넘었으면
-      this.banRepo.delete({user_id: user_id, channel_id: channel_id});
+      await this.banRepo.delete({user_id: user_id, channel_id: channel_id});
       return false;
     }
     else
@@ -53,14 +53,14 @@ export class BanService {
   //     return false;
   //   if (await this.banRepo.count({ user_id: user_id, channel_id: channel_id }) === 0)  // 유저가 ban이 아니면
   //     return false;
-  //   this.banRepo.delete({ user_id: user_id, channel_id: channel_id });
+  //   await this.banRepo.delete({ user_id: user_id, channel_id: channel_id });
   //   return true;
   // }  
 
   // async deleteAllBan(user_id: string){
   //   if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
   //     return false;
-  //   this.banRepo.delete({ user_id: user_id});
+  //   await this.banRepo.delete({ user_id: user_id});
   //   return true;
   // }  
 }

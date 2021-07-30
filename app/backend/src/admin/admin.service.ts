@@ -41,7 +41,7 @@ export class AdminService {
   async deleteAdmin(user_id: string){
     if (await this.adminRepo.count({ user_id: user_id}) === 0)  // 유저가 admin이 아니면
       return false;
-    this.adminRepo.delete({ user_id: user_id});
+    await this.adminRepo.delete({ user_id: user_id});
     return true;
   }
 }
