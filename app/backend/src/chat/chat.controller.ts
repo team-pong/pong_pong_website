@@ -11,7 +11,7 @@ export class ChatController {
 
   // 채널 생성
   @ApiResponse({ type: boolean, description: '채널 생성 성공시 true, 실패시 false' })
-  @ApiBody({ type: ChatDto1, description: '채널 방장, 제목, 타입, 비밀번호, 최대인원' })
+  @ApiBody({ type: ChatDto1, description: '채널 owner, 제목, 타입, 비밀번호, 최대인원' })
   @Post()
   creatChat(@Body() b: ChatDto1){
     return this.chatService.createChat(b.owner_id, b.title, b.type, b.passwd, b.max_people);
@@ -29,8 +29,8 @@ export class ChatController {
   readTitle(@Body() b:ChatDto8){
     return this.chatService.readTitle(b.title);
   }
-  // 채널 방장 검색
-  @ApiResponse({ type: ChatDto7, description: '해당 채널의 방장 아이디' })
+  // 채널 owner 검색
+  @ApiResponse({ type: ChatDto7, description: '해당 채널의 owner 아이디' })
   @ApiBody({ type: ChatDto6, description: '채널 아이디' })
   @Get('owner')
   readOwner(@Body() b: ChatDto6){
@@ -44,9 +44,9 @@ export class ChatController {
   updateChat(@Body() b: ChatDto4){
     return this.chatService.updateChat(b.channel_id, b.title, b.type, b.passwd, b.max_people);
   }
-  // 채널 방장 변경
-  @ApiResponse({ type: boolean, description: '채널 방장 변경 성공시 true, 실패시 false' })
-  @ApiBody({ type: ChatDto5, description: '방장 변경할 채널 아이디, 유저 아이디' })
+  // 채널 owner 변경
+  @ApiResponse({ type: boolean, description: '채널 owner 변경 성공시 true, 실패시 false' })
+  @ApiBody({ type: ChatDto5, description: 'owner 변경할 채널 아이디, 유저 아이디' })
   @Post('owner')
   updateOwner(@Body() b: ChatDto5){
     return this.chatService.updateOwner(b.channel_id, b.owner_id);

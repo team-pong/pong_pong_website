@@ -3,7 +3,7 @@ import { ApiProperty } from "@nestjs/swagger";
 export class ChatDto1{
   @ApiProperty({
 		example: 'jinbkim',
-		description: '방장 유저 아이디',
+		description: 'owner 유저 아이디',
 	})
 	public owner_id: string;
 
@@ -101,7 +101,7 @@ export class ChatDto5{
 
   @ApiProperty({
 		example: 'jinbkim',
-		description: '방장 유저 아이디',
+		description: 'owner 유저 아이디',
 	})
 	public owner_id: string;
 }
@@ -117,7 +117,7 @@ export class ChatDto6{
 export class ChatDto7{
   @ApiProperty({
 		example: 'jinbkim',
-		description: '방장 유저 아이디',
+		description: 'owner 유저 아이디',
 	})
 	public owner_id: string;
 }

@@ -26,7 +26,7 @@ export class ChatService {
     if (await this.chatUsersRepo.count({user_id: owner_id}))  // 이미 다른방에 있는 유저 라면
       return false;
     const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people});
-    await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 방장 추가
+    await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 owner 추가
     return true;
   }
 
