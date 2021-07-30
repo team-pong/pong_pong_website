@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { boolean } from 'joi';
-import { ChatDto1, ChatDto3, ChatDto4, ChatDto5, ChatDto6, ChatDto7 } from 'src/dto/chat';
+import { ChatDto1, ChatDto3, ChatDto4, ChatDto5, ChatDto6, ChatDto7, ChatDto8 } from 'src/dto/chat';
 import { ChatService } from './chat.service';
 
 @ApiTags('Chat')
@@ -22,6 +22,12 @@ export class ChatController {
   @Get()
   readChat(){
     return this.chatService.readChat();
+  }
+  // 채널 제목 검색
+  @ApiResponse({ type: ChatDto3, description: '모든 채널의 제목, 타입, 최대인원' })
+  @Get('title')
+  readTitle(@Body() b:ChatDto8){
+    return this.chatService.readTitle(b.title);
   }
   // 채널 방장 검색
   @ApiResponse({ type: ChatDto7, description: '해당 채널의 방장 아이디' })

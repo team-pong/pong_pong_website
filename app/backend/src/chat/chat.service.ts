@@ -42,6 +42,21 @@ export class ChatService {
     }
     return chatList;
   }
+  async readTitle(title: string){
+    const chat = await this.chatRepo.find();  // 모든 채널
+    let chatList = { chatList: Array<ChatDto2>() }
+    let idx = -1;
+    // 검색한 제목을 포함하는 채널의 제목, 타입, 최대인원만 담기
+    for(var i in chat){
+      if (chat[i].title.indexOf(title) == -1)  // 검색한 제목이 채널에 포함되지 않으면
+        continue ;
+      chatList.chatList.push(new ChatDto2());
+      chatList.chatList[++idx].title = chat[i].title;
+      chatList.chatList[idx].type = chat[i].type;
+      chatList.chatList[idx].max_people = chat[i].max_people;
+    }
+    return chatList;
+  }
   async readOwner(channel_id: number){
     const chanel = await this.chatRepo.find({channel_id: channel_id});  // 채널 찾기
     return chanel[0].owner_id; 

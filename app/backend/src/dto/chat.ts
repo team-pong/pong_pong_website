@@ -121,3 +121,11 @@ export class ChatDto7{
 	})
 	public owner_id: string;
 }
+
+export class ChatDto8{
+	@ApiProperty({
+		example: '아무나 와보던가',
+		description: '검색할 방 제목',
+	})
+	public title: string;
+}
