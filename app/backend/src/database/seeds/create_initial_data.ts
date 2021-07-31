@@ -36,7 +36,7 @@ export class createInitialData implements Seeder {
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(Chat)
-			.values([{owner_id: 'yochoi', title: '아무나', type: 'public', passwd: '', max_people: 10}, {owner_id: 'jinwkim', title: '와보렴', type: 'protected', passwd: '1234', max_people: 5}, {owner_id: 'hjing', title: '심심하니깐', type: 'private', passwd: '', max_people: 3}])
+			.values([{owner_id: 'yochoi', title: '아무나', type: 'public', passwd: '', max_people: 10}, {owner_id: 'jinwkim', title: '아무나 와보렴', type: 'protected', passwd: '1234', max_people: 5}, {owner_id: 'hjing', title: '심심하니깐', type: 'private', passwd: '', max_people: 3}])
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(DmStore)
@@ -48,7 +48,7 @@ export class createInitialData implements Seeder {
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(Match)
-			.values([{winner_id: 'jinbkim', loser_id: 'donglee', loser_score: 1, type: 'general'}, {winner_id: 'donglee', loser_id: 'yochoi', loser_score: 2, type: 'ranked'}, {winner_id: 'donglee', loser_id: 'jinbkim', loser_score: 0, type: 'general'}])
+			.values([{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 1}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3}])
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(Mute)
@@ -65,7 +65,6 @@ export class createInitialData implements Seeder {
 				{user_id: 'hjung', nick: 'hjung', avatar_url: 'f'},
 				{user_id: 'juhlee', nick: 'juhlee', avatar_url: 'g'},
 				{user_id: 'hyeonkim', nick: 'hyeonkim', avatar_url: 'h'},
-
 			])
 			.execute();
 	}

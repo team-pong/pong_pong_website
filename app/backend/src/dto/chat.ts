@@ -54,7 +54,18 @@ export class ChatDto2{
 
 export class ChatDto3{
   @ApiProperty({
-		example: `{ [ {'title': '아무나', 'type': 'public', 'max_people': 5 }, ]}`,
+		example: `[
+			{
+					"title": "아무나",
+					"type": "public",
+					"max_people": 10
+			},
+			{
+					"title": "아무나 와보렴",
+					"type": "protected",
+					"max_people": 5
+			}
+	]`,
 		description: '채널 리스트',
 	})
   public chatList: ChatDto2[];
