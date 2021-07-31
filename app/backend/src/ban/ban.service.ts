@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Ban } from 'src/entities/ban';
 import { Chat } from 'src/entities/chat';
+import { ChatUsers } from 'src/entities/chat-users';
 import { Users } from 'src/entities/users';
 import { Repository } from 'typeorm';
 
@@ -11,6 +12,7 @@ export class BanService {
     @InjectRepository(Ban) private banRepo: Repository<Ban>,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
+    @InjectRepository(ChatUsers) private chatUsersRepo: Repository<ChatUsers>,
     ){}
 
   async createBan(user_id: string, channel_id: number){
@@ -19,6 +21,8 @@ export class BanService {
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
       return false;
     if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널 이라면
+      return false;
+    if (await this.chatUsersRepo.count({user_id: user_id, channel_id: channel_id}) === 0)  // 해당 채널에 유저가 없다면
       return false;
     await this.banRepo.save({user_id: user_id, channel_id: channel_id})
     return true;

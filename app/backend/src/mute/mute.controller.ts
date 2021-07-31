@@ -1,4 +1,27 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { boolean } from 'joi';
+import { MuteDto1 } from 'src/dto/mute';
+import { MuteService } from './mute.service';
 
+@ApiTags('Mute')
 @Controller('mute')
-export class MuteController {}
+export class MuteController {
+  constructor(private muteService: MuteService){}
+
+  @ApiOperation({ summary: 'mute 설정'})
+  @ApiResponse({ type: boolean, description: 'mute 설정 성공시 true, 실패시 false' })
+  @ApiBody({ type: MuteDto1, description: 'mute 설정할 채널아이디, 유저아이디' })
+  @Post()
+  createMute(@Body() b: MuteDto1){
+    return this.muteService.createMute(b.user_id, b.channel_id);
+  }
+
+  @ApiOperation({ summary: '해당 유저가 해당 채널의 mute 인지 확인', description: 'mute 시간이 다지나면 mute 목록에서 지워짐'})
+  @ApiResponse({ type: boolean, description: '유저가 mute이면 true, 아니면 false' })
+  @ApiBody({ type: MuteDto1, description: 'mute인지 확인할 유저아이디, 채널아이디' })
+  @Get()
+  isMute(@Body() b: MuteDto1){
+    return this.muteService.isMute(b.user_id, b.channel_id);
+  }
+}
