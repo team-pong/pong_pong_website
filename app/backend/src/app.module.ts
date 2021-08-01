@@ -15,6 +15,7 @@ import { FriendModule } from './friend/friend.module';
 import { DmStoreModule } from './dm-store/dm-store.module';
 import { SessionModule } from './session/session.module';
 import { ChatUsersModule } from './chat-users/chat-users.module';
+import { BlockModule } from './block/block.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { ChatUsersModule } from './chat-users/chat-users.module';
     FriendModule, 
     DmStoreModule, 
     SessionModule,
-    ChatUsersModule
+    ChatUsersModule,
+    BlockModule
   ],
   controllers: [AppController],
   providers: [AppService],
