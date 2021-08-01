@@ -9,7 +9,14 @@ import { MatchService } from './match.service';
 export class MatchController {
   constructor(private matchService: MatchService){}
 
-  @ApiOperation({ summary: '전적 추가', description: '맵은 1, 2, 3 중에 하나 이어야함. 총게임수 +1, 승자는 1승추가, 패자는 1패추가. 랭크 게임이면 래더점수 변동이 있음. 게임 타입은 general 또는 ranked 이어야함.' })
+  @ApiOperation({ 
+    summary: '전적 추가', 
+    description: `
+      맵은 1, 2, 3 중에 하나 이어야함.
+      총게임수 +1, 승자는 1승추가, 패자는 1패추가.
+      랭크 게임이면 래더점수 변동이 있음.
+      게임 타입은 general 또는 ranked 이어야함.
+    `})
   @ApiResponse({ type: boolean, description: '전적 추가 성공시 true, 실패시 false' })
   @ApiBody({ type: MatchDto1, description: '승자 아이디, 패자 아이디, 승자 점수, 패자 점수, 게임 타입, 맵정보' })
   @Post()

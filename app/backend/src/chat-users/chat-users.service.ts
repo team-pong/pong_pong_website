@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatService } from 'src/chat/chat.service';
+import { Admin } from 'src/entities/admin';
 import { Chat } from 'src/entities/chat';
 import { ChatUsers } from 'src/entities/chat-users';
 import { Users } from 'src/entities/users';
@@ -13,6 +14,7 @@ export class ChatUsersService {
     @InjectRepository(ChatUsers) private chatUsersRepo: Repository<ChatUsers>,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
+    @InjectRepository(Admin) private adminRepo: Repository<Admin>,
     ){}
 
   async createChatUsers(user_id: string, channel_id: number){
@@ -42,6 +44,8 @@ export class ChatUsersService {
     if (await this.chatUsersRepo.count({ user_id: user_id, channel_id: channel_id }) === 0)  // 유저가 해당 채널에 없다면
       return false;
     await this.chatUsersRepo.delete({ user_id: user_id, channel_id: channel_id });
+    if (await this.adminRepo.count({user_id: user_id, channel_id: channel_id}))  // 나간 유저가 admin 이면
+      await this.adminRepo.delete({user_id: user_id, channel_id: channel_id});
     if (await this.chatUsersRepo.count({channel_id: channel_id}) === 0)  // 해당 채널에 아무도 없다면
       await this.chatRepo.delete({channel_id: channel_id});
     else{  // 채널에 누군가가 남아있다면

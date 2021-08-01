@@ -25,7 +25,13 @@ export class ChatUsersController {
     return this.chatUsersService.readChatUsers(b.channel_id);
   }
 
-  @ApiOperation({ summary: '한 유저의 채널 나가기', description:'모든 유저가 채널에서 나가면 그 채널 삭제. owner가 나가면 랜덤의 다른 인원으로 owner가 바뀜.'})
+  @ApiOperation({ 
+    summary: '한 유저의 채널 나가기', 
+    description:`
+      admin이 나가면 admin 자격 박탈 
+      모든 유저가 채널에서 나가면 그 채널 삭제
+      owner가 나가면 랜덤의 다른 인원으로 owner가 바뀜
+    `})
   @ApiResponse({ type: boolean, description: '유저가 채널에서 나가기 성공시 true, 실패시 false' })
   @ApiBody({ type: ChatUsersDto1, description: '채널에서 나갈 유저 아이디, 채널 아이디' })
   @Delete()
