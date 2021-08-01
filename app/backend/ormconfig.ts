@@ -11,7 +11,7 @@ import { Match } from './src/entities/match'
 import { Mute } from './src/entities/mute'
 import { Session } from './src/entities/session'
 import { Users } from './src/entities/users'
-import { Block } from 'src/entities/block';
+import { Block } from './src/entities/block';
 
 dotenv.config();
 const config: TypeOrmModuleOptions = {

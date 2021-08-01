@@ -10,6 +10,7 @@ import { DmStore } from "../../entities/dm-store";
 import { Friend } from "../../entities/friend";
 import { Match } from "../../entities/match";
 import { Mute } from "../../entities/mute";
+import { Block } from "../../entities/block";
 
 export class createInitialData implements Seeder {
 	public async run(factory: Factory, connection: Connection): Promise<any>{
@@ -29,6 +30,10 @@ export class createInitialData implements Seeder {
 		await connection
 			.createQueryBuilder().insert().into(Ban)
 			.values([{user_id: 'jinbkim', channel_id: 2}, {user_id: 'donglee', channel_id: 2}, {user_id: 'hna', channel_id: 3}])
+			.execute();
+		await connection
+			.createQueryBuilder().insert().into(Block)
+			.values([{user_id: 'jinbkim', block_id: 'hna'}, {user_id: 'donglee', block_id: 'yochoi'}, {user_id: 'jinbkim', block_id: 'jinwkim'}])
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(ChatUsers)

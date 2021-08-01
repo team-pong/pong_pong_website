@@ -33,7 +33,7 @@ export class FriendController {
   }
   @ApiOperation({ summary: '해당 유저가 친구 추가한 유저 인지 확인'})
   @ApiResponse({ type: boolean, description: '이미 친구 추가한 유저 이면 true, 아니면 false' })
-  @ApiBody({ type: FriendDto1, description: 'friend인지 확인할 유저아이디, 채널아이디' })
+  @ApiBody({ type: FriendDto1, description: 'friend인지 확인할 유저아이디, 상대아이디' })
   @Get()
   isFriend(@Body() b: FriendDto1){
     return this.friendService.isFriend(b.user_id, b.friend_id);
