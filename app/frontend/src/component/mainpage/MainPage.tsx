@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ModalController, ChatContent, ConfigContent } from '../modal/Modal'
+import { ModalController, ChatContent, ConfigContent, RecordContent } from '../modal/Modal'
 import NavBar from './navbar/NavBar'
 import '/src/scss/MainPage.scss'
 import EasyFetch from './../../utils/EasyFetch';
@@ -55,7 +55,7 @@ const MainPage = (): JSX.Element => {
             <span>게임을 하려면 누르세요!</span>
           </div>
         </div>
-        <ModalController content={() => <h1>Record</h1>} display={isRecordOpen} stateSetter={setIsRecordOpen}/>
+        <ModalController content={RecordContent} display={isRecordOpen} stateSetter={setIsRecordOpen}/>
         <ModalController content={ChatContent} display={isChatOpen} stateSetter={setIsChatOpen}/>
         <ModalController content={() => <h1>Game</h1>} display={isGameOpen} stateSetter={setIsGameOpen}/>
         <ModalController content={ConfigContent} display={isConfigOpen} stateSetter={setIsConfigOpen}/>
