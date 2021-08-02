@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DmStoreDto2 } from 'src/dto/dm-store';
 import { DmStore } from 'src/entities/dm-store';
 import { Users } from 'src/entities/users';
+import { err0, err2 } from 'src/err';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -14,14 +15,18 @@ export class DmStoreService {
 
   async createDmStore(sender_id: string, receiver_id: string, content: string){
     if (await this.usersRepo.count({user_id: sender_id}) === 0)  // 존재하지 않은 유저 라면
-      return false;
+      return err2;
     if (await this.usersRepo.count({user_id: receiver_id}) === 0)  // 존재하지 않은 유저 라면
-      return false;
+      return err2;
     await this.dmStoreRepo.save({sender_id: sender_id, receiver_id: receiver_id, content: content});
-    return true;
+    return err0;
   }
 
   async readDmStore(user_id: string, other_id: string){
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      return err2;
+    if (await this.usersRepo.count({user_id: other_id}) === 0)  // 존재하지 않은 유저 라면
+      return err2;
     // user_id와 other_id가 관련된 모든 dm 검색
     const dm = await this.dmStoreRepo
       .query(`SELECT * FROM dm_store WHERE (sender_id='${user_id}' AND receiver_id='${other_id}') OR (sender_id='${other_id}' AND receiver_id='${user_id}') ORDER BY "createdAt" DESC`);
@@ -39,9 +44,9 @@ export class DmStoreService {
 
   async deleteDmStore(user_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-      return false;
+      return err2;
     await this.dmStoreRepo.update({sender_id: user_id}, {sender_id: 'unknown'});
     await this.dmStoreRepo.update({receiver_id: user_id}, {receiver_id: 'unknown'});
-    return true;
+    return err0;
   }
 }

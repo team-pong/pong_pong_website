@@ -10,7 +10,7 @@ export class ChatUsersController {
   constructor(private chatUsersService: ChatUsersService){}
 
   @ApiOperation({ summary: '채널에 유저 추가'})
-  @ApiResponse({ type: boolean, description: '채널에 유저 추가 성공시 true, 실패시 false' })
+  @ApiResponse({ type: boolean, description: '채널에 유저 추가 실패시 실패 이유' })
   @ApiBody({ type: ChatUsersDto1, description: '채널 아이디, 추가할 유저 아이디' })
   @Post()
   createChatUsers(@Body() b: ChatUsersDto1){
@@ -32,7 +32,12 @@ export class ChatUsersController {
       모든 유저가 채널에서 나가면 그 채널 삭제
       owner가 나가면 랜덤의 다른 인원으로 owner가 바뀜
     `})
-  @ApiResponse({ type: boolean, description: '유저가 채널에서 나가기 성공시 true, 실패시 false' })
+  @ApiResponse({ 
+    type: boolean, 
+    description: `
+      유저가 채널에서 나가기 성공시 true, 실패시 false
+      나가기 실패시 실패 이유 반환
+    ` })
   @ApiBody({ type: ChatUsersDto1, description: '채널에서 나갈 유저 아이디, 채널 아이디' })
   @Delete()
   deleteChatUsers(@Body() b: ChatUsersDto1){
