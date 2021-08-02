@@ -2,6 +2,7 @@ import React, { FC, useEffect } from "react";
 import "/src/scss/Modal.scss";
 import ChatContent from './content/ChatContent';
 import ConfigContent from './content/ConfigContent';
+import RecordContent from './content/RecordContent';
 
 /*!
  * @author yochoi, donglee
@@ -143,4 +144,4 @@ const Modal: FC<modalPros> = ({ content, stateSetter }): JSX.Element => {
   );
 };
 
-export { ModalController, ChatContent, ConfigContent };
+export { ModalController, ChatContent, ConfigContent, RecordContent };
