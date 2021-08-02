@@ -29,3 +29,11 @@ export class ChatUsersDto3{
 	})
 	public user_ids: string[];
 }
+
+export class ChatUsersDto4{
+  @ApiProperty({
+		example: 'jinbkim',
+		description: '유저 아이디',
+	})
+	public user_id: string;
+}

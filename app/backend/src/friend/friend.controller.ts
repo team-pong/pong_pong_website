@@ -45,6 +45,12 @@ export class FriendController {
   @Delete()
   deleteFriend(@Body() b: FriendDto1){
     return this.friendService.deleteFriend(b.user_id, b.friend_id);
+  }
+  @ApiOperation({ summary: '해당 유저 관련 모든 친구 관계 삭제'})
+  @ApiResponse({ type: boolean, description: '모든 친구 관계 삭제 성공시 true, 실패시 false' })
+  @ApiBody({ type: FriendDto3, description: '모든 친구 관계를 삭제할 유저 아이디' })
+  @Delete('all')
+  deleteAllFriend(@Body() b: FriendDto3){
+    return this.friendService.deleteAllFriend(b.user_id);
   } 
 }
-

@@ -70,6 +70,8 @@ export class createInitialData implements Seeder {
 				{user_id: 'hjung', nick: 'hjung', avatar_url: 'f'},
 				{user_id: 'juhlee', nick: 'juhlee', avatar_url: 'g'},
 				{user_id: 'hyeonkim', nick: 'hyeonkim', avatar_url: 'h'},
+				{user_id: 'unknown', nick: 'unknown', avatar_url: 'i'},
+
 			])
 			.execute();
 	}

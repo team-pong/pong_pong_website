@@ -47,4 +47,11 @@ export class MuteService {
     else
       return true;
   }
+
+  async deleteMute(user_id: string){
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      return false;
+    await this.muteRepo.delete({user_id: user_id});
+      return true;
+  }
 }

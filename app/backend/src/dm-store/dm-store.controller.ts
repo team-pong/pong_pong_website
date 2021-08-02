@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { boolean } from 'joi';
-import { DmStoreDto1, DmStoreDto2, DmStoreDto3, DmStoreDto4 } from 'src/dto/dm-store';
+import { DmStoreDto1, DmStoreDto2, DmStoreDto3, DmStoreDto4, DmStoreDto5 } from 'src/dto/dm-store';
 import { DmStoreService } from './dm-store.service';
 
 @ApiTags('DM-Store')
@@ -24,5 +24,18 @@ export class DmStoreController {
   @Get()
   readDmStore(@Body() b: DmStoreDto3){
     return this.dmStoreService.readDmStore(b.user_id, b.other_id);
+  }
+
+  @ApiOperation({ 
+    summary: 'DM 로그 삭제', 
+    description: `
+    회원 탈퇴시 에만 사용됨
+    진짜 로그를 지우는게 아니라 아이디만 unknown으로 변경
+    `})
+  @ApiResponse({ type: boolean, description: 'DM 로그 삭제 성공시 true, 실패시 false' })
+  @ApiBody({ type: DmStoreDto5, description: 'DM 로그 삭제할 유저 아이디' })
+  @Delete()
+  deleteDmStore(@Body() b: DmStoreDto5){
+    return this.dmStoreService.deleteDmStore(b.user_id);
   }
 }

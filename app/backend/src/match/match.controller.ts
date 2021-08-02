@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Delete } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { boolean } from 'joi';
 import { MatchDto1, MatchDto2, MatchDto3, MatchDto4 } from 'src/dto/match';
@@ -30,5 +30,18 @@ export class MatchController {
   @Get()
   readMatch(@Body() b: MatchDto4){
     return this.matchService.readMatch(b.user_id);
+  }
+
+  @ApiOperation({ 
+    summary: '해당 유저의 모든 전적 삭제',
+    description: `
+      회원 탈퇴시에만 사용됨
+      실제로 지우는게 아니라 이름을 unknown 으로 바꿈
+    `})
+  @ApiResponse({ type: boolean, description: '전적 삭제 성공시 true, 실패시 false' })
+  @ApiBody({ type: MatchDto4, description: '모든 전적을 삭제할 유저 아이디' })
+  @Delete()
+  deleteMatch(@Body() b: MatchDto4){
+    return this.matchService.deleteMatch(b.user_id);
   }
 }

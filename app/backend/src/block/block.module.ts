@@ -9,6 +9,7 @@ import { BlockService } from './block.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Block, Users, Friend])],
   controllers: [BlockController],
-  providers: [BlockService]
+  providers: [BlockService],
+  exports: [BlockService],
 })
 export class BlockModule {}

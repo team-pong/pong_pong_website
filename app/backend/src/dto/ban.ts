@@ -16,22 +16,6 @@ export class BanDto1{
 
 export class BanDto2{
   @ApiProperty({
-		example: `[jinbkim, donglee]`,
-		description: '유저아이디 배열',
-	})
-	public bans: string[];
-}
-
-export class BanDto3{
-	@ApiProperty({
-		example: 1,
-		description: '채널 아이디',
-	})
-	public channel_id: number;
-}
-
-export class BanDto4{
-  @ApiProperty({
 		example: 'jinbkim',
 		description: '유저 아이디',
 	})

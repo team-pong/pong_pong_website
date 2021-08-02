@@ -7,8 +7,8 @@ import { DmStoreService } from './dm-store.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([DmStore, Users])],
-
   controllers: [DmStoreController],
-  providers: [DmStoreService]
+  providers: [DmStoreService],
+  exports: [DmStoreService],
 })
 export class DmStoreModule {}

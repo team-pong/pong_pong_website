@@ -47,10 +47,21 @@ export class FriendService {
   }
 
   async deleteFriend(user_id: string, friend_id: string){
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      return false;
+    if (await this.usersRepo.count({user_id: friend_id}) === 0)  // 존재하지 않은 유저 라면
+      return false;
     if (await this.isFriend(user_id, friend_id)){  // 이미 친구 이면
       await this.friendRepo.delete({user_id: user_id, friend_id: friend_id});
       return true;
     }
     return false;
+  }
+  async deleteAllFriend(user_id: string){
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      return false;
+    await this.friendRepo.delete({user_id: user_id});
+    await this.friendRepo.delete({friend_id: user_id});
+    return true;
   }
 }

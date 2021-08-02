@@ -45,10 +45,22 @@ export class BlockService {
   }
 
   async deleteBlock(user_id: string, block_id: string){
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      return false;
+    if (await this.usersRepo.count({user_id: block_id}) === 0)  // 존재하지 않은 유저 라면
+      return false;
     if (await this.isBlock(user_id, block_id)){  // 이미 차단 했으면
       await this.blockRepo.delete({user_id: user_id, block_id: block_id});
       return true;
     }
     return false;
+  }
+
+  async deleteAllBlock(user_id: string){
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      return false;
+    await this.blockRepo.delete({user_id: user_id});
+    await this.blockRepo.delete({block_id: user_id});
+    return true;
   }
 }

@@ -8,6 +8,7 @@ import { FriendService } from './friend.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Friend, Users])],
   controllers: [FriendController],
-  providers: [FriendService]
+  providers: [FriendService],
+  exports: [FriendService],
 })
 export class FriendModule {}

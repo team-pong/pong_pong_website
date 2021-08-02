@@ -39,5 +39,13 @@ export class BlockController {
   @Delete()
   deleteBlock(@Body() b: BlockDto1){
     return this.blockService.deleteBlock(b.user_id, b.block_id);
-  } 
+  }
+
+  @ApiOperation({ summary: '해당 유저에 대한 모든 차단 관계 해제', description: '회원 탈퇴시 에만 사용됨'})
+  @ApiResponse({ type: boolean, description: '차단 해제 성공시 true, 실패시 false' })
+  @ApiBody({ type: BlockDto3, description: '모든 차단 관계를 해제할 유저 아이디' })
+  @Delete('all')
+  deleteAllBlock(@Body() b: BlockDto3){
+    return this.blockService.deleteAllBlock(b.user_id);
+  }
 }

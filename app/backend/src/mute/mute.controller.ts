@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { boolean } from 'joi';
-import { MuteDto1 } from 'src/dto/mute';
+import { MuteDto1, MuteDto2 } from 'src/dto/mute';
 import { MuteService } from './mute.service';
 
 @ApiTags('Mute')
@@ -23,5 +23,13 @@ export class MuteController {
   @Get()
   isMute(@Body() b: MuteDto1){
     return this.muteService.isMute(b.user_id, b.channel_id);
+  }
+
+  @ApiOperation({ summary: '한 유저의 모든 mute 제거', description: '회원 탈퇴시 에만 사용됨'})
+  @ApiResponse({ type: boolean, description: 'mute 제거 성공시 true, 실패시 false' })
+  @ApiBody({ type: MuteDto2, description: 'mute 제거할 유저아이디' })
+  @Delete()
+  deletemute(@Body() b: MuteDto2){
+    return this.muteService.deleteMute(b.user_id);
   }
 }
