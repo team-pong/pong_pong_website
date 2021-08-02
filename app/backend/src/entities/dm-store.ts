@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, PrimaryColumn, OneToOne, JoinColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
 @Entity()
 export class DmStore{
@@ -10,6 +10,6 @@ export class DmStore{
 	receiver_id: string;
   @Column()
   content: string;
-	@Column()
-	time: Date;
+	@CreateDateColumn()
+	createdAt: Date;
 }

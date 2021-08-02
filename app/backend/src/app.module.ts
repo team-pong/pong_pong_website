@@ -14,6 +14,8 @@ import { MuteModule } from './mute/mute.module';
 import { FriendModule } from './friend/friend.module';
 import { DmStoreModule } from './dm-store/dm-store.module';
 import { SessionModule } from './session/session.module';
+import { ChatUsersModule } from './chat-users/chat-users.module';
+import { BlockModule } from './block/block.module';
 
 @Module({
   imports: [
@@ -28,7 +30,10 @@ import { SessionModule } from './session/session.module';
     MuteModule, 
     FriendModule, 
     DmStoreModule, 
-    SessionModule],
+    SessionModule,
+    ChatUsersModule,
+    BlockModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

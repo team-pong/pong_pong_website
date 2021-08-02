@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity()
-export class Admin{
+export class ChatUsers{
 	@PrimaryColumn()
 	user_id: string;
 	@Column()

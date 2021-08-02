@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, PrimaryColumn, OneToOne, JoinColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity()
 export class Users{
 	@PrimaryColumn()
 	user_id: string;
-	@Column()
+	@Column({unique: true})
 	nick: string;
 	@Column()
 	avatar_url: string;
@@ -16,6 +16,6 @@ export class Users{
   loss_games: number;
   @Column({default: 1000})
   ladder_level: number;
-	@Column({default: 'off'})
+	@Column({default: 'on'})
 	status: string;
 }

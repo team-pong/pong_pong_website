@@ -1,5 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
+import { ChatUsers } from './src/entities/chat-users';
+import { DmStore } from './src/entities/dm-store';
 import { Achievements } from './src/entities/achievements'
 import { Admin } from './src/entities/admin'
 import { Ban } from './src/entities/ban'
@@ -9,6 +11,7 @@ import { Match } from './src/entities/match'
 import { Mute } from './src/entities/mute'
 import { Session } from './src/entities/session'
 import { Users } from './src/entities/users'
+import { Block } from './src/entities/block';
 
 dotenv.config();
 const config: TypeOrmModuleOptions = {
@@ -23,11 +26,14 @@ const config: TypeOrmModuleOptions = {
     Admin,
     Ban,
     Chat,
+    ChatUsers,
+    DmStore,
     Friend,
     Match,
     Mute,
     Session,
-    Users
+    Users,
+    Block
   ],
   migrations: [__dirname + '/src/migrations/*.ts'],
   cli: { migrationsDir: 'src/migrations' },
