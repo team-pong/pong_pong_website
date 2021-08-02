@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Client } from 'pg';
 
 declare module 'express-session' {
@@ -13,6 +14,16 @@ declare module 'express-session' {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const config = new DocumentBuilder()
+  .setTitle('ft_transcendence API')
+  .setDescription('ft_transcendence API 문서')
+  .setVersion('1.0')
+  .addCookieAuth('connect.sid')
+  .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   const conObject = {
     user: 'pong_session_admin',
     host: process.env.PG_HOST,
