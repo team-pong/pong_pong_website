@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { err0, err1, err2, err3 } from 'src/err'
 
 @Injectable()
-export class AchivementsService {	
+export class achievementsService {	
   constructor(
   @InjectRepository(Achievements) private achievementRepo: Repository<Achievements>,
   @InjectRepository(Users) private usersRepo: Repository<Users>,

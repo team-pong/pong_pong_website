@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from 'src/entities/users';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { AchivementsModule } from 'src/achivements/achivements.module'
+import { achievementsModule } from 'src/achievements/achievements.module'
 import { AdminModule } from 'src/admin/admin.module';
 import { BanModule } from 'src/ban/ban.module';
 import { BlockModule } from 'src/block/block.module';
@@ -15,7 +15,7 @@ import { MuteModule } from 'src/mute/mute.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Users]),
-    AchivementsModule,
+    achievementsModule,
     AdminModule,
     BanModule,
     BlockModule,
