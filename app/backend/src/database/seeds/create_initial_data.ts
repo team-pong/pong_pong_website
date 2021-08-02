@@ -19,10 +19,10 @@ export class createInitialData implements Seeder {
 		await connection.query(`GRANT ALL PRIVILEGES ON TABLE session TO pong_admin`);
 		await connection.query(`CREATE INDEX IDX_session_expire ON session (expire)`);
 
-		await connection
-			.createQueryBuilder().insert().into(Achievements)
-			.values([{user_id: 'jinbkim', achievement: '난무조건이겨'}, {user_id: 'jinbkim', achievement: '나는야입문자'}, {user_id: 'donglee', achievement: '타락파워전사'}])
-			.execute();
+		// await connection
+		// 	.createQueryBuilder().insert().into(Achievements)
+		// 	.values([{user_id: 'jinbkim', achievement: '난무조건이겨'}, {user_id: 'jinbkim', achievement: '나는야입문자'}, {user_id: 'donglee', achievement: '타락파워전사'}])
+		// 	.execute();
 		await connection
 			.createQueryBuilder().insert().into(Admin)
 			.values([{user_id: 'jinbkim', channel_id: 1}, {user_id: 'donglee', channel_id: 1}, {user_id: 'hna', channel_id: 2}])
@@ -62,7 +62,7 @@ export class createInitialData implements Seeder {
 		await connection
 			.createQueryBuilder().insert().into(Users)
 			.values([
-				{user_id: 'jinbkim', nick: 'jinbkim', avatar_url: 'a'}, 
+				{user_id: 'jinbkim', nick: 'jinbkim', avatar_url: 'a', total_games:100, win_games:100}, 
 				{user_id: 'donglee', nick: 'donglee', avatar_url: 'b'}, 
 				{user_id: 'hna', nick: 'hna', avatar_url: 'c'}, 
 				{user_id: 'yochoi', nick: 'yochoi', avatar_url: 'd'}, 
