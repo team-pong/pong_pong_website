@@ -33,8 +33,32 @@ export class MatchController {
     ` })
   @ApiBody({ type: MatchDto4, description: '모든 전적을 검색할 유저 아이디' })
   @Get()
-  readMatch(@Body() b: MatchDto4){
-    return this.matchService.readMatch(b.user_id);
+  readAllMatch(@Body() b: MatchDto4){
+    return this.matchService.readMatch(b.user_id, 'all');
+  }
+  @ApiOperation({ summary: '해당 유저의 일반 전적 검색'})
+  @ApiResponse({ 
+    type: MatchDto3, 
+    description: `
+      유저(아바타, nickname, 점수), 상대(아바타, nickname, 점수), 시간, 게임종류, 맵정보, 승패여부 데이터를 가지는 배열
+      검색 실패시 실패 이유 반환
+    ` })
+  @ApiBody({ type: MatchDto4, description: '일반 전적을 검색할 유저 아이디' })
+  @Get('general')
+  readGeneralMatch(@Body() b: MatchDto4){
+    return this.matchService.readMatch(b.user_id, 'general');
+  }
+  @ApiOperation({ summary: '해당 유저의 래더 전적 검색'})
+  @ApiResponse({ 
+    type: MatchDto3, 
+    description: `
+      유저(아바타, nickname, 점수), 상대(아바타, nickname, 점수), 시간, 게임종류, 맵정보, 승패여부 데이터를 가지는 배열
+      검색 실패시 실패 이유 반환
+    ` })
+  @ApiBody({ type: MatchDto4, description: '래더 전적을 검색할 유저 아이디' })
+  @Get('ranked')
+  readRankedMatch(@Body() b: MatchDto4){
+    return this.matchService.readMatch(b.user_id, 'ranked');
   }
 
   @ApiOperation({ 
