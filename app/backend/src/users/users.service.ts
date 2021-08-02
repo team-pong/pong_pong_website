@@ -64,8 +64,8 @@ export class UsersService {
   }
 
   async deleteUsers(user_id: string){
-    // if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저이면
-      // return false;
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저이면
+      return false;
     await this.achivementsService.deleteAllAchievements(user_id);
     await this.adminService.deleteAdmin(user_id);
     await this.banService.deleteBan(user_id);

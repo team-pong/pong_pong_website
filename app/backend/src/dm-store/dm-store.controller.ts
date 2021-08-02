@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { boolean } from 'joi';
-import { DmStoreDto1, DmStoreDto2, DmStoreDto3, DmStoreDto4, DmStoreDto5 } from 'src/dto/dm-store';
+import { DmStoreDto1, DmStoreDto3, DmStoreDto4, DmStoreDto5 } from 'src/dto/dm-store';
 import { DmStoreService } from './dm-store.service';
 
 @ApiTags('DM-Store')

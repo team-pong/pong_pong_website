@@ -2,7 +2,7 @@ import { Controller, Post, Body, Get, Delete } from '@nestjs/common';
 import { AchivementsService } from './achivements.service'
 import { AcievementDto1, AcievementDto2, AcievementDto3 } from '../dto/achivements'
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { boolean, number, string } from 'joi';
+import { boolean } from 'joi';
 
 @ApiTags('Achivements')
 @Controller('achivements')

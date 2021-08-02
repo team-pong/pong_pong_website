@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Delete } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { boolean } from 'joi';
-import { MatchDto1, MatchDto2, MatchDto3, MatchDto4 } from 'src/dto/match';
+import { MatchDto1, MatchDto3, MatchDto4 } from 'src/dto/match';
 import { MatchService } from './match.service';
 
 @ApiTags('Match')

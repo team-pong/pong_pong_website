@@ -69,8 +69,8 @@ export class MatchService {
   }
 
   async deleteMatch(user_id: string){
-  // if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-    // return false;
+  if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+    return false;
   await this.matchRepo.update({winner_id: user_id}, {winner_id: 'unknown'});
   await this.matchRepo.update({loser_id: user_id}, {loser_id: 'unknown'});
   return true;
