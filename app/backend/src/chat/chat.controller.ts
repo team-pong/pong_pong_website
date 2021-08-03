@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { string } from 'joi';
-import { ChatDto1, ChatDto3, ChatDto4, ChatDto5, ChatDto6, ChatDto7, ChatDto8 } from 'src/dto/chat';
+import { ChatDto1, ChatDto3, ChatDto4, ChatDto5, ChatDto6 } from 'src/dto/chat';
 import { ChatService } from './chat.service';
 
 @ApiTags('Chat')
@@ -27,20 +27,21 @@ export class ChatController {
   @ApiOperation({ summary: '채널 제목 검색'})
   @ApiResponse({ type: ChatDto3, description: `모든 채널의 제목, 타입, 최대인원` })
   @Get('title')
-  readTitle(@Body() b:ChatDto8){
-    return this.chatService.readTitle(b.title);
+  @ApiQuery({ name: 'title', example:'아무나', description: '검색할 채널 제목' })
+  readTitle(@Query() q){
+    return this.chatService.readTitle(q.title);
   }
   @ApiOperation({ summary: '채널 owner 검색'})
   @ApiResponse({ 
-    type: ChatDto7, 
+    type: ChatDto6, 
     description: `
       해당 채널의 owner 아이디
       검색 실패시 실패 이유 반환
     ` })
-  @ApiBody({ type: ChatDto6, description: '채널 아이디' })
+  @ApiQuery({ name: 'channel_id', example: 1, description: '채널 아이디' })
   @Get('owner')
-  readOwner(@Body() b: ChatDto6){
-    return this.chatService.readOwner(b.channel_id);
+  readOwner(@Query() q){
+    return this.chatService.readOwner(q.channel_id);
   }
 
   @ApiOperation({ summary: '채널 설정 변경', description: '채팅방 타입은 public 또는 protected 또는 private 이어야함'})
@@ -60,9 +61,10 @@ export class ChatController {
 
   @ApiOperation({ summary: '채널 제거'})
   @ApiResponse({ type: string, description: '채널 제거 실패시 실패이유' })
-  @ApiBody({ type: ChatDto6, description: '제거할 채널 아이디' })
+  @ApiQuery({ name: 'channel_id', example: 1, description: '제거할 채널 아이디' })
   @Delete()
-  deleteChat(@Body() b: ChatDto6){
-    return this.chatService.deleteChat(b.channel_id);
+  deleteChat(@Query() q){
+    return this.chatService.deleteChat(q.channel_id);
+
   }
 }

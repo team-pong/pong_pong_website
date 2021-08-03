@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { string } from 'joi';
-import { UsersDto1, UsersDto2, UsersDto3, UsersDto4, UsersDto5 } from 'src/dto/users';
+import { UsersDto1, UsersDto2, UsersDto3 } from 'src/dto/users';
 import { UsersService } from './users.service';
 
 @ApiTags('Users')
@@ -24,10 +24,10 @@ export class UsersController {
       유저의 아이디, 닉네임, 아바타 url, 총 게임수, 이긴 게임수, 진 게임수, 래더점수, 유저의 상태
       검색 실패시 실패 이유
     ` })
-  @ApiBody({ type: UsersDto2, description: '프로필을 검색할 유저 닉네임' })
+  @ApiQuery({ name: 'nick', example: 'jinbkim',description: '프로필을 검색할 유저 닉네임' })
   @Get()
-  readUsers1(@Body() b: UsersDto2){
-    return this.usersService.readUsers(b.nick, 'nick');
+  readUsers1(@Query() q){
+    return this.usersService.readUsers(q.nick, 'nick');
   }
   @ApiOperation({ summary: '유저 아이디로 유저의 프로필 검색'})
   @ApiResponse({ 
@@ -36,25 +36,25 @@ export class UsersController {
       유저의 아이디, 닉네임, 아바타 url, 총 게임수, 이긴 게임수, 진 게임수, 래더점수, 유저의 상태
       검색 실패시 실패 이유
     ` })
-  @ApiBody({ type: UsersDto4, description: '프로필을 검색할 유저 아이디' })
+  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '프로필을 검색할 유저 아이디' })
   @Get('user')
-  readUsers2(@Body() b: UsersDto4){
-    return this.usersService.readUsers(b.user_id, 'user_id');
+  readUsers2(@Query() q){
+    return this.usersService.readUsers(q.user_id, 'user_id');
   }
 
   @ApiOperation({ summary: '유저 정보 변경'})
   @ApiResponse({ type: string, description: '유저 정보 변경 실패시 실패 이유' })
-  @ApiBody({ type: UsersDto5, description: '변경할 유저 아이디, 유저 닉네임, 아바타 이미지 url' })
+  @ApiBody({ type: UsersDto2, description: '변경할 유저 아이디, 유저 닉네임, 아바타 이미지 url' })
   @Post('info')
-  updateUsers(@Body() b: UsersDto5){
+  updateUsers(@Body() b: UsersDto2){
     return this.usersService.updateUsers(b.user_id, b.nick, b.avatar_url);
   }
 
   @ApiOperation({ summary: '유저 제거'})
   @ApiResponse({ type: string, description: '유저 제거 실패시 실패 이유' })
-  @ApiBody({ type: UsersDto4, description: '제거할 유저 아이디' })
+  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '제거할 유저 아이디' })
   @Delete()
-  deleteUsers(@Body() b: UsersDto4){
-    return this.usersService.deleteUsers(b.user_id);
+  deleteUsers(@Query() q){
+    return this.usersService.deleteUsers(q.user_id);
   }
 }

@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { boolean, string } from 'joi';
-import { AdminDto1, AdminDto2, AdminDto3, AdminDto4 } from 'src/dto/admin';
+import { AdminDto1, AdminDto2 } from 'src/dto/admin';
 import { AdminService } from './admin.service';
 
 @ApiTags('Admin')
@@ -24,10 +24,10 @@ export class AdminController {
       해당 채널의 admin 유저아이디 배열
       검색 실패시 실패 이유 반환
     `})
-  @ApiBody({ type: AdminDto3, description: 'admin을 검색할 채널아이디' })
+  @ApiQuery({ name: 'channel_id', example: 1, description: 'admin을 검색할 채널아이디' })
   @Get()
-  readAdmin(@Body() b: AdminDto3){
-    return this.adminService.readAdmin(b.channel_id);
+  readAdmin(@Query() q){
+    return this.adminService.readAdmin(q.channel_id);
   }
   @ApiOperation({ summary: '해당 유저가 해당 채널의 admin 인지 확인'})
   @ApiResponse({ 
@@ -36,17 +36,18 @@ export class AdminController {
       유저가 admin 이면 true, 아니면 false
       확인 실패시 실패 이유 반환
     `})
-  @ApiBody({ type: AdminDto1, description: 'admin인지 확인할 유저아이디, 채널아이디' })
+  @ApiQuery({ name:'user_id', example: 'jinbkim', description: 'admin인지 확인할 유저아이디' })
+  @ApiQuery({ name:'channel_id', example: 1, description: 'admin인지 확인할 채널아이디' })
   @Get('isAdmin')
-  isAdmin(@Body() b: AdminDto1){
-    return this.adminService.isAdmin(b.user_id, b.channel_id);
+  isAdmin(@Query() q){
+    return this.adminService.isAdmin(q.user_id, q.channel_id);
   }
 
   @ApiOperation({ summary: '해당 유저의 admin 제거'})
   @ApiResponse({ type: string, description: 'admin 제거 실패시 실패 이유' })
-  @ApiBody({ type: AdminDto4, description: 'admin 제거할 유저아이디' })
+  @ApiQuery({ name:'user_id', example: 'jinbkim', description: 'admin 제거할 유저아이디' })
   @Delete()
-  deleteAdmin(@Body() b: AdminDto1){
-    return this.adminService.deleteAdmin(b.user_id);
+  deleteAdmin(@Query() q){
+    return this.adminService.deleteAdmin(q.user_id);
   }
 }

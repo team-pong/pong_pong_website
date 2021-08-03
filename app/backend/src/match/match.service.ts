@@ -35,12 +35,14 @@ export class MatchService {
     return err0;
   }
 
-  async readMatch(user_id: string){
+  async readMatch(user_id: string, type: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
       return err2;
-    // 해당 유저의 모든 전적 검색
-    const match = await this.matchRepo
-      .query(`SELECT * FROM match WHERE winner_id='${user_id}' OR loser_id='${user_id}' ORDER BY "createdAt" DESC`);
+    let match;
+    if (type === 'all')  // 해당 유저의 모든 전적 검색
+      match = await this.matchRepo.query(`SELECT * FROM match WHERE winner_id='${user_id}' OR loser_id='${user_id}' ORDER BY "createdAt" DESC`);
+    else if (type === 'general' || type === 'ranked')  // 해당 유저의 일반 전적 또는 래더 전적 검색
+      match = await this.matchRepo.query(`SELECT * FROM match WHERE (winner_id='${user_id}' OR loser_id='${user_id}') AND type='${type}' ORDER BY "createdAt" DESC`);
     // 유저(아바타, nickname, 점수), 상대(아바타, nickname, 점수), 시간, 게임종류, 맵정보, 승패여부를 matchList에 담기
     let matchList = {matchList: Array<MatchDto2>()}
     for (var i in match){

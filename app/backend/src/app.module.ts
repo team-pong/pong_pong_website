@@ -4,7 +4,7 @@ import * as ormconfig from '../ormconfig';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { AchivementsModule } from './achivements/achivements.module';
+import { achievementsModule } from './achievements/achievements.module';
 import { UsersModule } from './users/users.module';
 import { MatchModule } from './match/match.module';
 import { ChatModule } from './chat/chat.module';
@@ -21,7 +21,7 @@ import { BlockModule } from './block/block.module';
   imports: [
     ConfigModule.forRoot(),
 		TypeOrmModule.forRoot(ormconfig),
-    AchivementsModule, 
+    achievementsModule, 
     UsersModule, 
     MatchModule, 
     ChatModule, 

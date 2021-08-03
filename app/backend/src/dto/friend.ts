@@ -21,11 +21,3 @@ export class FriendDto2{
 	})
 	public friends: string[];
 }
-
-export class FriendDto3{
-  @ApiProperty({
-		example: 'jinbkim',
-		description: '내 유저 아이디',
-	})
-	public user_id: string;
-}
