@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { boolean, string } from 'joi';
 import { FriendDto1, FriendDto2 } from 'src/dto/friend';
+import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { FriendService } from './friend.service';
 
 @ApiTags('Friend')
@@ -10,7 +10,7 @@ export class FriendController {
   constructor(private friendService: FriendService){}
 
   @ApiOperation({ summary: '친구 추가'})
-  @ApiResponse({ type: string, description: '친구 추가 실패시 실패 이유' })
+  @ApiResponse({ type: ErrMsgDto, description: '친구 추가 실패시 실패 이유' })
   @ApiBody({ type: FriendDto1, description: '내 유저 아이디, 친구 추가할 유저 아이디' })
   @Post()
   createFriend(@Body() b: FriendDto1){
@@ -43,7 +43,7 @@ export class FriendController {
   }
   @ApiOperation({ summary: '해당 유저가 친구 추가한 유저 인지 확인'})
   @ApiResponse({ 
-    type: boolean, 
+    type: Bool, 
     description: `
       이미 친구 추가한 유저 이면 true, 아니면 false
       확인 실패시 실패 이유 반환
@@ -56,7 +56,7 @@ export class FriendController {
   }
 
   @ApiOperation({ summary: '친구 삭제'})
-  @ApiResponse({ type: string, description: 'friend 삭제 실패시 실패 이유' })
+  @ApiResponse({ type: ErrMsgDto, description: 'friend 삭제 실패시 실패 이유' })
   @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '내 유저 아이디' })
   @ApiQuery({ name: 'friend_id', example: 'donglee', description: '친구 삭제할 유저 아이디' })
   @Delete()
@@ -64,7 +64,7 @@ export class FriendController {
     return this.friendService.deleteFriend(q.user_id, q.friend_id);
   }
   @ApiOperation({ summary: '해당 유저 관련 모든 친구 관계 삭제'})
-  @ApiResponse({ type: string, description: '모든 친구 관계 삭제 실패시 실패 이유' })
+  @ApiResponse({ type: ErrMsgDto, description: '모든 친구 관계 삭제 실패시 실패 이유' })
   @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '모든 친구 관계를 삭제할 유저 아이디' })
   @Delete('all')
   deleteAllFriend(@Query() q){

@@ -11,7 +11,8 @@ import { DmStoreService } from 'src/dm-store/dm-store.service';
 import { FriendService } from 'src/friend/friend.service';
 import { MatchService } from 'src/match/match.service';
 import { MuteService } from 'src/mute/mute.service';
-import { err0, err1, err2 } from 'src/err';
+import { err0, err1, err2, err21, err22 } from 'src/err';
+import { ErrMsgDto } from 'src/dto/utility';
 
 @Injectable()
 export class UsersService {
@@ -29,23 +30,23 @@ export class UsersService {
 
   async createUsers(user_id: string, nick: string, avatar_url: string){
     if (await this.usersRepo.count({user_id: user_id}))  // 이미 존재하는 유저 이면
-      return err1;
+      return new ErrMsgDto(err2);
     if (await this.usersRepo.count({nick: nick}))  // 중복된 닉네임 이면
-      return err1;
+      return new ErrMsgDto(err22);
     await this.usersRepo.save({user_id: user_id, nick: nick, avatar_url: avatar_url})
-    return err0;
+    return new ErrMsgDto(err0);
   }
 
   async readUsers(search: string, type: string){
     let user;
     if (type == 'nick'){  // 닉네임으로 검색시
       if (await this.usersRepo.count({nick: search}) === 0)  // 찾으려는 닉네임이 없으면
-        return err2;
+        return new ErrMsgDto(err21);;
       user = await this.usersRepo.findOne({nick: search});
     }
     else if (type == 'user_id'){  // 유저 아이디로 검색시
       if (await this.usersRepo.count({user_id: search}) === 0)  // 존재하지 않는 유저 이면
-        return err2;
+        return new ErrMsgDto(err2);
       user = await this.usersRepo.findOne({user_id: search});
     }
     // 유저의 아이디, 닉네임, 아바타 url, 총 게임수, 이긴 게임수, 진 게임수, 래더점수, 유저의 상태 데이터 배열을 profile에 담기
@@ -63,16 +64,16 @@ export class UsersService {
 
   async updateUsers(user_id: string, nick: string, avatar_url: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않는 유저 이면
-      return err2;
+    return new ErrMsgDto(err2);
     if (await this.usersRepo.count({nick: nick}))  // 중복된 닉네임 이면
-      return err1;
+    return new ErrMsgDto(err22);
     await this.usersRepo.save({user_id: user_id, nick: nick, avatar_url: avatar_url});
-    return err0;
+    return new ErrMsgDto(err0);
   }
 
   async deleteUsers(user_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저이면
-      return err2;
+      return new ErrMsgDto(err2);
     await this.achievementsService.deleteAllAchievements(user_id);
     await this.adminService.deleteAdmin(user_id);
     await this.banService.deleteBan(user_id);
@@ -82,6 +83,6 @@ export class UsersService {
     await this.matchService.deleteMatch(user_id);
     await this.muteService.deleteMute(user_id);
     await this.usersRepo.delete({user_id: user_id});
-    return err0;
+    return new ErrMsgDto(err0);
   }
 }

@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { string } from 'joi';
 import { UsersDto1, UsersDto2, UsersDto3 } from 'src/dto/users';
+import { ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from './users.service';
 
 @ApiTags('Users')
@@ -10,7 +10,7 @@ export class UsersController {
   constructor(private usersService: UsersService){}
 
   @ApiOperation({ summary: '유저 생성' })
-  @ApiResponse({ type: string, description: '유저 생성 실패시 실패 이유' })
+  @ApiResponse({ type: ErrMsgDto, description: '유저 생성 실패시 실패 이유' })
   @ApiBody({ type: UsersDto1, description: '유저 아이디, 닉네임, 아바타 url' })
   @Post()
   creatUsers(@Body() b: UsersDto1){
@@ -43,7 +43,7 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: '유저 정보 변경'})
-  @ApiResponse({ type: string, description: '유저 정보 변경 실패시 실패 이유' })
+  @ApiResponse({ type: ErrMsgDto, description: '유저 정보 변경 실패시 실패 이유' })
   @ApiBody({ type: UsersDto2, description: '변경할 유저 아이디, 유저 닉네임, 아바타 이미지 url' })
   @Post('info')
   updateUsers(@Body() b: UsersDto2){
@@ -51,7 +51,7 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: '유저 제거'})
-  @ApiResponse({ type: string, description: '유저 제거 실패시 실패 이유' })
+  @ApiResponse({ type: ErrMsgDto, description: '유저 제거 실패시 실패 이유' })
   @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '제거할 유저 아이디' })
   @Delete()
   deleteUsers(@Query() q){

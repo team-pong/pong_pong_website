@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MatchDto2 } from 'src/dto/match';
+import { ErrMsgDto } from 'src/dto/utility';
 import { Match } from 'src/entities/match';
 import { Users } from 'src/entities/users';
-import { err0, err10, err2 } from 'src/err';
+import { err0, err18, err19, err2 } from 'src/err';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -15,13 +16,13 @@ export class MatchService {
   
   async createMatch(winner_id: string, loser_id: string, winner_score: number, loser_score: number, type: string, map: number){
     if (await this.usersRepo.count({user_id: winner_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.usersRepo.count({user_id: loser_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (type != 'general' && type != 'ranked')  // 게임 타입이 일반게임 혹은 랭크게임이 아니면
-      return err10;
+      return new ErrMsgDto(err18);
     if (map != 1 && map != 2 && map != 3)  // 맵은 1, 2, 3 중에 하나 이어야함
-      return err10;
+      return new ErrMsgDto(err19);
     await this.matchRepo.save({winner_id: winner_id, loser_id: loser_id, winner_score: winner_score, loser_score: loser_score, type: type, map: map});
     const winner = await this.usersRepo.findOne({user_id: winner_id});
     const loser = await this.usersRepo.findOne({user_id: loser_id});
@@ -32,12 +33,12 @@ export class MatchService {
       await this.usersRepo.save({user_id: winner_id, ladder_level: winner.ladder_level+scoreChange});  // 승자는 +scoreChange점 
       await this.usersRepo.save({user_id: loser_id, ladder_level: loser.ladder_level-scoreChange});  // 패자는 -scoreChange점
     }
-    return err0;
+    return new ErrMsgDto(err0);;
   }
 
   async readMatch(user_id: string, type: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     let match;
     if (type === 'all')  // 해당 유저의 모든 전적 검색
       match = await this.matchRepo.query(`SELECT * FROM match WHERE winner_id='${user_id}' OR loser_id='${user_id}' ORDER BY "createdAt" DESC`);
@@ -75,9 +76,9 @@ export class MatchService {
 
   async deleteMatch(user_id: string){
   if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-    return err2;
+    return new ErrMsgDto(err2);
   await this.matchRepo.update({winner_id: user_id}, {winner_id: 'unknown'});
   await this.matchRepo.update({loser_id: user_id}, {loser_id: 'unknown'});
-  return err0;
+  return new ErrMsgDto(err0);
   }
 }
