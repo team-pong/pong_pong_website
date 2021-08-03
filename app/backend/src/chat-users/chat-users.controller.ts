@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { boolean } from 'joi';
 import { ChatUsersDto1, ChatUsersDto2 } from 'src/dto/chat-users';
+import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { ChatUsersService } from './chat-users.service';
 
 @ApiTags('Chat-users')
@@ -10,7 +10,7 @@ export class ChatUsersController {
   constructor(private chatUsersService: ChatUsersService){}
 
   @ApiOperation({ summary: '채널에 유저 추가'})
-  @ApiResponse({ type: boolean, description: '채널에 유저 추가 실패시 실패 이유' })
+  @ApiResponse({ type: ErrMsgDto, description: '채널에 유저 추가 실패시 실패 이유' })
   @ApiBody({ type: ChatUsersDto1, description: '채널 아이디, 추가할 유저 아이디' })
   @Post()
   createChatUsers(@Body() b: ChatUsersDto1){
@@ -33,7 +33,7 @@ export class ChatUsersController {
       owner가 나가면 랜덤의 다른 인원으로 owner가 바뀜
     `})
   @ApiResponse({ 
-    type: boolean, 
+    type: Bool, 
     description: `
       유저가 채널에서 나가기 성공시 true, 실패시 false
       나가기 실패시 실패 이유 반환

@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { boolean, string } from 'joi';
 import { AdminDto1, AdminDto2 } from 'src/dto/admin';
+import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { AdminService } from './admin.service';
 
 @ApiTags('Admin')
@@ -10,7 +10,7 @@ export class AdminController {
   constructor(private adminService: AdminService){}
 
   @ApiOperation({ summary: 'admin 설정'})
-  @ApiResponse({ type: string, description: 'admin 설정 실패시 실패 이유' })
+  @ApiResponse({ type: ErrMsgDto, description: 'admin 설정 실패시 실패 이유' })
   @ApiBody({ type: AdminDto1, description: 'admin 설정할 채널아이디, 유저아이디' })
   @Post()
   createAdmin(@Body() b: AdminDto1){
@@ -31,7 +31,7 @@ export class AdminController {
   }
   @ApiOperation({ summary: '해당 유저가 해당 채널의 admin 인지 확인'})
   @ApiResponse({ 
-    type: boolean, 
+    type: Bool,
     description: `
       유저가 admin 이면 true, 아니면 false
       확인 실패시 실패 이유 반환
@@ -44,7 +44,7 @@ export class AdminController {
   }
 
   @ApiOperation({ summary: '해당 유저의 admin 제거'})
-  @ApiResponse({ type: string, description: 'admin 제거 실패시 실패 이유' })
+  @ApiResponse({ type: ErrMsgDto, description: 'admin 제거 실패시 실패 이유' })
   @ApiQuery({ name:'user_id', example: 'jinbkim', description: 'admin 제거할 유저아이디' })
   @Delete()
   deleteAdmin(@Query() q){

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Delete, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { boolean } from 'joi';
 import { MatchDto1, MatchDto3 } from 'src/dto/match';
+import { ErrMsgDto } from 'src/dto/utility';
 import { MatchService } from './match.service';
 
 @ApiTags('Match')
@@ -17,7 +17,7 @@ export class MatchController {
       랭크 게임이면 래더점수 변동이 있음.
       게임 타입은 general 또는 ranked 이어야함.
     `})
-  @ApiResponse({ type: boolean, description: '전적 추가 실패시 실패 이유' })
+  @ApiResponse({ type: ErrMsgDto, description: '전적 추가 실패시 실패 이유' })
   @ApiBody({ type: MatchDto1, description: '승자 아이디, 패자 아이디, 승자 점수, 패자 점수, 게임 타입, 맵정보' })
   @Post()
   createMatch(@Body() b: MatchDto1){
@@ -67,7 +67,7 @@ export class MatchController {
       회원 탈퇴시에만 사용됨
       실제로 지우는게 아니라 이름을 unknown 으로 바꿈
     `})
-  @ApiResponse({ type: boolean, description: '전적 삭제 실패시 실패 이유' })
+  @ApiResponse({ type: ErrMsgDto, description: '전적 삭제 실패시 실패 이유' })
   @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '모든 전적을 삭제할 유저 아이디' })
   @Delete()
   deleteMatch(@Query() q){
