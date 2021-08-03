@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { boolean, string } from 'joi';
 import { BlockDto1, BlockDto2 } from 'src/dto/block';
+import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { BlockService } from './block.service';
 
 @ApiTags('Block')
@@ -10,7 +10,7 @@ export class BlockController {
   constructor(private blockService: BlockService){}
 
   @ApiOperation({ summary: '차단 추가', description: '친구인 상태이면 친구 삭제'})
-  @ApiResponse({ type: string, description: '차단 추가 실패시 실패이유' })
+  @ApiResponse({ type: ErrMsgDto, description: '차단 추가 실패시 실패이유' })
   @ApiBody({ type: BlockDto1, description: '내 유저 아이디, 차단할 유저 아이디' })
   @Post()
   createBlock(@Body() b: BlockDto1){
@@ -32,7 +32,7 @@ export class BlockController {
   }
   @ApiOperation({ summary: '해당 유저가 차단한 유저 인지 확인'})
   @ApiResponse({
-    type: boolean, 
+    type: Bool, 
     description: `
       이미 차단한 유저 이면 true, 아니면 false
       확인 실패시 실패 이유 반환
@@ -45,7 +45,7 @@ export class BlockController {
   }
 
   @ApiOperation({ summary: '차단 해제'})
-  @ApiResponse({ type: string, description: '차단 해제 실패시 실패이유' })
+  @ApiResponse({ type: ErrMsgDto, description: '차단 해제 실패시 실패이유' })
   @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '유저 아이디' })
   @ApiQuery({ name: 'block_id', example: 'hna', description: '차단 해제 할 유저 아이디' })
   @Delete()
@@ -53,7 +53,7 @@ export class BlockController {
     return this.blockService.deleteBlock(q.user_id, q.block_id);
   }
   @ApiOperation({ summary: '해당 유저에 대한 모든 차단 관계 해제', description: '회원 탈퇴시 에만 사용됨'})
-  @ApiResponse({ type: string, description: '차단 해제 실패시 실패이유' })
+  @ApiResponse({ type: ErrMsgDto, description: '차단 해제 실패시 실패이유' })
   @ApiQuery({ name: 'user_id', example: 'jinbkim' ,description: '모든 차단 관계를 해제할 유저 아이디' })
   @Delete('all')
   deleteAllBlock(@Query() q){

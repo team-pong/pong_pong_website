@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { Friend } from 'src/entities/friend';
 import { Users } from 'src/entities/users';
-import { err0, err1, err2, err3 } from 'src/err';
+import { err0, err16, err17, err2} from 'src/err';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -14,16 +15,18 @@ export class FriendService {
   
   async createFriend(user_id: string, friend_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.usersRepo.count({user_id: friend_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.friendRepo.count({user_id: user_id, friend_id: friend_id}))  // 이미 친구 이면
-      return err1;
+      return new ErrMsgDto(err16);
     await this.friendRepo.save({user_id: user_id, friend_id: friend_id});
-    return err0;
+    return new ErrMsgDto(err0);
   }
 
   async readFriend(user_id: string, type: string){
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      return new ErrMsgDto(err2);
     let user;
     let friendList = { friendList: Array<string>() };
     if (type === 'send'){
@@ -40,30 +43,30 @@ export class FriendService {
   }
   async isFriend(user_id: string, friend_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.usersRepo.count({user_id: friend_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.friendRepo.count({user_id: user_id, friend_id: friend_id}))  // 이미 친구 이면
-      return true;
-    return false;
+      return new Bool(true);
+    return new Bool(false);
   }
 
   async deleteFriend(user_id: string, friend_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2
+      return new ErrMsgDto(err2)
     if (await this.usersRepo.count({user_id: friend_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.isFriend(user_id, friend_id)){  // 이미 친구 이면
       await this.friendRepo.delete({user_id: user_id, friend_id: friend_id});
-      return err0;
+      return new ErrMsgDto(err0);
     }
-    return err3;
+    return new ErrMsgDto(err17);
   }
   async deleteAllFriend(user_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     await this.friendRepo.delete({user_id: user_id});
     await this.friendRepo.delete({friend_id: user_id});
-    return err0;
+    return new ErrMsgDto(err0);
   }
 }

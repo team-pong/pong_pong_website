@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { Block } from 'src/entities/block';
 import { Friend } from 'src/entities/friend';
 import { Users } from 'src/entities/users';
@@ -16,20 +17,20 @@ export class BlockService {
   
   async createBlock(user_id: string, block_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.usersRepo.count({user_id: block_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.blockRepo.count({user_id: user_id, block_id: block_id}))  // 이미 차단 했으면
-      return err1;
+      return new ErrMsgDto(err1);;
     await this.blockRepo.save({user_id: user_id, block_id: block_id});
     if (await this.FriendRepo.count({user_id: user_id, friend_id:block_id}))  // 친구인 상태이면, 친구 삭제
       await this.FriendRepo.delete({user_id: user_id, friend_id: block_id});
-    return err0;
+    return new ErrMsgDto(err0);
   }
 
   async readBlock(user_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     const user = await this.blockRepo.find({user_id: user_id});  // 해당 유저의 차단 목록 검색
     let blockList = { blockList: Array<string>() };
     for (var i in user)
@@ -39,31 +40,31 @@ export class BlockService {
 
   async isBlock(user_id: string, block_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.usersRepo.count({user_id: block_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.blockRepo.count({user_id: user_id, block_id: block_id}))  // 이미 차단 했으면
-      return true;
-    return false;
+      return new Bool(true);
+    return new Bool(false);
   }
 
   async deleteBlock(user_id: string, block_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.usersRepo.count({user_id: block_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     if (await this.isBlock(user_id, block_id)){  // 차단이 되어 있으면
       await this.blockRepo.delete({user_id: user_id, block_id: block_id});
-      return err0;
+      return new ErrMsgDto(err0);
     }
-    return err3;
+    return new ErrMsgDto(err3);
   }
 
   async deleteAllBlock(user_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      return new ErrMsgDto(err2);
     await this.blockRepo.delete({user_id: user_id});
     await this.blockRepo.delete({block_id: user_id});
-    return err0;
+    return new ErrMsgDto(err0);
   }
 }
