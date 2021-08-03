@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import CircleChart from "../../circlechart/CircleChart";
 import "../../../scss/content/RecordContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 
@@ -10,11 +11,12 @@ interface statistics {
   ladder_level: number
 }
 
-const Record: FC<any> = ({stats}) => {
+const Record: FC<any> = ({stats: {total_games, win_games, ladder_level}}) => {
   return (
     <div id="record">
       <div id="stats">
-        {stats.total_games}/{stats.win_games}/{stats.ladder_level}
+        <CircleChart width={100} height={100} percentage={(win_games / total_games) * 100} />
+        {total_games}/{win_games}/{ladder_level}
       </div>
     </div>
   )
