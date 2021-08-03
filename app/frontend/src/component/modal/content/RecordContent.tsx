@@ -10,9 +10,20 @@ interface statistics {
   ladder_level: number
 }
 
+const Record: FC<any> = ({stats}) => {
+  return (
+    <div id="record">
+      <div id="stats">
+        {stats.total_games}/{stats.win_games}/{stats.ladder_level}
+      </div>
+    </div>
+  )
+}
+
 const RecordContent: FC = (): JSX.Element => {
 
   const [nickNameToFind, setNickNameToFind] = useState("");
+  const [isRecordOpen, setIsRecordOpen] = useState(false);
   const [stats, setStats] = useState<statistics>({
     total_games: 0,
     win_games: 0,
@@ -25,6 +36,10 @@ const RecordContent: FC = (): JSX.Element => {
     if (nickNameToFind) {
       const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nickNameToFind}`);
       const res = await (await easyfetch.fetch()).json();
+      if (res.err_msg) {
+        setIsRecordOpen(false);
+        return ;
+      }
       setStats({
         total_games: res.total_games,
         win_games: res.win_games,
@@ -32,6 +47,7 @@ const RecordContent: FC = (): JSX.Element => {
         winning_rate: (res.win_games / res.total_games) * 100,
         ladder_level: res.ladder_level
       });
+      setIsRecordOpen(true);
     }
   }
 
@@ -45,7 +61,7 @@ const RecordContent: FC = (): JSX.Element => {
           onChange={({target: {value}}) => setNickNameToFind(value)} />
         <button onClick={search}>Search</button>
       </div>
-      {stats.total_games}/{stats.win_games}/{stats.ladder_level}
+      {isRecordOpen ? <Record stats={stats}/> : <></>}
     </div>
   );
 }
