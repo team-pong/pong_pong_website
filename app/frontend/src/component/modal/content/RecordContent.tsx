@@ -3,6 +3,11 @@ import CircleChart from "../../circlechart/CircleChart";
 import "../../../scss/content/RecordContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 
+/*!
+ * @author yochoi
+ * @brief 통계를 저장하는 인터페이스
+ */
+
 interface statistics {
   total_games: number,
   win_games: number,
@@ -10,6 +15,11 @@ interface statistics {
   winning_rate: number,
   ladder_level: number
 }
+
+/*!
+ * @author yochoi
+ * @brief 통계 및 전적을 보여주는 컴포넌트
+ */
 
 const Record: FC<{stats: statistics}> = ({stats: {total_games, win_games, loss_games, ladder_level}}) => {
   return (
@@ -21,6 +31,11 @@ const Record: FC<{stats: statistics}> = ({stats: {total_games, win_games, loss_g
     </div>
   )
 }
+
+/*!
+ * @author yochoi
+ * @brief 검색, 전적을 보여주는 컴포넌트
+ */
 
 const RecordContent: FC = (): JSX.Element => {
 
