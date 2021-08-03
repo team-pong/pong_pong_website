@@ -10,4 +10,22 @@
       height: 35px;
     }
   }
+  #record {
+    text-align: center;
+    #stats {
+      margin-top: 20px;
+      #circle-chart {
+        display: inline-block;
+        vertical-align: middle;
+        text {
+          font-size: 0.5em;
+          text-anchor: middle;
+        }
+      }
+      span {
+        padding-left: 20px;
+        font-size: larger;
+      }
+    }
+  }
 }

@@ -11,12 +11,12 @@ interface statistics {
   ladder_level: number
 }
 
-const Record: FC<any> = ({stats: {total_games, win_games, ladder_level}}) => {
+const Record: FC<any> = ({stats: {total_games, win_games, loss_games, ladder_level}}) => {
   return (
     <div id="record">
       <div id="stats">
         <CircleChart width={100} height={100} percentage={(win_games / total_games) * 100} />
-        {total_games}/{win_games}/{ladder_level}
+        <span>{total_games}전 {win_games}승 {loss_games}패 {ladder_level}점</span>
       </div>
     </div>
   )
