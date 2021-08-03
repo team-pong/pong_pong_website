@@ -11,7 +11,7 @@ interface statistics {
   ladder_level: number
 }
 
-const Record: FC<any> = ({stats: {total_games, win_games, loss_games, ladder_level}}) => {
+const Record: FC<{stats: statistics}> = ({stats: {total_games, win_games, loss_games, ladder_level}}) => {
   return (
     <div id="record">
       <div id="stats">
