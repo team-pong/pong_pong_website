@@ -47,20 +47,6 @@ export class DmStoreDto2{
 }
 
 export class DmStoreDto3{
-  @ApiProperty({
-		example: 'jinbkim',
-		description: 'DM 로그 검색할 유저 아이디',
-	})
-	public user_id: string;
-
-	@ApiProperty({
-		example: 'donglee',
-		description: 'DM 로그 검색할 상대 아이디',
-	})
-	public other_id: string;
-}
-
-export class DmStoreDto4{
 	@ApiProperty({
 		example: ` [
       {
@@ -85,12 +71,4 @@ export class DmStoreDto4{
 		description: 'DM 보낸 유저 아이디, 받은 유저 아이디, 내용, 보낸 시간 데이터들의 배열',
 	})
 	public dmList: DmStoreDto2[];
-}
-
-export class DmStoreDto5{
-  @ApiProperty({
-		example: 'jinbkim',
-		description: '유저 아이디',
-	})
-	public user_id: string;
 }

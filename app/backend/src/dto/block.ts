@@ -21,11 +21,3 @@ export class BlockDto2{
 	})
 	public blocks: string[];
 }
-
-export class BlockDto3{
-  @ApiProperty({
-		example: 'jinbkim',
-		description: '내 유저 아이디',
-	})
-	public user_id: string;
-}

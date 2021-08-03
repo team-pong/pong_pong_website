@@ -1,7 +1,7 @@
-import { Controller, Post, Body, Get, Delete } from '@nestjs/common';
+import { Controller, Get, Delete, Query } from '@nestjs/common';
 import { achievementsService } from './achievements.service'
-import { AcievementDto1, AcievementDto2, AcievementDto3 } from '../dto/achievements'
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AcievementDto2 } from '../dto/achievements'
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { string } from 'joi';
 
 @ApiTags('achievements')
@@ -24,10 +24,10 @@ export class achievementsController {
       유저의 칭호 배열
       검색 실패시 실패 이유 반환
     ` })
-  @ApiBody({ type: AcievementDto3, description: '칭호를 검색할 유저아이디'})
+  @ApiQuery({ name: 'user_id', example:'jinbkim', description: '칭호를 검색할 유저아이디'})
   @Get()
-  readAchievements(@Body() b: AcievementDto3){
-    return this.achievementsService.readAchievements(b.user_id);
+    readAchoevements(@Query() q){
+    return this.achievementsService.readAchievements(q.user_id);
   }
 
   // @ApiOperation({ summary: '유저 칭호 1개 삭제'})
@@ -40,9 +40,10 @@ export class achievementsController {
   
   @ApiOperation({ summary: '한 유저의 칭호 모두 삭제', description: '회원 탈퇴시 에만 사용됨'})
   @ApiResponse({ type: string, description: '칭호 삭제 실패시 실패 이유' })
-  @ApiBody({ type: AcievementDto3, description: '모든 칭호를 삭제할 유저아이디' })
+  @ApiQuery({ name: 'user_id', example:'jinbkim', description: '모든 칭호를 삭제할 유저아이디'})
   @Delete()
-  deleteAllAchievements(@Body() b: AcievementDto3){
-    return this.achievementsService.deleteAllAchievements(b.user_id);
+  deleteAllAchievements(@Query() q){
+    console.log(q);
+    return this.achievementsService.deleteAllAchievements(q.user_id);
   }
 }

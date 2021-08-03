@@ -52,8 +52,8 @@ export class ChatUsersService {
     if (await this.chatUsersRepo.count({channel_id: channel_id}) === 0)  // 해당 채널에 아무도 없다면
       await this.chatRepo.delete({channel_id: channel_id});
     else{  // 채널에 누군가가 남아있다면
-      const owner = await this.chatRepo.find({owner_id: user_id});  // 해당 채널의 owner
-      if (owner[0].owner_id == user_id){  // 나간 사람이 owner이라면
+      const channel = await this.chatRepo.findOne({channel_id: channel_id});
+      if (channel.owner_id == user_id){  // 나간 사람이 owner이라면
         const newOwner = await this.chatUsersRepo.findOne({channel_id: channel_id});  // 채널에 남은 인원중 아무나 뽑기
         await this.chatService.updateOwner(channel_id, newOwner.user_id);  // owner 변경
       }

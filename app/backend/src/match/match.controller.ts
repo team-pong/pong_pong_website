@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post, Delete } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Delete, Query } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { boolean } from 'joi';
-import { MatchDto1, MatchDto3, MatchDto4 } from 'src/dto/match';
+import { MatchDto1, MatchDto3 } from 'src/dto/match';
 import { MatchService } from './match.service';
 
 @ApiTags('Match')
@@ -31,10 +31,10 @@ export class MatchController {
       유저(아바타, nickname, 점수), 상대(아바타, nickname, 점수), 시간, 게임종류, 맵정보, 승패여부 데이터를 가지는 배열
       검색 실패시 실패 이유 반환
     ` })
-  @ApiBody({ type: MatchDto4, description: '모든 전적을 검색할 유저 아이디' })
+  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '모든 전적을 검색할 유저 아이디' })
   @Get()
-  readAllMatch(@Body() b: MatchDto4){
-    return this.matchService.readMatch(b.user_id, 'all');
+  readAllMatch(@Query() q){
+    return this.matchService.readMatch(q.user_id, 'all');
   }
   @ApiOperation({ summary: '해당 유저의 일반 전적 검색'})
   @ApiResponse({ 
@@ -43,10 +43,10 @@ export class MatchController {
       유저(아바타, nickname, 점수), 상대(아바타, nickname, 점수), 시간, 게임종류, 맵정보, 승패여부 데이터를 가지는 배열
       검색 실패시 실패 이유 반환
     ` })
-  @ApiBody({ type: MatchDto4, description: '일반 전적을 검색할 유저 아이디' })
+  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '일반 전적을 검색할 유저 아이디' })
   @Get('general')
-  readGeneralMatch(@Body() b: MatchDto4){
-    return this.matchService.readMatch(b.user_id, 'general');
+  readGeneralMatch(@Query() q){
+    return this.matchService.readMatch(q.user_id, 'general');
   }
   @ApiOperation({ summary: '해당 유저의 래더 전적 검색'})
   @ApiResponse({ 
@@ -55,10 +55,10 @@ export class MatchController {
       유저(아바타, nickname, 점수), 상대(아바타, nickname, 점수), 시간, 게임종류, 맵정보, 승패여부 데이터를 가지는 배열
       검색 실패시 실패 이유 반환
     ` })
-  @ApiBody({ type: MatchDto4, description: '래더 전적을 검색할 유저 아이디' })
+  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '래더 전적을 검색할 유저 아이디' })
   @Get('ranked')
-  readRankedMatch(@Body() b: MatchDto4){
-    return this.matchService.readMatch(b.user_id, 'ranked');
+  readRankedMatch(@Query() q){
+    return this.matchService.readMatch(q.user_id, 'ranked');
   }
 
   @ApiOperation({ 
@@ -68,9 +68,9 @@ export class MatchController {
       실제로 지우는게 아니라 이름을 unknown 으로 바꿈
     `})
   @ApiResponse({ type: boolean, description: '전적 삭제 실패시 실패 이유' })
-  @ApiBody({ type: MatchDto4, description: '모든 전적을 삭제할 유저 아이디' })
+  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '모든 전적을 삭제할 유저 아이디' })
   @Delete()
-  deleteMatch(@Body() b: MatchDto4){
-    return this.matchService.deleteMatch(b.user_id);
+  deleteMatch(@Query() q){
+    return this.matchService.deleteMatch(q.user_id);
   }
 }

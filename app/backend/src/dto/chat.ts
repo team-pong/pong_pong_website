@@ -118,25 +118,9 @@ export class ChatDto5{
 }
 
 export class ChatDto6{
-	@ApiProperty({
-		example: 1,
-		description: '채널 아이디',
-	})
-	public channel_id: number;
-}
-
-export class ChatDto7{
   @ApiProperty({
 		example: 'jinbkim',
 		description: 'owner 유저 아이디',
 	})
 	public owner_id: string;
-}
-
-export class ChatDto8{
-	@ApiProperty({
-		example: '아무나 와보던가',
-		description: '검색할 방 제목',
-	})
-	public title: string;
 }
