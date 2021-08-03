@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { string } from 'joi';
-import { DmStoreDto1, DmStoreDto3, DmStoreDto4, DmStoreDto5 } from 'src/dto/dm-store';
+import { DmStoreDto1, DmStoreDto3 } from 'src/dto/dm-store';
 import { DmStoreService } from './dm-store.service';
 
 @ApiTags('DM-Store')
@@ -20,15 +20,16 @@ export class DmStoreController {
 
   @ApiOperation({ summary: 'DM 로그 검색'})
   @ApiResponse({ 
-    type: DmStoreDto4, 
+    type: DmStoreDto3, 
     description: `
       DM 보낸 유저 아이디, 받은 유저 아이디, 내용, 보낸 시간 데이터들의 배열
       검색 실패시 실패 이유 반환
     `})
-  @ApiBody({ type: DmStoreDto3, description: 'DM 로그 검색할 유저 아이디, 상대 아이디' })
+  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: 'DM 로그 검색할 유저 아이디' })
+  @ApiQuery({ name: 'other_id', example: 'donglee', description: 'DM 로그 검색할 상대 아이디' })
   @Get()
-  readDmStore(@Body() b: DmStoreDto3){
-    return this.dmStoreService.readDmStore(b.user_id, b.other_id);
+  readDmStore(@Query() q){
+    return this.dmStoreService.readDmStore(q.user_id, q.other_id);
   }
 
   @ApiOperation({ 
@@ -38,9 +39,9 @@ export class DmStoreController {
     진짜 로그를 지우는게 아니라 아이디만 unknown으로 변경
     `})
   @ApiResponse({ type: string, description: 'DM 로그 삭제 실패시 실패 이유' })
-  @ApiBody({ type: DmStoreDto5, description: 'DM 로그 삭제할 유저 아이디' })
+  @ApiQuery({ name: 'user_id', example: 'jinbkim' ,description: 'DM 로그 삭제할 유저 아이디' })
   @Delete()
-  deleteDmStore(@Body() b: DmStoreDto5){
-    return this.dmStoreService.deleteDmStore(b.user_id);
+  deleteDmStore(@Query() q){
+    return this.dmStoreService.deleteDmStore(q.user_id);
   }
 }

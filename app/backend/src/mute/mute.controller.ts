@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { boolean, string } from 'joi';
-import { MuteDto1, MuteDto2 } from 'src/dto/mute';
+import { MuteDto1 } from 'src/dto/mute';
 import { MuteService } from './mute.service';
 
 @ApiTags('Mute')
@@ -24,17 +24,18 @@ export class MuteController {
       유저가 mute이면 true, 아니면 false
       확인 실패시 실패 이유
     ` })
-  @ApiBody({ type: MuteDto1, description: 'mute인지 확인할 유저아이디, 채널아이디' })
+  @ApiQuery({ name: 'user_id', example: 'yochoi', description: 'mute인지 확인할 유저아이디' })
+  @ApiQuery({ name: 'channel_id', example: 1, description: 'mute인지 확인할 채널아이디' })
   @Get()
-  isMute(@Body() b: MuteDto1){
-    return this.muteService.isMute(b.user_id, b.channel_id);
+  isMute(@Query() q){
+    return this.muteService.isMute(q.user_id, q.channel_id);
   }
 
   @ApiOperation({ summary: '한 유저의 모든 mute 제거', description: '회원 탈퇴시 에만 사용됨'})
   @ApiResponse({ type: string, description: 'mute 제거 실패시 실패 이유' })
-  @ApiBody({ type: MuteDto2, description: 'mute 제거할 유저아이디' })
+  @ApiQuery({ name: 'user_id', example: 'yochoi', description: 'mute 제거할 유저아이디' })
   @Delete()
-  deletemute(@Body() b: MuteDto2){
-    return this.muteService.deleteMute(b.user_id);
+  deletemute(@Query() q){
+    return this.muteService.deleteMute(q.user_id);
   }
 }

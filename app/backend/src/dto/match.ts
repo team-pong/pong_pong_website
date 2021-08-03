@@ -132,11 +132,3 @@ export class MatchDto3{
 	})
 	public matchList: MatchDto2[];
 }
-
-export class MatchDto4{
-  @ApiProperty({
-		example: 'jinbkim',
-		description: '유저 아이디',
-	})
-	public user_id: string;
-}

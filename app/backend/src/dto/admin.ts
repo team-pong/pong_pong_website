@@ -21,19 +21,3 @@ export class AdminDto2{
 	})
 	public admins: string[];
 }
-
-export class AdminDto3{
-	@ApiProperty({
-		example: 1,
-		description: '채널 아이디',
-	})
-	public channel_id: number;
-}
-
-export class AdminDto4{
-  @ApiProperty({
-		example: 'jinbkim',
-		description: '유저 아이디',
-	})
-	public user_id: string;
-}

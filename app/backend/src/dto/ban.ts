@@ -13,11 +13,3 @@ export class BanDto1{
 	})
 	public channel_id: number;
 }
-
-export class BanDto2{
-  @ApiProperty({
-		example: 'jinbkim',
-		description: '유저 아이디',
-	})
-	public user_id: string;
-}

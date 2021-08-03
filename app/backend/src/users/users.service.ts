@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersDto3 } from 'src/dto/users';
 import { Users } from 'src/entities/users';
 import { Repository } from 'typeorm';
-import { AchivementsService } from 'src/achivements/achivements.service';
+import { achievementsService } from 'src/achievements/achievements.service';
 import { AdminService } from 'src/admin/admin.service';
 import { BanService } from 'src/ban/ban.service';
 import { BlockService } from 'src/block/block.service';
@@ -17,7 +17,7 @@ import { err0, err1, err2 } from 'src/err';
 export class UsersService {
   constructor(
     @InjectRepository(Users) private usersRepo: Repository<Users>,
-    private achivementsService: AchivementsService,
+    private achievementsService: achievementsService,
     private adminService: AdminService,
     private banService: BanService,
     private blockService: BlockService,
@@ -73,7 +73,7 @@ export class UsersService {
   async deleteUsers(user_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저이면
       return err2;
-    await this.achivementsService.deleteAllAchievements(user_id);
+    await this.achievementsService.deleteAllAchievements(user_id);
     await this.adminService.deleteAdmin(user_id);
     await this.banService.deleteBan(user_id);
     await this.blockService.deleteAllBlock(user_id);
