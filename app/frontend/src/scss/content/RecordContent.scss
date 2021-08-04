@@ -16,8 +16,17 @@
   }
   #record {
     #stats {
-      text-align: center;
       margin-top: 20px;
+      margin-bottom: 20px;
+      #profile {
+        all: revert;
+        img {
+          width: 95px;
+          height: 95px;
+          border-radius: 50%;
+          vertical-align: middle;
+        }
+      }
       #circle-chart {
         display: inline-block;
         vertical-align: middle;

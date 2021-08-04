@@ -5,10 +5,12 @@ import EasyFetch from "../../../utils/EasyFetch";
 
 /*!
  * @author yochoi
- * @brief 통계를 저장하는 인터페이스
+ * @brief 유저 정보를 저장하는 인터페이스
  */
 
-interface statistics {
+interface userInfo {
+  nick: string,
+  avatar_url: string,
   total_games: number,
   win_games: number,
   loss_games: number,
@@ -21,13 +23,17 @@ interface statistics {
  * @brief 통계 및 전적을 보여주는 컴포넌트
  */
 
-const Record: FC<{stats: statistics}> = ({stats: {total_games, win_games, loss_games, ladder_level}}) => {
+const Record: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, win_games, loss_games, ladder_level}}) => {
 
   const [recordSelector, setRecordSelector] = useState("all");
 
   return (
     <div id="record">
       <div id="stats">
+        <span id="profile">
+          <img src={`https://cdn.intra.42.fr/users/medium_yochoi.png`} alt={`${nick}'s img`}/>
+          <span>{nick}   </span>
+        </span>
         <CircleChart width={100} height={100} percentage={(win_games / total_games) * 100} />
         <span>{total_games}전 {win_games}승 {loss_games}패 {ladder_level}점</span>
       </div>
@@ -58,7 +64,9 @@ const RecordContent: FC = (): JSX.Element => {
 
   const [nickNameToFind, setNickNameToFind] = useState("");
   const [isRecordOpen, setIsRecordOpen] = useState(false);
-  const [stats, setStats] = useState<statistics>({
+  const [stats, setStats] = useState<userInfo>({
+    nick: "",
+    avatar_url: "",
     total_games: 0,
     win_games: 0,
     loss_games: 0,
@@ -75,6 +83,8 @@ const RecordContent: FC = (): JSX.Element => {
         return ;
       }
       setStats({
+        nick: res.nick,
+        avatar_url: res.avatar_url,
         total_games: res.total_games,
         win_games: res.win_games,
         loss_games: res.loss_games,
