@@ -1,7 +1,85 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import CircleChart from "../../circlechart/CircleChart";
 import "../../../scss/content/RecordContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
+
+interface matchLog {
+  user_score: number,
+  other_score: number,
+  isWin: boolean,
+  user_url: string,
+  user_nick: string,
+  other_url: string,
+  other_nick: string,
+  createdAt: string,
+  type: string,
+  map: number
+}
+
+/*!
+ * @author yochoi
+ * @brief 전적 검색 후 <li>로 감싸 반환하는 컴포넌트
+ * @param[in] target 전적을 검색하려는 유저의 nickname
+ * @param[in] type 검색하려는 게임의 타입(e.g. 전체, 일반, 레더)
+ */
+
+const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.Element => {
+
+  const [matchList, setMatchList] = useState<matchLog[]>([]);
+
+  const getRecord = async () => {
+    let apiAddress: string = "";
+    switch (type) {
+      case "normal":
+        apiAddress = `http://127.0.0.1:3001/match/general?user_id=${target}`
+        break;
+      case "ladder":
+        apiAddress = `http://127.0.0.1:3001/match/ranked?user_id=${target}`
+        break;
+      default:
+        apiAddress = `http://127.0.0.1:3001/match?user_id=${target}`
+        break;
+    };
+    const easyfetch = new EasyFetch(apiAddress);
+    const res = await (await easyfetch.fetch()).json();
+    setMatchList(res.matchList);
+  };
+
+  useEffect(() => {
+    getRecord();
+  }, [target, type]);
+
+  return (
+    <ul id="record-list">
+      {matchList.map((log, i) => {
+        return (
+          <div id="log" key={i} style={log.isWin ? {backgroundColor: "#62C375"} : {backgroundColor: "#CE4D36"}}>
+            <span id="player">
+              <img src={`https://cdn.intra.42.fr/users/medium_yochoi.png`/*log.user_url*/} alt={`${log.user_nick}'s img`}/>
+              {' '}
+              {log.user_nick}
+              {' '}
+              {log.user_score}
+            </span>
+            <img src="./public/vs.svg"/>
+            <span id="player">
+              <img src={`https://cdn.intra.42.fr/users/medium_jinbkim.jpg`/*log.other_url*/} alt={`${log.other_nick}'s img`}/>
+              {' '}
+              {log.other_nick}
+              {' '}
+              {log.other_score}
+            </span>
+            <span id="game-info">
+              <div>15분전</div>
+              <div>{log.type}</div>
+              <div>{`map${log.map}`}</div>
+            </span>
+          </div>
+        );
+      })}
+    </ul>
+  );
+}
 
 /*!
  * @author yochoi
@@ -51,6 +129,7 @@ const Record: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, w
             <label>레더</label>
         </li>
       </ul>
+      <RecordList target={nick} type={recordSelector}/>
     </div>
   )
 }
