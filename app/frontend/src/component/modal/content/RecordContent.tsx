@@ -28,6 +28,13 @@ const Record: FC<{stats: statistics}> = ({stats: {total_games, win_games, loss_g
         <CircleChart width={100} height={100} percentage={(win_games / total_games) * 100} />
         <span>{total_games}전 {win_games}승 {loss_games}패 {ladder_level}점</span>
       </div>
+      <div id="all-record">
+        <form>
+          <input type="radio" value="전체" />전체
+          <input type="radio" value="일반" />일반
+          <input type="radio" value="레더" />레더
+        </form>
+      </div>
     </div>
   )
 }
