@@ -31,21 +31,19 @@
         font-size: larger;
       }
     }
-    #all-record {
-      border-collapse: collapse;
-      input {
-        margin: 0;
-        padding: 3px;
-        padding-left: 5px;
-        padding-right: 5px;
-        border: none;
-        background-color: #fff;
-        &:hover {
-          background-color: rgb(241, 237, 237);
+    #record-selector {
+      margin: 0;
+      padding: 0;
+      li {
+        display: inline-block;
+        list-style: none;
+        font-size: large;
+        margin-right: 6px;
+        input[type=radio] {
+          display: none;
         }
-        &:active {
+        input[type=radio]:checked + label {
           color: $green;
-          font-weight: bold;
           border-bottom: 3px solid $green;
         }
       }
