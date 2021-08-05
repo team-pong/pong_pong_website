@@ -4,6 +4,7 @@ import NavBar from './navbar/NavBar';
 import '/src/scss/MainPage.scss';
 import EasyFetch from './../../utils/EasyFetch';
 import { testFriendList } from '../../dummydata/testFriendList';
+import { SMALL_MODAL } from "../../utils/constant";
 
 /*!
  * @author yochoi, donglee
@@ -16,6 +17,7 @@ const MainPage = (): JSX.Element => {
   const [isChatOpen, setIsChatOpen] = useState(false); // 채팅 모달을 위한 State
   const [isGameOpen, setIsGameOpen] = useState(false); // 게임, 매치메이킹 모달을 위한 State
   const [isConfigOpen, setIsConfigOpen] = useState(false);
+  const [isMyProfileOpen, setIsMyProfileOpen] = useState(false);  // 내 프로필 모달을 위한 State
 
   useEffect(() => {
     const postAuthCodeToBackend = async () => {
@@ -34,11 +36,12 @@ const MainPage = (): JSX.Element => {
   return (
     <>
       <NavBar
-        avartarImgUrl="https://static.coindesk.com/wp-content/uploads/2021/04/dogecoin.jpg"
+        avartarImgUrl="https://cdn.intra.42.fr/users/medium_yochoi.png"
         friends={testFriendList}
         setIsRecordOpen={setIsRecordOpen}
         setIsGameOpen={setIsGameOpen}
         setIsConfigOpen={setIsConfigOpen}
+        setIsMyProfileOpen={setIsMyProfileOpen}
       />
       <main>
         <div id="button-container">
@@ -55,6 +58,7 @@ const MainPage = (): JSX.Element => {
             <span>게임을 하려면 누르세요!</span>
           </div>
         </div>
+        <ModalController content={() => <h1>myprofile</h1>} display={isMyProfileOpen} stateSetter={setIsMyProfileOpen} size={SMALL_MODAL}/>
         <ModalController content={() => <h1>Record</h1>} display={isRecordOpen} stateSetter={setIsRecordOpen}/>
         <ModalController content={ChatContent} display={isChatOpen} stateSetter={setIsChatOpen}/>
         <ModalController content={() => <h1>Game</h1>} display={isGameOpen} stateSetter={setIsGameOpen}/>

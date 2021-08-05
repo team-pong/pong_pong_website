@@ -14,6 +14,7 @@ import "/src/scss/NavBar.scss";
  * @param[in] setIsRecordOpen: 클릭시 Record 모달이 오픈되도록 하기 위한 Mainpage.tsx의 stateSetter
  * @param[in] setIsGameOpen: 클릭시 Match-game 모달이 오픈되도록 하기 위한 Mainpage.tsx의 stateSetter
  * @param[in] setIsConfigOpen: 클릭시 Config 모달이 오픈되도록 하기 위한 Mainpage.tsx의 stateSetter
+ * @param[in] setIsMyProfileOpen: 클릭시 MyProfile 모달이 오픈되도록 하기 위한 Mainpage.tsx의 stateSetter
  */
 
 interface navBarProps {
@@ -22,6 +23,7 @@ interface navBarProps {
   setIsRecordOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsGameOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsConfigOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsMyProfileOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const NavBar: FC<navBarProps> = (props): JSX.Element => {
@@ -32,8 +34,12 @@ const NavBar: FC<navBarProps> = (props): JSX.Element => {
   return (
     <nav className="menu">
       <header className="avatar">
-        <img id="avartarImg" src={props.avartarImgUrl} alt="Avatar" />
-        <h2>DomHardy</h2>
+        <img
+          id="avartarImg"
+          src={props.avartarImgUrl}
+          alt="Avatar"
+          onClick={() => props.setIsMyProfileOpen(true)}/>
+        <h2>Dom Hardy</h2>
       </header>
       <ul>
         <li id="nav-friend" onClick={() => setIsFriendListOpen(!isFriendListOpen)}>
