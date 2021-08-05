@@ -179,10 +179,10 @@ const RecordContent: FC = (): JSX.Element => {
       <div id="search">
         <input
           type="text"
-          placeholder="닉네임"
+          placeholder="전적 검색을 하려는 닉네임을 입력해 주세요"
           value={nickNameToFind}
           onChange={({target: {value}}) => setNickNameToFind(value)} />
-        <button onClick={search}>Search</button>
+        <button onClick={search}><img src="./public/search.svg" alt="검색"/></button>
       </div>
       {isRecordOpen ? <Record stats={stats}/> : <></>}
     </div>
