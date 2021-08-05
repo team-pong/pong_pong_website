@@ -3,7 +3,7 @@ import { ModalController, ChatContent, ConfigContent, RecordContent } from '../m
 import NavBar from './navbar/NavBar'
 import '/src/scss/MainPage.scss'
 import EasyFetch from './../../utils/EasyFetch';
-import { testFriendList } from '../../dummydata/testFriendList'
+import { testFriendList } from '../../dummydata/testFriendList';
 
 /*!
  * @author yochoi, donglee

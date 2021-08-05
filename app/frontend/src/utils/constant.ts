@@ -1,0 +1,1 @@
+export const SMALL_MODAL = ["400px", "500px"];

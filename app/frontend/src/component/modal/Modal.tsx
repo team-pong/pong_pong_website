@@ -3,6 +3,7 @@ import "/src/scss/Modal.scss";
 import ChatContent from './content/ChatContent';
 import ConfigContent from './content/ConfigContent';
 import RecordContent from './content/RecordContent';
+import {SMALL_MODAL} from "../../utils/constant";
 
 /*!
  * @author yochoi, donglee
@@ -10,21 +11,24 @@ import RecordContent from './content/RecordContent';
  * @param[in] content: Modal 안에 들어갈 FC
  * @param[in] display: Modal 의 display 여부
  * @param[in] stateSetter: Modal의 상위 컴포넌트 state를 조정함으로써 display를 결정함
+ * @param[in] size?: 작은 modal을 만들 때의 사이즈. 기본값은 css에 정의돼있는 값.
  */
 
 interface modalControllerProps {
   content: FC;
   display: boolean;
   stateSetter: React.Dispatch<React.SetStateAction<boolean>>;
+  size?: Array<string>;
 }
 
 const ModalController: FC<modalControllerProps> = ({
   content,
   display,
   stateSetter,
+  size,
 }): JSX.Element => {
   if (display) {
-    return <Modal content={content} stateSetter={stateSetter} />;
+    return <Modal content={content} stateSetter={stateSetter} modalSize={size}/>;
   } else {
     return <></>;
   }
@@ -35,14 +39,16 @@ const ModalController: FC<modalControllerProps> = ({
  * @brief FC를 Modal 형태로 띄워주는 컴포넌트
  * @param[in] content: Modal 안에 들어갈 함수형 컴포넌트
  * @param[in] stateSetter: Modal의 상위 컴포넌트 state를 조정함으로써 display를 결정함
+ * @param[in] modalSize?: ModalController에서 받아오는 modal 사이즈.
  */
 
 interface modalPros {
   content: FC;
   stateSetter: React.Dispatch<React.SetStateAction<boolean>>;
+  modalSize?: Array<string>;
 }
 
-const Modal: FC<modalPros> = ({ content, stateSetter }): JSX.Element => {
+const Modal: FC<modalPros> = ({ content, stateSetter, modalSize }): JSX.Element => {
   let isGoBackClicked = false;  //뒤로가기 버튼을 눌렀는지 여부를 저장
   
   /*!
@@ -115,10 +121,24 @@ const Modal: FC<modalPros> = ({ content, stateSetter }): JSX.Element => {
 
   /*!
   * @author donglee
+  * @brief modal의 사이즈값이 있을 때 css값을 바꿔주는 함수
+  */
+  const initModalSize = () => {
+    if (modalSize) {
+      const modal = document.getElementById("content");
+      
+      modal.style.width = SMALL_MODAL[0];
+      modal.style.height = SMALL_MODAL[1];
+    }
+  };
+
+  /*!
+  * @author donglee
   * @brief -history에 새로운 state를 넣어서 뒤로가기시에 모달창만 꺼지도록함
   *        -SEC키와 뒤로가기 버튼에 대한 이벤트리스너를 등록하고 언마운트시에 제거함
   */
   useEffect(() => {
+    initModalSize();
     history.pushState({page:"modal"}, document.title);
     showAnimatedModal();
 
