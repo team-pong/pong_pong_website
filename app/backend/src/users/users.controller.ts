@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UsersDto1, UsersDto2, UsersDto3 } from 'src/dto/users';
+import { UsersDto1, UsersDto2, UsersDto3, UsersDto4 } from 'src/dto/users';
 import { ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from './users.service';
 
@@ -48,6 +48,14 @@ export class UsersController {
   @Post('info')
   updateUsers(@Body() b: UsersDto2){
     return this.usersService.updateUsers(b.user_id, b.nick, b.avatar_url);
+  }
+
+  @ApiOperation({ summary: '유저 상태 변경'})
+  @ApiResponse({ type: ErrMsgDto, description: '유저 상태 변경 실패시 실패 이유' })
+  @ApiBody({ type: UsersDto4, description: '변경할 유저 아이디, 유저 상태' })
+  @Post('status')
+  updateStatus(@Body() b: UsersDto4){
+    return this.usersService.updateStatus(b.user_id, b.status);
   }
 
   @ApiOperation({ summary: '유저 제거'})
