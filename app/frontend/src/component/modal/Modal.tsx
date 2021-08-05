@@ -2,6 +2,7 @@ import React, { FC, useEffect } from "react";
 import "/src/scss/Modal.scss";
 import ChatContent from './content/ChatContent';
 import ConfigContent from './content/ConfigContent';
+import RecordContent from './content/RecordContent';
 import {SMALL_MODAL} from "../../utils/constant";
 
 /*!
@@ -41,13 +42,13 @@ const ModalController: FC<modalControllerProps> = ({
  * @param[in] modalSize?: ModalController에서 받아오는 modal 사이즈.
  */
 
-interface modalPros {
+interface modalProps {
   content: FC;
   stateSetter: React.Dispatch<React.SetStateAction<boolean>>;
   modalSize?: Array<string>;
 }
 
-const Modal: FC<modalPros> = ({ content, stateSetter, modalSize }): JSX.Element => {
+const Modal: FC<modalProps> = ({ content, stateSetter, modalSize }): JSX.Element => {
   let isGoBackClicked = false;  //뒤로가기 버튼을 눌렀는지 여부를 저장
   
   /*!
@@ -156,11 +157,11 @@ const Modal: FC<modalPros> = ({ content, stateSetter, modalSize }): JSX.Element 
   return (
     <div id="modal" onClick={detectOutsideOfModal}>
       <div id="content">
-        <img src="./public/closeWindow.png" onClick={closer} alt="close" />
+        <img src="./public/closeWindow.png" onClick={closer} alt="close" id="modal-closer"/>
         {content({})}
       </div>
     </div>
   );
 };
 
-export { ModalController, ChatContent, ConfigContent };
+export { ModalController, ChatContent, ConfigContent, RecordContent };
