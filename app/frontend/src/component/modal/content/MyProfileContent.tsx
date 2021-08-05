@@ -31,7 +31,7 @@ const MyProfileContent: React.FC = () => {
     <div id="profile">
       <div id="upper-part">
         <div id="button-container">
-          <button id="stat-detail" onClick={() => setIsRecordOpen(true)}>
+          <button id="stat-detail">
             상세전적보기
           </button>
           <button id="second-auth">2단계 인증</button>
