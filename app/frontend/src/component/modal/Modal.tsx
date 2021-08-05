@@ -2,6 +2,7 @@ import React, { FC, useEffect } from "react";
 import "/src/scss/Modal.scss";
 import ChatContent from './content/ChatContent';
 import ConfigContent from './content/ConfigContent';
+import RecordContent from './content/RecordContent';
 import {SMALL_MODAL} from "../../utils/constant";
 
 /*!
@@ -156,11 +157,11 @@ const Modal: FC<modalPros> = ({ content, stateSetter, modalSize }): JSX.Element 
   return (
     <div id="modal" onClick={detectOutsideOfModal}>
       <div id="content">
-        <img src="./public/closeWindow.png" onClick={closer} alt="close" />
+        <img src="./public/closeWindow.png" onClick={closer} alt="close" id="modal-closer"/>
         {content({})}
       </div>
     </div>
   );
 };
 
-export { ModalController, ChatContent, ConfigContent };
+export { ModalController, ChatContent, ConfigContent, RecordContent };
