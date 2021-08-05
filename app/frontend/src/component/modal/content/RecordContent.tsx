@@ -59,20 +59,20 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
               {' '}
               {log.user_nick}
               {' '}
-              {log.user_score}
+              <img src={`./public/number/${log.other_score}.svg`} alt={`${log.user_score}`} style={{borderRadius: "0"}}/>
             </span>
             <img src="./public/vs.svg"/>
             <span id="player">
-              <img src={`https://cdn.intra.42.fr/users/medium_jinbkim.jpg`/*log.other_url*/} alt={`${log.other_nick}'s img`}/>
+              <img src={`./public/number/${log.other_score}.svg`} alt={`${log.other_score}`} style={{borderRadius: "0"}}/>
               {' '}
               {log.other_nick}
               {' '}
-              {log.other_score}
+              <img src={`https://cdn.intra.42.fr/users/medium_jinbkim.jpg`/*log.other_url*/} alt={`${log.other_nick}'s img`}/>
             </span>
             <span id="game-info">
               <div>15분전</div>
-              <div>{log.type}</div>
-              <div>{`map${log.map}`}</div>
+              <div>{log.type === "general" ? <>일반</> : <>레더</>}</div>
+              <div>{`맵${log.map}`}</div>
             </span>
           </div>
         );
@@ -181,6 +181,7 @@ const RecordContent: FC = (): JSX.Element => {
           type="text"
           placeholder="전적 검색을 하려는 닉네임을 입력해 주세요"
           value={nickNameToFind}
+          spellCheck={false}
           onChange={({target: {value}}) => setNickNameToFind(value)} 
           onKeyDown={(e) => {if (e.key === "Enter") search()}} />
         <button onClick={search}><img src="./public/search.svg" alt="검색"/></button>
