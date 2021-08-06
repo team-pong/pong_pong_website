@@ -89,3 +89,17 @@ export class UsersDto3{
 	})
 	public status: string;
 }
+
+export class UsersDto4{
+  @ApiProperty({
+		example: 'jinbkim',
+		description: '유저 아이디',
+	})
+	public user_id: string;
+
+  @ApiProperty({
+		example: 'game',
+		description: '유저의 상태',
+	})
+	public status: string;
+}

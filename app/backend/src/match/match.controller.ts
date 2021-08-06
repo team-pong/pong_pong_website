@@ -31,10 +31,12 @@ export class MatchController {
       유저(아바타, nickname, 점수), 상대(아바타, nickname, 점수), 시간, 게임종류, 맵정보, 승패여부 데이터를 가지는 배열
       검색 실패시 실패 이유 반환
     ` })
-  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '모든 전적을 검색할 유저 아이디' })
+  @ApiQuery({ name: 'nick', example: 'jinbkim', description: '모든 전적을 검색할 유저 닉네임' })
   @Get()
-  readAllMatch(@Query() q){
-    return this.matchService.readMatch(q.user_id, 'all');
+  async readAllMatch(@Query() q){
+    let user_id;
+    await this.matchService.nickToId(q.nick).then((v) => { user_id = v; });
+    return this.matchService.readMatch(user_id, 'all');
   }
   @ApiOperation({ summary: '해당 유저의 일반 전적 검색'})
   @ApiResponse({ 
@@ -43,10 +45,12 @@ export class MatchController {
       유저(아바타, nickname, 점수), 상대(아바타, nickname, 점수), 시간, 게임종류, 맵정보, 승패여부 데이터를 가지는 배열
       검색 실패시 실패 이유 반환
     ` })
-  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '일반 전적을 검색할 유저 아이디' })
+  @ApiQuery({ name: 'nick', example: 'jinbkim', description: '일반 전적을 검색할 유저 닉네임' })
   @Get('general')
-  readGeneralMatch(@Query() q){
-    return this.matchService.readMatch(q.user_id, 'general');
+  async readGeneralMatch(@Query() q){
+    let user_id;
+    await this.matchService.nickToId(q.nick).then((v) => { user_id = v; });
+    return this.matchService.readMatch(user_id, 'general');
   }
   @ApiOperation({ summary: '해당 유저의 래더 전적 검색'})
   @ApiResponse({ 
@@ -55,10 +59,12 @@ export class MatchController {
       유저(아바타, nickname, 점수), 상대(아바타, nickname, 점수), 시간, 게임종류, 맵정보, 승패여부 데이터를 가지는 배열
       검색 실패시 실패 이유 반환
     ` })
-  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '래더 전적을 검색할 유저 아이디' })
+  @ApiQuery({ name: 'nick', example: 'jinbkim', description: '래더 전적을 검색할 유저 닉네임' })
   @Get('ranked')
-  readRankedMatch(@Query() q){
-    return this.matchService.readMatch(q.user_id, 'ranked');
+  async readRankedMatch(@Query() q){
+    let user_id;
+    await this.matchService.nickToId(q.nick).then((v) => { user_id = v; });
+    return this.matchService.readMatch(user_id, 'ranked');
   }
 
   @ApiOperation({ 

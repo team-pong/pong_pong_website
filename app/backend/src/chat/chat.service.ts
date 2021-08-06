@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChatDto2 } from 'src/dto/chat';
+import { ChatDto2, ChatDto7 } from 'src/dto/chat';
 import { ErrMsgDto } from 'src/dto/utility';
 import { Chat } from 'src/entities/chat';
 import { ChatUsers } from 'src/entities/chat-users';
@@ -64,6 +64,13 @@ export class ChatService {
       return new ErrMsgDto(err4);
     const chanel = await this.chatRepo.find({channel_id: channel_id});  // 채널 찾기
     return chanel[0].owner_id; 
+  }
+  async readPeople(channel_id: number){
+    if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널이면
+      return new ErrMsgDto(err4);
+    let people = new ChatDto7;
+    people.people = await this.chatUsersRepo.count({channel_id: channel_id});
+    return people;
   }
 
   async updateChat(channel_id: number, title: string, type: string, passwd: string, max_people: number){
