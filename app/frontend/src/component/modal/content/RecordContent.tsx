@@ -31,13 +31,13 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
     let apiAddress: string = "";
     switch (type) {
       case "normal":
-        apiAddress = `http://127.0.0.1:3001/match/general?user_id=${target}`
+        apiAddress = `http://127.0.0.1:3001/match/general?nick=${target}`
         break;
       case "ladder":
-        apiAddress = `http://127.0.0.1:3001/match/ranked?user_id=${target}`
+        apiAddress = `http://127.0.0.1:3001/match/ranked?nick=${target}`
         break;
       default:
-        apiAddress = `http://127.0.0.1:3001/match?user_id=${target}`
+        apiAddress = `http://127.0.0.1:3001/match?nick=${target}`
         break;
     };
     const easyfetch = new EasyFetch(apiAddress);
