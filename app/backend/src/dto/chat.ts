@@ -124,3 +124,11 @@ export class ChatDto6{
 	})
 	public owner_id: string;
 }
+
+export class ChatDto7{
+  @ApiProperty({
+		example: 3,
+		description: '현재 채널의 인원수',
+	})
+	public people: number;
+}
