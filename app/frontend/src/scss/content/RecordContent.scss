@@ -1,0 +1,114 @@
+@import '../../colors.scss';
+
+#record-content {
+  width: 80%;
+  margin: auto;
+  #search {
+    text-align: center;
+    input {
+      width: 80%;
+      height: 35px;
+      margin: 0;
+      padding: 0;
+      border: none;
+      border-bottom: 3px solid $green;
+      &:focus {
+        outline: none;
+      }
+    }
+    button {
+      width: 15%;
+      height: 39px;
+      margin: 0;
+      margin-left: 10px;
+      padding: 0;
+      vertical-align: middle;
+      background-color: $green;
+      border: none;
+      border-radius: 15px;
+      img {
+        width: 50px;
+        height: 90%;
+        padding-top: 2px;
+      }
+    }
+  }
+  #record {
+    #stats {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      #profile {
+        all: revert;
+        img {
+          width: 95px;
+          height: 95px;
+          border-radius: 50%;
+          vertical-align: middle;
+        }
+      }
+      #circle-chart {
+        display: inline-block;
+        vertical-align: middle;
+        text {
+          font-size: 0.5em;
+          text-anchor: middle;
+        }
+      }
+      span {
+        padding-left: 20px;
+        font-size: larger;
+      }
+    }
+    #record-selector {
+      margin: 0;
+      padding: 0;
+      li {
+        display: inline-block;
+        list-style: none;
+        font-size: large;
+        margin-right: 10px;
+        input[type=radio] {
+          display: none;
+        }
+        input[type=radio]:checked + label {
+          color: $green;
+          border-bottom: 3px solid $green;
+        }
+      }
+    }
+    #record-list {
+      margin: 0;
+      padding: 0;
+      color: #fff;
+      #log {
+        margin-top: 5px;
+        border-radius: 15px;
+        display: flex;
+        justify-content: space-between;
+        img {
+          width: 81px;
+          height: 81px;
+        }
+        #player {
+          img {
+            display: inline;
+            width: 67px;
+            height: 67px;
+            padding: 7px;
+            border-radius: 50%;
+            vertical-align: middle;
+          }
+        }
+        #game-info {
+          padding: 3px;
+          div {
+            border-left: 0.5px solid rgba(255, 255, 255, 0.3);
+            padding: 3px;
+            padding-left: 5px;
+            padding-right: 5px;
+          }
+        }
+      }
+    }
+  }
+}
