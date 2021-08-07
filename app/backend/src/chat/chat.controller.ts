@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ChatDto1, ChatDto3, ChatDto4, ChatDto5, ChatDto6, ChatDto7 } from 'src/dto/chat';
+import { ChatDto1, ChatDto3, ChatDto4, ChatDto5, ChatDto6 } from 'src/dto/chat';
 import { ErrMsgDto } from 'src/dto/utility';
 import { ChatService } from './chat.service';
 
@@ -18,14 +18,13 @@ export class ChatController {
   }
 
   @ApiOperation({ summary: '모든 채널 검색'})
-  @ApiResponse({ type: ChatDto3, description: `모든 채널의 제목, 타입, 최대인원` })
+  @ApiResponse({ type: ChatDto3, description: `모든 채널의 제목, 타입, 현재인원, 최대인원` })
   @Get()
   readChat(){
     return this.chatService.readChat();
   }
-
-  @ApiOperation({ summary: '채널 제목 검색'})
-  @ApiResponse({ type: ChatDto3, description: `모든 채널의 제목, 타입, 최대인원` })
+  @ApiOperation({ summary: '제목으로 채널 검색'})
+  @ApiResponse({ type: ChatDto3, description: `모든 채널의 제목, 타입, 현재인원, 최대인원` })
   @Get('title')
   @ApiQuery({ name: 'title', example:'아무나', description: '검색할 채널 제목' })
   readTitle(@Query() q){
@@ -42,13 +41,6 @@ export class ChatController {
   @Get('owner')
   readOwner(@Query() q){
     return this.chatService.readOwner(q.channel_id);
-  }
-  @ApiOperation({ summary: '현재 채널의 인원수 검색'})
-  @ApiResponse({ type: ChatDto7, description: `현재 채널의 인원수` })
-  @Get('people')
-  @ApiQuery({ name: 'channel_id', example:1 , description: '채널 아이디' })
-  readPeople(@Query() q){
-    return this.chatService.readPeople(q.channel_id);
   }
 
   @ApiOperation({ summary: '채널 설정 변경', description: '채팅방 타입은 public 또는 protected 또는 private 이어야함'})
