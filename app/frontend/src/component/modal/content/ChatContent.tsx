@@ -1,70 +1,31 @@
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react";
+import "../../../scss/content/ChatContent.scss";
+import EasyFetch from "../../../utils/EasyFetch";
+
 
 /*!
  * @author yochoi
- * @brief 더미 데이터를 만드는 함수와 인터페이스
+ * @brief 검색, 전적을 보여주는 컴포넌트
  */
-
-interface dummyDataInterface {
-  name: string,
-  type: string,
-  numOfMembers: number
-}
-
-function makeDummyData(): Array<dummyDataInterface> {
-  let dummyData: Array<dummyDataInterface> = [];
-  for (let i = 0; i < 50; ++i) {
-    dummyData.push({
-      name: `chat room ${i}`,
-      type: (i % 2 === 0 ? 'public' : 'secret'),
-      numOfMembers: i
-    })
-  }
-  return dummyData;
-}
-
-/*!
- * @author yochoi
- * @brief ChatContent
- */
-
-const ChatList: FC<{setChatID: (chatID: string) => void}> = ({setChatID}): JSX.Element => {
-  const dummyData = makeDummyData();
-
-  const makeChatList = (chatRoom: dummyDataInterface, idx: number) => {
-    return (
-      <li key={idx} onClick={() => setChatID(chatRoom.name)}>
-        {chatRoom.name}/{chatRoom.type}/{chatRoom.numOfMembers}
-      </li>
-    );
-  };
-
-  return (
-    <div id="chatlist">
-      <ul>
-        {dummyData.map(makeChatList)}
-      </ul>
-    </div>
-  );
-}
-
-const ChatRoom: FC<{chatID: string}> = ({chatID}): JSX.Element => {
-
-  useEffect(() => {
-    // get chatID->fetch chat log data
-    // socket connect
-  }, []);
-
-  return (<h1>{chatID}</h1>);
-}
 
 const ChatContent: FC = (): JSX.Element => {
-  const [chatID, setChatID] = useState("");
-  if (chatID === "") {
-    return (<ChatList setChatID={setChatID}/>);
-  } else {
-    return (<ChatRoom chatID={chatID}/>);
-  }
+
+  const [chatRoomToFind, setChatRoomToFind] = useState("");
+
+  return (
+    <div id="chat-content">
+      <div id="search">
+        <input
+          type="text"
+          placeholder="검색하려는 채팅방 이름을 입력해 주세요"
+          value={chatRoomToFind}
+          spellCheck={false}
+          onChange={({target: {value}}) => setChatRoomToFind(value)} 
+          onKeyDown={(e) => {if (e.key === "Enter") null}} />
+        <button onClick={null}><img src="./public/search.svg" alt="검색"/></button>
+      </div>
+    </div>
+  );
 }
 
 export default ChatContent;
