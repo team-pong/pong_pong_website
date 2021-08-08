@@ -9,7 +9,7 @@ interface chatRoom {
   max_people: number
 };
 
-const ChatRoomList: FC<{target: string}> = ({target}): JSX.Element => {
+const ChatRoomList: FC<{search: string, type: string}> = ({search, type}): JSX.Element => {
 
   const [publicChatRoom, setPublicChatRoom] = useState<chatRoom[]>([]);
   const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
@@ -39,21 +39,29 @@ const ChatRoomList: FC<{target: string}> = ({target}): JSX.Element => {
   }
 
   const getChatRoomList = async (): Promise<chatRoom[]> => {
-    const easyfetch = new EasyFetch('http://127.0.0.1:3001/chat');
-    const {chatList}: {chatList: chatRoom[]} = await (await easyfetch.fetch()).json();
-    return (chatList);
+    let res: {chatList: chatRoom[]};
+    setPublicChatRoom([]);
+    setProtectedChatRoom([]);
+    if (search === "") {
+      const easyfetch = new EasyFetch('http://127.0.0.1:3001/chat');
+      res = await (await easyfetch.fetch()).json();
+    } else {
+      const easyfetch = new EasyFetch(`http://127.0.0.1:3001/chat/title?title=${search}`);
+      res = await (await easyfetch.fetch()).json();
+    }
+    return (res.chatList);
   }
 
   useEffect(() => {
     getChatRoomList()
     .then(sortChatRoomList);
-  }, []);
+  }, [search]);
 
   return (
     <ul id="chat-room-list">
-      {target === "all" ? [...publicChatRoom, ...protectedChatRoom].map(chatRoomListGenerator) : <></>}
-      {target === "public" ? publicChatRoom.map(chatRoomListGenerator) : <></>}
-      {target === "protected" ? protectedChatRoom.map(chatRoomListGenerator) : <></>}
+      {type === "all" ? [...publicChatRoom, ...protectedChatRoom].map(chatRoomListGenerator) : <></>}
+      {type === "public" ? publicChatRoom.map(chatRoomListGenerator) : <></>}
+      {type === "protected" ? protectedChatRoom.map(chatRoomListGenerator) : <></>}
     </ul>
   );
 }
@@ -65,6 +73,7 @@ const ChatRoomList: FC<{target: string}> = ({target}): JSX.Element => {
 
 const ChatContent: FC = (): JSX.Element => {
 
+  const [searchInputValue, setSearchInputValue] = useState("");
   const [chatRoomToFind, setChatRoomToFind] = useState("");
   const [chatRoomSelector, setChatRoomSelector] = useState("all");
 
@@ -74,11 +83,11 @@ const ChatContent: FC = (): JSX.Element => {
         <input
           type="text"
           placeholder="검색하려는 채팅방 이름을 입력해 주세요"
-          value={chatRoomToFind}
+          value={searchInputValue}
           spellCheck={false}
-          onChange={({target: {value}}) => setChatRoomToFind(value)} 
-          onKeyDown={(e) => {if (e.key === "Enter") null}} />
-        <button onClick={null}><img src="./public/search.svg" alt="검색"/></button>
+          onChange={({target: {value}}) => setSearchInputValue(value)} 
+          onKeyDown={(e) => {if (e.key === "Enter") setChatRoomToFind(searchInputValue)}} />
+        <button onClick={() => setChatRoomToFind(searchInputValue)}><img src="./public/search.svg" alt="검색"/></button>
       </div>
       <ul id="chat-room-selector">
         <li onClick={() => setChatRoomSelector("all")}>
@@ -94,7 +103,7 @@ const ChatContent: FC = (): JSX.Element => {
             <label>비밀방</label>
         </li>
       </ul>
-      <ChatRoomList target={chatRoomSelector}/>
+      <ChatRoomList search={chatRoomToFind} type={chatRoomSelector}/>
       <button>채팅방 만들기</button>
     </div>
   );
