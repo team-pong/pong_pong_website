@@ -2,6 +2,58 @@ import { FC, useEffect, useState } from "react";
 import "../../../scss/content/ChatContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 
+interface chatRoom {
+  title: string,
+  type: string,
+  current_people: number,
+  max_people: number
+};
+
+const ChatRoomList: FC<{target: string}> = ({target}): JSX.Element => {
+
+  const [publicChatRoom, setPublicChatRoom] = useState<chatRoom[]>([]);
+  const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
+
+  const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
+    return (
+      <li key={idx}>{chatRoom.title}/{chatRoom.type}/{chatRoom.current_people}/{chatRoom.max_people}</li>
+    );
+  }
+
+  const sortChatRoomList = (list: chatRoom[]) => {
+    list.map(chatRoom => {
+      switch (chatRoom.type) {
+        case "public":
+          setPublicChatRoom(publicChatRoom => [...publicChatRoom, chatRoom]);
+          break ;
+        case "protected":
+          setProtectedChatRoom(protectedChatRoom => [...protectedChatRoom, chatRoom]);
+          break ;
+        default:
+          break ;
+      }
+    });
+  }
+
+  const getChatRoomList = async (): Promise<chatRoom[]> => {
+    const easyfetch = new EasyFetch('http://127.0.0.1:3001/chat');
+    const {chatList}: {chatList: chatRoom[]} = await (await easyfetch.fetch()).json();
+    return (chatList);
+  }
+
+  useEffect(() => {
+    getChatRoomList()
+    .then(sortChatRoomList);
+  }, []);
+
+  return (
+    <ul id="chat-room-list">
+      {target === "all" ? [...publicChatRoom, ...protectedChatRoom].map(chatRoomListGenerator) : <></>}
+      {target === "public" ? publicChatRoom.map(chatRoomListGenerator) : <></>}
+      {target === "protected" ? protectedChatRoom.map(chatRoomListGenerator) : <></>}
+    </ul>
+  );
+}
 
 /*!
  * @author yochoi
@@ -39,6 +91,7 @@ const ChatContent: FC = (): JSX.Element => {
             <label>비밀방</label>
         </li>
       </ul>
+      <ChatRoomList target={chatRoomSelector}/>
     </div>
   );
 }
