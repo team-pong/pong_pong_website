@@ -75,4 +75,14 @@
       }
     }
   }
+  button {
+    float: right;
+    margin: 0;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 12px;
+    border: none;
+    background-color: $green;
+    color: #fff;
+  }
 }

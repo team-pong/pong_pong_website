@@ -95,6 +95,7 @@ const ChatContent: FC = (): JSX.Element => {
         </li>
       </ul>
       <ChatRoomList target={chatRoomSelector}/>
+      <button>채팅방 만들기</button>
     </div>
   );
 }
