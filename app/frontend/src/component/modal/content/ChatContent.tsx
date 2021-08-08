@@ -16,7 +16,10 @@ const ChatRoomList: FC<{target: string}> = ({target}): JSX.Element => {
 
   const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
     return (
-      <li key={idx}>{chatRoom.title}/{chatRoom.type}/{chatRoom.current_people}/{chatRoom.max_people}</li>
+      <li key={idx}>
+        <span>{chatRoom.title}{chatRoom.type === "protected" ? <img src="./public/lock.svg" alt="비밀방" /> : <></>}</span>
+        <span>{chatRoom.current_people}/{chatRoom.max_people}</span>
+      </li>
     );
   }
 
