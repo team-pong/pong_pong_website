@@ -196,6 +196,14 @@ const RecordContent: FC = (): JSX.Element => {
       </div>
       {isRecordOpen === recordState.open && <Record stats={stats}/>}
       {
+        isRecordOpen === recordState.close &&
+        <div id="record-closed">
+          <div id="most-played-map"></div>
+          <div id="worst-played-map"></div>
+          <div id="ladder-rank"></div>
+        </div>
+      }
+      {
         isRecordOpen === recordState.noResult &&
         <div id="no-result">
           <img src="./public/exclamation-mark.svg" alt="Exclamation mark" />
