@@ -1,0 +1,88 @@
+@import '../../colors.scss';
+
+#chat-content {
+  width: 80%;
+  margin: auto;
+  #search {
+    text-align: center;
+    input {
+      width: 80%;
+      height: 35px;
+      margin: 0;
+      padding: 0;
+      border: none;
+      border-bottom: 3px solid $green;
+      &:focus {
+        outline: none;
+      }
+    }
+    button {
+      width: 15%;
+      height: 39px;
+      margin: 0;
+      margin-left: 10px;
+      padding: 0;
+      vertical-align: middle;
+      background-color: $green;
+      border: none;
+      border-radius: 15px;
+      img {
+        width: 50px;
+        height: 90%;
+        padding-top: 2px;
+      }
+    }
+  }
+  #chat-room-selector {
+    margin: 0;
+    margin-top: 25px;
+    padding: 0;
+    li {
+      display: inline-block;
+      list-style: none;
+      font-size: large;
+      margin-right: 10px;
+      input[type=radio] {
+        display: none;
+      }
+      input[type=radio]:checked + label {
+        color: $green;
+        border-bottom: 3px solid $green;
+      }
+    }
+  }
+  #chat-room-list {
+    margin: 0;
+    margin-top: 10px;
+    padding: 0;
+    width: 100%;
+    height: 53vh;
+    overflow: auto;
+    li {
+      margin-top: 10px;
+      border-radius: 10px;
+      list-style: none;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      background-color: $green;
+      span {
+        padding: 15px;
+        img {
+          width: 15px;
+          height: 15px;
+        }
+      }
+    }
+  }
+  button {
+    float: right;
+    margin: 0;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 12px;
+    border: none;
+    background-color: $green;
+    color: #fff;
+  }
+}
