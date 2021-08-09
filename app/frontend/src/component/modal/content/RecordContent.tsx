@@ -139,10 +139,16 @@ const Record: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, w
  * @brief 검색, 전적을 보여주는 컴포넌트
  */
 
+enum recordState {
+  open,
+  close,
+  noResult
+}
+
 const RecordContent: FC = (): JSX.Element => {
 
   const [nickNameToFind, setNickNameToFind] = useState("");
-  const [isRecordOpen, setIsRecordOpen] = useState(false);
+  const [isRecordOpen, setIsRecordOpen] = useState(recordState.close);
   const [stats, setStats] = useState<userInfo>({
     nick: "",
     avatar_url: "",
@@ -158,7 +164,7 @@ const RecordContent: FC = (): JSX.Element => {
       const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nickNameToFind}`);
       const res = await (await easyfetch.fetch()).json();
       if (res.err_msg) {
-        setIsRecordOpen(false);
+        setIsRecordOpen(recordState.noResult);
         return ;
       }
       setStats({
@@ -170,7 +176,7 @@ const RecordContent: FC = (): JSX.Element => {
         winning_rate: (res.win_games / res.total_games) * 100,
         ladder_level: res.ladder_level
       });
-      setIsRecordOpen(true);
+      setIsRecordOpen(recordState.open);
     }
   }
 
@@ -186,7 +192,8 @@ const RecordContent: FC = (): JSX.Element => {
           onKeyDown={(e) => {if (e.key === "Enter") search()}} />
         <button onClick={search}><img src="./public/search.svg" alt="검색"/></button>
       </div>
-      {isRecordOpen ? <Record stats={stats}/> : <></>}
+      {isRecordOpen === recordState.open && <Record stats={stats}/>}
+      {isRecordOpen === recordState.noResult && <>no result</>}
     </div>
   );
 }
