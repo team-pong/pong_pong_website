@@ -177,6 +177,8 @@ const RecordContent: FC = (): JSX.Element => {
         ladder_level: res.ladder_level
       });
       setIsRecordOpen(recordState.open);
+    } else {
+      setIsRecordOpen(recordState.close);
     }
   }
 
@@ -193,7 +195,13 @@ const RecordContent: FC = (): JSX.Element => {
         <button onClick={search}><img src="./public/search.svg" alt="검색"/></button>
       </div>
       {isRecordOpen === recordState.open && <Record stats={stats}/>}
-      {isRecordOpen === recordState.noResult && <>no result</>}
+      {
+        isRecordOpen === recordState.noResult &&
+        <div id="no-result">
+          <img src="./public/exclamation-mark.svg" alt="Exclamation mark" />
+          <span>검색 결과가 없습니다</span>
+        </div>
+      }
     </div>
   );
 }

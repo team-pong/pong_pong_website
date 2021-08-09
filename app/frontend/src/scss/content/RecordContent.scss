@@ -33,6 +33,18 @@
       }
     }
   }
+  #no-result {
+    margin-top: 20px;
+    img {
+      width: 80px;
+      height: 80px;
+      vertical-align: middle;
+      margin-right: 20px;
+    }
+    span {
+      color: #bebebe;
+    }
+  }
   #record {
     #stats {
       margin-top: 20px;
