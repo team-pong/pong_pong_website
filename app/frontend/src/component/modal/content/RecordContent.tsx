@@ -198,8 +198,11 @@ const RecordContent: FC = (): JSX.Element => {
       {
         isRecordOpen === recordState.close &&
         <div id="record-closed">
-          <div id="most-played-map"></div>
-          <div id="worst-played-map"></div>
+          <div id="motd">
+            <div id="message"></div>
+            <div id="message"></div>
+            <div id="message"></div>
+          </div>
           <div id="ladder-rank"></div>
         </div>
       }
