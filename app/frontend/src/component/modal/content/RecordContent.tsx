@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from "react";
 import CircleChart from "../../circlechart/CircleChart";
 import "../../../scss/content/RecordContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
+import ladderRank from '../../../dummydata/testLadderRank';
 
 interface matchLog {
   user_score: number,
@@ -142,7 +143,18 @@ const RecordClose: FC = (): JSX.Element => {
         <div id="message"></div>
         <div id="message"></div>
       </div>
-      <div id="ladder-rank"></div>
+      <ul id="ladder-rank">
+        {
+          ladderRank.rank.map((user, i) => {
+            return (
+              <li key={i}>
+                <img src={user.avatar_url}/>
+                <span>{user.nick}</span>
+              </li>
+            );
+          })
+        }
+      </ul>
     </div>
   );
 }

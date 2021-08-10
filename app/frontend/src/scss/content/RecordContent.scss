@@ -62,6 +62,8 @@
       }
     }
     #ladder-rank {
+      margin: 0;
+      padding: 0;
       margin-top: 20px;
       width: 300px;
       height: calc(100% - 20px);
@@ -69,6 +71,21 @@
       display: inline;
       background-color: $green;
       border-radius: 12px;
+      li {
+        list-style: none;
+        color: #fff;
+        padding: 10px;
+        img {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          vertical-align: middle;
+        }
+        span {
+          padding-left: 10px;
+        }
+      }
+      overflow: auto;
     }
   }
   #record-open {
