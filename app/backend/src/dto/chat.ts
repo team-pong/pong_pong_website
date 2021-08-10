@@ -60,7 +60,7 @@ export class ChatDto2{
 
 export class ChatDto3{
   @ApiProperty({
-		example: ` [
+		example: `[
 			{
 				"title": "아무나",
 				"type": "public",
@@ -72,12 +72,6 @@ export class ChatDto3{
 				"type": "protected",
 				"current_people": 2,
 				"max_people": 5
-			},
-			{
-				"title": "심심하니깐",
-				"type": "private",
-				"current_people": 1,
-				"max_people": 3
 			}
 		]`,
 		description: '채널 리스트',
