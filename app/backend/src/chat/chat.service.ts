@@ -38,6 +38,8 @@ export class ChatService {
     let current_people;
     // 모든 채널의 제목, 타입, 현재인원 ,최대인원만 담기
     for(var i in chat){
+      if (chat[i].type === 'private')  // private 채널이면
+        continue ;
       chatList.chatList.push(new ChatDto2());
       chatList.chatList[i].title = chat[i].title;
       chatList.chatList[i].type = chat[i].type;
@@ -54,7 +56,7 @@ export class ChatService {
     let idx = -1;
     // 검색한 제목을 포함하는 채널의 제목, 타입, 현재인원, 최대인원만 담기
     for(var i in chat){
-      if (chat[i].title.indexOf(title) == -1)  // 검색한 제목이 채널에 포함되지 않으면
+      if ((chat[i].title.indexOf(title) == -1) || chat[i].type === 'private')  // 검색한 제목이 채널에 포함되지 않거나 private 채널이면
         continue ;
       chatList.chatList.push(new ChatDto2());
       chatList.chatList[++idx].title = chat[i].title;
