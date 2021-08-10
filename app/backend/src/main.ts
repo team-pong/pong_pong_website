@@ -32,11 +32,11 @@ async function bootstrap() {
     port: +process.env.PG_PORT,
   };
 
-const pgSession = require('connect-pg-simple')(session);
+  const pgSession = require('connect-pg-simple')(session);
 
-const pgStoreConfig = {
-  conString: `postgres://${conObject.user}:${conObject.password}@${conObject.host}:${conObject.port}/${conObject.database}`,
-};
+  const pgStoreConfig = {
+    conString: `postgres://${conObject.user}:${conObject.password}@${conObject.host}:${conObject.port}/${conObject.database}`,
+  };
 
   app.enableCors({
     "origin": ["http://localhost:3000", "http://127.0.0.1:3000"],

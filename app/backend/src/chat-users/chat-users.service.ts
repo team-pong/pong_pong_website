@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChatService } from 'src/chat/chat.service';
 import { ErrMsgDto } from 'src/dto/utility';
 import { Admin } from 'src/entities/admin';
 import { Chat } from 'src/entities/chat';
@@ -8,11 +7,11 @@ import { ChatUsers } from 'src/entities/chat-users';
 import { Users } from 'src/entities/users';
 import { err0, err13, err2, err3, err4, err9 } from 'src/err';
 import { Repository } from 'typeorm';
+import axios from 'axios';
 
 @Injectable()
 export class ChatUsersService {
   constructor(
-    private chatService: ChatService,
     @InjectRepository(ChatUsers) private chatUsersRepo: Repository<ChatUsers>,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
@@ -56,7 +55,7 @@ export class ChatUsersService {
       const channel = await this.chatRepo.findOne({channel_id: channel_id});
       if (channel.owner_id == user_id){  // 나간 사람이 owner이라면
         const newOwner = await this.chatUsersRepo.findOne({channel_id: channel_id});  // 채널에 남은 인원중 아무나 뽑기
-        await this.chatService.updateOwner(channel_id, newOwner.user_id);  // owner 변경
+        await axios.post('http://127.0.0.1:3001/chat/owner', {channel_id: channel_id, owner_id: newOwner.user_id}) // owner변경
       }
     }
     return new ErrMsgDto(err0);
