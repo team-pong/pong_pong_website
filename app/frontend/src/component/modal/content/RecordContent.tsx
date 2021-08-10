@@ -101,12 +101,12 @@ interface userInfo {
  * @brief 통계 및 전적을 보여주는 컴포넌트
  */
 
-const Record: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, win_games, loss_games, ladder_level}}) => {
+const RecordOpen: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, win_games, loss_games, ladder_level}}) => {
 
   const [recordSelector, setRecordSelector] = useState("all");
 
   return (
-    <div id="record">
+    <div id="record-open">
       <div id="stats">
         <span id="profile">
           <img src={`https://cdn.intra.42.fr/users/medium_yochoi.png`} alt={`${nick}'s img`}/>
@@ -132,6 +132,19 @@ const Record: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, w
       <RecordList target={nick} type={recordSelector}/>
     </div>
   )
+}
+
+const RecordClose: FC = (): JSX.Element => {
+  return (
+    <div id="record-close">
+      <div id="motd">
+        <div id="message"></div>
+        <div id="message"></div>
+        <div id="message"></div>
+      </div>
+      <div id="ladder-rank"></div>
+    </div>
+  );
 }
 
 /*!
@@ -194,18 +207,8 @@ const RecordContent: FC = (): JSX.Element => {
           onKeyDown={(e) => {if (e.key === "Enter") search()}} />
         <button onClick={search}><img src="./public/search.svg" alt="검색"/></button>
       </div>
-      {isRecordOpen === recordState.open && <Record stats={stats}/>}
-      {
-        isRecordOpen === recordState.close &&
-        <div id="record-closed">
-          <div id="motd">
-            <div id="message"></div>
-            <div id="message"></div>
-            <div id="message"></div>
-          </div>
-          <div id="ladder-rank"></div>
-        </div>
-      }
+      {isRecordOpen === recordState.open && <RecordOpen stats={stats}/>}
+      {isRecordOpen === recordState.close && <RecordClose />}
       {
         isRecordOpen === recordState.noResult &&
         <div id="no-result">
