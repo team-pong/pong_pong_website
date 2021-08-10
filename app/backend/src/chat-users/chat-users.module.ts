@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ChatService } from 'src/chat/chat.service';
 import { Admin } from 'src/entities/admin';
 import { Chat } from 'src/entities/chat';
 import { ChatUsers } from 'src/entities/chat-users';
@@ -11,6 +10,6 @@ import { ChatUsersService } from './chat-users.service';
 @Module({
   imports: [TypeOrmModule.forFeature([ChatUsers, Users, Chat, Admin])],
   controllers: [ChatUsersController],
-  providers: [ChatUsersService, ChatService]
+  providers: [ChatUsersService]
 })
 export class ChatUsersModule {}

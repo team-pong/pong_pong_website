@@ -7,6 +7,7 @@ import { ChatUsers } from 'src/entities/chat-users';
 import { Users } from 'src/entities/users';
 import { err0, err10, err13, err15, err2, err24, err4, err6, err8, err9 } from 'src/err';
 import { Repository } from 'typeorm';
+import { ChatGateway } from './chat.gateway';
 
 @Injectable()
 export class ChatService {
@@ -14,6 +15,7 @@ export class ChatService {
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(ChatUsers) private chatUsersRepo: Repository<ChatUsers>,
+    private chatGateway: ChatGateway,
     ){}
 
   async createChat(owner_id: string, title: string, type: string, passwd: string, max_people: number){
@@ -29,7 +31,8 @@ export class ChatService {
       return new ErrMsgDto(err9);
     const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people});
     await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 owner 추가
-    return new ErrMsgDto(err0);
+    return {channel_id: newChat.channel_id};
+    // return new ErrMsgDto(err0);
   }
 
   async readChat(){
@@ -114,5 +117,13 @@ export class ChatService {
       return new ErrMsgDto(err8);
     await this.chatRepo.delete({channel_id: channel_id});
     return new ErrMsgDto(err0);
+  }
+
+  async emitChat(channel_id: string, userId: string, chatContent: string) {
+    const chat = {
+      user: userId,
+      chat: chatContent,
+    };
+    this.chatGateway.server.to(channel_id).emit('message', chat);
   }
 }
