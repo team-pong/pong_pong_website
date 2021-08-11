@@ -68,21 +68,35 @@
       width: 300px;
       height: calc(100% - 20px);
       float: right;
-      display: inline;
       background-color: $green;
       border-radius: 12px;
       li {
         list-style: none;
-        color: #fff;
-        padding: 10px;
+        color: $green;
+        margin: 10px;
+        width: calc(100% - 20px);
+        background-color: #fff;
+        border-radius: 12px;
+        display: inline-flex;
+        justify-content: space-between;
         img {
           width: 40px;
           height: 40px;
+          padding: 5px;
           border-radius: 50%;
-          vertical-align: middle;
         }
-        span {
-          padding-left: 10px;
+        #nick {
+          width: 55px;
+          margin-top: 17px;
+        }
+        svg {
+          width: 100px;
+          height: 50px;
+          border-radius: 15px;
+        }
+        #percentage {
+          width: 40px;
+          margin-top: 17px;
         }
       }
       overflow: auto;

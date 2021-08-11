@@ -150,7 +150,9 @@ const RecordClose: FC = (): JSX.Element => {
             return (
               <li key={i}>
                 <img src={user.avatar_url}/>
-                <span>{user.nick}</span>
+                <span id="nick">{user.nick}</span>
+                <BarChart left={user.win} right={user.loss} />
+                <span id="percentage">{Math.floor((user.win / (user.win + user.loss)) * 100)}%</span>
               </li>
             );
           })
