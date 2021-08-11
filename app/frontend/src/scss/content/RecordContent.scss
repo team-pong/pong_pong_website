@@ -59,6 +59,14 @@
         height: 33%;
         background-color: $green;
         border-radius: 12px;
+        #you-know-that {
+          border-bottom: 3px solid green;
+          width: calc(100% - 40px);
+          margin: auto;
+          margin-top: 3px;
+          padding: 10px;
+          color: #fff;
+        }
       }
     }
     #ladder-rank {

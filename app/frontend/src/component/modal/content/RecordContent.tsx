@@ -140,9 +140,18 @@ const RecordClose: FC = (): JSX.Element => {
   return (
     <div id="record-close">
       <div id="motd">
-        <div id="message"></div>
-        <div id="message"></div>
-        <div id="message"></div>
+        <div id="message">
+          <div id="you-know-that">알고계셨나요?</div>
+          <span id="content"></span>
+        </div>
+        <div id="message">
+          <div id="you-know-that">알고계셨나요?</div>
+          <span id="content"></span>
+        </div>
+        <div id="message">
+          <div id="you-know-that">알고계셨나요?</div>
+          <span id="content"></span>
+        </div>
       </div>
       <ul id="ladder-rank">
         {
