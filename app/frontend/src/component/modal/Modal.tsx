@@ -157,7 +157,7 @@ const Modal: FC<modalPros> = ({ content, stateSetter, modalSize }): JSX.Element 
   return (
     <div id="modal" onClick={detectOutsideOfModal}>
       <div id="content">
-        <img src="./public/closeWindow.png" onClick={closer} alt="close" id="modal-closer"/>
+        <img src="./public/closeWindow.svg" onClick={closer} alt="close" id="modal-closer"/>
         {content({})}
       </div>
     </div>
