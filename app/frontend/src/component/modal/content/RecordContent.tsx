@@ -1,7 +1,9 @@
 import { FC, useEffect, useState } from "react";
-import CircleChart from "../../circlechart/CircleChart";
+import CircleChart from "../../chart/CircleChart";
+import BarChart from "../../chart/BarChart";
 import "../../../scss/content/RecordContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
+import ladderRank from '../../../dummydata/testLadderRank';
 
 interface matchLog {
   user_score: number,
@@ -101,12 +103,12 @@ interface userInfo {
  * @brief 통계 및 전적을 보여주는 컴포넌트
  */
 
-const Record: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, win_games, loss_games, ladder_level}}) => {
+const RecordOpen: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, win_games, loss_games, ladder_level}}) => {
 
   const [recordSelector, setRecordSelector] = useState("all");
 
   return (
-    <div id="record">
+    <div id="record-open">
       <div id="stats">
         <span id="profile">
           <img src={`https://cdn.intra.42.fr/users/medium_yochoi.png`} alt={`${nick}'s img`}/>
@@ -132,6 +134,41 @@ const Record: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, w
       <RecordList target={nick} type={recordSelector}/>
     </div>
   )
+}
+
+const RecordClose: FC = (): JSX.Element => {
+  return (
+    <div id="record-close">
+      <div id="motd">
+        <div id="message">
+          <div id="you-know-that">알고계셨나요?</div>
+          <span id="content"></span>
+        </div>
+        <div id="message">
+          <div id="you-know-that">알고계셨나요?</div>
+          <span id="content"></span>
+        </div>
+        <div id="message">
+          <div id="you-know-that">알고계셨나요?</div>
+          <span id="content"></span>
+        </div>
+      </div>
+      <ul id="ladder-rank">
+        {
+          ladderRank.rank.map((user, i) => {
+            return (
+              <li key={i}>
+                <img src={user.avatar_url}/>
+                <span id="nick">{user.nick}</span>
+                <BarChart left={user.win} right={user.loss} />
+                <span id="percentage">{Math.floor((user.win / (user.win + user.loss)) * 100)}%</span>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  );
 }
 
 /*!
@@ -194,7 +231,8 @@ const RecordContent: FC = (): JSX.Element => {
           onKeyDown={(e) => {if (e.key === "Enter") search()}} />
         <button onClick={search}><img src="./public/search.svg" alt="검색"/></button>
       </div>
-      {isRecordOpen === recordState.open && <Record stats={stats}/>}
+      {isRecordOpen === recordState.open && <RecordOpen stats={stats}/>}
+      {isRecordOpen === recordState.close && <RecordClose />}
       {
         isRecordOpen === recordState.noResult &&
         <div id="no-result">

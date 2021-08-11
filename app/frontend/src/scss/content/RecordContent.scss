@@ -45,7 +45,72 @@
       color: #bebebe;
     }
   }
-  #record {
+  #record-close {
+    margin-top: 10px;
+    height: 60vh;
+    #motd {
+      display: inline-flex;
+      flex-direction: column;
+      height: 100%;
+      #message {
+        margin-top: 20px;
+        display: inline-block;
+        width: 300px;
+        height: 33%;
+        background-color: $green;
+        border-radius: 12px;
+        #you-know-that {
+          border-bottom: 3px solid green;
+          width: calc(100% - 40px);
+          margin: auto;
+          margin-top: 3px;
+          padding: 10px;
+          color: #fff;
+        }
+      }
+    }
+    #ladder-rank {
+      margin: 0;
+      padding: 0;
+      margin-top: 20px;
+      width: 300px;
+      height: calc(100% - 20px);
+      float: right;
+      background-color: $green;
+      border-radius: 12px;
+      li {
+        list-style: none;
+        color: $green;
+        margin: 10px;
+        width: calc(100% - 20px);
+        background-color: #fff;
+        border-radius: 12px;
+        display: inline-flex;
+        justify-content: space-between;
+        img {
+          width: 40px;
+          height: 40px;
+          padding: 5px;
+          border-radius: 50%;
+        }
+        #nick {
+          width: 55px;
+          margin-top: 17px;
+        }
+        svg {
+          width: 100px;
+          height: 50px;
+          border-radius: 15px;
+        }
+        #percentage {
+          width: 40px;
+          margin-top: 17px;
+        }
+      }
+      overflow: auto;
+    }
+  }
+  #record-open {
     #stats {
       margin-top: 20px;
       margin-bottom: 20px;
