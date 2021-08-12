@@ -52,7 +52,7 @@
     padding: 0.5em 0;
     margin: 0;
 
-    //scroll bar°¡ friend list¿¡¸¸ Àû¿ëµÇ°Ô ÇÏ´Â ÄÁÅ×ÀÌ³Ê
+    //scroll barï¿½ï¿½ friend listï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì³ï¿½
     #friendListContainer {
       max-height: 370px;
       overflow-y: scroll;
@@ -97,7 +97,6 @@
     li {
       padding: 0.5em 1em 0.5em 1em;
       font-size: 0.95em;
-      font-weight: regular;
       transition: all 0.15s linear;
       cursor: pointer;
 
@@ -193,141 +192,6 @@
       &:focus {
         outline: none;
       }
-    }
-  }
-}
-
-@media screen and (max-width: 900px) and (min-width: 400px) {
-  body {
-    padding-left: 90px;
-  }
-  .menu {
-    width: 90px;
-
-    .avatar {
-      padding: 0.5em;
-      position: relative;
-      img {
-        width: 90px - 30px;
-      }
-
-      h2 {
-        opacity: 0;
-        position: absolute;
-        top: 50%;
-        left: 90px + 10px;
-        margin: 0;
-        min-width: 200px;
-        border-radius: 4px;
-        background: rgba(0, 0, 0, 0.4);
-        transform: translate3d(-20px, -50%, 0);
-        transition: all 0.15s ease-in-out;
-      }
-
-      &:hover {
-        h2 {
-          opacity: 1;
-          transform: translate3d(0px, -50%, 0);
-        }
-      }
-    }
-
-    ul {
-      .friend {
-        padding: 1px;
-        text-align: center;
-        img {
-          display: none;
-        }
-      }
-      #context-menu {
-        li {
-          margin: 0;
-          padding: 6px 12px;
-        }
-      }
-      li {
-        height: 90px/1.5;
-        position: relative;
-        margin-top: 25px;
-        padding: 0.8em;
-
-        img {
-          top: 0%;
-          left: 37%;
-        }
-
-        #icon-plus {
-          opacity: 0;
-        }
-
-        span {
-          opacity: 0;
-          position: absolute;
-          background: rgba(0, 0, 0, 0.5);
-          padding: 0.2em 0.5em;
-          border-radius: 4px;
-          top: 50%;
-          left: 90px - 10px;
-          transform: translate3d(-15px, -50%, 0);
-          transition: all 0.25s ease-in-out;
-
-          &:before {
-            content: "";
-            width: 0;
-            height: 0;
-            position: absolute;
-            top: 50%;
-            left: -5px;
-            border-top: 5px solid transparent;
-            border-bottom: 5px solid transparent;
-            border-right: 5px solid rgba(0, 0, 0, 0.5);
-            transform: translateY(-50%);
-          }
-        }
-
-        &:hover {
-          span {
-            opacity: 1;
-            transform: translate3d(0px, -50%, 0);
-          }
-        }
-      }
-    }
-  }
-}
-
-@media screen and (max-width: 400px) {
-  body {
-    padding-left: 0;
-  }
-
-  .menu {
-    width: 230px;
-    box-shadow: 0 0 0 100em rgba(0, 0, 0, 0);
-    transform: translate3d(-230px, 0, 0);
-    transition: all 0.3s ease-in-out;
-
-    .avatar {
-      h2 {
-        font-size: 1em;
-      }
-
-      img {
-        width: 90px - 30px;
-      }
-    }
-
-    ul {
-      li {
-        padding: 1em 1em 1em 3em;
-        font-size: 0.5em;
-      }
-    }
-
-    &:focus {
-      transform: translate3d(0, 0, 0);
-      box-shadow: 0 0 0 100em rgba(0, 0, 0, 0.6);
     }
   }
 }

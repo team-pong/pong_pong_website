@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { ModalController, ChatContent, ConfigContent, RecordContent } from '../modal/Modal'
 import NavBar from './navbar/NavBar'
-import '/src/scss/MainPage.scss'
+import '/src/scss/mainpage/MainPage.scss'
+import '/src/scss/mainpage/MainPage-mobile.scss'
 import EasyFetch from './../../utils/EasyFetch';
 import { testFriendList } from '../../dummydata/testFriendList';
 
