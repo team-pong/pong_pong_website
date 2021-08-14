@@ -20,7 +20,7 @@ const MainPage = (): JSX.Element => {
   useEffect(() => {
     const postAuthCodeToBackend = async () => {
       let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
-      const easyfetch = new EasyFetch('http://127.0.0.1:3001/api/oauth', 'POST');
+      const easyfetch = new EasyFetch('http://127.0.0.1:3001/session/oauth', 'POST');
       await easyfetch.fetch({code: searchParams.get('code')});
     }
     
