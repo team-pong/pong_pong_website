@@ -2,7 +2,8 @@ import { FC, useState } from "react";
 import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
 import "/src/scss/navbar/NavBar.scss";
-import "/src/scss/navbar/NavBar-mobile.scss"
+import "/src/scss/navbar/NavBar-media.scss";
+import "/src/scss/navbar/NavBar-mobile.scss";
 
 /*!
  * @author donglee
