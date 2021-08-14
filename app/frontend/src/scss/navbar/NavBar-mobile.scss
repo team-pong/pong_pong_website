@@ -1,0 +1,77 @@
+/*!
+ * @author yochoi
+ * @brief NavBar style for mobile
+          Screen: 320px ~ 480px
+          Device: mobile
+          State: vertical
+ */
+
+
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+  .menu {
+    display: block;
+    width: 100%;
+    height: auto;
+    position: relative;
+    .avatar {
+      text-align: left;
+      position: relative;
+      img {
+        width: 90px;
+        height: 90px;
+        display: inline;
+        margin: 0px 0px 0px 10px;
+        vertical-align: bottom;
+      }
+      h2 {
+        display: inline;
+        font-size: 70px;
+        margin-left: 35px;
+      }
+    }
+    ul {
+      .friend {
+        padding: 1px 1px 1px 70px;
+        font-size: 78px;
+        img {
+          width: 78px;
+          height: 78px;
+          margin: 0px 20px 0px 0px;
+        }
+      }
+      #context-menu {
+        width: auto;
+        max-width: none;
+        li {
+          margin: 0;
+          padding: 6px 12px;
+          font-size: 50px;
+        }
+      }
+      li {
+        height: auto;
+        margin-top: 25px;
+        padding: 0.8em;
+        img {
+          width: 70px;
+          height: 70px;
+          position: relative;
+        }
+        #icon-plus {
+          position: absolute;
+        }
+        span {
+          font-size: 80px;
+        }
+        #form-add-friend {
+          #input-add-friend {
+            font-size: 70px;
+          }
+          #submitButton {
+            font-size: 70px;
+          }
+        }
+      }
+    }
+  }
+}
