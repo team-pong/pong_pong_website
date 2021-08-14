@@ -1,11 +1,11 @@
 import { Entity, PrimaryColumn, Column, } from 'typeorm';
 
 @Entity()
-export class Session{
+export class session{
 	@PrimaryColumn()
 	sid: string;
 	@Column()
-	session: string;
+	sess: string;
   @Column({type: "timestamp", precision: 6})
 	expire: Date;
 }

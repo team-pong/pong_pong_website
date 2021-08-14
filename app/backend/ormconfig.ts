@@ -9,7 +9,7 @@ import { Chat } from './src/entities/chat'
 import { Friend } from './src/entities/friend'
 import { Match } from './src/entities/match'
 import { Mute } from './src/entities/mute'
-import { Session } from './src/entities/session'
+import { session } from './src/entities/session'
 import { Users } from './src/entities/users'
 import { Block } from './src/entities/block';
 
@@ -31,7 +31,7 @@ const config: TypeOrmModuleOptions = {
     Friend,
     Match,
     Mute,
-    Session,
+    session,
     Users,
     Block
   ],
