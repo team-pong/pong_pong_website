@@ -1,5 +1,14 @@
 @import '../../colors.scss';
 
+@keyframes circle-chart-animation {
+  from {
+    stroke-dasharray: 0 100;
+  }
+  to {
+    stroke-dasharray: auto, 100;
+  }
+}
+
 #record-content {
   width: 80%;
   margin: auto;
@@ -126,6 +135,11 @@
       #circle-chart {
         display: inline-block;
         vertical-align: middle;
+        svg {
+          #percentage {
+            animation: circle-chart-animation 3s;
+          }
+        }
         text {
           font-size: 0.5em;
           text-anchor: middle;
