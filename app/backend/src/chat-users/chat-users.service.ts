@@ -5,7 +5,7 @@ import { Admin } from 'src/entities/admin';
 import { Chat } from 'src/entities/chat';
 import { ChatUsers } from 'src/entities/chat-users';
 import { Users } from 'src/entities/users';
-import { err0, err13, err2, err3, err4, err9 } from 'src/err';
+import { err0, err13, err2, err4, err9 } from 'src/err';
 import { Repository } from 'typeorm';
 import axios from 'axios';
 

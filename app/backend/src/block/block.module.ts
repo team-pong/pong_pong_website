@@ -10,6 +10,5 @@ import { BlockService } from './block.service';
   imports: [TypeOrmModule.forFeature([Block, Users, Friend])],
   controllers: [BlockController],
   providers: [BlockService],
-  exports: [BlockService],
 })
 export class BlockModule {}
