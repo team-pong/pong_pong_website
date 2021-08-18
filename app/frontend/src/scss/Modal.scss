@@ -34,9 +34,10 @@
     transform: scale(0.6);
     transition: opacity 250ms 250ms ease, transform 300ms 250ms ease;
     #modal-closer {
-      margin-left: calc(100% - 30px) !important;
+      margin-left: calc(100% - 30px - 10px) !important;
       width: 30px !important;
       height: 30px !important;
+      padding: 10px 10px 0 0;
       &:hover {
         opacity: 0.6;
       }
