@@ -34,12 +34,15 @@
     transform: scale(0.6);
     transition: opacity 250ms 250ms ease, transform 300ms 250ms ease;
     #modal-closer {
-      margin-left: calc(100% - 30px - 10px) !important;
+      position: relative;
+      float: right;
       width: 30px !important;
       height: 30px !important;
-      padding: 10px 10px 0 0;
+      padding: 10px;
       &:hover {
         opacity: 0.6;
+        transform: rotate(180deg);
+        transition: all 0.3s ease;
       }
     }
   }
