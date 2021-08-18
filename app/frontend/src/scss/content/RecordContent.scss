@@ -21,7 +21,6 @@
   width: 80%;
   margin: auto;
   #search {
-    text-align: center;
     input {
       width: 80%;
       height: 35px;
@@ -32,12 +31,27 @@
       &:focus {
         outline: none;
       }
+      &:focus + .input-border {
+        outline: none;
+        transform: scaleX(0);
+      }
+    }
+    .input-border {
+      position: absolute;
+      top: 71px;
+      left: 10%;
+      display: inline-block;
+      width: calc(80% / 100 * 80);
+      height: 0px;
+      border-bottom: 3px solid #fff;
+      transform: scaleX(1);
+      transition: 1s all;
     }
     button {
       width: 15%;
       height: 39px;
+      float: right;
       margin: 0;
-      margin-left: 10px;
       padding: 0;
       vertical-align: middle;
       background-color: $green;
