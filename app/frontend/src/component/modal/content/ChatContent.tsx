@@ -1,6 +1,14 @@
-import { FC, useEffect, useState } from "react";
+import React, { FC, SetStateAction, useEffect, useState } from "react";
 import "../../../scss/content/ChatContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
+
+const ChatRoom: FC<{chatRoomID: string}> = ({chatRoomID}): JSX.Element => {
+  return (
+    <div id="chat-room">
+      {chatRoomID}
+    </div>
+  );
+};
 
 interface chatRoom {
   title: string,
@@ -9,14 +17,20 @@ interface chatRoom {
   max_people: number
 };
 
-const ChatRoomList: FC<{search: string, type: string}> = ({search, type}): JSX.Element => {
+interface chatRoomListProps {
+  search: string,
+  type: string,
+  setChatRoomID: React.Dispatch<SetStateAction<string>>
+};
+
+const ChatRoomList: FC<chatRoomListProps> = ({search, type, setChatRoomID}): JSX.Element => {
 
   const [publicChatRoom, setPublicChatRoom] = useState<chatRoom[]>([]);
   const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
 
   const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
     return (
-      <li key={idx}>
+      <li key={idx} onClick={() => setChatRoomID(chatRoom.title)}>
         <span>{chatRoom.title}{chatRoom.type === "protected" ? <img src="./public/lock.svg" alt="비밀방" /> : <></>}</span>
         <span>{chatRoom.current_people}/{chatRoom.max_people}</span>
       </li>
@@ -71,14 +85,14 @@ const ChatRoomList: FC<{search: string, type: string}> = ({search, type}): JSX.E
  * @brief 검색, 전적을 보여주는 컴포넌트
  */
 
-const ChatContent: FC = (): JSX.Element => {
+const ChatMain: FC<{setChatRoomID: React.Dispatch<React.SetStateAction<string>>}> = ({setChatRoomID}): JSX.Element => {
 
   const [searchInputValue, setSearchInputValue] = useState("");
   const [chatRoomToFind, setChatRoomToFind] = useState("");
   const [chatRoomSelector, setChatRoomSelector] = useState("all");
 
   return (
-    <div id="chat-content">
+    <div id="chat-main">
       <div id="search">
         <input
           type="text"
@@ -103,9 +117,25 @@ const ChatContent: FC = (): JSX.Element => {
             <label>비밀방</label>
         </li>
       </ul>
-      <ChatRoomList search={chatRoomToFind} type={chatRoomSelector}/>
+      <ChatRoomList search={chatRoomToFind} type={chatRoomSelector} setChatRoomID={setChatRoomID}/>
       <button>채팅방 만들기</button>
     </div>
+  );
+}
+
+/*!
+ * @author yochoi
+ * @brief 상황에 따라 content를 보여주는 컴포넌트
+ */
+
+const ChatContent: FC = (): JSX.Element => {
+
+  const [chatRoomID, setChatRoomID] = useState<string>("");
+
+  return (
+    <>
+      {chatRoomID === "" ? <ChatMain setChatRoomID={setChatRoomID}/> : <ChatRoom chatRoomID={chatRoomID} />}
+    </>
   );
 }
 
