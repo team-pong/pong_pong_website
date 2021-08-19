@@ -1,10 +1,17 @@
 @import '../../colors.scss';
 
+@keyframes search-button-animation {
+  0% {
+  }
+  100% {
+    transform: rotate(45deg);
+  }
+}
+
 #chat-main {
   width: 80%;
-  margin: auto;
+  margin: 45px auto auto auto;
   #search {
-    text-align: center;
     input {
       width: 80%;
       height: 35px;
@@ -15,6 +22,21 @@
       &:focus {
         outline: none;
       }
+      &:focus + .input-border {
+        outline: none;
+        transform: scaleX(0);
+      }
+    }
+    .input-border {
+      position: absolute;
+      top: 81px;
+      left: 10%;
+      display: inline-block;
+      width: calc(80% / 100 * 80);
+      height: 0px;
+      border-bottom: 3px solid #fff;
+      transform: scaleX(1);
+      transition: 1s all;
     }
     button {
       width: 15%;
@@ -28,8 +50,13 @@
       border-radius: 15px;
       img {
         width: 50px;
-        height: 90%;
+        height: 70%;
         padding-top: 2px;
+      }
+      &:hover {
+        img {
+          animation: search-button-animation 0.5s 2 alternate;
+        }
       }
     }
   }

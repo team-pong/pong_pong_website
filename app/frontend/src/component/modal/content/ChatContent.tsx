@@ -1,11 +1,11 @@
-import React, { FC, SetStateAction, useEffect, useState } from "react";
+import { FC, Dispatch, SetStateAction, useEffect, useState } from "react";
 import "../../../scss/content/ChatContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 
-const ChatRoom: FC<{chatRoomID: string}> = ({chatRoomID}): JSX.Element => {
+const ChatRoom: FC<{chatRoomInfo: chatRoom}> = ({chatRoomInfo}): JSX.Element => {
   return (
     <div id="chat-room">
-      {chatRoomID}
+      {chatRoomInfo.title}
     </div>
   );
 };
@@ -20,17 +20,17 @@ interface chatRoom {
 interface chatRoomListProps {
   search: string,
   type: string,
-  setChatRoomID: React.Dispatch<SetStateAction<string>>
+  setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>
 };
 
-const ChatRoomList: FC<chatRoomListProps> = ({search, type, setChatRoomID}): JSX.Element => {
+const ChatRoomList: FC<chatRoomListProps> = ({search, type, setChatRoomInfo}): JSX.Element => {
 
   const [publicChatRoom, setPublicChatRoom] = useState<chatRoom[]>([]);
   const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
 
   const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
     return (
-      <li key={idx} onClick={() => setChatRoomID(chatRoom.title)}>
+      <li key={idx} onClick={() => setChatRoomInfo({...chatRoom})}>
         <span>{chatRoom.title}{chatRoom.type === "protected" ? <img src="./public/lock.svg" alt="비밀방" /> : <></>}</span>
         <span>{chatRoom.current_people}/{chatRoom.max_people}</span>
       </li>
@@ -85,7 +85,7 @@ const ChatRoomList: FC<chatRoomListProps> = ({search, type, setChatRoomID}): JSX
  * @brief 검색, 전적을 보여주는 컴포넌트
  */
 
-const ChatMain: FC<{setChatRoomID: React.Dispatch<React.SetStateAction<string>>}> = ({setChatRoomID}): JSX.Element => {
+const ChatMain: FC<{setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({setChatRoomInfo}): JSX.Element => {
 
   const [searchInputValue, setSearchInputValue] = useState("");
   const [chatRoomToFind, setChatRoomToFind] = useState("");
@@ -100,7 +100,7 @@ const ChatMain: FC<{setChatRoomID: React.Dispatch<React.SetStateAction<string>>}
           value={searchInputValue}
           spellCheck={false}
           onChange={({target: {value}}) => setSearchInputValue(value)} 
-          onKeyDown={(e) => {if (e.key === "Enter") setChatRoomToFind(searchInputValue)}} />
+          onKeyDown={(e) => {if (e.key === "Enter") setChatRoomToFind(searchInputValue)}} /><span className="input-border" />
         <button onClick={() => setChatRoomToFind(searchInputValue)}><img src="./public/search.svg" alt="검색"/></button>
       </div>
       <ul id="chat-room-selector">
@@ -117,7 +117,7 @@ const ChatMain: FC<{setChatRoomID: React.Dispatch<React.SetStateAction<string>>}
             <label>비밀방</label>
         </li>
       </ul>
-      <ChatRoomList search={chatRoomToFind} type={chatRoomSelector} setChatRoomID={setChatRoomID}/>
+      <ChatRoomList search={chatRoomToFind} type={chatRoomSelector} setChatRoomInfo={setChatRoomInfo}/>
       <button>채팅방 만들기</button>
     </div>
   );
@@ -130,11 +130,11 @@ const ChatMain: FC<{setChatRoomID: React.Dispatch<React.SetStateAction<string>>}
 
 const ChatContent: FC = (): JSX.Element => {
 
-  const [chatRoomID, setChatRoomID] = useState<string>("");
+  const [chatRoomInfo, setChatRoomInfo] = useState<chatRoom>({title: "", type: "", max_people: 0, current_people: 0});
 
   return (
     <>
-      {chatRoomID === "" ? <ChatMain setChatRoomID={setChatRoomID}/> : <ChatRoom chatRoomID={chatRoomID} />}
+      {chatRoomInfo.title === "" ? <ChatMain setChatRoomInfo={setChatRoomInfo}/> : <ChatRoom chatRoomInfo={chatRoomInfo} />}
     </>
   );
 }
