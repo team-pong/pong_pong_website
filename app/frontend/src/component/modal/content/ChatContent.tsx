@@ -86,7 +86,7 @@ const ChatContent: FC = (): JSX.Element => {
           value={searchInputValue}
           spellCheck={false}
           onChange={({target: {value}}) => setSearchInputValue(value)} 
-          onKeyDown={(e) => {if (e.key === "Enter") setChatRoomToFind(searchInputValue)}} />
+          onKeyDown={(e) => {if (e.key === "Enter") setChatRoomToFind(searchInputValue)}} /><span className="input-border" />
         <button onClick={() => setChatRoomToFind(searchInputValue)}><img src="./public/search.svg" alt="검색"/></button>
       </div>
       <ul id="chat-room-selector">
