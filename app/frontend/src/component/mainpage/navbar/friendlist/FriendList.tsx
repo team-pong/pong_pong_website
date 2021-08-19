@@ -70,7 +70,7 @@ const FriendList: FC<friendListProps> = (props): JSX.Element => {
   }, []);
 
   return (
-    <div id="friendListContainer">
+    <div id="friend-list-container">
       {props.friends.map(friendListGenerator)}
       {contextMenuInfo.isOpen ? <ContextMenu target={contextMenuInfo.target} x={contextMenuInfo.xPos} y={contextMenuInfo.yPos}/> : <></>}
     </div>
