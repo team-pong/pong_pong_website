@@ -40,12 +40,14 @@
     }
 
     ul {
-      .friend {
-        padding: 1px;
-        text-align: center;
-        img {
-          display: none;
-        }
+      #friend-list-container {
+        position: absolute;
+        left: 80px;
+        width: 240px;
+        background-color: #5bc995;
+        border-radius: 4px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 5px rgb(0 0 0 / 15%);
       }
       #context-menu {
         li {
@@ -65,7 +67,7 @@
         }
 
         #icon-plus {
-          opacity: 0;
+          display: none;
         }
 
         span {
