@@ -114,7 +114,7 @@ const RecordOpen: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_game
           <img src={`https://cdn.intra.42.fr/users/medium_yochoi.png`} alt={`${nick}'s img`}/>
           <span>{nick}   </span>
         </span>
-        <CircleChart width={100} height={100} percentage={(win_games / total_games) * 100} />
+        <CircleChart width={100} height={100} percentage={Math.floor((win_games / total_games) * 100)} />
         <span>{total_games}전 {win_games}승 {loss_games}패 {ladder_level}점</span>
       </div>
       <ul id="record-selector">
