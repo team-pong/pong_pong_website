@@ -2,10 +2,13 @@ import { FC, Dispatch, SetStateAction, useEffect, useState } from "react";
 import "../../../scss/content/ChatContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 
-const ChatRoom: FC<{chatRoomInfo: chatRoom}> = ({chatRoomInfo}): JSX.Element => {
+const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({chatRoomInfo, setChatRoomInfo}): JSX.Element => {
   return (
     <div id="chat-room">
-      {chatRoomInfo.title}
+      <div id="chat-room-header">
+        <img src="./public/arrow.svg" id="arrow-button" alt="뒤로가기" onClick={() => setChatRoomInfo({title: "", type: "", max_people: 0, current_people: 0})}/>
+        {chatRoomInfo.title}{chatRoomInfo.type === "protected" ? <img id="lock" src="./public/lock-black.svg" alt="비밀방" /> : <></>}
+      </div>
     </div>
   );
 };
@@ -134,7 +137,7 @@ const ChatContent: FC = (): JSX.Element => {
 
   return (
     <>
-      {chatRoomInfo.title === "" ? <ChatMain setChatRoomInfo={setChatRoomInfo}/> : <ChatRoom chatRoomInfo={chatRoomInfo} />}
+      {chatRoomInfo.title === "" ? <ChatMain setChatRoomInfo={setChatRoomInfo}/> : <ChatRoom chatRoomInfo={chatRoomInfo} setChatRoomInfo={setChatRoomInfo}/>}
     </>
   );
 }

@@ -8,6 +8,30 @@
   }
 }
 
+@keyframes arrow-button-animation-in {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-45deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes arrow-button-animation-out {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(45deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
 #chat-main {
   width: 80%;
   margin: 45px auto auto auto;
@@ -111,5 +135,28 @@
     border: none;
     background-color: $green;
     color: #fff;
+  }
+}
+
+#chat-room {
+  #chat-room-header {
+    margin: 10px;
+    font-size: 30px;
+    border-bottom: 1px solid $green;
+    text-align: center;
+    #arrow-button {
+      position: relative;
+      float: left;
+      width: 30px;
+      height: 30px;
+      animation: arrow-button-animation-in 0.5s;
+      &:hover {
+        animation: arrow-button-animation-out 0.5s;
+      }
+    }
+    #lock {
+      width: 30px;
+      height: 30px;
+    }
   }
 }
