@@ -1,13 +1,18 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FriendDto1, FriendDto2 } from 'src/dto/friend';
+import { SessionDto1 } from 'src/dto/session';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
+import { SessionService } from 'src/session/session.service';
 import { FriendService } from './friend.service';
 
 @ApiTags('Friend')
 @Controller('friend')
 export class FriendController {
-  constructor(private friendService: FriendService){}
+  constructor(
+    private friendService: FriendService,
+    private sessionService: SessionService,
+  ){}
 
   @ApiOperation({ summary: '친구 추가'})
   @ApiResponse({ type: ErrMsgDto, description: '친구 추가 실패시 실패 이유' })
@@ -24,10 +29,12 @@ export class FriendController {
       해당 유저의 친구 유저 아이디 배열
       검색 실패시 실패 이유 반환
     `})
-  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '모든 친구들 검색할 유저 아이디 ' })
-  @Get('send')
-  readFriend1(@Query() q){
-    return this.friendService.readFriend(q.user_id, 'send');
+  // @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '모든 친구들 검색할 유저 아이디 ' })
+  @ApiQuery({ name: 'sid', example: '0TBeNj59PUBZ_XjbXGKq9sHHPHCkZky4', description: '세션아이디' })
+  @Get('list')
+  async readFriend1(@Query() q){
+    let user_id = await this.sessionService.readUserId(q.sid);
+    return this.friendService.readFriend(user_id, 'send');
   }
   @ApiOperation({ summary: '해당 유저를 친구 추가한 모든 유저 검색'})
   @ApiResponse({ 
@@ -37,7 +44,7 @@ export class FriendController {
       검색 실패시 실패 이유 반환
     ` })
   @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '자신을 친구 추가한 모든 유저들을 검색할 유저 아이디'})
-  @Get('receive')
+  @Get('list2')
   readFriend2(@Query() q){
     return this.friendService.readFriend(q.user_id, 'receive');
   }
