@@ -5,6 +5,12 @@ import { Session, SessionData } from 'express-session';
 import { Request, Response } from 'express';
 import { UsersService } from 'src/users/users.service';
 import { Client } from 'pg';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { session } from 'src/entities/session';
+import { SessionDto1 } from 'src/dto/session';
+import { err25 } from 'src/err';
+import { ErrMsgDto } from 'src/dto/utility';
 
 const db = {
 	user: process.env.PG_PONG_ADMIN,
@@ -21,6 +27,8 @@ const client = new Client(db);
 export class SessionService {
   constructor(
     private usersService: UsersService,
+    @InjectRepository(session) private sessionRepo: Repository<session>,
+
     ){}
 
   async getToken(loginCodeDto: LoginCodeDto) {
@@ -135,5 +143,17 @@ async saveSession(session: Session & Partial<SessionData>, id: string, token: st
     } catch (err) {
       console.log("valid check error:", err);
     }
+  }
+
+  // 세션 아이디로 유저아이디 검색
+  async readUserId(sid: string){
+    if (await this.sessionRepo.count({sid: sid}) === 0)  // 해당하는 세션 아이디가 없으면
+      return err25;
+    // 세션아이디에서 유저아이디를 뽑아내는 과정
+    let sess = await this.sessionRepo.findOne({sid : sid});
+    let process1 = sess.sess;
+    let process2 = process1.split(",\"userid\":\"");
+    let process3 = process2[1].split("\"");
+    return process3[0];
   }
 }

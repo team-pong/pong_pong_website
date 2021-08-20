@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginCodeDto } from 'src/dto/login-token-dto';
 import { SessionService } from './session.service';
 import { Request, Response } from 'express';
+import { SessionDto1 } from 'src/dto/session';
 
 @ApiTags('Session')
 @Controller('session')
