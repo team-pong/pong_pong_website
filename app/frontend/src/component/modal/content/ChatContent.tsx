@@ -36,6 +36,10 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
             );
           })
         }
+        <div id="chat-room-menu">
+          <img src="./public/plus.svg" alt="invite" />
+          <img src="./public/tools.svg" alt="config" />
+        </div>
       </div>
       <form>
         <textarea placeholder="대화내용 입력" rows={4} cols={50} value={message} onChange={({target: {value}}) => setMessage(value)}/>
