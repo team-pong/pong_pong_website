@@ -3,12 +3,44 @@ import "../../../scss/content/ChatContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 
 const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({chatRoomInfo, setChatRoomInfo}): JSX.Element => {
+
+  const [chatUsers, setChatUsers] = useState<{nick: string, avatar_url: string, position: string}[]>(require("../../../dummydata/testChatRoomLog").chatUsers);
+  const [chatLog, setChatLog] = useState(require("../../../dummydata/testChatRoomLog").chatLog);
+  const [message, setMessage] = useState("");
+
   return (
     <div id="chat-room">
       <div id="chat-room-header">
         <img src="./public/arrow.svg" id="arrow-button" alt="뒤로가기" onClick={() => setChatRoomInfo({title: "", type: "", max_people: 0, current_people: 0})}/>
         {chatRoomInfo.title}{chatRoomInfo.type === "protected" ? <img id="lock" src="./public/lock-black.svg" alt="비밀방" /> : <></>}
       </div>
+      <div id="chat-room-body">
+        {
+          chatLog.map((value, idx) => {
+            return (
+              <div key={idx} className="chat-room-message">
+                {value.nick} : {value.message}
+              </div>
+            );
+          })
+        }
+      </div>
+      <div id="chat-room-users">
+        {
+          chatUsers.map((value, idx) => {
+            return (
+              <div key={idx} className="chat-user">
+                <img src={value.avatar_url} alt={value.nick}/>
+                <span>{value.nick}</span>
+              </div>
+            );
+          })
+        }
+      </div>
+      <form>
+        <textarea placeholder="대화내용 입력" rows={4} cols={50} value={message} onChange={({target: {value}}) => setMessage(value)}/>
+        <button onClick={() => console.log(message)}>전송</button>
+      </form>
     </div>
   );
 };
