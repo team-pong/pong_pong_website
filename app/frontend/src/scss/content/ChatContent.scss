@@ -165,11 +165,38 @@
     display: inline-flex;
     flex-direction: column-reverse;
     position: relative;
-    margin-left: 10px;
+    padding: 0 9px 0 10px;
     width: calc(70% - 15px);
     height: 80%;
     border-bottom: 1px solid $green;
     overflow: auto;
+    .chat-room-message {
+      padding: 10px;
+      #message-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 4px;
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 10px;
+      }
+      #message-content {
+        display: inline-block;
+        width: calc(100% - 50px);
+        margin: 4px;
+        #message-nick {
+          display: inline-block;
+          width: 100%;
+        }
+        #message-body {
+          display: inline-block;
+          white-space: pre-line;
+        }
+      }
+      &:hover {
+        background-color: rgb(230, 230, 230);
+      }
+    }
   }
   #chat-room-users {
     position: relative;

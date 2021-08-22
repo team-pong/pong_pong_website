@@ -108,7 +108,7 @@ export const chatLog = [{
   nick: "first",
   position: "admin",
   avatar_url: `https://cdn.intra.42.fr/users/medium_donglee.jpg`,
-  time: "2017-01-01T00:00:00.000Z",
+  time: new Date().getTime(),
   message: "first"
 }, {
   nick: "yochoi",
@@ -121,7 +121,7 @@ export const chatLog = [{
   position: "owner",
   avatar_url: `https://cdn.intra.42.fr/users/medium_yochoi.png`,
   time: "2017-01-01T00:00:00.000Z",
-  message: "ㅇㅇ"
+  message: "ㅇㅇ\n안녕하세요\n여러줄 테스트중\n긴줄테스터123412341234123412341234123412341234123412341234긴줄테스터123412341234123412341234123412341234123412341234"
 }, {
   nick: "yochoi",
   position: "owner",

@@ -17,9 +17,16 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
       <div id="chat-room-body">
         {
           chatLog.map((value, idx) => {
+            const date = new Date(value.time);
+            const hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+            const minute = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
             return (
               <div key={idx} className="chat-room-message">
-                {value.nick} : {value.message}
+                <img id="message-avatar" src={value.avatar_url}/>
+                <div id="message-content">
+                  <span id="message-nick"><b>{value.nick}</b> {hour}:{minute}</span>
+                  <span id="message-body">{value.message}</span>
+                </div>
               </div>
             );
           })
