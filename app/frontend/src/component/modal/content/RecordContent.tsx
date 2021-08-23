@@ -229,7 +229,7 @@ const RecordContent: FC = (): JSX.Element => {
           spellCheck={false}
           onChange={({target: {value}}) => setNickNameToFind(value)} 
           onKeyDown={(e) => {if (e.key === "Enter") search()}} /><span className="input-border" />
-        <button onClick={search}><img src="./public/search.svg" alt="검색"/></button>
+        <button onClick={search}><img src="/public/search.svg" alt="검색"/></button>
       </div>
       {isRecordOpen === recordState.open && <RecordOpen stats={stats}/>}
       {isRecordOpen === recordState.close && <RecordClose />}

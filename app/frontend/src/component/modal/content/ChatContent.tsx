@@ -147,7 +147,7 @@ const ChatMain: FC<{setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({se
           spellCheck={false}
           onChange={({target: {value}}) => setSearchInputValue(value)} 
           onKeyDown={(e) => {if (e.key === "Enter") setChatRoomToFind(searchInputValue)}} /><span className="input-border" />
-        <button onClick={() => setChatRoomToFind(searchInputValue)}><img src="./public/search.svg" alt="검색"/></button>
+        <button onClick={() => setChatRoomToFind(searchInputValue)}><img src="/public/search.svg" alt="검색"/></button>
       </div>
       <ul id="chat-room-selector">
         <li onClick={() => setChatRoomSelector("all")}>
