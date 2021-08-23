@@ -12,6 +12,5 @@ import { BanService } from './ban.service';
   imports: [TypeOrmModule.forFeature([Ban, Users, Chat, ChatUsers, Admin])],
   controllers: [BanController],
   providers: [BanService],
-  exports: [BanService],
 })
 export class BanModule {}

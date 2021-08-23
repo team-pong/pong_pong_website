@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { withRouter, RouteComponentProps, Link, match, Route } from "react-router-dom";
+import { withRouter, RouteComponentProps, Link, Route } from "react-router-dom";
 import "../../../scss/content/MyProfileContent.scss";
 import Modal from "../Modal";
 import RecordContent from "./RecordContent";

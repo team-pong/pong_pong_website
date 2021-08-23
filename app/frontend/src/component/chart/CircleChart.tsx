@@ -25,6 +25,8 @@ const CircleChart: FC<circleChartProps> = (props): JSX.Element => {
             a 15.9155 15.9155 0 0 1 0 -31.831"
         />
         <path
+          id="percentage"
+          key={props.percentage}
           fill="none"
           strokeWidth="2.8"
           strokeLinecap="round"

@@ -4,7 +4,7 @@ import { MatchDto2 } from 'src/dto/match';
 import { ErrMsgDto } from 'src/dto/utility';
 import { Match } from 'src/entities/match';
 import { Users } from 'src/entities/users';
-import { err0, err18, err19, err2 } from 'src/err';
+import { err0, err18, err19, err2, err21 } from 'src/err';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -80,5 +80,12 @@ export class MatchService {
   await this.matchRepo.update({winner_id: user_id}, {winner_id: 'unknown'});
   await this.matchRepo.update({loser_id: user_id}, {loser_id: 'unknown'});
   return new ErrMsgDto(err0);
+  }
+
+  async nickToId(nick: string){
+    if (await this.usersRepo.count({nick: nick}) === 0)  // 존재하지 않은 닉네임이면
+      return new ErrMsgDto(err21);
+    const user = await this.usersRepo.findOne({nick: nick});
+    return user.user_id;
   }
 }

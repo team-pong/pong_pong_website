@@ -1,7 +1,9 @@
 import { FC, useEffect, useState } from "react";
-import CircleChart from "../../circlechart/CircleChart";
+import CircleChart from "../../chart/CircleChart";
+import BarChart from "../../chart/BarChart";
 import "../../../scss/content/RecordContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
+import ladderRank from '../../../dummydata/testLadderRank';
 
 interface matchLog {
   user_score: number,
@@ -31,13 +33,13 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
     let apiAddress: string = "";
     switch (type) {
       case "normal":
-        apiAddress = `http://127.0.0.1:3001/match/general?user_id=${target}`
+        apiAddress = `http://127.0.0.1:3001/match/general?nick=${target}`
         break;
       case "ladder":
-        apiAddress = `http://127.0.0.1:3001/match/ranked?user_id=${target}`
+        apiAddress = `http://127.0.0.1:3001/match/ranked?nick=${target}`
         break;
       default:
-        apiAddress = `http://127.0.0.1:3001/match?user_id=${target}`
+        apiAddress = `http://127.0.0.1:3001/match?nick=${target}`
         break;
     };
     const easyfetch = new EasyFetch(apiAddress);
@@ -59,20 +61,20 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
               {' '}
               {log.user_nick}
               {' '}
-              {log.user_score}
+              <img src={`./public/number/${log.other_score}.svg`} alt={`${log.user_score}`} style={{borderRadius: "0"}}/>
             </span>
             <img src="./public/vs.svg"/>
             <span id="player">
-              <img src={`https://cdn.intra.42.fr/users/medium_jinbkim.jpg`/*log.other_url*/} alt={`${log.other_nick}'s img`}/>
+              <img src={`./public/number/${log.other_score}.svg`} alt={`${log.other_score}`} style={{borderRadius: "0"}}/>
               {' '}
               {log.other_nick}
               {' '}
-              {log.other_score}
+              <img src={`https://cdn.intra.42.fr/users/medium_jinbkim.jpg`/*log.other_url*/} alt={`${log.other_nick}'s img`}/>
             </span>
             <span id="game-info">
               <div>15분전</div>
-              <div>{log.type}</div>
-              <div>{`map${log.map}`}</div>
+              <div>{log.type === "general" ? <>일반</> : <>레더</>}</div>
+              <div>{`맵${log.map}`}</div>
             </span>
           </div>
         );
@@ -101,18 +103,18 @@ interface userInfo {
  * @brief 통계 및 전적을 보여주는 컴포넌트
  */
 
-const Record: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, win_games, loss_games, ladder_level}}) => {
+const RecordOpen: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, win_games, loss_games, ladder_level}}) => {
 
   const [recordSelector, setRecordSelector] = useState("all");
 
   return (
-    <div id="record">
+    <div id="record-open">
       <div id="stats">
         <span id="profile">
           <img src={`https://cdn.intra.42.fr/users/medium_yochoi.png`} alt={`${nick}'s img`}/>
           <span>{nick}   </span>
         </span>
-        <CircleChart width={100} height={100} percentage={(win_games / total_games) * 100} />
+        <CircleChart width={100} height={100} percentage={Math.floor((win_games / total_games) * 100)} />
         <span>{total_games}전 {win_games}승 {loss_games}패 {ladder_level}점</span>
       </div>
       <ul id="record-selector">
@@ -134,15 +136,56 @@ const Record: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, w
   )
 }
 
+const RecordClose: FC = (): JSX.Element => {
+  return (
+    <div id="record-close">
+      <div id="motd">
+        <div id="message">
+          <div id="you-know-that">알고계셨나요?</div>
+          <span id="content"></span>
+        </div>
+        <div id="message">
+          <div id="you-know-that">알고계셨나요?</div>
+          <span id="content"></span>
+        </div>
+        <div id="message">
+          <div id="you-know-that">알고계셨나요?</div>
+          <span id="content"></span>
+        </div>
+      </div>
+      <ul id="ladder-rank">
+        {
+          ladderRank.rank.map((user, i) => {
+            return (
+              <li key={i}>
+                <img src={user.avatar_url}/>
+                <span id="nick">{user.nick}</span>
+                <BarChart left={user.win} right={user.loss} />
+                <span id="percentage">{Math.floor((user.win / (user.win + user.loss)) * 100)}%</span>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  );
+}
+
 /*!
  * @author yochoi
  * @brief 검색, 전적을 보여주는 컴포넌트
  */
 
+enum recordState {
+  open,
+  close,
+  noResult
+}
+
 const RecordContent: FC = (): JSX.Element => {
 
   const [nickNameToFind, setNickNameToFind] = useState("");
-  const [isRecordOpen, setIsRecordOpen] = useState(false);
+  const [isRecordOpen, setIsRecordOpen] = useState(recordState.close);
   const [stats, setStats] = useState<userInfo>({
     nick: "",
     avatar_url: "",
@@ -158,7 +201,7 @@ const RecordContent: FC = (): JSX.Element => {
       const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nickNameToFind}`);
       const res = await (await easyfetch.fetch()).json();
       if (res.err_msg) {
-        setIsRecordOpen(false);
+        setIsRecordOpen(recordState.noResult);
         return ;
       }
       setStats({
@@ -170,7 +213,9 @@ const RecordContent: FC = (): JSX.Element => {
         winning_rate: (res.win_games / res.total_games) * 100,
         ladder_level: res.ladder_level
       });
-      setIsRecordOpen(true);
+      setIsRecordOpen(recordState.open);
+    } else {
+      setIsRecordOpen(recordState.close);
     }
   }
 
@@ -179,12 +224,22 @@ const RecordContent: FC = (): JSX.Element => {
       <div id="search">
         <input
           type="text"
-          placeholder="닉네임"
+          placeholder="전적 검색을 하려는 닉네임을 입력해 주세요"
           value={nickNameToFind}
-          onChange={({target: {value}}) => setNickNameToFind(value)} />
-        <button onClick={search}>Search</button>
+          spellCheck={false}
+          onChange={({target: {value}}) => setNickNameToFind(value)} 
+          onKeyDown={(e) => {if (e.key === "Enter") search()}} /><span className="input-border" />
+        <button onClick={search}><img src="/public/search.svg" alt="검색"/></button>
       </div>
-      {isRecordOpen ? <Record stats={stats}/> : <></>}
+      {isRecordOpen === recordState.open && <RecordOpen stats={stats}/>}
+      {isRecordOpen === recordState.close && <RecordClose />}
+      {
+        isRecordOpen === recordState.noResult &&
+        <div id="no-result">
+          <img src="./public/exclamation-mark.svg" alt="Exclamation mark" />
+          <span>검색 결과가 없습니다</span>
+        </div>
+      }
     </div>
   );
 }

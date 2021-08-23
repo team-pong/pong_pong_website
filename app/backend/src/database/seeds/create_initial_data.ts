@@ -3,7 +3,6 @@ import { Factory, Seeder } from "typeorm-seeding";
 import { Ban } from "../../entities/ban";
 import { Users } from "../../entities/users";
 import { Chat } from "../../entities/chat";
-import { Achievements } from "../../entities/achievements";
 import { Admin } from "../../entities/admin";
 import { ChatUsers } from "../../entities/chat-users";
 import { DmStore } from "../../entities/dm-store";
@@ -19,10 +18,6 @@ export class createInitialData implements Seeder {
 		await connection.query(`GRANT ALL PRIVILEGES ON TABLE session TO pong_admin`);
 		await connection.query(`CREATE INDEX IDX_session_expire ON session (expire)`);
 
-		// await connection
-		// 	.createQueryBuilder().insert().into(Achievements)
-		// 	.values([{user_id: 'jinbkim', achievement: '난무조건이겨'}, {user_id: 'jinbkim', achievement: '나는야입문자'}, {user_id: 'donglee', achievement: '타락파워전사'}])
-		// 	.execute();
 		await connection
 			.createQueryBuilder().insert().into(Admin)
 			.values([{user_id: 'jinbkim', channel_id: 1}, {user_id: 'donglee', channel_id: 1}, {user_id: 'hna', channel_id: 2}])
@@ -38,7 +33,7 @@ export class createInitialData implements Seeder {
 		await connection
 			.createQueryBuilder().insert().into(ChatUsers)
 			.values([{user_id: 'jinbkim', channel_id: 1}, {user_id: 'donglee', channel_id: 1}, {user_id: 'hna', channel_id: 2}, {user_id: 'yochoi', channel_id: 1}, {user_id: 'jinwkim', channel_id: 2}, {user_id: 'hjung', channel_id: 3}])
-			.execute();
+			.execute();			
 		await connection
 			.createQueryBuilder().insert().into(Chat)
 			.values([{owner_id: 'yochoi', title: '아무나', type: 'public', passwd: '', max_people: 10}, {owner_id: 'jinwkim', title: '아무나 와보렴', type: 'protected', passwd: '1234', max_people: 5}, {owner_id: 'hjing', title: '심심하니깐', type: 'private', passwd: '', max_people: 3}])
@@ -53,7 +48,18 @@ export class createInitialData implements Seeder {
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(Match)
-			.values([{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 1}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3}])
+			.values([
+				{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 1}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3},
+				{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 2}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3},
+				{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 3}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3},
+				{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 1}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3},
+				{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 2}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3},
+				{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 3}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3},
+				{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 1}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3},
+				{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 2}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3},
+				{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 3}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3},
+				{winner_id: 'jinbkim', loser_id: 'donglee', winner_score: 3, loser_score: 1, type: 'general', map: 3}, {winner_id: 'donglee', loser_id: 'yochoi', winner_score: 3, loser_score: 2, type: 'ranked', map: 2}, {winner_id: 'donglee', loser_id: 'jinbkim', winner_score: 2, loser_score: 0, type: 'general', map: 3},
+			])
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(Mute)
@@ -62,16 +68,15 @@ export class createInitialData implements Seeder {
 		await connection
 			.createQueryBuilder().insert().into(Users)
 			.values([
-				{user_id: 'jinbkim', nick: 'jinbkim', avatar_url: 'a', total_games:100, win_games:100}, 
-				{user_id: 'donglee', nick: 'donglee', avatar_url: 'b'}, 
-				{user_id: 'hna', nick: 'hna', avatar_url: 'c'}, 
-				{user_id: 'yochoi', nick: 'yochoi', avatar_url: 'd'}, 
-				{user_id: 'jinwkim', nick: 'jinwkim', avatar_url: 'e'}, 
-				{user_id: 'hjung', nick: 'hjung', avatar_url: 'f'},
-				{user_id: 'juhlee', nick: 'juhlee', avatar_url: 'g'},
-				{user_id: 'hyeonkim', nick: 'hyeonkim', avatar_url: 'h'},
-				{user_id: 'unknown', nick: 'unknown', avatar_url: 'i'},
-
+				{user_id: 'jinbkim', nick: 'jinbkim', avatar_url: 'https://gravatar.com/avatar/d93441b99017237ec67159e63c4f991?s=400&d=robohash&r=x', total_games:20, win_games:10, loss_games:10}, 
+				{user_id: 'donglee', nick: 'donglee', avatar_url: 'https://gravatar.com/avatar/d93441b990172e7ec67159e63c4f992?s=400&d=robohash&r=x', total_games:30, win_games:20, loss_games:10, ladder_level:1500}, 
+				{user_id: 'hna', nick: 'hna', avatar_url: 'https://gravatar.com/avatar/d93441b9901723e7ec6159e63c4f993?s=400&d=robohash&r=x'}, 
+				{user_id: 'yochoi', nick: 'yochoi', avatar_url: 'https://gravatar.com/avatar/d93441b990173e7ec67159e63c4f994?s=400&d=robohash&r=x', total_games:10, win_games:0, loss_games:10, ladder_level:500}, 
+				{user_id: 'jinwkim', nick: 'jinwkim', avatar_url: 'https://gravatar.com/avatar/d93441b991723e7ec67159e63c4f995?s=400&d=robohash&r=x'}, 
+				{user_id: 'hjung', nick: 'hjung', avatar_url: 'https://gravatar.com/avatar/d93441b990173e7ec67159e63c4f996?s=400&d=robohash&r=x'},
+				{user_id: 'juhlee', nick: 'juhlee', avatar_url: 'https://gravatar.com/avatar/d93441b991723e7ec67159e63c4f997?s=400&d=robohash&r=x'},
+				{user_id: 'hyeonkim', nick: 'hyeonkim', avatar_url: 'https://gravatar.com/avatar/d9341b9901723e7ec67159e63c4f998?s=400&d=robohash&r=x'},
+				{user_id: 'unknown', nick: 'unknown', avatar_url: 'https://gravatar.com/avatar/d9344b9901723e7ec67159e63c4f999?s=400&d=robohash&r=x'},
 			])
 			.execute();
 	}

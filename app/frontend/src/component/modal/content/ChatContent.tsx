@@ -1,70 +1,112 @@
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react";
+import "../../../scss/content/ChatContent.scss";
+import EasyFetch from "../../../utils/EasyFetch";
 
-/*!
- * @author yochoi
- * @brief 더미 데이터를 만드는 함수와 인터페이스
- */
-
-interface dummyDataInterface {
-  name: string,
+interface chatRoom {
+  title: string,
   type: string,
-  numOfMembers: number
-}
+  current_people: number,
+  max_people: number
+};
 
-function makeDummyData(): Array<dummyDataInterface> {
-  let dummyData: Array<dummyDataInterface> = [];
-  for (let i = 0; i < 50; ++i) {
-    dummyData.push({
-      name: `chat room ${i}`,
-      type: (i % 2 === 0 ? 'public' : 'secret'),
-      numOfMembers: i
-    })
-  }
-  return dummyData;
-}
+const ChatRoomList: FC<{search: string, type: string}> = ({search, type}): JSX.Element => {
 
-/*!
- * @author yochoi
- * @brief ChatContent
- */
+  const [publicChatRoom, setPublicChatRoom] = useState<chatRoom[]>([]);
+  const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
 
-const ChatList: FC<{setChatID: (chatID: string) => void}> = ({setChatID}): JSX.Element => {
-  const dummyData = makeDummyData();
-
-  const makeChatList = (chatRoom: dummyDataInterface, idx: number) => {
+  const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
     return (
-      <li key={idx} onClick={() => setChatID(chatRoom.name)}>
-        {chatRoom.name}/{chatRoom.type}/{chatRoom.numOfMembers}
+      <li key={idx}>
+        <span>{chatRoom.title}{chatRoom.type === "protected" ? <img src="./public/lock.svg" alt="비밀방" /> : <></>}</span>
+        <span>{chatRoom.current_people}/{chatRoom.max_people}</span>
       </li>
     );
-  };
+  }
+
+  const sortChatRoomList = (list: chatRoom[]) => {
+    list.map(chatRoom => {
+      switch (chatRoom.type) {
+        case "public":
+          setPublicChatRoom(publicChatRoom => [...publicChatRoom, chatRoom]);
+          break ;
+        case "protected":
+          setProtectedChatRoom(protectedChatRoom => [...protectedChatRoom, chatRoom]);
+          break ;
+        default:
+          break ;
+      }
+    });
+  }
+
+  const getChatRoomList = async (): Promise<chatRoom[]> => {
+    let res: {chatList: chatRoom[]};
+    setPublicChatRoom([]);
+    setProtectedChatRoom([]);
+    if (search === "") {
+      const easyfetch = new EasyFetch('http://127.0.0.1:3001/chat');
+      res = await (await easyfetch.fetch()).json();
+    } else {
+      const easyfetch = new EasyFetch(`http://127.0.0.1:3001/chat/title?title=${search}`);
+      res = await (await easyfetch.fetch()).json();
+    }
+    return (res.chatList);
+  }
+
+  useEffect(() => {
+    getChatRoomList()
+    .then(sortChatRoomList);
+  }, [search]);
 
   return (
-    <div id="chatlist">
-      <ul>
-        {dummyData.map(makeChatList)}
-      </ul>
-    </div>
+    <ul id="chat-room-list">
+      {type === "all" ? [...publicChatRoom, ...protectedChatRoom].map(chatRoomListGenerator) : <></>}
+      {type === "public" ? publicChatRoom.map(chatRoomListGenerator) : <></>}
+      {type === "protected" ? protectedChatRoom.map(chatRoomListGenerator) : <></>}
+    </ul>
   );
 }
 
-const ChatRoom: FC<{chatID: string}> = ({chatID}): JSX.Element => {
-
-  useEffect(() => {
-    // get chatID->fetch chat log data
-    // socket connect
-  }, []);
-
-  return (<h1>{chatID}</h1>);
-}
+/*!
+ * @author yochoi
+ * @brief 검색, 전적을 보여주는 컴포넌트
+ */
 
 const ChatContent: FC = (): JSX.Element => {
-  const [chatID, setChatID] = useState("");
-  if (chatID === "") {
-    return (<ChatList setChatID={setChatID}/>);
-  } else {
-    return (<ChatRoom chatID={chatID}/>);
-  }
+
+  const [searchInputValue, setSearchInputValue] = useState("");
+  const [chatRoomToFind, setChatRoomToFind] = useState("");
+  const [chatRoomSelector, setChatRoomSelector] = useState("all");
+
+  return (
+    <div id="chat-content">
+      <div id="search">
+        <input
+          type="text"
+          placeholder="검색하려는 채팅방 이름을 입력해 주세요"
+          value={searchInputValue}
+          spellCheck={false}
+          onChange={({target: {value}}) => setSearchInputValue(value)} 
+          onKeyDown={(e) => {if (e.key === "Enter") setChatRoomToFind(searchInputValue)}} /><span className="input-border" />
+        <button onClick={() => setChatRoomToFind(searchInputValue)}><img src="/public/search.svg" alt="검색"/></button>
+      </div>
+      <ul id="chat-room-selector">
+        <li onClick={() => setChatRoomSelector("all")}>
+            <input type="radio" name="all" checked={chatRoomSelector === "all"} onChange={() => {}}/>
+            <label>전체</label>
+        </li>
+        <li onClick={() => setChatRoomSelector("public")}>
+            <input type="radio" name="public" checked={chatRoomSelector === "public"} onChange={() => {}}/>
+            <label>공개방</label>
+        </li>
+        <li onClick={() => setChatRoomSelector("protected")}>
+            <input type="radio" name="protected" checked={chatRoomSelector === "protected"} onChange={() => {}}/>
+            <label>비밀방</label>
+        </li>
+      </ul>
+      <ChatRoomList search={chatRoomToFind} type={chatRoomSelector}/>
+      <button>채팅방 만들기</button>
+    </div>
+  );
 }
 
 export default ChatContent;

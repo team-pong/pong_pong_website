@@ -5,8 +5,9 @@ import { ErrMsgDto } from 'src/dto/utility';
 import { Chat } from 'src/entities/chat';
 import { ChatUsers } from 'src/entities/chat-users';
 import { Users } from 'src/entities/users';
-import { err0, err10, err13, err15, err2, err4, err6, err8, err9 } from 'src/err';
+import { err0, err10, err13, err15, err2, err24, err4, err6, err8, err9 } from 'src/err';
 import { Repository } from 'typeorm';
+import { ChatGateway } from './chat.gateway';
 
 @Injectable()
 export class ChatService {
@@ -14,6 +15,7 @@ export class ChatService {
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(ChatUsers) private chatUsersRepo: Repository<ChatUsers>,
+    private chatGateway: ChatGateway,
     ){}
 
   async createChat(owner_id: string, title: string, type: string, passwd: string, max_people: number){
@@ -29,17 +31,23 @@ export class ChatService {
       return new ErrMsgDto(err9);
     const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people});
     await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 owner 추가
-    return new ErrMsgDto(err0);
+    return {channel_id: newChat.channel_id};
+    // return new ErrMsgDto(err0);
   }
 
   async readChat(){
     const chat = await this.chatRepo.find();  // 모든 채널
     let chatList = { chatList: Array<ChatDto2>() }
-    // 모든 채널의 제목, 타입, 최대인원만 담기
+    let current_people;
+    // 모든 채널의 제목, 타입, 현재인원 ,최대인원만 담기
     for(var i in chat){
+      if (chat[i].type === 'private')  // private 채널이면
+        continue ;
       chatList.chatList.push(new ChatDto2());
       chatList.chatList[i].title = chat[i].title;
       chatList.chatList[i].type = chat[i].type;
+      current_people = await this.readPeople(chat[i].channel_id);
+      chatList.chatList[i].current_people = current_people;
       chatList.chatList[i].max_people = chat[i].max_people;
     }
     return chatList;
@@ -47,14 +55,17 @@ export class ChatService {
   async readTitle(title: string){
     const chat = await this.chatRepo.find();  // 모든 채널
     let chatList = { chatList: Array<ChatDto2>() }
+    let current_people;
     let idx = -1;
-    // 검색한 제목을 포함하는 채널의 제목, 타입, 최대인원만 담기
+    // 검색한 제목을 포함하는 채널의 제목, 타입, 현재인원, 최대인원만 담기
     for(var i in chat){
-      if (chat[i].title.indexOf(title) == -1)  // 검색한 제목이 채널에 포함되지 않으면
+      if ((chat[i].title.indexOf(title) == -1) || chat[i].type === 'private')  // 검색한 제목이 채널에 포함되지 않거나 private 채널이면
         continue ;
       chatList.chatList.push(new ChatDto2());
       chatList.chatList[++idx].title = chat[i].title;
       chatList.chatList[idx].type = chat[i].type;
+      current_people = await this.readPeople(chat[i].channel_id);
+      chatList.chatList[i].current_people = current_people;
       chatList.chatList[idx].max_people = chat[i].max_people;
     }
     return chatList;
@@ -64,6 +75,12 @@ export class ChatService {
       return new ErrMsgDto(err4);
     const chanel = await this.chatRepo.find({channel_id: channel_id});  // 채널 찾기
     return chanel[0].owner_id; 
+  }
+  async readPeople(channel_id: number){
+    if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널이면
+      return new ErrMsgDto(err4);
+    let people = await this.chatUsersRepo.count({channel_id: channel_id});
+    return people;
   }
 
   async updateChat(channel_id: number, title: string, type: string, passwd: string, max_people: number){
@@ -75,6 +92,9 @@ export class ChatService {
       return new ErrMsgDto(err15);
     if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널이면
       return new ErrMsgDto(err4);
+    let current_people = await this.readPeople(channel_id);
+    if (max_people < current_people)
+      return new ErrMsgDto(err24);
     await this.chatRepo.save({channel_id: channel_id, title: title, type: type, passwd: passwd, max_people: max_people});
     return new ErrMsgDto(err0);
   }
@@ -97,5 +117,13 @@ export class ChatService {
       return new ErrMsgDto(err8);
     await this.chatRepo.delete({channel_id: channel_id});
     return new ErrMsgDto(err0);
+  }
+
+  async emitChat(channel_id: string, userId: string, chatContent: string) {
+    const chat = {
+      user: userId,
+      chat: chatContent,
+    };
+    this.chatGateway.server.to(channel_id).emit('message', chat);
   }
 }

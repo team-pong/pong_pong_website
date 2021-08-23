@@ -12,6 +12,5 @@ import { MuteService } from './mute.service';
   imports: [TypeOrmModule.forFeature([Mute, Users, Chat, ChatUsers, Admin])],
   controllers: [MuteController],
   providers: [MuteService],
-  exports: [MuteService],
 })
 export class MuteModule {}

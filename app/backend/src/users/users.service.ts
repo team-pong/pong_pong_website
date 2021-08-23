@@ -11,7 +11,7 @@ import { DmStoreService } from 'src/dm-store/dm-store.service';
 import { FriendService } from 'src/friend/friend.service';
 import { MatchService } from 'src/match/match.service';
 import { MuteService } from 'src/mute/mute.service';
-import { err0, err1, err2, err21, err22 } from 'src/err';
+import { err0, err2, err21, err22, err23 } from 'src/err';
 import { ErrMsgDto } from 'src/dto/utility';
 
 @Injectable()
@@ -64,10 +64,19 @@ export class UsersService {
 
   async updateUsers(user_id: string, nick: string, avatar_url: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않는 유저 이면
-    return new ErrMsgDto(err2);
+      return new ErrMsgDto(err2);
     if (await this.usersRepo.count({nick: nick}))  // 중복된 닉네임 이면
-    return new ErrMsgDto(err22);
+      return new ErrMsgDto(err22);
     await this.usersRepo.save({user_id: user_id, nick: nick, avatar_url: avatar_url});
+    return new ErrMsgDto(err0);
+  }
+
+  async updateStatus(user_id: string, status: string){
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않는 유저 이면
+      return new ErrMsgDto(err2);
+    if (status != 'on' && status != 'off' && status != 'game')  // 잘못된 유저 상태 라면
+      return new ErrMsgDto(err23);
+    await this.usersRepo.save({user_id: user_id, status: status});
     return new ErrMsgDto(err0);
   }
 

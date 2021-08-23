@@ -13,8 +13,6 @@
   height: 100vh;
   overflow: hidden;
   background-color: rgba(15, 17, 16, 0.75);
-  // opacity: 0;
-  // transition: opacity 250ms 700ms ease;
   .content {
     position: relative;
     width: 100vw;
@@ -29,18 +27,18 @@
     overflow: auto;
     align-self: center;
     box-shadow: 0 12px 25px 0 rgba(199, 175, 189, 0.25);
-    // opacity: 0;
-    // transform: scale(0.6);
-    // transition: opacity 250ms 250ms ease, transform 300ms 250ms ease;
+    overflow: hidden;
     .modal-closer {
-      position: absolute;
-      margin-left: calc(100% - 33px);
-      margin-top: 4px;
+      position: relative;
+      float: right;
       width: 30px !important;
       height: 30px !important;
+      padding: 10px;
       &:hover {
         opacity: 0.6;
         cursor: pointer;
+        transform: rotate(180deg);
+        transition: all 0.3s ease;
       }
     }
   }

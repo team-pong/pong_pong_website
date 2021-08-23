@@ -45,6 +45,12 @@ export class ChatDto2{
 	})
 	public type: string;
 
+	@ApiProperty({
+		example: 3,
+		description: '채널 현재인원',
+	})
+	public current_people: number;
+
   @ApiProperty({
 		example: 10,
 		description: '채널 최대인원',
@@ -56,16 +62,18 @@ export class ChatDto3{
   @ApiProperty({
 		example: `[
 			{
-					"title": "아무나",
-					"type": "public",
-					"max_people": 10
+				"title": "아무나",
+				"type": "public",
+				"current_people": 3,
+				"max_people": 10
 			},
 			{
-					"title": "아무나 와보렴",
-					"type": "protected",
-					"max_people": 5
+				"title": "아무나 와보렴",
+				"type": "protected",
+				"current_people": 2,
+				"max_people": 5
 			}
-	]`,
+		]`,
 		description: '채널 리스트',
 	})
   public chatList: ChatDto2[];
