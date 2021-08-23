@@ -11,8 +11,8 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
   return (
     <div id="chat-room">
       <div id="chat-room-header">
-        <img src="./public/arrow.svg" id="arrow-button" alt="뒤로가기" onClick={() => setChatRoomInfo({title: "", type: "", max_people: 0, current_people: 0})}/>
-        {chatRoomInfo.title}{chatRoomInfo.type === "protected" ? <img id="lock" src="./public/lock-black.svg" alt="비밀방" /> : <></>}
+        <img src="/public/arrow.svg" id="arrow-button" alt="뒤로가기" onClick={() => setChatRoomInfo({title: "", type: "", max_people: 0, current_people: 0})}/>
+        {chatRoomInfo.title}{chatRoomInfo.type === "protected" ? <img id="lock" src="/public/lock-black.svg" alt="비밀방" /> : <></>}
       </div>
       <div id="chat-room-body">
         {
@@ -44,8 +44,8 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
           })
         }
         <div id="chat-room-menu">
-          <img src="./public/plus.svg" alt="invite" />
-          <img src="./public/tools.svg" alt="config" />
+          <img src="/public/plus.svg" alt="invite" />
+          <img src="/public/tools.svg" alt="config" />
         </div>
       </div>
       <form>
@@ -77,7 +77,7 @@ const ChatRoomList: FC<chatRoomListProps> = ({search, type, setChatRoomInfo}): J
   const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
     return (
       <li key={idx} onClick={() => setChatRoomInfo({...chatRoom})}>
-        <span>{chatRoom.title}{chatRoom.type === "protected" ? <img src="./public/lock.svg" alt="비밀방" /> : <></>}</span>
+        <span>{chatRoom.title}{chatRoom.type === "protected" ? <img src="/public/lock.svg" alt="비밀방" /> : <></>}</span>
         <span>{chatRoom.current_people}/{chatRoom.max_people}</span>
       </li>
     );

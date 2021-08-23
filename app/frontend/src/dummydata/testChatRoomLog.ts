@@ -100,7 +100,7 @@ export const chatUsers = [{
   position: "mute"
 }, {
   nick: "last",
-  avatar_url: `./public/users.svg`,
+  avatar_url: `/public/users.svg`,
   position: "mute"
 }];
 
