@@ -1,4 +1,4 @@
-@import '../../colors.scss';
+@import "../../colors.scss";
 
 @keyframes circle-chart-animation {
   from {
@@ -185,10 +185,10 @@
         list-style: none;
         font-size: large;
         margin-right: 10px;
-        input[type=radio] {
+        input[type="radio"] {
           display: none;
         }
-        input[type=radio]:checked + label {
+        input[type="radio"]:checked + label {
           color: $green;
           border-bottom: 3px solid $green;
         }
