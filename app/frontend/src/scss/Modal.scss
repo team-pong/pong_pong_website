@@ -1,4 +1,4 @@
-#modal {
+.modal {
   position: fixed;
   display: -ms-flexbox;
   display: flex;
@@ -11,12 +11,12 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 100;
   overflow: hidden;
   background-color: rgba(15, 17, 16, 0.75);
-  opacity: 0;
-  transition: opacity 250ms 700ms ease;
-  #content {
+  // opacity: 0;
+  // transition: opacity 250ms 700ms ease;
+  .content {
+    position: relative;
     width: 100vw;
     max-width: 800px;
     height: 80vh;
@@ -26,28 +26,28 @@
     border-radius: 15px;
     padding-bottom: 20px;
     background-color: #fff;
-    -ms-flex-item-align: center;
     overflow: auto;
     align-self: center;
     box-shadow: 0 12px 25px 0 rgba(199, 175, 189, 0.25);
-    opacity: 0;
-    transform: scale(0.6);
-    transition: opacity 250ms 250ms ease, transform 300ms 250ms ease;
-    #modal-closer {
-      position: fixed;
-      margin-left: calc(100% - 33px) !important;
+    // opacity: 0;
+    // transform: scale(0.6);
+    // transition: opacity 250ms 250ms ease, transform 300ms 250ms ease;
+    .modal-closer {
+      position: absolute;
+      margin-left: calc(100% - 33px);
       margin-top: 4px;
       width: 30px !important;
       height: 30px !important;
       &:hover {
         opacity: 0.6;
+        cursor: pointer;
       }
     }
   }
 }
 
 @media screen and (max-width: 500px) {
-  #content {
+  .content {
     width: calc(100% - 40px);
     padding-bottom: 15px;
   }

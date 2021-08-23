@@ -1,4 +1,6 @@
+import React from "react";
 import { FC, useState } from "react";
+import { Link, RouteComponentProps, withRouter } from "react-router-dom";
 import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
 import "/src/scss/NavBar.scss";
@@ -9,24 +11,22 @@ import "/src/scss/NavBar.scss";
  *        부모 컴포넌트인 MainPage에서 props로 stateSetter를 받아와서
  *        이 컴포넌트에서 부모컴포넌트의 state를 수정해서 NavBar 요소 선택시
  *        부모 컴포넌트 위에서 모달이 뜨도록 함.
- * @param[in] avartarImgUrl: NavBar에 나타나는 본인의 아바타이미지url
+ * @param[in] avatarImgUrl: NavBar에 나타나는 본인의 아바타이미지url
  * @param[in] friends: 테스트용 친구목록 TODO: 모달에서 보여지게 해야 함
  * @param[in] setIsRecordOpen: 클릭시 Record 모달이 오픈되도록 하기 위한 Mainpage.tsx의 stateSetter
  * @param[in] setIsGameOpen: 클릭시 Match-game 모달이 오픈되도록 하기 위한 Mainpage.tsx의 stateSetter
  * @param[in] setIsConfigOpen: 클릭시 Config 모달이 오픈되도록 하기 위한 Mainpage.tsx의 stateSetter
- * @param[in] setIsMyProfileOpen: 클릭시 MyProfile 모달이 오픈되도록 하기 위한 Mainpage.tsx의 stateSetter
  */
 
 interface navBarProps {
-  avartarImgUrl: string;
+  avatarImgUrl: string;
   friends: { name: string; state: string; avatarURL: string }[];
   setIsRecordOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsGameOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsConfigOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsMyProfileOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
+};
 
-const NavBar: FC<navBarProps> = (props): JSX.Element => {
+const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
 
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
@@ -34,11 +34,12 @@ const NavBar: FC<navBarProps> = (props): JSX.Element => {
   return (
     <nav className="menu">
       <header className="avatar">
+        <Link to={`${props.match.url}/myprofile`}>
         <img
-          id="avartarImg"
-          src={props.avartarImgUrl}
-          alt="Avatar"
-          onClick={() => props.setIsMyProfileOpen(true)}/>
+          id="avatarImg"
+          src={props.avatarImgUrl}
+          alt="Avatar" />
+        </Link>
         <h2>Dom Hardy</h2>
       </header>
       <ul>
@@ -63,4 +64,4 @@ const NavBar: FC<navBarProps> = (props): JSX.Element => {
   );
 };
 
-export default NavBar;
+export default withRouter(NavBar);

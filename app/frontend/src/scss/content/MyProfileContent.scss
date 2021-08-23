@@ -68,6 +68,7 @@
       transform: scale(1.1);
       transition: 0.2s all ease-in-out;
       opacity: 1;
+      cursor: pointer;
     }
 
     #user-info {
@@ -96,7 +97,6 @@
 					cursor: pointer;
 				}
       }
-
 
       #user-stat {
         margin-top: 30px;
