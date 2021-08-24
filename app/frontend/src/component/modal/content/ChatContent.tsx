@@ -1,6 +1,9 @@
 import { FC, Dispatch, SetStateAction, useEffect, useState } from "react";
 import "../../../scss/content/ChatContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
+import { Route, Link } from "react-router-dom";
+import Modal from "../Modal";
+import ChatConfigContent from "./ChatConfigContent";
 
 function submitMessage(message: string, setMessage: Dispatch<SetStateAction<string>>,
                         chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
@@ -57,13 +60,14 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
         }
         <div id="chat-room-menu">
           <img src="/public/plus.svg" alt="invite" />
-          <img src="/public/tools.svg" alt="config" />
+          <Link to="http://127.0.0.1:3000/mainpage/chat/config"></Link><img src="/public/tools.svg" alt="config" />
         </div>
       </div>
       <form>
         <textarea placeholder="대화내용 입력" rows={4} cols={50} value={message} onChange={({target: {value}}) => setMessage(value)}/>
         <button onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
       </form>
+      <Route path="http://127.0.0.1:3000/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<ChatConfigContent/>}/></Route>
     </div>
   );
 };
