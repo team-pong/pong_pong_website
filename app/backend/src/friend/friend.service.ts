@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { Friend } from 'src/entities/friend';
 import { Users } from 'src/entities/users';
-import { err0, err16, err17, err2} from 'src/err';
+import { err0, err16, err17, err2, err25} from 'src/err';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -25,6 +25,8 @@ export class FriendService {
   }
 
   async readFriend(user_id: string, type: string){
+    if (user_id === err25)
+      return new ErrMsgDto(err25);
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
       return new ErrMsgDto(err2);
     let user;

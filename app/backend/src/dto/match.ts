@@ -132,3 +132,43 @@ export class MatchDto3{
 	})
 	public matchList: MatchDto2[];
 }
+
+export class MatchDto4{
+	@ApiProperty({
+		example: 'jinbkim',
+		description: '유저 닉네임',
+	})
+	public nick: string;
+
+  @ApiProperty({
+		example: 'https://gravatar.com/avatar/d93441b9901723e7ec67159e63c4f995?s=400&d=robohash&r=x',
+		description: '아바타 이미지 url',
+	})
+	public avatar_url: string;
+
+	@ApiProperty({
+		example: 6,
+		description: '이긴 게임수',
+	})
+	public win_games: number;
+
+  @ApiProperty({
+		example: 4,
+		description: '진 게임수',
+	})
+	public loss_games: number;
+
+	@ApiProperty({
+		example: 1200,
+		description: '래더 점수',
+	})
+	public ladder_level: number;
+}
+
+export class MatchDto5{
+	@ApiProperty({
+		example: ``,
+		description: '유저 닉네임, 아바타 이미지 url, 이긴 게임수, 진게임수 래더 점수 데이터를 담은 배열',
+	})
+	public rankList: MatchDto4[];
+}

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MatchDto2 } from 'src/dto/match';
+import { MatchDto2, MatchDto4 } from 'src/dto/match';
 import { ErrMsgDto } from 'src/dto/utility';
 import { Match } from 'src/entities/match';
 import { Users } from 'src/entities/users';
@@ -72,6 +72,24 @@ export class MatchService {
       matchList.matchList[i].map = match[i].map;
     }
     return matchList;
+  }
+  async readRanking(){
+    let users = await this.usersRepo
+      .query(`SELECT * FROM users ORDER BY ladder_level DESC`);  // 래더 점수 내림차순으로 유저 검색
+    // 유저 닉네임, 아바타 이미지 url, 이긴 게임수, 진 게임수 데이터를 rankList 에 담기
+    let rankList = {rankList: Array<MatchDto4>()}
+    let idx = -1;
+    for (var i in users){
+      if (users[i].nick == 'unknown')
+        continue ;
+      rankList.rankList.push(new MatchDto4());
+      rankList.rankList[++idx].nick = users[i].nick;
+      rankList.rankList[idx].avatar_url = users[i].avatar_url;
+      rankList.rankList[idx].win_games = users[i].win_games;
+      rankList.rankList[idx].loss_games = users[i].loss_games;
+      rankList.rankList[idx].ladder_level = users[i].ladder_level;
+    }
+    return rankList;
   }
 
   async deleteMatch(user_id: string){

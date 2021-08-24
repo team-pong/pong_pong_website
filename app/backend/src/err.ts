@@ -23,6 +23,7 @@ const err21 = "The nickname does not exist"  // 존재하지 않는 닉네임 �
 const err22 = "The nickname already exists"  // 이미 존재하는 닉네임 입니다
 const err23 = "The user status is wrong"  // 잘못된 유저 상태 입니다
 const err24 = "The current people is bigger than max people"  // 현재인원이 최대 인원보다 크다
+const err25 = "The session does not exist"  // 존재하지 않는 세션입니다
 
 
-export {err0, err1, err2, err3, err4, err5, err6, err7, err8, err9, err10, err11, err12, err13, err14, err15, err16, err17, err18, err19, err20, err21, err22, err23, err24};
+export {err0, err1, err2, err3, err4, err5, err6, err7, err8, err9, err10, err11, err12, err13, err14, err15, err16, err17, err18, err19, err20, err21, err22, err23, err24, err25};
