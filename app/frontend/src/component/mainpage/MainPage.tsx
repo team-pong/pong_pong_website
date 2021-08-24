@@ -6,7 +6,6 @@ import "/src/scss/mainpage/MainPage-media.scss";
 import "/src/scss/mainpage/MainPage-mobile.scss";
 import EasyFetch from './../../utils/EasyFetch';
 import { testFriendList } from '../../dummydata/testFriendList';
-import { SMALL_MODAL } from "../../utils/constant";
 import MyProfileContent from "../modal/content/MyProfileContent";
 import { Link, Route, Switch } from "react-router-dom";
 
@@ -57,7 +56,7 @@ const MainPage = ({match}): JSX.Element => {
           </div>
         </div>
         <Switch>
-          <Route path={`${match.path}/myprofile`}><Modal id={Date.now()} content={<MyProfileContent />} modalSize={SMALL_MODAL}/></Route>
+          <Route path={`${match.path}/myprofile`}><Modal id={Date.now()} content={<MyProfileContent />} smallModal/></Route>
           <Route path={`${match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
           <Route path={`${match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
         </Switch>

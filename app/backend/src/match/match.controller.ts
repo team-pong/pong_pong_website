@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Delete, Query } from '@nestjs/common';
+ import { Body, Controller, Get, Post, Delete, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MatchDto1, MatchDto3 } from 'src/dto/match';
 import { ErrMsgDto } from 'src/dto/utility';
@@ -65,6 +65,14 @@ export class MatchController {
     let user_id;
     await this.matchService.nickToId(q.nick).then((v) => { user_id = v; });
     return this.matchService.readMatch(user_id, 'ranked');
+  }
+  @ApiOperation({ summary: '모든 유저의 래더 랭킹 검색'})
+  @ApiResponse({ 
+    type: MatchDto3, 
+    description: `유저 닉네임, 아바타 이미지 url, 이긴 게임수, 진게임수, 래더 점수 데이터를 담은 배열` })
+  @Get('ranking')
+  readRanking(){
+    return this.matchService.readRanking();
   }
 
   @ApiOperation({ 
