@@ -8,6 +8,10 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
   const [chatLog, setChatLog] = useState(require("../../../dummydata/testChatRoomLog").chatLog);
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    setMessage("");
+  }, [chatLog]);
+
   return (
     <div id="chat-room">
       <div id="chat-room-header">
@@ -50,7 +54,13 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
       </div>
       <form>
         <textarea placeholder="대화내용 입력" rows={4} cols={50} value={message} onChange={({target: {value}}) => setMessage(value)}/>
-        <button onClick={() => console.log(message)}>전송</button>
+        <button onClick={() => setChatLog([{
+            nick: "yochoi",
+            position: "admin",
+            avatar_url: `https://cdn.intra.42.fr/users/medium_donglee.jpg`,
+            time: new Date().getTime(),
+            message: message
+          }, ...chatLog])}>전송</button>
       </form>
     </div>
   );
