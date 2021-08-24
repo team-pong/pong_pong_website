@@ -35,7 +35,7 @@ export class SessionService {
     const { code } = loginCodeDto;
     const type = "authorization_code";
     const getTokenUrl = "https://api.intra.42.fr/oauth/token";
-    const redirectUrl = "http://127.0.0.1:3000/mainpage"
+    const redirectUrl = "http://127.0.0.1:3001/session/oauth"
     const requestBody = {
       grant_type: type,
       client_id: process.env.CLIENT_ID,
@@ -60,16 +60,16 @@ export class SessionService {
     });
   }
 
-/*!
- * @author hna
- * @brief id와 토큰값을 Session 객체의 속성에 추가하고 Postgres의 session 테이블에 저장.
- * @warning 세션 객체에 새로운 값을 추가하는 경우 main.ts 에서 SessionData 인터페이스에 먼저 추가해야함
- */
-async saveSession(session: Session & Partial<SessionData>, id: string, token: string) {
-  session.userid = id;
-  session.token = token;
-  session.save();
-}
+  /*!
+  * @author hna
+  * @brief id와 토큰값을 Session 객체의 속성에 추가하고 Postgres의 session 테이블에 저장.
+  * @warning 세션 객체에 새로운 값을 추가하는 경우 main.ts 에서 SessionData 인터페이스에 먼저 추가해야함
+  */
+  async saveSession(session: Session & Partial<SessionData>, id: string, token: string) {
+    session.userid = id;
+    session.token = token;
+    session.save();
+  }
 
 
   /*!
@@ -89,14 +89,7 @@ async saveSession(session: Session & Partial<SessionData>, id: string, token: st
       const result = await this.getToken(loginCodeDto)
       const { access_token } = result.data;
       const { data } = await this.getInfo(access_token)
-      // await this.saveInfo(data.login, data.image_url)
       await this.usersService.createUsers(data.login, data.login, data.image_url);
-
-      // console.log('req.session : ', req.session);
-      // console.log('data.login : ', data.login);
-      // console.log('access_token : ', access_token);
-
-
       await this.saveSession(req.session, data.login, access_token);
     } catch (err: any | AxiosError) {
       if (axios.isAxiosError(err)) {
