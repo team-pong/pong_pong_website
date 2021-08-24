@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route } from "react-router-dom";
-import "../../../scss/content/MyProfileContent.scss";
-import Modal from "../Modal";
+import "/src/scss/content/myprofile/MyProfileContent.scss";
+import Modal from "../../Modal";
 import ManageFriendContent from "./ManageFriendContent";
-import RecordContent from "./RecordContent";
+import RecordContent from "../RecordContent";
 
 interface UserInfo {
   avatarUrl: string;
