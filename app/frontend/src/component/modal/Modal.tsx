@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, useEffect, useState } from "react";
+import React, { FC, ReactElement } from "react";
 import "/src/scss/Modal.scss";
 import ChatContent from './content/ChatContent';
 import RecordContent from './content/RecordContent';
@@ -24,8 +24,6 @@ const Modal: FC<modalProps & RouteComponentProps> = ({ history, content, smallMo
   const contentId = String(id + 1); //css className=content 요소의 id
   const modalCloserId = String(id + 2); //css className=modalCloser 요소의 id
 
-  const [isSmall, setIsSmall] = useState(false);  //smallModal 인지 확인하는 state
-  
   /*!
   * @author donglee
   * @brief 모달 컴포넌트를 종료할 때 실행하는 함수.
@@ -43,15 +41,9 @@ const Modal: FC<modalProps & RouteComponentProps> = ({ history, content, smallMo
     }
   };
 
-  useEffect(() => {
-    if (smallModal) {
-      setIsSmall(true);
-    }
-  }, []);
-
   return (
     <div className="modal" id={modalId} onClick={detectOutsideOfModal}>
-      <div className={["content", isSmall && "small-content"].join(" ")} id={contentId}>
+      <div className={["content", smallModal && "small-content"].join(" ")} id={contentId}>
         <img
           className="modal-closer"
           id={modalCloserId}
