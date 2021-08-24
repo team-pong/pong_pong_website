@@ -24,15 +24,14 @@
     border-radius: 15px;
     padding-bottom: 20px;
     background-color: #fff;
-    overflow: auto;
     align-self: center;
     box-shadow: 0 12px 25px 0 rgba(199, 175, 189, 0.25);
     overflow: hidden;
     .modal-closer {
       position: relative;
       float: right;
-      width: 30px !important;
-      height: 30px !important;
+      width: 30px;
+      height: 30px;
       padding: 10px;
       &:hover {
         opacity: 0.6;
@@ -41,6 +40,10 @@
         transition: all 0.3s ease;
       }
     }
+  }
+  .small-content {
+    width: 400px;
+    height: 500px;
   }
 }
 

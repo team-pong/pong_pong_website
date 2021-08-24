@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route } from "react-router-dom";
 import "../../../scss/content/MyProfileContent.scss";
 import Modal from "../Modal";
+import ManageFriendContent from "./ManageFriendContent";
 import RecordContent from "./RecordContent";
 
 interface UserInfo {
@@ -39,7 +40,9 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
             </button>
           </Link>
           <button id="second-auth">2단계 인증</button>
-          <button id="manage-friend">친구 관리</button>
+          <Link to={`${props.match.url}/manageFriend`}>
+            <button id="manage-friend">친구 관리</button>
+          </Link>
         </div>
         <div id="avatar-container">
           <img src={userInfo.avatarUrl} alt="프로필사진" />
@@ -69,6 +72,7 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
         </div>
       </div>
       <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
+      <Route path={`${props.match.path}/manageFriend`}><Modal id={Date.now()} smallModal content={<ManageFriendContent/>} /></Route>
     </div>
   );
 };
