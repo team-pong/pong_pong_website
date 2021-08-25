@@ -1,8 +1,8 @@
 import { FC, Dispatch, SetStateAction, useEffect, useState } from "react";
 import "/src/scss/content/ChatContent.scss";
-import EasyFetch from "../../../utils/EasyFetch";
+import EasyFetch from "../../../../utils/EasyFetch";
 import { Route, Link } from "react-router-dom";
-import Modal from "../Modal";
+import Modal from "../../Modal";
 import ChatConfigContent from "./ChatConfigContent";
 
 function submitMessage(message: string, setMessage: Dispatch<SetStateAction<string>>,
@@ -19,8 +19,8 @@ function submitMessage(message: string, setMessage: Dispatch<SetStateAction<stri
 
 const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({chatRoomInfo, setChatRoomInfo}): JSX.Element => {
 
-  const [chatUsers, setChatUsers] = useState<{nick: string, avatar_url: string, position: string}[]>(require("../../../dummydata/testChatRoomLog").chatUsers);
-  const [chatLog, setChatLog] = useState(require("../../../dummydata/testChatRoomLog").chatLog);
+  const [chatUsers, setChatUsers] = useState<{nick: string, avatar_url: string, position: string}[]>(require("../../../../dummydata/testChatRoomLog").chatUsers);
+  const [chatLog, setChatLog] = useState(require("../../../../dummydata/testChatRoomLog").chatLog);
   const [message, setMessage] = useState("");
 
   return (

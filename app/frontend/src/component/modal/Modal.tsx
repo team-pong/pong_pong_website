@@ -1,6 +1,6 @@
 import React, { FC, ReactElement } from "react";
 import "/src/scss/Modal.scss";
-import ChatContent from './content/ChatContent';
+import ChatContent from './content/chat/ChatContent';
 import RecordContent from './content/RecordContent';
 import { RouteComponentProps, withRouter } from "react-router";
 
