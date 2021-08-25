@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import CircleChart from "../../chart/CircleChart";
 import BarChart from "../../chart/BarChart";
-import "../../../scss/content/RecordContent.scss";
+import "/src/scss/content/RecordContent.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 import ladderRank from '../../../dummydata/testLadderRank';
 

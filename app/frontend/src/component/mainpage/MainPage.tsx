@@ -4,9 +4,9 @@ import NavBar from './navbar/NavBar'
 import "/src/scss/mainpage/MainPage.scss";
 import "/src/scss/mainpage/MainPage-media.scss";
 import "/src/scss/mainpage/MainPage-mobile.scss";
-import EasyFetch from './../../utils/EasyFetch';
+import EasyFetch from '../../utils/EasyFetch';
 import { testFriendList } from '../../dummydata/testFriendList';
-import MyProfileContent from "../modal/content/MyProfileContent";
+import MyProfileContent from "../modal/content/myprofile/MyProfileContent";
 import { Link, Route, Switch } from "react-router-dom";
 
 /*!

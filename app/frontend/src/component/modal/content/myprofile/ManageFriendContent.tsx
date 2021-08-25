@@ -1,4 +1,4 @@
-import "../../../scss/content/ManageFriendContent.scss";
+import "/src/scss/content/myprofile/ManageFriendContent.scss";
 
 const ManageFriendContent: React.FC = () => {
     return (
