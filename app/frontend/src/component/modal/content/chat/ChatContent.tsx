@@ -72,7 +72,7 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
         }
         <div id="chat-room-menu">
           <img src="/public/plus.svg" alt="invite" />
-          <Link to="http://127.0.0.1:3000/mainpage/chat/config"></Link><img src="/public/tools.svg" alt="config" />
+          <Link to="/mainpage/chat/config"><img src="/public/tools.svg" alt="config" /></Link>
         </div>
       </div>
       <form>
@@ -85,7 +85,7 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
           onChange={({target: {value}}) => setMessage(value)}/>
         <button onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
       </form>
-      <Route path="http://127.0.0.1:3000/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<ChatConfigContent/>}/></Route>
+      <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<ChatConfigContent/>}/></Route>
     </div>
   );
 };
