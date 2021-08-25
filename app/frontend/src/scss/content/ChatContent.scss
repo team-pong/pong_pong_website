@@ -100,6 +100,9 @@
         color: $green;
         border-bottom: 3px solid $green;
       }
+      label {
+        cursor: pointer;
+      }
     }
   }
   #chat-room-list {
@@ -116,7 +119,11 @@
       color: #fff;
       display: flex;
       justify-content: space-between;
+      transition-duration: 0.3s;
       background-color: $green;
+      &:hover {
+        background-color: #53a062;
+      }
       span {
         padding: 15px;
         img {
@@ -124,6 +131,7 @@
           height: 15px;
         }
       }
+      cursor: pointer;
     }
   }
   button {
@@ -133,8 +141,13 @@
     padding: 10px;
     border-radius: 12px;
     border: none;
+    transition-duration: 0.3s;
     background-color: $green;
+    &:hover {
+      background-color: #53a062;
+    }
     color: #fff;
+    cursor: pointer;
   }
 }
 
@@ -151,6 +164,7 @@
       float: left;
       width: 30px;
       height: 30px;
+      cursor: pointer;
       animation: arrow-button-animation-in 0.5s;
       &:hover {
         animation: arrow-button-animation-out 0.5s;
@@ -212,6 +226,7 @@
       background-color: rgba(98, 195, 117, 0.3);
       border-radius: 5px;
       transition-duration: 0.3s;
+      cursor: pointer;
       img {
         width: 30px;
         height: 30px;
@@ -278,6 +293,7 @@
       background-color: rgba(98, 195, 117, 0.3);
       color: gray;
       transition-duration: 0.3s;
+      cursor: pointer;
       &:hover {
         background-color: $green;
         color: white;
