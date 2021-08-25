@@ -13,7 +13,7 @@ export const chatUsers = [{
 }, {
   nick: "hna",
   avatar_url: `https://cdn.intra.42.fr/users/medium_hna.jpg`,
-  position: ""
+  position: "user"
 }, {
   nick: "jinbkim",
   avatar_url: `https://cdn.intra.42.fr/users/medium_jinbkim.jpg`,

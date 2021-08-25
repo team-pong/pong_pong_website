@@ -4,6 +4,7 @@ import EasyFetch from "../../../../utils/EasyFetch";
 import { Route, Link } from "react-router-dom";
 import Modal from "../../Modal";
 import ChatConfigContent from "./ChatConfigContent";
+import ChatContextMenu from "./ChatContextMenu";
 
 function submitMessage(message: string, setMessage: Dispatch<SetStateAction<string>>,
                         chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
@@ -29,11 +30,31 @@ function textAreaKeyDown(e: React.KeyboardEvent,
   }
 };
 
+function openContextMenu( e: React.MouseEvent,
+                          setContextMenu: Dispatch<SetStateAction<any>>,
+                          target: string,
+                          targetPosition: string) {
+  setContextMenu({
+    isOpen: true,
+    x: e.pageX,
+    y: e.pageY,
+    target,
+    targetPosition
+  });
+};
+
 const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({chatRoomInfo, setChatRoomInfo}): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<{nick: string, avatar_url: string, position: string}[]>(require("../../../../dummydata/testChatRoomLog").chatUsers);
   const [chatLog, setChatLog] = useState(require("../../../../dummydata/testChatRoomLog").chatLog);
   const [message, setMessage] = useState("");
+  const [contextMenu, setContextMenu] = useState<{
+    isOpen: boolean,
+    x: number,
+    y: number,
+    target: string,
+    targetPosition: string
+  }>({isOpen: false, x: 0, y: 0, target: "", targetPosition: ""});
 
   return (
     <div id="chat-room">
@@ -63,8 +84,13 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
         {
           chatUsers.map((value, idx) => {
             return (
-              <div key={idx} className="chat-user">
-                <img src={value.avatar_url} alt={value.nick}/>
+              <div  key={idx}
+                    className="chat-user"
+                    onClick={(e) => {
+                      if (contextMenu.isOpen === true) setContextMenu({isOpen: false, x: 0, y: 0, target: "", targetPosition: ""})
+                      else openContextMenu(e, setContextMenu, value.nick, value.position)
+                    }}>
+                <img src={value.avatar_url} alt={value.nick} />
                 <span>{value.nick}</span>
               </div>
             );
@@ -85,6 +111,7 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
           onChange={({target: {value}}) => setMessage(value)}/>
         <button onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
       </form>
+      {contextMenu.isOpen && <ChatContextMenu x={contextMenu.x} y={contextMenu.y} myPosition="owner" targetPosition={contextMenu.targetPosition}/>}
       <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<ChatConfigContent/>}/></Route>
     </div>
   );
