@@ -1,4 +1,4 @@
-import { FC, Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { FC, Dispatch, SetStateAction, useEffect, useState } from "react";
 import "/src/scss/content/ChatContent.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { Route, Link } from "react-router-dom";
@@ -7,6 +7,7 @@ import ChatConfigContent from "./ChatConfigContent";
 
 function submitMessage(message: string, setMessage: Dispatch<SetStateAction<string>>,
                         chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
+  if (message === "") return ;
   setChatLog([{
     nick: "yochoi",
     position: "admin",
@@ -15,6 +16,17 @@ function submitMessage(message: string, setMessage: Dispatch<SetStateAction<stri
     message: message
   }, ...chatLog]);
   setMessage("");
+};
+
+function textAreaKeyDown(e: React.KeyboardEvent,
+                          message: string, setMessage: Dispatch<SetStateAction<string>>,
+                          chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
+  const keyCode = e.key;
+
+  if (keyCode === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    submitMessage(message, setMessage, chatLog, setChatLog);
+  }
 };
 
 const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({chatRoomInfo, setChatRoomInfo}): JSX.Element => {
@@ -64,7 +76,13 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
         </div>
       </div>
       <form>
-        <textarea placeholder="대화내용 입력" rows={4} cols={50} value={message} onChange={({target: {value}}) => setMessage(value)}/>
+        <textarea
+          placeholder="대화내용 입력"
+          rows={4}
+          cols={50}
+          value={message}
+          onKeyDown={(e) => textAreaKeyDown(e, message, setMessage, chatLog, setChatLog)}
+          onChange={({target: {value}}) => setMessage(value)}/>
         <button onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
       </form>
       <Route path="http://127.0.0.1:3000/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<ChatConfigContent/>}/></Route>
