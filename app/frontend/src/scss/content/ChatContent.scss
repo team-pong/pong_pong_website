@@ -218,6 +218,10 @@
         vertical-align: middle;
         border-radius: 50%;
       }
+      #position {
+        position: relative;
+        float: right;
+      }
       span {
         &::before {
           content: "";

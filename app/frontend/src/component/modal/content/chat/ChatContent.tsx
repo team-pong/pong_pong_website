@@ -92,6 +92,9 @@ const ChatRoom: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAc
                     }}>
                 <img src={value.avatar_url} alt={value.nick} />
                 <span>{value.nick}</span>
+                {value.position === "owner" && <img id="position" src={"/public/crown.png"} alt="owner"/>}
+                {value.position === "admin" && <img id="position" src={"/public/knight.png"} alt="admin"/>}
+                {value.position === "mute" && <img id="position" src={"/public/mute.png"} alt="mute"/>}
               </div>
             );
           })
