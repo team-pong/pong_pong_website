@@ -1,5 +1,5 @@
 import React, { FC, Dispatch, SetStateAction, useEffect, useState } from "react";
-import "/src/scss/content/ChatContent.scss";
+import "/src/scss/content/chat/ChatContent.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { Route, Link } from "react-router-dom";
 import Modal from "../../Modal";
