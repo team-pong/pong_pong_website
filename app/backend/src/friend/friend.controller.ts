@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FriendDto1, FriendDto2 } from 'src/dto/friend';
-import { SessionDto1 } from 'src/dto/session';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { SessionService } from 'src/session/session.service';
 import { FriendService } from './friend.service';
