@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "../../../scss/content/ManageFriendContent.scss";
+import "/src/scss/content/myprofile/ManageFriendContent.scss";
 
 const FriendList: React.FC = () => {
 

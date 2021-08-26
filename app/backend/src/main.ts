@@ -25,7 +25,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   const conObject = {
-    user: 'pong_session_admin',
+    user: 'pong_admin',
     host: process.env.PG_HOST,
     database: process.env.PG_PONG_DB,
     password: '1234',
