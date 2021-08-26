@@ -10,15 +10,22 @@ import { SessionDto1 } from 'src/dto/session';
 export class SessionController {
   constructor(private sessionService: SessionService){}
 
-  @ApiOperation({ summary: '로그인' })
-  @Post("/oauth")
-  public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
+  @ApiOperation({ summary: '42로그인 페이지에서 이 주소로 코드를 전송'})
+  @Get("/oauth")
+  async login(@Query() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
     try {
-      console.log("post inside");
-      await this.sessionService.login(loginCodeDto, request, response);
+      if (LoginCodeDto)
+        await this.sessionService.login(loginCodeDto, request, response);
+      return response.redirect('http://127.0.0.1:3000/mainpage')
     } catch (err){
       console.log("get42UserInfo Err: ", err);
     }
+  }
+
+  @ApiOperation({ summary: '로그인' })
+  @Post("/oauth")
+  public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
+    return response.redirect('http://127.0.0.1:3000/mainpage')
   }
 
   @ApiOperation({ summary: '입력받은 세션 ID와 토큰이 유효한지 체크해서 Body에 결과를 담는다' })
