@@ -1,3 +1,26 @@
+#context-menu {
+  margin: 0;
+  padding: 2px 0;
+  position: fixed;
+  background: #4ba37a;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgb(0 0 0 / 15%);
+  font-size: 13px;
+  outline: 0;
+  max-width: 250px;
+  min-width: 125px;
+  li {
+    color: #fff;
+    text-align: -webkit-match-parent;
+    padding: 6px 12px;
+    list-style: none;
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
 .menu {
   //scroll bar custom design
   ::-webkit-scrollbar-track {
@@ -80,27 +103,6 @@
         border-radius: 50%;
         vertical-align: middle;
         margin-right: 5px;
-      }
-    }
-
-    #context-menu {
-      margin: 0;
-      padding: 2px 0;
-      position: fixed;
-      background: #4ba37a;
-      border: 1px solid rgba(0, 0, 0, 0.2);
-      box-shadow: 0 2px 5px rgb(0 0 0 / 15%);
-      font-size: 13px;
-      outline: 0;
-      max-width: 250px;
-      min-width: 125px;
-      li {
-        text-align: -webkit-match-parent;
-        padding: 6px 12px;
-        list-style: none;
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.1);
-        }
       }
     }
 
