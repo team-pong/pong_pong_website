@@ -49,6 +49,7 @@ export class ChatService {
       current_people = await this.readPeople(chat[i].channel_id);
       chatList.chatList[i].current_people = current_people;
       chatList.chatList[i].max_people = chat[i].max_people;
+      chatList.chatList[i].channel_id = chat[i].channel_id;
     }
     return chatList;
   }
@@ -65,8 +66,9 @@ export class ChatService {
       chatList.chatList[++idx].title = chat[i].title;
       chatList.chatList[idx].type = chat[i].type;
       current_people = await this.readPeople(chat[i].channel_id);
-      chatList.chatList[i].current_people = current_people;
+      chatList.chatList[idx].current_people = current_people;
       chatList.chatList[idx].max_people = chat[i].max_people;
+      chatList.chatList[idx].channel_id = chat[i].channel_id;
     }
     return chatList;
   }
