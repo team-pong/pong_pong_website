@@ -2,7 +2,8 @@ import { FC } from "react";
 
 const ChatConfigContent: FC = (): JSX.Element => {
   return (
-    <>chat config content</>
+    <div id="chat-config-content">
+    </div>
   );
 };
 

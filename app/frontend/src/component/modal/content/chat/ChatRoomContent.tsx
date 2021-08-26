@@ -2,6 +2,7 @@ import { FC, Dispatch, SetStateAction, useState } from "react";
 import { Link, Route } from "react-router-dom";
 import Modal from "../../Modal";
 import ChatConfigContent from "./ChatConfigContent";
+import ChatInviteContent from "./ChatInviteContent";
 import ChatContextMenu from "./ChatContextMenu";
 
 interface chatRoom {
@@ -105,7 +106,7 @@ const ChatRoomContent: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<Set
           })
         }
         <div id="chat-room-menu">
-          <img src="/public/plus.svg" alt="invite" />
+          <Link to="/mainpage/chat/invite"><img src="/public/plus.svg" alt="invite" /></Link>
           <Link to="/mainpage/chat/config"><img src="/public/tools.svg" alt="config" /></Link>
         </div>
       </div>
@@ -121,6 +122,7 @@ const ChatRoomContent: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<Set
       </form>
       {contextMenu.isOpen && <ChatContextMenu x={contextMenu.x} y={contextMenu.y} myPosition="owner" targetPosition={contextMenu.targetPosition}/>}
       <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<ChatConfigContent/>}/></Route>
+      <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
     </div>
   );
 };
