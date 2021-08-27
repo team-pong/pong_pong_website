@@ -65,7 +65,7 @@ export class ChatService {
       chatList.chatList[++idx].title = chat[i].title;
       chatList.chatList[idx].type = chat[i].type;
       current_people = await this.readPeople(chat[i].channel_id);
-      chatList.chatList[i].current_people = current_people;
+      chatList.chatList[idx].current_people = current_people;
       chatList.chatList[idx].max_people = chat[i].max_people;
     }
     return chatList;
