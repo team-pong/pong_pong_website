@@ -132,20 +132,20 @@
 						opacity: 0.4;
 					}
 
-					.fl-ban-friend {
+					.fl-block-friend {
 						width: 20px;
 						height: 20px;
 						opacity: 0.4;
 						margin-right: 5px;
 					}
 
-					.bl-unban {
+					.bl-unblock {
 						font-size: 12pt;
 						font-weight: bold;
 						color: rgb(179, 176, 176);
 					}
 
-					.bl-unban:hover {
+					.bl-unblock:hover {
 						cursor: pointer;
 						color: black;
 					}
@@ -155,7 +155,7 @@
 						opacity: 1;
 					}
 					
-					.fl-ban-friend:hover {
+					.fl-block-friend:hover {
 						cursor: pointer;
 						opacity: 1;
 					}
