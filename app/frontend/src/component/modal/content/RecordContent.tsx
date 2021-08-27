@@ -61,11 +61,11 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
               {' '}
               {log.user_nick}
               {' '}
-              <img src={`./public/number/${log.other_score}.svg`} alt={`${log.user_score}`} style={{borderRadius: "0"}}/>
+              <img src={`/public/number/${log.other_score}.svg`} alt={`${log.user_score}`} style={{borderRadius: "0"}}/>
             </span>
-            <img src="./public/vs.svg"/>
+            <img src="/public/vs.svg"/>
             <span id="player">
-              <img src={`./public/number/${log.other_score}.svg`} alt={`${log.other_score}`} style={{borderRadius: "0"}}/>
+              <img src={`/public/number/${log.other_score}.svg`} alt={`${log.other_score}`} style={{borderRadius: "0"}}/>
               {' '}
               {log.other_nick}
               {' '}
@@ -236,7 +236,7 @@ const RecordContent: FC = (): JSX.Element => {
       {
         isRecordOpen === recordState.noResult &&
         <div id="no-result">
-          <img src="./public/exclamation-mark.svg" alt="Exclamation mark" />
+          <img src="/public/exclamation-mark.svg" alt="Exclamation mark" />
           <span>검색 결과가 없습니다</span>
         </div>
       }
