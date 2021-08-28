@@ -4,8 +4,12 @@ import "/src/scss/content/myprofile/MyProfileContent.scss";
 import Modal from "../../Modal";
 import ManageFriendContent from "./ManageFriendContent";
 import RecordContent from "../RecordContent";
+import EasyFetch from "../../../../utils/EasyFetch";
 
 interface UserInfo {
+  user_id: string;
+  nick: string;
+  avatar_url: string;
   avatarUrl: string;
   winCnt: number;
   loseCnt: number;
@@ -17,6 +21,9 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
   //일단 test용으로 하드코딩 초기화
   const [userNickName, setUserNickName] = useState("Dom Hardy");
   const [userInfo, setUserInfo] = useState<UserInfo>({
+    user_id: "donglee",
+    nick: "Dom Hardy",
+    avatar_url: "https://gravatar.com/avatar/d93441b9901723e7ec67159e63c4f995?s=400&d=robohash&r=x",
     avatarUrl: "/public/me.jpg",
     winCnt: 6,
     loseCnt: 4,
@@ -52,8 +59,15 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
   /* TODO: 1. 다른 곳을 클릭했을 때 닉네임수정이 취소돼야 함
            2. 수정완료 했을 때 API 요청하고 다시 렌더링 해야 함 */
 
-  const changeNick = () => {
-    console.log("changE!");
+  const changeNick = async () => {
+    const easyfetch = new EasyFetch("http://localhost:3001/users/info", "POST");
+    const body = {
+      "user_id": `${userInfo.user_id}`,
+      "nick": `${nickToEdit}`,
+      "avatar_url": `${userInfo.avatar_url}`
+    }
+    const res = await (await easyfetch.fetch(body)).json();
+    console.log("result", res);
     setIsEditNickClicked(false);
   };
 
