@@ -22,14 +22,14 @@ export class ChatController {
   }
 
   @ApiOperation({ summary: '모든 채널 검색'})
-  @ApiResponse({ type: ChatDto3, description: `모든 채널의 제목, 타입, 현재인원, 최대인원` })
+  @ApiResponse({ type: ChatDto3, description: `모든 채널의 제목, 타입, 현재인원, 최대인원, 채널 아이디` })
   @Get()
   readChat(){
     return this.chatService.readChat();
   }
   
   @ApiOperation({ summary: '제목으로 채널 검색'})
-  @ApiResponse({ type: ChatDto3, description: `모든 채널의 제목, 타입, 현재인원, 최대인원` })
+  @ApiResponse({ type: ChatDto3, description: `모든 채널의 제목, 타입, 현재인원, 최대인원, 채널 아이디` })
   @Get('title')
   @ApiQuery({ name: 'title', example:'아무나', description: '검색할 채널 제목' })
   readTitle(@Query() q){

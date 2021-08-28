@@ -39,7 +39,7 @@ export class ChatService {
     const chat = await this.chatRepo.find();  // 모든 채널
     let chatList = { chatList: Array<ChatDto2>() }
     let current_people;
-    // 모든 채널의 제목, 타입, 현재인원 ,최대인원만 담기
+    // 모든 채널의 제목, 타입, 현재인원 ,최대인원, 채널아이디만 담기
     for(var i in chat){
       if (chat[i].type === 'private')  // private 채널이면
         continue ;
@@ -49,6 +49,7 @@ export class ChatService {
       current_people = await this.readPeople(chat[i].channel_id);
       chatList.chatList[i].current_people = current_people;
       chatList.chatList[i].max_people = chat[i].max_people;
+      chatList.chatList[i].channel_id = chat[i].channel_id;
     }
     return chatList;
   }
@@ -57,7 +58,7 @@ export class ChatService {
     let chatList = { chatList: Array<ChatDto2>() }
     let current_people;
     let idx = -1;
-    // 검색한 제목을 포함하는 채널의 제목, 타입, 현재인원, 최대인원만 담기
+    // 검색한 제목을 포함하는 채널의 제목, 타입, 현재인원, 최대인원, 채널아이디만 담기
     for(var i in chat){
       if ((chat[i].title.indexOf(title) == -1) || chat[i].type === 'private')  // 검색한 제목이 채널에 포함되지 않거나 private 채널이면
         continue ;
@@ -65,8 +66,9 @@ export class ChatService {
       chatList.chatList[++idx].title = chat[i].title;
       chatList.chatList[idx].type = chat[i].type;
       current_people = await this.readPeople(chat[i].channel_id);
-      chatList.chatList[i].current_people = current_people;
+      chatList.chatList[idx].current_people = current_people;
       chatList.chatList[idx].max_people = chat[i].max_people;
+      chatList.chatList[idx].channel_id = chat[i].channel_id;
     }
     return chatList;
   }

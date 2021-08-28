@@ -56,6 +56,12 @@ export class ChatDto2{
 		description: '채널 최대인원',
 	})
 	public max_people: number;
+
+	@ApiProperty({
+		example: 1,
+		description: '채널 아이디',
+	})
+	public channel_id: number;
 }
 
 export class ChatDto3{
@@ -65,13 +71,15 @@ export class ChatDto3{
 				"title": "아무나",
 				"type": "public",
 				"current_people": 3,
-				"max_people": 10
+				"max_people": 10,
+				"channel_id": 1
 			},
 			{
 				"title": "아무나 와보렴",
 				"type": "protected",
 				"current_people": 2,
-				"max_people": 5
+				"max_people": 5,
+				"channel_id": 2
 			}
 		]`,
 		description: '채널 리스트',
