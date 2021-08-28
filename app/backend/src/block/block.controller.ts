@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { BlockDto1, BlockDto2 } from 'src/dto/block';
+import { BlockDto1 } from 'src/dto/block';
+import { UsersDto5 } from 'src/dto/users';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { BlockService } from './block.service';
 
@@ -19,16 +20,16 @@ export class BlockController {
 
   @ApiOperation({ summary: '해당 유저의 차단 목록 검색'})
   @ApiResponse({ 
-    type: BlockDto2, 
+    // type: BlockDto2,
+    type: UsersDto5, 
     description: `
-      해당 유저의 차단 아이디 배열
+      해당 유저의 차단 객체 배열
       검색 실패시 실패 이유 반환
     ` })
   @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '차단 목록을 검색할 유저 아이디' })
   @Get()
   readblock(@Query() q){
     return this.blockService.readBlock(q.user_id);
-
   }
   @ApiOperation({ summary: '해당 유저가 차단한 유저 인지 확인'})
   @ApiResponse({

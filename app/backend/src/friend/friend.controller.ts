@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { FriendDto1, FriendDto2 } from 'src/dto/friend';
+import { FriendDto1 } from 'src/dto/friend';
+import { UsersDto5 } from 'src/dto/users';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { SessionService } from 'src/session/session.service';
 import { FriendService } from './friend.service';
@@ -9,7 +10,9 @@ import { FriendService } from './friend.service';
 @Controller('friend')
 export class FriendController {
   constructor(
+    @Inject(forwardRef(() => FriendService))
     private friendService: FriendService,
+    @Inject(forwardRef(() => SessionService))
     private sessionService: SessionService,
   ){}
 
@@ -23,9 +26,10 @@ export class FriendController {
 
   @ApiOperation({ summary: '해당 유저의 모든 친구 검색'})
   @ApiResponse({ 
-    type: FriendDto2, 
+    // type: FriendDto2, 
+    type: UsersDto5,
     description: `
-      해당 유저의 친구 유저 아이디 배열
+      해당 유저의 친구 유저 객체 배열
       검색 실패시 실패 이유 반환
     `})
   // @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '모든 친구들 검색할 유저 아이디 ' })
@@ -37,9 +41,10 @@ export class FriendController {
   }
   @ApiOperation({ summary: '해당 유저를 친구 추가한 모든 유저 검색'})
   @ApiResponse({ 
-    type: FriendDto2, 
+    // type: FriendDto2, 
+    type: UsersDto5,
     description: `
-      해당 유저를 친구 추가한 유저 아이디 배열
+      해당 유저를 친구 추가한 유저 객체 배열
       검색 실패시 실패 이유 반환
     ` })
   @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '자신을 친구 추가한 모든 유저들을 검색할 유저 아이디'})

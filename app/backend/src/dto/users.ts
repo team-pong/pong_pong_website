@@ -103,3 +103,32 @@ export class UsersDto4{
 	})
 	public status: string;
 }
+
+export class UsersDto5{
+	@ApiProperty({
+		example: `[
+			{
+				"user_id": "hna",
+				"nick": "hna",
+				"avatar_url": "https://gravatar.com/avatar/d93441b9901723e7ec6159e63c4f993?s=400&d=robohash&r=x",
+				"total_games": 0,
+				"win_games": 0,
+				"loss_games": 0,
+				"ladder_level": 1000,
+				"status": "on"
+			},
+			{
+				"user_id": "jinwkim",
+				"nick": "jinwkim",
+				"avatar_url": "https://gravatar.com/avatar/d93441b991723e7ec67159e63c4f995?s=400&d=robohash&r=x",
+				"total_games": 0,
+				"win_games": 0,
+				"loss_games": 0,
+				"ladder_level": 1000,
+				"status": "on"
+			}
+		]`,
+		description: '유저객체 배열',
+	})
+	public users_arr: UsersDto3[];
+}
