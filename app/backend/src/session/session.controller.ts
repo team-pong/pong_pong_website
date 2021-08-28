@@ -33,4 +33,12 @@ export class SessionController {
   isValidSession(@Req() request: Request, @Res() response: Response) {
     return this.sessionService.sessionValidCheck(request.sessionID, response);
   }
+
+  @ApiOperation({ summary: '세션 아이디로 유저아이디 검색'})
+  @ApiResponse({ type: SessionDto1, description: '유저 아이디' })
+  @ApiQuery({ name: 'sid', example: '0TBeNj59PUBZ_XjbXGKq9sHHPHCkZky4', description: '세션아이디' })
+  @Get("/user_id")
+  readUser(@Query() q){
+    return this.sessionService.readUser(q.sid);
+  }  
 }

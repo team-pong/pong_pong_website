@@ -8,9 +8,8 @@ import { Client } from 'pg';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { session } from 'src/entities/session';
-import { SessionDto1 } from 'src/dto/session';
 import { err25 } from 'src/err';
-import { ErrMsgDto } from 'src/dto/utility';
+import { SessionDto1 } from 'src/dto/session';
 
 const db = {
 	user: process.env.PG_PONG_ADMIN,
@@ -138,7 +137,7 @@ export class SessionService {
     }
   }
 
-  // 세션 아이디로 유저아이디 검색
+  // 세션 아이디로 유저아이디 검색 (문자열로 반환)
   async readUserId(sid: string){
     if (await this.sessionRepo.count({sid: sid}) === 0)  // 해당하는 세션 아이디가 없으면
       return err25;
@@ -148,5 +147,13 @@ export class SessionService {
     let process2 = process1.split(",\"userid\":\"");
     let process3 = process2[1].split("\"");
     return process3[0];
+  }
+
+  // 세션 아이디로 유저아이디 검색 (json 형식으로 반환)
+  async readUser(sid: string){
+    let user_id = await this.readUserId(sid);  // 세션아이디에서 유저 아이디 읽음
+    let user = new SessionDto1;
+    user.user_id = user_id;
+    return user;
   }
 }
