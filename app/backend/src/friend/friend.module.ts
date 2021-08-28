@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { achievementsService } from 'src/achievements/achievements.service';
 import { AdminService } from 'src/admin/admin.service';
@@ -19,7 +19,9 @@ import { session } from 'src/entities/session';
 import { Users } from 'src/entities/users';
 import { MatchService } from 'src/match/match.service';
 import { MuteService } from 'src/mute/mute.service';
+import { SessionModule } from 'src/session/session.module';
 import { SessionService } from 'src/session/session.service';
+import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { FriendController } from './friend.controller';
 import { FriendService } from './friend.service';
@@ -40,19 +42,11 @@ import { FriendService } from './friend.service';
       Match, 
       Mute
     ]),
+    forwardRef(() => UsersModule),
+    forwardRef(() => SessionModule),
   ],
   controllers: [FriendController],
-  providers: [
-    FriendService,
-    SessionService,
-    UsersService, 
-    achievementsService, 
-    AdminService, 
-    BanService, 
-    BlockService,
-    DmStoreService, 
-    MatchService, 
-    MuteService
-  ]
+  providers: [FriendService],
+  exports: [FriendService],
 })
 export class FriendModule {}

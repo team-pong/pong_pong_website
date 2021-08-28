@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from 'src/entities/users';
 import { UsersController } from './users.controller';
@@ -11,16 +11,16 @@ import { DmStore } from 'src/entities/dm-store';
 import { Friend } from 'src/entities/friend';
 import { Match } from 'src/entities/match';
 import { Mute } from 'src/entities/mute';
-import { achievementsService } from 'src/achievements/achievements.service';
-import { AdminService } from 'src/admin/admin.service';
-import { BanService } from 'src/ban/ban.service';
-import { BlockService } from 'src/block/block.service';
-import { DmStoreService } from 'src/dm-store/dm-store.service';
-import { FriendService } from 'src/friend/friend.service';
-import { MatchService } from 'src/match/match.service';
-import { MuteService } from 'src/mute/mute.service';
 import { Chat } from 'src/entities/chat';
 import { ChatUsers } from 'src/entities/chat-users';
+import { achievementsModule } from 'src/achievements/achievements.module';
+import { AdminModule } from 'src/admin/admin.module';
+import { BanModule } from 'src/ban/ban.module';
+import { BlockModule } from 'src/block/block.module';
+import { DmStoreModule } from 'src/dm-store/dm-store.module';
+import { FriendModule } from 'src/friend/friend.module';
+import { MatchModule } from 'src/match/match.module';
+import { MuteModule } from 'src/mute/mute.module';
 
 @Module({
   imports: [
@@ -37,18 +37,17 @@ import { ChatUsers } from 'src/entities/chat-users';
       Match, 
       Mute
     ]),
+    forwardRef(() => achievementsModule),
+    forwardRef(() => AdminModule),
+    forwardRef(() => BanModule),
+    forwardRef(() => BlockModule),
+    forwardRef(() => DmStoreModule),
+    forwardRef(() => FriendModule),
+    forwardRef(() => MatchModule),
+    forwardRef(() => MuteModule),
   ],
   controllers: [UsersController],
-  providers: [
-    UsersService, 
-    achievementsService, 
-    AdminService, 
-    BanService, 
-    BlockService,
-    DmStoreService, 
-    FriendService, 
-    MatchService, 
-    MuteService
-  ]
+  providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}
