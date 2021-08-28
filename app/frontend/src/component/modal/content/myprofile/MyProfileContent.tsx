@@ -24,6 +24,39 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
     userTitle: "Majesty",
   });
 
+  const [isEditNickClicked, setIsEditNickClicked] = useState(false);
+  const [nickToEdit, setNickToEdit] = useState("Dom Hardy");
+
+ /*!
+ * @author donglee
+ * @brief 닉네임 변경 버튼을 눌렀을 때 현재 닉네임 텍스트가 자동으로 하이라이트되는 함수
+ */
+  const autoHighlightText = () => {
+    const editInput : HTMLInputElement = document.getElementsByClassName("mf-edit-nick")[0] as HTMLInputElement;
+    
+    setTimeout(() => {
+      editInput.focus();
+      editInput.select();
+    }, 0);
+  };
+
+  /*!
+  * @author donglee
+  * @brief 닉네임 변경 버튼을 눌렀을 때 span 대신에 input태그가 display되도록 함
+  */
+  const activateEdit = () => {
+    setIsEditNickClicked(true);
+    autoHighlightText();
+  };
+
+  /* TODO: 1. 다른 곳을 클릭했을 때 닉네임수정이 취소돼야 함
+           2. 수정완료 했을 때 API 요청하고 다시 렌더링 해야 함 */
+
+  const changeNick = () => {
+    console.log("changE!");
+    setIsEditNickClicked(false);
+  };
+
   useEffect(() => {
     
     /* API 이용 fetch로 받아와서 데이터값을 초기화해야 한다 */
@@ -49,8 +82,17 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
         </div>
         <div id="user-info">
           <div id="user-id">
-            {`${userNickName} `}
-            <img src="/public/pencil.png" alt="편집" />
+            <input
+              className={["mf-edit-nick", isEditNickClicked && "mf-edit-nick-clicked"].join(" ")}
+              type="text"
+              value={nickToEdit}
+              onChange={(e) => setNickToEdit(e.target.value)}
+              onKeyDown={(e) => {if (e.key === "Enter") changeNick()}} />
+            <span className={["mf-nick", isEditNickClicked && "mf-nick-clicked"].join(" ")}>{`${userNickName} `}</span>
+            <img
+              src={isEditNickClicked ? "/public/check.png" : "/public/pencil.png"}
+              alt="편집"
+              onClick={!isEditNickClicked ? activateEdit : changeNick}/>
           </div>
           <div id="user-stat">
             <span id="win">{userInfo.winCnt} 승</span>
