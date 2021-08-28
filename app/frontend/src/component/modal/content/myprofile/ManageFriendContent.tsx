@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { testFriendListMyProfile } from "../../../../dummydata/testFriendListMyProfile";
 import EasyFetch from "../../../../utils/EasyFetch";
 import "/src/scss/content/myprofile/ManageFriendContent.scss";
+import { testBlockedList } from "../../../../dummydata/testBlockedList";
 
 interface Friend {
 	user_id: string;
@@ -30,31 +32,7 @@ const FriendList: React.FC = () => {
 		// const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nick}`);
 		// const res = await (await EasyFetch.fetch()).json();
 
-		//일단 test용 하드코딩
-		setFriendList(
-			[
-				{
-					user_id: "jinbkim",
-					nick: "jinbkim",
-					avatar_url: "https://gravatar.com/avatar/d93441b99017237ec67159e63c4f991?s=400&d=robohash&r=x",
-					total_games: 20,
-					win_games: 10,
-					loss_games: 10,
-					ladder_level: 1000,
-					status: "on"
-				},
-				{
-  				user_id: "hna",
-  				nick: "hna",
-  				avatar_url: "https://gravatar.com/avatar/d93441b9901723e7ec6159e63c4f993?s=400&d=robohash&r=x",
-  				total_games: 0,
-  				win_games: 0,
-  				loss_games: 0,
-  				ladder_level: 1000,
-  				status: "on"
-				}
-			]
-		);
+		setFriendList(testFriendListMyProfile);
 	}
 
 	useEffect(() => {
@@ -111,21 +89,7 @@ const BlockedList: React.FC<{nick: string}> = ({nick}) => {
 		// const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nick}`);
 		// const res =  await (await easyfetch.fetch()).json();
 		
-		//test 하드코딩
-		setBlockedList(
-			[
-				{
-					user_id: "yochoi",
-					nick: "yochoi",
-					avatar_url: "https://gravatar.com/avatar/d93441b990173e7ec67159e63c4f994?s=400&d=robohash&r=x",
-					total_games: 10,
-					win_games: 0,
-					loss_games: 10,
-					ladder_level: 500,
-					status: "on"
-				}
-			]
-		)
+		setBlockedList(testBlockedList);
 	};
 
 	useEffect(() => {
