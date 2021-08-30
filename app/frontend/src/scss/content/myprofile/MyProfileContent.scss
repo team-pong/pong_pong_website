@@ -81,9 +81,35 @@
 				margin-top: 4px;
 				margin-left: 15px;
 
+        #mf-form {
+          display: inline;
+        }
+
+        .mf-nick-clicked {
+          display: none;
+        }
+
+        .mf-edit-nick {
+          display: none;
+        }
+
+        .mf-edit-nick-clicked {
+          display: inline;
+          font-size: 17pt;
+          width: 130px;
+          background: none;
+          border: none;
+          border-bottom: solid 3px black;
+        }
+
+        .mf-edit-nick-clicked:focus-within {
+          outline: none;
+        }
+
         img {
-					width: 15px;
-					height: 15px;
+          margin-left: 5px;
+					width: 17px;
+					height: 17px;
 					filter: invert(100%);
 					opacity: 0.8;
 					transform: scale(1);
