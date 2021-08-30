@@ -83,9 +83,9 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
     e.preventDefault();
     const easyfetch = new EasyFetch("http://localhost:3001/users/info", "POST");
     const body = {
-      "user_id": `${userInfo.user_id}`,
-      "nick": `${nickToEdit}`,
-      "avatar_url": `${userInfo.avatar_url}`
+      "user_id": userInfo.user_id,
+      "nick": nickToEdit,
+      "avatar_url": userInfo.avatar_url
     }
     const res = await (await easyfetch.fetch(body)).json();
     
@@ -192,7 +192,7 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
             <div id="user-id">
               <form onSubmit={changeNick} id="mf-form">
                 <input
-                  className={["mf-edit-nick", isEditNickClicked && "mf-edit-nick-clicked"].join(" ")}
+                  className={"mf-edit-nick"  + (isEditNickClicked ? " mf-edit-nick-clicked" : "")}
                   type="text"
                   value={nickToEdit}
                   minLength={2}
