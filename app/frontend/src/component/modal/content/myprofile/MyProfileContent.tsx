@@ -26,20 +26,8 @@ interface UserInfo {
 const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
 
   const [userInfo, setUserInfo] = useState<UserInfo>();
-  const [isEditNickClicked, _setIsEditNickClicked] = useState(false);
+  const [isEditNickClicked, setIsEditNickClicked] = useState(false);
   const [nickToEdit, setNickToEdit] = useState("");
-
-  const isEditNickClickedRef = useRef(isEditNickClicked); //isEditNickClicked의 ref
-
-  /*!
-   * @author donglee
-   * @brief ref를 이용해서 state가 비동기로 변하는 것을 기다리지 않고
-   *        변화된 즉시 그 값을 활용하기 위해서 current 값에 담아둠
-   */
-  const setIsEditNickClicked = (data: boolean) => {
-    isEditNickClickedRef.current = data;
-    _setIsEditNickClicked(data);
-  };
 
   /*!
    * @author donglee
@@ -128,12 +116,10 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
    *         다른 부분을 눌렀을 때는 수정을 취소하고 원래 닉네임을 보여줌
    */
   const cancelEdit = (e: MouseEvent, nick: string) => {
-    if (isEditNickClickedRef.current) {
-      if (e.target !== document.getElementById("mf-edit-img") &&
-          e.target !== document.getElementsByClassName("mf-edit-nick")[0]) {
-        setIsEditNickClicked(false);
-        setNickToEdit(nick);
-      }
+    if (e.target !== document.getElementById("mf-edit-img") &&
+        e.target !== document.getElementsByClassName("mf-edit-nick")[0]) {
+      setIsEditNickClicked(false);
+      setNickToEdit(nick);
     }
   };
 
@@ -201,7 +187,7 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
                   onChange={(e) => setNickToEdit(e.target.value)}
                   onKeyDown={(e) => cancelEditNick(e)} />
               </form>
-              <span className={["mf-nick", isEditNickClicked && "mf-nick-clicked"].join(" ")}>{`${nickToEdit}`}</span>
+              <span className={"mf-nick" + (isEditNickClicked ? " mf-nick-clicked" : "")}>{`${nickToEdit}`}</span>
               <img
                 id="mf-edit-img"
                 src={isEditNickClicked ? "/public/check.png" : "/public/pencil.png"}
