@@ -38,22 +38,30 @@ const MainPage = ({match}): JSX.Element => {
       />
       <main>
         <div id="button-container">
-          <Link to={`${match.url}/record`} style={{textDecoration: "none"}}>
-          <div className="buttons" id="record">
+          <Link
+            to={`${match.url}/record`}
+            style={{textDecoration: "none"}}
+            className="buttons"
+            id="record">
             전적
             <span>게임 전적을 보려면 누르세요!</span>
-          </div>
           </Link>
-          <Link to={`${match.path}/chat`} style={{textDecoration: "none"}}>
-          <div className="buttons" id="chat">
+          <Link
+            to={`${match.path}/chat`}
+            style={{textDecoration: "none"}}
+            className="buttons"
+            id="chat">
             채팅
             <span>친구와 채팅을 하려면 누르세요!</span>
-          </div>
           </Link>
-          <div className="buttons" id="game">
-            게임
-            <span>게임을 하려면 누르세요!</span>
-          </div>
+          <Link
+            to=""
+            style={{textDecoration: "none"}}
+            className="buttons"
+            id="game">
+              게임
+              <span>게임을 하려면 누르세요!</span>
+          </Link>
         </div>
         <Switch>
           <Route path={`${match.path}/myprofile`}><Modal id={Date.now()} content={<MyProfileContent />} smallModal/></Route>
