@@ -81,6 +81,10 @@
 				margin-top: 4px;
 				margin-left: 15px;
 
+        #mf-form {
+          display: inline;
+        }
+
         .mf-nick-clicked {
           display: none;
         }
@@ -103,6 +107,7 @@
         }
 
         img {
+          margin-left: 5px;
 					width: 17px;
 					height: 17px;
 					filter: invert(100%);
