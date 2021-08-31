@@ -1,10 +1,11 @@
-import React, { FormEvent, useEffect, useRef, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route } from "react-router-dom";
 import "/src/scss/content/myprofile/MyProfileContent.scss";
 import Modal from "../../Modal";
 import ManageFriendContent from "./ManageFriendContent";
 import RecordContent from "../RecordContent";
 import EasyFetch from "../../../../utils/EasyFetch";
+import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 
 /*!
  * @author donglee
@@ -201,7 +202,9 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
               <span className="delimiter">|</span>
               <span id="score">{userInfo.ladder_level} 점</span>
             </div>
-            <div id="user-title">{userInfo.win_games >= 10 && "majesty"}</div>
+            <div id="user-title">{setAchievementStr(userInfo.ladder_level)}
+              <img id="user-achievement-img" src={setAchievementImg(userInfo.ladder_level)} alt="타이틀로고" />
+            </div>
           </div>
         </div>
         <div id="lower-part">

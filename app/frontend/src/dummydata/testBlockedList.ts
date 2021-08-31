@@ -6,7 +6,7 @@ export const testBlockedList = [
         total_games: 10,
         win_games: 0,
         loss_games: 10,
-        ladder_level: 500,
+        ladder_level: 300,
         status: "on"
     }
 ]
