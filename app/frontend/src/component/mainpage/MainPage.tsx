@@ -16,6 +16,9 @@ import { Link, Route, Switch } from "react-router-dom";
 
 const MainPage = ({match}): JSX.Element => {
 
+  //test
+  const myNick = "donglee";
+
   useEffect(() => {
     const postAuthCodeToBackend = async () => {
       let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
@@ -47,7 +50,7 @@ const MainPage = ({match}): JSX.Element => {
             <span>게임 전적을 보려면 누르세요!</span>
           </Link>
           <Link
-            to={`${match.path}/chat`}
+            to={`${match.path}/chat/:hello`}
             style={{textDecoration: "none"}}
             className="buttons"
             id="chat">
@@ -64,7 +67,7 @@ const MainPage = ({match}): JSX.Element => {
           </Link>
         </div>
         <Switch>
-          <Route path={`${match.path}/myprofile`}><Modal id={Date.now()} content={<MyProfileContent />} smallModal/></Route>
+          <Route path={`${match.path}/profile/:nick`}><Modal id={Date.now()} content={<MyProfileContent />} smallModal/></Route>
           <Route path={`${match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
           <Route path={`${match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
         </Switch>

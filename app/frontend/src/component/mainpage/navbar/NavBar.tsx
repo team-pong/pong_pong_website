@@ -6,6 +6,7 @@ import "/src/scss/navbar/NavBar.scss";
 import "/src/scss/navbar/NavBar-media.scss";
 import "/src/scss/navbar/NavBar-mobile.scss";
 import Modal, { ChatContent, RecordContent } from "../../modal/Modal";
+import MyProfileContent from "../../modal/content/myprofile/MyProfileContent";
 
 /*!
  * @author donglee
@@ -25,10 +26,13 @@ const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
 
+  //test
+  const myNick = "jinbkim";
+
   return (
     <nav className="menu">
       <header className="avatar">
-        <Link to={`${props.match.url}/myprofile`}>
+        <Link to={`${props.match.url}/profile/${myNick}`}>
         <img
           id="avatarImg"
           src={props.avatarImgUrl}
