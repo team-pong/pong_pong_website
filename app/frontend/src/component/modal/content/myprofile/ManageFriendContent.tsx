@@ -3,6 +3,7 @@ import { testFriendListMyProfile } from "../../../../dummydata/testFriendListMyP
 import EasyFetch from "../../../../utils/EasyFetch";
 import "/src/scss/content/myprofile/ManageFriendContent.scss";
 import { testBlockedList } from "../../../../dummydata/testBlockedList";
+import { setAchievementStr, setAchievementImg } from "../../../../utils/setAchievement";
 
 interface Friend {
 	user_id: string;
@@ -49,8 +50,8 @@ const FriendList: React.FC = () => {
 								<img className="fl-avatar" src={friend.avatar_url} alt="프로필" />
 								<div>
 									<span className="fl-nickname">{friend.nick}</span>
-									<span className="fl-title">majesty</span>
-									<img className="fl-title-icon" src="/public/yellow-crown.png" alt="타이틀로고" />
+									<span className="fl-title">{setAchievementStr(friend.ladder_level)}</span>
+									<img className="fl-title-icon" src={setAchievementImg(friend.ladder_level)} alt="타이틀로고" />
 								</div>
 							</div>
 							<div className="fl-buttons">
@@ -106,8 +107,8 @@ const BlockedList: React.FC<{nick: string}> = ({nick}) => {
 								<img className="fl-avatar" src={blocked.avatar_url} alt="프로필" />
 								<div>
 									<span className="fl-nickname">{blocked.nick}</span>
-									<span className="fl-title">loser</span>
-									<img className="fl-title-icon" src="/public/green-crown.png" alt="타이틀로고" />
+									<span className="fl-title">{setAchievementStr(blocked.ladder_level)}</span>
+									<img className="fl-title-icon" src={setAchievementImg(blocked.ladder_level)} alt="타이틀로고" />
 								</div>
 							</div>
 							<div className="fl-buttons">
