@@ -3,7 +3,7 @@
 
 #profile {
 
-  #upper-part {
+  .upper-part {
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
     height: 380px;
@@ -14,7 +14,7 @@
     );
     cursor: default;
 
-    #button-container {
+    .button-container {
       position: absolute;
       display: flex;
       justify-content: space-evenly;
@@ -42,6 +42,13 @@
       button:hover {
         transform: scale(1.1);
         transition: 0.2s all ease-in-out;
+      }
+    }
+
+    .user-button-container {
+      button {
+        box-shadow: 0 0 20px rgba(221, 163, 255, 0.5);
+        color: rgb(74, 4, 204);
       }
     }
 
@@ -151,6 +158,14 @@
         margin-left: 10px;
       }
     }
+  }
+
+  .user-profile {
+    background: linear-gradient(
+      145deg,
+      rgb(51, 1, 190),
+      rgb(143, 115, 170)
+    );
   }
 
   #lower-part {

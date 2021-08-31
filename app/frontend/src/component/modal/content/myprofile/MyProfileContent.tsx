@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useState } from "react";
-import { withRouter, RouteComponentProps, Link, Route } from "react-router-dom";
+import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-router-dom";
 import "/src/scss/content/myprofile/MyProfileContent.scss";
 import Modal from "../../Modal";
 import ManageFriendContent from "./ManageFriendContent";
@@ -29,6 +29,11 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
   const [nickToEdit, setNickToEdit] = useState("");
+
+  //url parameter로 넘어오는 nick 문자열 저장
+  const {nick} = useParams<{nick: string}>();
+  //test 현재 내 nick은 donglee 이고 param으로 들어온 nick은 jinbkim이니까 false
+  const isMyProfile = ("donglee" === nick);
 
   /*!
    * @author donglee
@@ -92,8 +97,14 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
    * @brief API /user 에서 프로필 정보를 요청해서 state에 저장함
    */
   const getUserInfo = async (): Promise<UserInfo> => {
+    let targetNick = "";
+    if (isMyProfile) {
+      targetNick = "donglee";
+    } else {
+      targetNick = nick;
+    }
     /* TODO: session id로 유저의 정보를 받아오도록 해야 함 */
-    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users/user?user_id=donglee`);
+    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users/user?user_id=${targetNick}`);
     const res = await (await easyfetch.fetch()).json();
 
     setUserInfo(res);
@@ -157,11 +168,11 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
       .then((res) => {setNickToEdit(res.nick); return res;});
   }, []);
 
-  if (userInfo) {
+  if (userInfo && isMyProfile) {
     return (
       <div id="profile">
-        <div id="upper-part">
-          <div id="button-container">
+        <div className="upper-part">
+          <div className="button-container">
             <Link to={`${props.match.url}/record`}>
               <button id="stat-detail">
                 상세전적보기
@@ -219,6 +230,51 @@ const MyProfileContent: React.FC<RouteComponentProps> = (props) => {
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
         <Route path={`${props.match.path}/manageFriend`}><Modal id={Date.now()} smallModal content={<ManageFriendContent nick={userInfo.nick}/>} /></Route>
       </div>
+    );
+  } else if (userInfo && !isMyProfile) {
+    return (
+      <div id="profile">
+        <div className="upper-part user-profile">
+          <div className="button-container user-button-container">
+            <Link to={`${props.match.url}/record`}>
+              <button id="stat-detail">
+                친구 추가
+              </button>
+            </Link>
+            <button id="second-auth">메세지 보내기</button>
+            <Link to={`${props.match.url}/manageFriend`}>
+              <button id="manage-friend">대전 신청</button>
+            </Link>
+          </div>
+          <div id="avatar-container">
+            <img src={userInfo.avatar_url} alt="프로필사진" />
+          </div>
+          <div id="user-info">
+            <div id="user-id">
+              <span className="mf-nick">{`${nick}`}</span>
+            </div>
+            <div id="user-stat">
+              <span id="win">{userInfo.win_games} 승</span>
+              <span className="delimiter">|</span>
+              <span id="lose">{userInfo.loss_games} 패</span>
+              <span className="delimiter">|</span>
+              <span id="score">{userInfo.ladder_level} 점</span>
+            </div>
+            <div id="user-title">{setAchievementStr(userInfo.ladder_level)}
+              <img id="user-achievement-img" src={setAchievementImg(userInfo.ladder_level)} alt="타이틀로고" />
+            </div>
+          </div>
+        </div>
+        <div id="lower-part">
+          <div id="blank"></div>
+          <div id="delete-user">
+            <div id="delete-icon">
+              <img src="/public/block.png" alt="차단" />
+            </div>
+            <span>클릭하면 해당 유저를 차단합니다.</span>
+          </div>          
+        </div>
+      </div>      
     );
   } else {
     return ( <h1>Loading..</h1> );
