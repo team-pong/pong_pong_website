@@ -20,12 +20,12 @@ const FriendList: React.FC = () => {
 
 	const [friendList, setFriendList] = useState<Friend[]>();
 
-	const deleteFriend = (e: React.MouseEvent) => {
-		console.log("delete friend");
+	const deleteFriend = (nick: string) => {
+		console.log(`${nick} delete`);
 	};
 
-	const blockFriend = (e: React.MouseEvent) => {
-		console.log("block friend");
+	const blockFriend = (nick: string) => {
+		console.log(`${nick} block`);
 	};
 
 	const getFriendList = async () => {
@@ -60,13 +60,13 @@ const FriendList: React.FC = () => {
 									title="친구 삭제"
 									src="/public/trashcan.png"
 									alt="친구삭제"
-									onClick={deleteFriend} />
+									onClick={() => deleteFriend(friend.nick)} />
 								<img
 									className="fl-block-friend"
 									title="친구 차단"
 									src="/public/block.png"
 									alt="친구차단"
-									onClick={blockFriend} />
+									onClick={() => blockFriend(friend.nick)} />
 							</div>
 						</li>
 					);
@@ -82,8 +82,8 @@ const BlockedList: React.FC<{nick: string}> = ({nick}) => {
 	
 	const [blockedList, setBlockedList] = useState<Friend[]>();
 
-	const unblockFriend = (e: React.MouseEvent) => {
-		console.log("unblock friend");
+	const unblockFriend = (nick: string) => {
+		console.log(`${nick} unblock!`);
 	};
 
 	const getBlockedList = async () => {
@@ -112,7 +112,7 @@ const BlockedList: React.FC<{nick: string}> = ({nick}) => {
 								</div>
 							</div>
 							<div className="fl-buttons">
-								<span className="bl-unblock" onClick={unblockFriend}>차단 해제</span>
+								<span className="bl-unblock" onClick={() => unblockFriend(blocked.nick)}>차단 해제</span>
 							</div>
 						</li>
 					);
