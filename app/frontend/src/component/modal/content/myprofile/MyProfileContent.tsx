@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useRef, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route } from "react-router-dom";
 import "/src/scss/content/myprofile/MyProfileContent.scss";
 import Modal from "../../Modal";
