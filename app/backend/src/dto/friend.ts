@@ -14,10 +14,10 @@ export class FriendDto1{
 	public friend_id: string;
 }
 
-export class FriendDto2{
-  @ApiProperty({
-		example: `['jinbkim', 'donglee', 'yochoi' ]`,
-		description: '유저 아이디 배열',
-	})
-	public friends: string[];
-}
+// export class FriendDto2{
+//   @ApiProperty({
+// 		example: `['jinbkim', 'donglee', 'yochoi' ]`,
+// 		description: '유저 아이디 배열',
+// 	})
+// 	public friends: string[];
+// }

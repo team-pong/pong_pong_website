@@ -14,10 +14,10 @@ export class BlockDto1{
 	public block_id: string;
 }
 
-export class BlockDto2{
-  @ApiProperty({
-		example: `['jinbkim', 'donglee', 'yochoi' ]`,
-		description: '해당 유저의 차단 목록',
-	})
-	public blocks: string[];
-}
+// export class BlockDto2{
+//   @ApiProperty({
+// 		example: `['jinbkim', 'donglee', 'yochoi' ]`,
+// 		description: '해당 유저의 차단 목록',
+// 	})
+// 	public blocks: string[];
+// }
