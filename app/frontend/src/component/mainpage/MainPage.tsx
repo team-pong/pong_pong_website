@@ -38,7 +38,6 @@ const MainPage = ({match}): JSX.Element => {
         friends={testFriendList}
       />
       <main>
-        <Loading width={100} height={100} />
         <div id="button-container">
           <Link
             to={`${match.url}/record`}

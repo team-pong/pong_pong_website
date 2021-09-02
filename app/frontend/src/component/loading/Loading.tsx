@@ -1,8 +1,8 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 
 /*!
  * @author yochoi
- * @brief 로딩 동그라미
+ * @brief 로딩시 사용할 svg
  */
 
 interface loadingProps {
@@ -13,29 +13,33 @@ interface loadingProps {
 const Loading: FC<loadingProps> = (props): JSX.Element => {
 
   return (
-    <div id="circle-chart" style={{width: props.width, height: props.height, position: "fixed"}}>
-      <svg viewBox="0 0 36 36">
-        <path
-          fill="none"
-          stroke="#eee"
-          strokeWidth="3.8"
-          d="M18 2.0845
-            a 15.9155 15.9155 0 0 1 0 31.831
-            a 15.9155 15.9155 0 0 1 0 -31.831"
-        />
-        <path
-          id="percentage"
-          fill="none"
-          strokeWidth="2.8"
-          strokeLinecap="round"
-          stroke="#4CC790"
-          strokeDasharray={"100, 100"}
-          d="M18 2.0845
-            a 15.9155 15.9155 0 0 1 0 31.831
-            a 15.9155 15.9155 0 0 1 0 -31.831"
-        />
-      </svg>
-    </div>
+    <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+      viewBox="0 0 100 100" enableBackground="new 0 0 0 0" xmlSpace="preserve" style={{width: props.width, height: props.height}}>
+      <circle fill="#fff" stroke="none" cx="6" cy="50" r="6">
+        <animate
+          attributeName="opacity"
+          dur="1s"
+          values="0;1;0"
+          repeatCount="indefinite"
+          begin="0.1"/>    
+      </circle>
+      <circle fill="#fff" stroke="none" cx="26" cy="50" r="6">
+        <animate
+          attributeName="opacity"
+          dur="1s"
+          values="0;1;0"
+          repeatCount="indefinite" 
+          begin="0.2"/>       
+      </circle>
+      <circle fill="#fff" stroke="none" cx="46" cy="50" r="6">
+        <animate
+          attributeName="opacity"
+          dur="1s"
+          values="0;1;0"
+          repeatCount="indefinite" 
+          begin="0.3"/>     
+      </circle>
+    </svg>
   )
 }
 
