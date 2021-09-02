@@ -8,6 +8,7 @@ import EasyFetch from '../../utils/EasyFetch';
 import { testFriendList } from '../../dummydata/testFriendList';
 import MyProfileContent from "../modal/content/myprofile/MyProfileContent";
 import { Link, Route, Switch } from "react-router-dom";
+import Loading from "../loading/Loading";
 
 /*!
  * @author yochoi, donglee
@@ -37,6 +38,7 @@ const MainPage = ({match}): JSX.Element => {
         friends={testFriendList}
       />
       <main>
+        <Loading width={100} height={100} />
         <div id="button-container">
           <Link
             to={`${match.url}/record`}
