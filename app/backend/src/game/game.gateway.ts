@@ -1,17 +1,49 @@
+import { Req } from '@nestjs/common';
 import { ConnectedSocket, OnGatewayDisconnect } from '@nestjs/websockets';
 import { WebSocketServer, OnGatewayConnection, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
+import { SessionService } from 'src/session/session.service';
 
 /*
 * https://127.0.0.1:3001/
 */
+class WaitUser {
+	constructor(
+		public id: string,
+		public socket: Socket,
+	) {}
+}
+
+var normal_waiting: WaitUser[] = [];
+
 @WebSocketGateway({ namespace: 'game', cors: true })
 export class GameGateway {
-	@WebSocketServer() public server: Server;
+	constructor(
+		private sessionService: SessionService,
+	) {}
 
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
-    return 'Hello world!';
+	@WebSocketServer()public server: Server;
+
+  @SubscribeMessage('normal')
+  async handleMessage(@ConnectedSocket() socket: Socket) {
+		// 쿠키에서 sid 파싱
+		const sid: string = socket.request.headers.cookie.split('.')[1].substring(8);
+		// sid로 유저 아이디 찾기
+		const userid = await this.sessionService.readUserId(sid);
+		// 큐에 넣기
+		normal_waiting.push(new WaitUser(userid, socket));
+		// 2인 이상시 매칭
+		if (normal_waiting.length >= 2) {
+			console.log('매칭 완료');
+			const roomName: string = normal_waiting[0].id + normal_waiting[1].id;
+			normal_waiting[0].socket.join(roomName);
+			normal_waiting[1].socket.join(roomName);
+			normal_waiting[0].socket.emit('matched', {roomId: roomName, opponent: normal_waiting[1].id});
+			normal_waiting[1].socket.emit('matched', {roomId: roomName, opponent: normal_waiting[0].id});
+			normal_waiting.splice(0, 2);
+		}
+		console.log('waiting:', normal_waiting);
   }
 
 	afterInit(server: Server): any {
@@ -19,10 +51,16 @@ export class GameGateway {
 	}
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
-		console.log('Game 웹소켓 연결됨: ', socket.nsp.name);
-
+		console.log('Game 웹소켓 연결됨', socket.nsp.name);
+		
 		socket.on('disconnect', () => {
-			console.log('Game 웹소켓 연결 해제');
+			for (let i = 0; i < normal_waiting.length; i++) {
+				if (normal_waiting[i].socket.id === socket.id)  {
+					normal_waiting.splice(i, 1);
+					i--;
+				}
+			}
+			console.log('Game 웹소켓 연결 해제', socket.id);
 		})
 	}
 }

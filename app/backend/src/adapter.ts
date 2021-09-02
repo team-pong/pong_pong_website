@@ -9,7 +9,13 @@ export class SocketAdapter extends IoAdapter {
       server?: any;
     },
   ) {
-    const server = super.createIOServer(port, { ...options, cors: true });
+    const server = super.createIOServer(port, { ...options, cors: {
+			origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
+			methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+			preflightContinue: false,
+			optionsSuccessStatus: 204,
+			credentials: true,}
+		});
     return server;
   }
 }

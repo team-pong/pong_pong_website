@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { SessionModule } from 'src/session/session.module';
 import { GameController } from './game.controller';
 import { GameGateway } from './game.gateway';
 import { GameService } from './game.service';
@@ -9,8 +10,8 @@ import { GameService } from './game.service';
 * 2. 대전 소켓 통신
 */
 @Module({
-	imports: [GameService],
+	imports: [ SessionModule],
   controllers: [GameController],
-  providers: [GameService, GameGateway]
+  providers: [GameService, GameGateway,]
 })
 export class GameModule {}
