@@ -2,6 +2,7 @@ import React, { FC, ReactElement } from "react";
 import "/src/scss/Modal.scss";
 import ChatContent from './content/chat/ChatContent';
 import RecordContent from './content/RecordContent';
+import GameContent from "./content/game/GameContent";
 import { RouteComponentProps, withRouter } from "react-router";
 
 /*!
@@ -57,4 +58,4 @@ const Modal: FC<modalProps & RouteComponentProps> = ({ history, content, smallMo
 };
 
 export default withRouter(Modal);
-export { ChatContent, RecordContent };
+export { ChatContent, RecordContent, GameContent };

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import Modal, { ChatContent, RecordContent } from '../modal/Modal'
+import Modal, { ChatContent, RecordContent, GameContent } from '../modal/Modal'
 import NavBar from './navbar/NavBar'
 import "/src/scss/mainpage/MainPage.scss";
 import "/src/scss/mainpage/MainPage-media.scss";
@@ -55,7 +55,7 @@ const MainPage = ({match}): JSX.Element => {
             <span>친구와 채팅을 하려면 누르세요!</span>
           </Link>
           <Link
-            to=""
+            to="/mainpage/game"
             style={{textDecoration: "none"}}
             className="buttons"
             id="game">
@@ -67,6 +67,7 @@ const MainPage = ({match}): JSX.Element => {
           <Route path={`${match.path}/myprofile`}><Modal id={Date.now()} content={<MyProfileContent />} smallModal/></Route>
           <Route path={`${match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
           <Route path={`${match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
+          <Route path="/mainpage/game"><Modal id={Date.now()} content={<GameContent />} /></Route>
         </Switch>
       </main>
     </>
