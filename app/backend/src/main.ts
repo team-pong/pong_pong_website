@@ -4,6 +4,7 @@ import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Client } from 'pg';
+import { SocketAdapter } from './adapter';
 
 declare module 'express-session' {
   export interface SessionData {
@@ -14,6 +15,8 @@ declare module 'express-session' {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+	app.useWebSocketAdapter(new SocketAdapter(app));
 
   const config = new DocumentBuilder()
   .setTitle('ft_transcendence API')

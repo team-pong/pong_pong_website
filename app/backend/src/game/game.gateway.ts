@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io';
 /*
 * https://127.0.0.1:3001/
 */
-@WebSocketGateway({ namespace: 'game' })
+@WebSocketGateway({ namespace: 'game', cors: true })
 export class GameGateway {
 	@WebSocketServer() public server: Server;
 
@@ -14,7 +14,7 @@ export class GameGateway {
     return 'Hello world!';
   }
 
-	afterInit(server: any): any {
+	afterInit(server: Server): any {
 		console.log('Game Socket Server Init');
 	}
 
