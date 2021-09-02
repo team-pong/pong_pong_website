@@ -8,6 +8,7 @@ import EasyFetch from '../../utils/EasyFetch';
 import { testFriendList } from '../../dummydata/testFriendList';
 import MyProfileContent from "../modal/content/myprofile/MyProfileContent";
 import { Link, Route, Switch } from "react-router-dom";
+import Loading from "../loading/Loading";
 
 /*!
  * @author yochoi, donglee
