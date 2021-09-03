@@ -1,7 +1,24 @@
+@import "../../../colors.scss";
+
 div#game-content {
   width: 80%;
   margin: 45px auto auto auto;
+  height: calc(100% - 45px);
   a.match-buttons {
+    display: block;
+    width: 100%;
+    height: calc(50% - 10px);
+    font-size: xx-large;
+    color: #fff;
+    margin-bottom: 10px;
+    background-color: $green;
     text-decoration: none;
+    text-align: center;
+    border-radius: 10px;
+    transition-duration: 0.5s;
+    cursor: pointer;
+    &:hover {
+      background-color: #51a061;
+    }
   }
 }
