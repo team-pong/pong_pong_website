@@ -1,31 +1,28 @@
 import { FC } from "react";
-import { Link, Route } from "react-router-dom";
+import { Link, Route, RouteComponentProps, withRouter } from "react-router-dom";
 import Modal from "../../Modal";
 import GameMatchContent from "./GameMatchContent";
 import "/src/scss/content/game/GameContent.scss";
 
-const GameContent: FC = (): JSX.Element => {
+const GameContent: FC<RouteComponentProps> = ({match: {path, url}}): JSX.Element => {
   return (
     <div id="game-content">
       <Link
-        to="/mainpage/game/normal-matching"
+        to={`${url}/normal-matching`}
         className="match-buttons">
         일반게임
       </Link>
       <Link
-        to="/mainpage/game/ladder-matching"
+        to={`${url}/ladder-matching`}
         className="match-buttons">
         래더게임
       </Link>
 
-      <Route path="/mainpage/game/normal-matching">
-        <Modal id={Date.now()} smallModal content={<GameMatchContent matchType="normal"/>}/>
-      </Route>
-      <Route path="/mainpage/game/ladder-matching">
-        <Modal id={Date.now()} smallModal content={<GameMatchContent matchType="ladder"/>}/>
+      <Route path={`${path}/:matchType`}>
+        <Modal id={Date.now()} smallModal content={<GameMatchContent />}/>
       </Route>
     </div>
   );
 }
 
-export default GameContent;
+export default withRouter(GameContent);
