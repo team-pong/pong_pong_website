@@ -28,6 +28,11 @@ const GameMatchContent: FC<gameMatchContentProps & RouteComponentProps> = ({matc
       <Loading width={400} height={300} color="#62C375"/>
       {(params as any).matchType.split("-")[0] === "normal" && <span className="game-searching-message">일반 게임을 찾는중...</span>}
       {(params as any).matchType.split("-")[0] === "ladder" && <span className="game-searching-message">래더 게임을 찾는중...</span>}
+
+      {/*테스트용 버튼*/}
+      {/*추후에 혼자서도 매칭을 테스트 할 수 있는 수단이 생기면 제거 요망*/}
+      <button onClick={() => setIsMatched({isMatched: true, roomId: "12", opponent: "asdf"})}>수동 매칭 테스트</button>
+
     </div>
   );
 }
