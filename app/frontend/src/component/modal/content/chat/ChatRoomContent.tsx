@@ -40,12 +40,24 @@ function openContextMenu( e: React.MouseEvent,
                           setContextMenu: Dispatch<SetStateAction<any>>,
                           target: string,
                           targetPosition: string) {
+  document.getElementById("chat-room-users").style.overflowY = "hidden";
   setContextMenu({
     isOpen: true,
     x: e.pageX,
     y: e.pageY,
     target,
     targetPosition
+  });
+};
+
+function closeContextMenu(setContextMenu: Dispatch<SetStateAction<any>>) {
+  document.getElementById("chat-room-users").style.overflowY = "auto";
+  setContextMenu({
+    isOpen: false,
+    x: 0,
+    y: 0,
+    target: "",
+    targetPosition: ""
   });
 };
 
@@ -93,8 +105,8 @@ const ChatRoomContent: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<Set
               <div  key={idx}
                     className="chat-user"
                     onClick={(e) => {
-                      if (contextMenu.isOpen === true) setContextMenu({isOpen: false, x: 0, y: 0, target: "", targetPosition: ""})
-                      else openContextMenu(e, setContextMenu, value.nick, value.position)
+                      if (contextMenu.isOpen === true) closeContextMenu(setContextMenu);
+                      else openContextMenu(e, setContextMenu, value.nick, value.position);
                     }}>
                 <img src={value.avatar_url} alt={value.nick} />
                 <span>{value.nick}</span>
