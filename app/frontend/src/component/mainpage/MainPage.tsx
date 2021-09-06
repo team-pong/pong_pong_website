@@ -15,17 +15,9 @@ import Loading from "../loading/Loading";
  */
 
 const MainPage = ({match}): JSX.Element => {
-    //test
-  // const myNick = "donglee";
-  const [myNick, setMyNick] = useState("");
-
-  useEffect(() => {
-    console.log("Main myNick: ", myNick);
-  }, [myNick]);
-  
   return (
     <>
-      <NavBar friends={testFriendList} nickStateSetter={setMyNick} />
+      <NavBar friends={testFriendList} />
       <main>
         <div id="button-container">
           <Link

@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-router-dom";
 import "/src/scss/content/profile/ProfileContent.scss";
 import Modal from "../../Modal";
@@ -24,7 +24,20 @@ interface UserInfo {
   status: string;
 }
 
-const ProfileContent: React.FC<RouteComponentProps> = (props) => {
+/*!
+ * @author donglee
+ * @param[in] myNickSetter: 프로필 컴포넌트에서 닉네임 수정 시 NavBar에서
+ *                         props로 넘어온 setMyNick stateSetter를 바꿔서
+ *                         NavBar에서도 업데이트된 nick이 렌더링되도록 함
+ * @param[in] myAvatarSetter: 아바타 state setter
+ */
+
+interface ProfileContentProps {
+  myNickSetter?: Dispatch<SetStateAction<string>>;
+  myAvatarSetter?: Dispatch<SetStateAction<string>>;
+}
+
+const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (props) => {
 
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
@@ -90,6 +103,7 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
       return ;
     }
     updateUserInfo();
+    props.myNickSetter(nickToEdit);
     setIsEditNickClicked(false);
   };
 

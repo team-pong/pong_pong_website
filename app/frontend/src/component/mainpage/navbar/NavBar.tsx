@@ -17,7 +17,6 @@ import ProfileContent from "../../modal/content/profile/ProfileContent";
  */
 
 interface navBarProps {
-  nickStateSetter: React.Dispatch<SetStateAction<string>>;
   friends: { name: string; state: string; avatarURL: string }[];
 };
 
@@ -37,6 +36,8 @@ const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>();
+  const [myNick, setMyNick] = useState("");
+  const [myAvatar, setMyAvatar] = useState("");
 
   /*!
    * @author donglee
@@ -53,7 +54,7 @@ const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
 
   useEffect(() => {
     getUserInfo()
-      .then((res) => props.nickStateSetter(res.nick));
+      .then((res) => setMyNick(res.nick));
   },[]);
 
   if (userInfo) {
@@ -66,7 +67,7 @@ const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
             src={userInfo.avatar_url}
             alt="Avatar" />
           </Link>
-          <h2>{userInfo.nick}</h2>
+          <h2>{myNick}</h2>
         </header>
         <ul className="nav-ul">
           <li className="nav-list-button" onClick={() => setIsFriendListOpen(!isFriendListOpen)}>
@@ -101,7 +102,7 @@ const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
             </li>
           {/* </Link> */}
         </ul>
-        <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent />} smallModal/></Route>
+        <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent myNickSetter={setMyNick} myAvatarSetter={setMyAvatar}/>} smallModal/></Route>
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
         <Route path={`${props.match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
         {/* <Route path={`${props.match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route> */}
