@@ -15,7 +15,7 @@ const CircleChart: FC<circleChartProps> = (props): JSX.Element => {
 
   return (
     <div id="circle-chart" style={{width: props.width, height: props.height}}>
-      <svg viewBox="0 0 36 36">
+      <svg className="circle-chart-svg" viewBox="0 0 36 36">
         <path
           fill="none"
           stroke="#eee"
@@ -36,7 +36,7 @@ const CircleChart: FC<circleChartProps> = (props): JSX.Element => {
             a 15.9155 15.9155 0 0 1 0 31.831
             a 15.9155 15.9155 0 0 1 0 -31.831"
         />
-        <text x="18" y="20.35" style={{opacity: "0.5"}}>{`${props.percentage}%`}</text>
+        <text className="circle-chart-text" x="18" y="20.35" style={{opacity: "0.5"}}>{`${props.percentage}%`}</text>
       </svg>
     </div>
   )

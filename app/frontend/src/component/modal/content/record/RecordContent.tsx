@@ -56,25 +56,25 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
       {matchList.map((log, i) => {
         return (
           <div id="log" key={i} style={log.isWin ? {backgroundColor: "#62C375"} : {backgroundColor: "#CE4D36"}}>
-            <span id="player">
-              <img src={log.user_url} alt={`${log.user_nick}'s img`}/>
+            <span className="player">
+              <img  className="record-player-img" src={log.user_url} alt={`${log.user_nick}'s img`}/>
               {' '}
               {log.user_nick}
               {' '}
               <img src={`/public/number/${log.other_score}.svg`} alt={`${log.user_score}`} style={{borderRadius: "0"}}/>
             </span>
-            <img src="/public/vs.svg"/>
-            <span id="player">
+            <img className="record-list-vs" src="/public/vs.svg"/>
+            <span className="player">
               <img src={`/public/number/${log.other_score}.svg`} alt={`${log.other_score}`} style={{borderRadius: "0"}}/>
               {' '}
               {log.other_nick}
               {' '}
-              <img src={log.other_url} alt={`${log.other_nick}'s img`}/>
+              <img  className="record-player-img" src={log.other_url} alt={`${log.other_nick}'s img`}/>
             </span>
             <span id="game-info">
-              <div>15분전</div>
-              <div>{log.type === "general" ? <>일반</> : <>레더</>}</div>
-              <div>{`맵${log.map}`}</div>
+              <div className="game-info-div">15분전</div>
+              <div className="game-info-div">{log.type === "general" ? <>일반</> : <>레더</>}</div>
+              <div className="game-info-div">{`맵${log.map}`}</div>
             </span>
           </div>
         );
@@ -115,23 +115,23 @@ const RecordOpen: FC<{
       <img src="/public/arrow.svg" className="arrow-button" onClick={() => setIsRecordOpen(1)}/>
       <div id="stats">
         <span id="profile">
-          <img src={avatar_url} alt={`${nick}'s img`}/>
-          <span>{nick}   </span>
+          <img className="record-pro-img" src={avatar_url} alt={`${nick}'s img`}/>
+          <span className="record-profile-nick">{nick}   </span>
         </span>
         <CircleChart width={100} height={100} percentage={Math.floor((win_games / total_games) * 100)} />
-        <span>{total_games}전 {win_games}승 {loss_games}패 {ladder_level}점</span>
+        <span className="record-stat-span">{total_games}전 {win_games}승 {loss_games}패 {ladder_level}점</span>
       </div>
       <ul id="record-selector">
-        <li onClick={() => setRecordSelector("all")}>
-            <input type="radio" name="all" checked={recordSelector === "all"} onChange={() => {}}/>
+        <li className="record-selector-li" onClick={() => setRecordSelector("all")}>
+            <input className="record-selector-input" type="radio" name="all" checked={recordSelector === "all"} onChange={() => {}}/>
             <label>전체</label>
         </li>
-        <li onClick={() => setRecordSelector("normal")}>
-            <input type="radio" name="normal" checked={recordSelector === "normal"} onChange={() => {}}/>
+        <li className="record-selector-li" onClick={() => setRecordSelector("normal")}>
+            <input className="record-selector-input" type="radio" name="normal" checked={recordSelector === "normal"} onChange={() => {}}/>
             <label>일반</label>
         </li>
-        <li onClick={() => setRecordSelector("ladder")}>
-            <input type="radio" name="ladder" checked={recordSelector === "ladder"} onChange={() => {}}/>
+        <li className="record-selector-li" onClick={() => setRecordSelector("ladder")}>
+            <input className="record-selector-input" type="radio" name="ladder" checked={recordSelector === "ladder"} onChange={() => {}}/>
             <label>레더</label>
         </li>
       </ul>
@@ -161,8 +161,8 @@ const RecordClose: FC = (): JSX.Element => {
         {
           ladderRank.rank.map((user, i) => {
             return (
-              <li key={i}>
-                <img src={user.avatar_url}/>
+              <li className="record-ladder-li" key={i}>
+                <img className="record-ladder-img" src={user.avatar_url}/>
                 <span id="nick">{user.nick}</span>
                 <BarChart left={user.win} right={user.loss} />
                 <span id="percentage">{Math.floor((user.win / (user.win + user.loss)) * 100)}%</span>
@@ -227,13 +227,14 @@ const RecordContent: FC = (): JSX.Element => {
     <div id="record-content">
       <div id="search">
         <input
+          className="record-search-input"
           type="text"
           placeholder="전적 검색을 하려는 닉네임을 입력해 주세요"
           value={nickNameToFind}
           spellCheck={false}
           onChange={({target: {value}}) => setNickNameToFind(value)} 
           onKeyDown={(e) => {if (e.key === "Enter") search()}} /><span className="input-border" />
-        <button onClick={search}><img src="/public/search.svg" alt="검색"/></button>
+        <button className="record-search-btn" onClick={search}><img className="record-search-img" src="/public/search.svg" alt="검색"/></button>
       </div>
       {isRecordOpen === recordState.open && <RecordOpen stats={stats} setIsRecordOpen={setIsRecordOpen}/>}
       {isRecordOpen === recordState.close && <RecordClose />}
@@ -242,7 +243,7 @@ const RecordContent: FC = (): JSX.Element => {
         <div id="no-result">
           <img src="/public/arrow.svg" className="arrow-button" onClick={() => setIsRecordOpen(recordState.close)}/>
           <img src="/public/exclamation-mark.svg" id="no-result-img" alt="Exclamation mark" />
-          <span>검색 결과가 없습니다</span>
+          <span className="record-no-result-span">검색 결과가 없습니다</span>
         </div>
       }
     </div>
