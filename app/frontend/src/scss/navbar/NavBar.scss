@@ -9,7 +9,7 @@
   outline: 0;
   max-width: 250px;
   min-width: 125px;
-  li {
+  .cm-list {
     color: #fff;
     text-align: -webkit-match-parent;
     padding: 6px 12px;
@@ -22,21 +22,6 @@
 }
 
 .menu {
-  //scroll bar custom design
-  ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
-    background-color: #5bc995;
-  }
-
-  ::-webkit-scrollbar {
-    width: 6px;
-    background-color: #5bc995;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: #4daa7e;
-  }
-
   background: #5bc995;
   color: #fff;
   height: 100vh;
@@ -45,18 +30,13 @@
   top: 0;
   left: 0;
   outline: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -o-user-select: none;
-  user-select: none;
 
   .avatar {
     background: rgba(0, 0, 0, 0.1);
     padding: 2em 0.5em;
     text-align: center;
 
-    img {
+    #avatarImg {
       width: 100px;
       border-radius: 50%;
       overflow: hidden;
@@ -67,7 +47,7 @@
       transition: .1s all ease-in-out;
     }
 
-    img:hover {
+    #avatarImg:hover {
       opacity: 1;
       transform: scale(1.1);
       transition: .2s all ease-in-out;
@@ -81,42 +61,42 @@
     }
   }
 
-  ul {
+  .nav-ul {
     list-style: none;
     padding: 0.5em 0;
     margin: 0;
 
     #friend-list-container {
-      max-height: 370px;
+      max-height: 350px;
       overflow-y: scroll;
+
+      .friend {
+        padding-top: 5px;
+        padding-left: calc(0.5em + 23px);
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+        .flg-friend-avatar {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          vertical-align: middle;
+          margin-right: 5px;
+        }
+      }
     }
 
-    .friend {
-      padding-top: 5px;
-      padding-left: calc(0.5em + 23px);
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
-      }
-      img {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        vertical-align: middle;
-        margin-right: 5px;
-      }
-    }
-
-    li {
+    .nav-list-button {
       padding: 0.5em 1em 0.5em 1em;
       font-size: 0.95em;
       transition: all 0.15s linear;
       cursor: pointer;
 
-      span {
+      .nav-list-span {
         margin-left: 35px;
       }
 
-      img {
+      .nav-list-img {
         position: absolute;
         width: 23px;
         height: 23px;
@@ -124,6 +104,10 @@
       }
 
       #icon-plus {
+        position: absolute;
+        margin-right: 10px;
+        width: 23px;
+        height: 23px;
         right: 0%;
         &:hover {
           opacity: 0.6;
@@ -159,7 +143,7 @@
         display: flex;
         width: 100%;
         margin-top: 10px;
-        & > button,
+        #submit-button,
         #input-add-friend {
           white-space: nowrap;
           &:not(:first-child):not(:last-child) {
@@ -175,12 +159,14 @@
             margin-left: -1px;
           }
         }
+
         #input-add-friend {
           position: relative;
           flex: 1 1 auto;
           width: 1%;
         }
-        & > button {
+
+        #submit-button {
           text-align: center;
           padding: 8px 12px;
           font-size: 13px;
@@ -190,7 +176,8 @@
           border: 1px solid #cdd9ed;
           transition: background 0.3s ease, border 0.3s ease, color 0.3s ease;
         }
-        & > button:hover {
+        
+        #submit-button:hover {
           color: #6d7483;
           background: #88c3f3;
           border-color: #bdc2ca;

@@ -64,11 +64,12 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
 				id="input-add-friend"
         type="type"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
+				autoComplete="off"
         required
         placeholder="추가할 닉네임을 입력하세요"
 				value={nicknameToFind}
 				onChange={(e: React.FormEvent<HTMLInputElement>) => setNicknameToFind(e.currentTarget.value)} />
-			<button id="submitButton" onClick={(e: React.MouseEvent<HTMLElement>) => {e.stopPropagation()}}>추가</button>
+			<button id="submit-button" onClick={(e: React.MouseEvent<HTMLElement>) => {e.stopPropagation()}}>추가</button>
     </form>
   );
 }

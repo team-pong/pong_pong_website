@@ -21,7 +21,7 @@
   width: 80%;
   margin: 45px auto auto auto;
   #search {
-    input {
+    .record-search-input {
       width: 80%;
       height: 35px;
       margin: 0;
@@ -47,7 +47,7 @@
       transform: scaleX(1);
       transition: 1s all;
     }
-    button {
+    .record-search-btn {
       width: 15%;
       height: 39px;
       float: right;
@@ -57,13 +57,13 @@
       background-color: $green;
       border: none;
       border-radius: 15px;
-      img {
+      .record-search-img {
         width: 50px;
         height: 70%;
         padding-top: 2px;
       }
       &:hover {
-        img {
+        .record-search-img {
           animation: search-button-animation 0.5s 2 alternate;
         }
       }
@@ -71,13 +71,13 @@
   }
   #no-result {
     margin-top: 20px;
-    img {
+    .record-no-result-img {
       width: 80px;
       height: 80px;
       vertical-align: middle;
       margin-right: 20px;
     }
-    span {
+    .record-no-result-span {
       color: #bebebe;
     }
   }
@@ -114,16 +114,18 @@
       float: right;
       background-color: $green;
       border-radius: 12px;
-      li {
+      overflow-y: scroll;
+      overflow-x: hidden;
+      .record-ladder-li {
         list-style: none;
         color: $green;
         margin: 10px;
-        width: calc(100% - 20px);
+        width: 270px;
         background-color: #fff;
         border-radius: 12px;
         display: inline-flex;
         justify-content: space-between;
-        img {
+        .record-ladder-img {
           width: 40px;
           height: 40px;
           padding: 5px;
@@ -131,19 +133,18 @@
         }
         #nick {
           width: 55px;
-          margin-top: 17px;
+          margin-top: 12px;
         }
-        svg {
+        .bar-chart-svg {
           width: 100px;
           height: 50px;
           border-radius: 15px;
         }
         #percentage {
           width: 40px;
-          margin-top: 17px;
+          margin-top: 12px;
         }
       }
-      overflow: auto;
     }
   }
   #record-open {
@@ -152,27 +153,32 @@
       margin-bottom: 20px;
       #profile {
         all: revert;
-        img {
+        .record-pro-img {
           width: 95px;
           height: 95px;
           border-radius: 50%;
           vertical-align: middle;
         }
+        .record-profile-nick {
+          font-size: 16pt;
+          font-weight: bold;
+          margin: 0px 15px;
+        }
       }
       #circle-chart {
         display: inline-block;
         vertical-align: middle;
-        svg {
+        .circle-chart-svg {
           #percentage {
             animation: circle-chart-animation 3s;
           }
         }
-        text {
+        .circle-chart-text {
           font-size: 0.5em;
           text-anchor: middle;
         }
       }
-      span {
+      .record-stat-span {
         padding-left: 20px;
         font-size: larger;
       }
@@ -180,15 +186,15 @@
     #record-selector {
       margin: 0;
       padding: 0;
-      li {
+      .record-selector-li {
         display: inline-block;
         list-style: none;
         font-size: large;
         margin-right: 10px;
-        input[type="radio"] {
+        .record-selector-input[type="radio"] {
           display: none;
         }
-        input[type="radio"]:checked + label {
+        .record-selector-input[type="radio"]:checked + label {
           color: $green;
           border-bottom: 3px solid $green;
         }
@@ -203,12 +209,14 @@
         border-radius: 15px;
         display: flex;
         justify-content: space-between;
-        img {
+        .record-list-vs {
           width: 81px;
           height: 81px;
         }
-        #player {
+        .player {
+          .record-player-img,
           img {
+            margin-top: 4px;
             display: inline;
             width: 67px;
             height: 67px;
@@ -219,7 +227,7 @@
         }
         #game-info {
           padding: 3px;
-          div {
+          .game-info-div {
             border-left: 0.5px solid rgba(255, 255, 255, 0.3);
             padding: 3px;
             padding-left: 5px;

@@ -36,7 +36,7 @@
   width: 80%;
   margin: 45px auto auto auto;
   #search {
-    input {
+    .chat-search-input {
       width: 80%;
       height: 35px;
       margin: 0;
@@ -62,7 +62,7 @@
       transform: scaleX(1);
       transition: 1s all;
     }
-    button {
+    .chat-search-button {
       width: 15%;
       height: 39px;
       margin: 0;
@@ -72,7 +72,7 @@
       background-color: $green;
       border: none;
       border-radius: 15px;
-      img {
+      .chat-search-img {
         width: 50px;
         height: 70%;
         padding-top: 2px;
@@ -88,19 +88,19 @@
     margin: 0;
     margin-top: 25px;
     padding: 0;
-    li {
+    .chat-room-li {
       display: inline-block;
       list-style: none;
       font-size: large;
       margin-right: 10px;
-      input[type=radio] {
+      .chat-room-input[type=radio] {
         display: none;
       }
-      input[type=radio]:checked + label {
+      .chat-room-input[type=radio]:checked + label {
         color: $green;
         border-bottom: 3px solid $green;
       }
-      label {
+      .chat-room-label {
         cursor: pointer;
       }
     }
@@ -112,7 +112,7 @@
     width: 100%;
     height: 53vh;
     overflow: auto;
-    li {
+    .chat-generator-li {
       margin-top: 10px;
       border-radius: 10px;
       list-style: none;
@@ -124,9 +124,9 @@
       &:hover {
         background-color: #53a062;
       }
-      span {
+      .chat-generator-span {
         padding: 15px;
-        img {
+        .chat-generator-lock-img {
           width: 15px;
           height: 15px;
         }
@@ -134,7 +134,7 @@
       cursor: pointer;
     }
   }
-  button {
+  .chat-room-btn {
     float: right;
     margin: 0;
     margin-top: 10px;
@@ -227,17 +227,21 @@
       border-radius: 5px;
       transition-duration: 0.3s;
       cursor: pointer;
-      img {
+      .chat-room-user-img {
         width: 30px;
         height: 30px;
         vertical-align: middle;
         border-radius: 50%;
       }
-      #position {
+      .position {
         position: relative;
         float: right;
+        width: 30px;
+        height: 30px;
+        vertical-align: middle;
+        border-radius: 50%;
       }
-      span {
+      .chat-room-user-nick {
         &::before {
           content: "";
           margin: 2px;
@@ -258,18 +262,18 @@
       display: flex;
       align-items: center;
       flex-direction: row-reverse;
-      img {
+      .chat-menu-img {
         width: 30px;
         height: 30px;
         border-radius: 50%;
       }
     }
   }
-  form {
+  .chat-msg-form {
     width: calc(70% - 15px);
     height: 10%;
     margin: 10px 10px 0 10px;
-    textarea {
+    .chat-msg-textarea {
       box-sizing: border-box;
       resize: none;
       margin: 0;
@@ -282,7 +286,7 @@
         outline: none;
       }
     }
-    button {
+    .chat-msg-btn {
       box-sizing: border-box;
       position: relative;
       float: right;
@@ -298,6 +302,16 @@
         background-color: $green;
         color: white;
       }
+    }
+  }
+
+  #context-menu {
+    list-style: none;
+    color: white;
+
+    .chat-context-li {
+      padding: 3px 5px;
+      font-size: 11pt;
     }
   }
 }

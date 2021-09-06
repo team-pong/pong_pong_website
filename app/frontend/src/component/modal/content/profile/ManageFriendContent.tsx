@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { testFriendListMyProfile } from "../../../../dummydata/testFriendListMyProfile";
 import EasyFetch from "../../../../utils/EasyFetch";
-import "/src/scss/content/myprofile/ManageFriendContent.scss";
+import "/src/scss/content/profile/ManageFriendContent.scss";
 import { testBlockedList } from "../../../../dummydata/testBlockedList";
 import { setAchievementStr, setAchievementImg } from "../../../../utils/setAchievement";
 
