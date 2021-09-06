@@ -71,12 +71,28 @@
   }
   #no-result {
     margin-top: 20px;
-    .record-no-result-img {
+
+    img.arrow-button {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      padding: 10px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      animation: arrow-button-animation-in 0.5s;
+      &:hover {
+        animation: arrow-button-animation-out 0.5s;
+      }
+    }
+
+    img#no-result-img {
       width: 80px;
       height: 80px;
       vertical-align: middle;
       margin-right: 20px;
     }
+    
     .record-no-result-span {
       color: #bebebe;
     }
@@ -148,6 +164,19 @@
     }
   }
   #record-open {
+    img.arrow-button {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      padding: 10px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      animation: arrow-button-animation-in 0.5s;
+      &:hover {
+        animation: arrow-button-animation-out 0.5s;
+      }
+    }
     #stats {
       margin-top: 20px;
       margin-bottom: 20px;

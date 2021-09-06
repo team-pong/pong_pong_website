@@ -1,9 +1,9 @@
-import { FC, useEffect, useState } from "react";
-import CircleChart from "../../chart/CircleChart";
-import BarChart from "../../chart/BarChart";
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import CircleChart from "../../../chart/CircleChart";
+import BarChart from "../../../chart/BarChart";
 import "/src/scss/content/RecordContent.scss";
-import EasyFetch from "../../../utils/EasyFetch";
-import ladderRank from '../../../dummydata/testLadderRank';
+import EasyFetch from "../../../../utils/EasyFetch";
+import ladderRank from '../../../../dummydata/testLadderRank';
 
 interface matchLog {
   user_score: number,
@@ -57,7 +57,7 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
         return (
           <div id="log" key={i} style={log.isWin ? {backgroundColor: "#62C375"} : {backgroundColor: "#CE4D36"}}>
             <span className="player">
-              <img className="record-player-img" src={`https://cdn.intra.42.fr/users/medium_yochoi.png`/*log.user_url*/} alt={`${log.user_nick}'s img`}/>
+              <img  className="record-player-img" src={log.user_url} alt={`${log.user_nick}'s img`}/>
               {' '}
               {log.user_nick}
               {' '}
@@ -69,7 +69,7 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
               {' '}
               {log.other_nick}
               {' '}
-              <img className="record-player-img" src={`https://cdn.intra.42.fr/users/medium_jinbkim.jpg`/*log.other_url*/} alt={`${log.other_nick}'s img`}/>
+              <img  className="record-player-img" src={log.other_url} alt={`${log.other_nick}'s img`}/>
             </span>
             <span id="game-info">
               <div className="game-info-div">15분전</div>
@@ -103,16 +103,20 @@ interface userInfo {
  * @brief 통계 및 전적을 보여주는 컴포넌트
  */
 
-const RecordOpen: FC<{stats: userInfo}> = ({stats: {nick, avatar_url, total_games, win_games, loss_games, ladder_level}}) => {
+const RecordOpen: FC<{
+  stats: userInfo,
+  setIsRecordOpen: Dispatch<SetStateAction<number>>
+}> = ({stats: {nick, avatar_url, total_games, win_games, loss_games, ladder_level}, setIsRecordOpen}) => {
 
   const [recordSelector, setRecordSelector] = useState("all");
 
   return (
     <div id="record-open">
+      <img src="/public/arrow.svg" className="arrow-button" onClick={() => setIsRecordOpen(1)}/>
       <div id="stats">
         <span id="profile">
-          <img className="record-pro-img" src={`https://cdn.intra.42.fr/users/medium_yochoi.png`} alt={`${nick}'s img`}/>
-          <span className="record-profile-nick">{nick}</span>
+          <img className="record-pro-img" src={avatar_url} alt={`${nick}'s img`}/>
+          <span className="record-profile-nick">{nick}   </span>
         </span>
         <CircleChart width={100} height={100} percentage={Math.floor((win_games / total_games) * 100)} />
         <span className="record-stat-span">{total_games}전 {win_games}승 {loss_games}패 {ladder_level}점</span>
@@ -232,12 +236,13 @@ const RecordContent: FC = (): JSX.Element => {
           onKeyDown={(e) => {if (e.key === "Enter") search()}} /><span className="input-border" />
         <button className="record-search-btn" onClick={search}><img className="record-search-img" src="/public/search.svg" alt="검색"/></button>
       </div>
-      {isRecordOpen === recordState.open && <RecordOpen stats={stats}/>}
+      {isRecordOpen === recordState.open && <RecordOpen stats={stats} setIsRecordOpen={setIsRecordOpen}/>}
       {isRecordOpen === recordState.close && <RecordClose />}
       {
         isRecordOpen === recordState.noResult &&
         <div id="no-result">
-          <img className="record-no-result-img" src="/public/exclamation-mark.svg" alt="Exclamation mark" />
+          <img src="/public/arrow.svg" className="arrow-button" onClick={() => setIsRecordOpen(recordState.close)}/>
+          <img src="/public/exclamation-mark.svg" id="no-result-img" alt="Exclamation mark" />
           <span className="record-no-result-span">검색 결과가 없습니다</span>
         </div>
       }

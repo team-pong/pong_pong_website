@@ -3,7 +3,7 @@ import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-r
 import "/src/scss/content/profile/ProfileContent.scss";
 import Modal from "../../Modal";
 import ManageFriendContent from "./ManageFriendContent";
-import RecordContent from "../RecordContent";
+import RecordContent from "../record/RecordContent";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 
