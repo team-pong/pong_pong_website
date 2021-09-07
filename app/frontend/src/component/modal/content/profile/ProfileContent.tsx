@@ -300,7 +300,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
               <span className="delimiter">|</span>
               <span>{userInfo.ladder_level} 점</span>
               <Link to={`${props.match.url}/record`}>
-                <img className="profile-stat-detail" src="/public/search.svg" alt="상세전적보기" />
+                <img className="profile-stat-detail" src="/public/search.svg" alt="상세전적보기" title="상세전적보기"/>
               </Link>
             </div>
             <div id="user-title">{setAchievementStr(userInfo.ladder_level)}
