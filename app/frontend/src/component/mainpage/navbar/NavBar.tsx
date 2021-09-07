@@ -109,12 +109,12 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
               <span className="nav-list-span">채팅</span>
             </li>
           </Link>
-          {/* <Link to={`${props.match.url}/game`} style={{color: "inherit", textDecoration: "none"}}> */}
+          <Link to={`${props.match.url}/game`} style={{color: "inherit", textDecoration: "none"}}>
             <li className="nav-list-button">
               <img className="nav-list-img" src="/public/controller-play.svg"/>
               <span className="nav-list-span">게임하기</span>
             </li>
-          {/* </Link> */}
+          </Link>
         </ul>
         <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent myNickSetter={setMyNick} myAvatarSetter={setMyAvatar}/>} smallModal/></Route>
       </nav>
