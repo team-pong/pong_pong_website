@@ -10,6 +10,29 @@ import { SessionDto1 } from 'src/dto/session';
 export class SessionController {
   constructor(private sessionService: SessionService){}
 
+	/*
+	* 소켓 통신용 테스트 유저로 로그인하는 api
+	* production 환경에서 삭제되어야함
+	*/
+	@ApiOperation({ summary: '개발용 테스트유저1 로 로그인' })
+	@Post("/test_user01")
+	async tester_login01(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
+		await this.sessionService.tester_login(request, 'tester01', 'test_user_01');
+		return response.redirect('http://127.0.0.1:3000/mainpage')
+	}
+
+	/*!
+	 * 소켓 통신용 테스트 유저로 로그인하는 api
+	 * production 환경에서 삭제되어야함
+	 */
+	@ApiOperation({ summary: '개발용 테스트유저2 로 로그인' })
+	@Post("/test_user02")
+	async tester_login02(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
+		await this.sessionService.tester_login(request, 'tester02', 'test_user_02');
+		return response.redirect('http://127.0.0.1:3000/mainpage')
+	}
+
+
   @ApiOperation({ summary: '42로그인 페이지에서 이 주소로 코드를 전송'})
   @Get("/oauth")
   async login(@Query() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
