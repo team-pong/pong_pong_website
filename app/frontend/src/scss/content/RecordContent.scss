@@ -193,6 +193,7 @@
           font-size: 16pt;
           font-weight: bold;
           margin: 0px 15px;
+          color: black;
         }
       }
       #circle-chart {
@@ -211,11 +212,13 @@
       .record-stat-span {
         padding-left: 20px;
         font-size: larger;
+        color: black;
       }
     }
     #record-selector {
       margin: 0;
       padding: 0;
+      color: black;
       .record-selector-li {
         display: inline-block;
         list-style: none;
