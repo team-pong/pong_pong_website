@@ -40,6 +40,7 @@ function openContextMenu( e: React.MouseEvent,
                           setContextMenu: Dispatch<SetStateAction<any>>,
                           target: string,
                           targetPosition: string) {
+  document.getElementById("chat-room-users").style.overflowY = "hidden";
   setContextMenu({
     isOpen: true,
     x: e.pageX,
@@ -92,12 +93,9 @@ const ChatRoomContent: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<Set
             return (
               <div  key={idx}
                     className="chat-user"
-                    onClick={(e) => {
-                      if (contextMenu.isOpen === true) setContextMenu({isOpen: false, x: 0, y: 0, target: "", targetPosition: ""})
-                      else openContextMenu(e, setContextMenu, value.nick, value.position)
-                    }}>
+                    onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position)}>
                 <img className="chat-room-user-img" src={value.avatar_url} alt={value.nick} />
-                <span className="chat-room-user-nick">{value.nick}</span>
+                <span className="chat-room-user-nick" >{value.nick}</span>
                 {value.position === "owner" && <img className="position" src={"/public/crown.png"} alt="owner"/>}
                 {value.position === "admin" && <img className="position" src={"/public/knight.png"} alt="admin"/>}
                 {value.position === "mute" && <img className="position" src={"/public/mute.png"} alt="mute"/>}
@@ -121,7 +119,12 @@ const ChatRoomContent: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<Set
           onChange={({target: {value}}) => setMessage(value)}/>
         <button className="chat-msg-btn" onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
       </form>
-      {contextMenu.isOpen && <ChatContextMenu x={contextMenu.x} y={contextMenu.y} myPosition="owner" targetPosition={contextMenu.targetPosition}/>}
+      {contextMenu.isOpen && <ChatContextMenu
+                                x={contextMenu.x}
+                                y={contextMenu.y}
+                                myPosition="owner"
+                                targetPosition={contextMenu.targetPosition}
+                                closer={setContextMenu}/>}
       <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<ChatConfigContent/>}/></Route>
       <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
     </div>
