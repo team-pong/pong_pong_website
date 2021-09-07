@@ -5,7 +5,7 @@ import FriendList from "./friendlist/FriendList";
 import "/src/scss/navbar/NavBar.scss";
 import "/src/scss/navbar/NavBar-media.scss";
 import "/src/scss/navbar/NavBar-mobile.scss";
-import Modal, { ChatContent, RecordContent } from "../../modal/Modal";
+import Modal, { ChatContent, RecordContent, GameContent } from "../../modal/Modal";
 import EasyFetch from "../../../utils/EasyFetch";
 import ProfileContent from "../../modal/content/profile/ProfileContent";
 
@@ -95,17 +95,17 @@ const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
               <span className="nav-list-span">채팅</span>
             </li>
           </Link>
-          {/* <Link to={`${props.match.url}/game`} style={{color: "inherit", textDecoration: "none"}}> */}
+          <Link to={`${props.match.url}/game`} style={{color: "inherit", textDecoration: "none"}}>
             <li className="nav-list-button">
               <img className="nav-list-img" src="/public/controller-play.svg"/>
               <span className="nav-list-span">게임하기</span>
             </li>
-          {/* </Link> */}
+          </Link>
         </ul>
         <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent myNickSetter={setMyNick} myAvatarSetter={setMyAvatar}/>} smallModal/></Route>
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
         <Route path={`${props.match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
-        {/* <Route path={`${props.match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route> */}
+        <Route path={`${props.match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route>
       </nav>
     );
   } else {
