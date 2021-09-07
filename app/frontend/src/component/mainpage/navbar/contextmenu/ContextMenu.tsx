@@ -16,8 +16,8 @@ interface contextMenuProps {
 const ContextMenu: FC<contextMenuProps> = ({target, x, y}): JSX.Element => {
   return (
     <ul id="context-menu" style={{ top: y, left: x, }}>
-      <li onClick={() => console.log(`message to ${target}`)}>메세지 보내기</li>
-      <li onClick={() => console.log(`delete ${target}`)}>친구 삭제하기</li>
+      <li className="cm-list" onClick={() => console.log(`message to ${target}`)}>메세지 보내기</li>
+      <li className="cm-list" onClick={() => console.log(`delete ${target}`)}>친구 삭제하기</li>
     </ul>
   );
 }
