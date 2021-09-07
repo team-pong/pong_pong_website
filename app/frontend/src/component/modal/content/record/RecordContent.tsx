@@ -186,7 +186,7 @@ enum recordState {
   noResult
 }
 
-const RecordContent: FC = (): JSX.Element => {
+const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
 
   const [nickNameToFind, setNickNameToFind] = useState("");
   const [isRecordOpen, setIsRecordOpen] = useState(recordState.close);
@@ -200,9 +200,14 @@ const RecordContent: FC = (): JSX.Element => {
     ladder_level: 0
   });
 
-  const search = async () => {
-    if (nickNameToFind) {
-      const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nickNameToFind}`);
+  const search = async (nick?: string) => {
+    if (nickNameToFind || nick) {
+      let easyfetch = null;
+      if (nick) {
+        easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nick}`);  
+      } else {
+        easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nickNameToFind}`);
+      }
       const res = await (await easyfetch.fetch()).json();
       if (res.err_msg) {
         setIsRecordOpen(recordState.noResult);
@@ -223,6 +228,17 @@ const RecordContent: FC = (): JSX.Element => {
     }
   }
 
+  /*!
+   * @author donglee
+   * @brief props로 nick이 있으면 프로필에서 열람 한 것이므로 바로 검색을 실행한다
+   */
+  useEffect(() => {
+    if (nick) {
+      setNickNameToFind(nick);
+      search(nick);
+    }
+  }, []);
+
   return (
     <div id="record-content">
       <div id="search">
@@ -234,7 +250,7 @@ const RecordContent: FC = (): JSX.Element => {
           spellCheck={false}
           onChange={({target: {value}}) => setNickNameToFind(value)} 
           onKeyDown={(e) => {if (e.key === "Enter") search()}} /><span className="input-border" />
-        <button className="record-search-btn" onClick={search}><img className="record-search-img" src="/public/search.svg" alt="검색"/></button>
+        <button className="record-search-btn" onClick={() => search()}><img className="record-search-img" src="/public/search.svg" alt="검색"/></button>
       </div>
       {isRecordOpen === recordState.open && <RecordOpen stats={stats} setIsRecordOpen={setIsRecordOpen}/>}
       {isRecordOpen === recordState.close && <RecordClose />}
