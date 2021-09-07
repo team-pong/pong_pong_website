@@ -1,13 +1,18 @@
- import { Body, Controller, Get, Post, Delete, Query } from '@nestjs/common';
+ import { Body, Controller, Get, Post, Delete, Query, forwardRef, Inject } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MatchDto1, MatchDto3 } from 'src/dto/match';
 import { ErrMsgDto } from 'src/dto/utility';
+import { UsersService } from 'src/users/users.service';
 import { MatchService } from './match.service';
 
 @ApiTags('Match')
 @Controller('match')
 export class MatchController {
-  constructor(private matchService: MatchService){}
+  constructor(
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
+    private matchService: MatchService
+  ){}
 
   @ApiOperation({ 
     summary: '전적 추가', 
@@ -18,10 +23,15 @@ export class MatchController {
       게임 타입은 general 또는 ranked 이어야함.
     `})
   @ApiResponse({ type: ErrMsgDto, description: '전적 추가 실패시 실패 이유' })
-  @ApiBody({ type: MatchDto1, description: '승자 아이디, 패자 아이디, 승자 점수, 패자 점수, 게임 타입, 맵정보' })
+  // @ApiBody({ type: MatchDto1, description: '승자 아이디, 패자 아이디, 승자 점수, 패자 점수, 게임 타입, 맵정보' })
+  @ApiBody({ type: MatchDto1, description: '승자 닉네임, 패자 닉네임, 승자 점수, 패자 점수, 게임 타입, 맵정보' })
   @Post()
-  createMatch(@Body() b: MatchDto1){
-    return this.matchService.createMatch(b.winner_id, b.loser_id, b.winner_score, b.loser_score, b.type, b.map);
+  async createMatch(@Body() b: MatchDto1){
+    let winner, loser;
+    winner = await this.usersService.readUsers(b.winner_nick, 'nick');
+    loser = await this.usersService.readUsers(b.loser_nick, 'nick');
+    return this.matchService.createMatch(winner.user_id, loser.user_id, b.winner_score, b.loser_score, b.type, b.map);
+    // return this.matchService.createMatch(b.winner_id, b.loser_id, b.winner_score, b.loser_score, b.type, b.map);
   }
 
   @ApiOperation({ summary: '해당 유저의 모든 전적 검색'})

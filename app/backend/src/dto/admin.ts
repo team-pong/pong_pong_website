@@ -1,11 +1,17 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class AdminDto1{
-  @ApiProperty({
+  // @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: '유저 아이디',
+	// })
+	// public user_id: string;
+
+	@ApiProperty({
 		example: 'jinbkim',
-		description: '유저 아이디',
+		description: '유저 닉네임',
 	})
-	public user_id: string;
+	public nick: string;
 
 	@ApiProperty({
 		example: 1,
@@ -14,10 +20,10 @@ export class AdminDto1{
 	public channel_id: number;
 }
 
-export class AdminDto2{
-  @ApiProperty({
-		example: `[jinbkim, donglee]`,
-		description: '유저아이디 배열',
-	})
-	public admins: string[];
-}
+// export class AdminDto2{
+//   @ApiProperty({
+// 		example: `[jinbkim, donglee]`,
+// 		description: '유저아이디 배열',
+// 	})
+// 	public admins: string[];
+// }

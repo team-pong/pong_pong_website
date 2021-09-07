@@ -1,20 +1,29 @@
-import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MuteDto1 } from 'src/dto/mute';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
+import { UsersService } from 'src/users/users.service';
 import { MuteService } from './mute.service';
 
 @ApiTags('Mute')
 @Controller('mute')
 export class MuteController {
-  constructor(private muteService: MuteService){}
+  constructor(
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
+    private muteService: MuteService
+  ){}
 
   @ApiOperation({ summary: 'mute 설정'})
   @ApiResponse({ type: ErrMsgDto, description: 'mute 설정 실패시 실패 이유' })
-  @ApiBody({ type: MuteDto1, description: 'mute 설정할 채널아이디, 유저아이디' })
+  // @ApiBody({ type: MuteDto1, description: 'mute 설정할 채널아이디, 유저아이디' })
+  @ApiBody({ type: MuteDto1, description: 'mute 설정할 채널아이디, 유저 닉네임' })
   @Post()
-  createMute(@Body() b: MuteDto1){
-    return this.muteService.createMute(b.user_id, b.channel_id);
+  async createMute(@Body() b: MuteDto1){
+    let user;
+    user = await this.usersService.readUsers(b.nick, 'nick');
+    return await this.muteService.createMute(user.user_id, b.channel_id);
+    // return this.muteService.createMute(b.user_id, b.channel_id);
   }
 
   @ApiOperation({ summary: '해당 유저가 해당 채널의 mute 인지 확인', description: 'mute 시간이 다지나면 mute 목록에서 지워짐'})
@@ -24,11 +33,15 @@ export class MuteController {
       유저가 mute이면 true, 아니면 false
       확인 실패시 실패 이유
     ` })
-  @ApiQuery({ name: 'user_id', example: 'yochoi', description: 'mute인지 확인할 유저아이디' })
+  // @ApiQuery({ name: 'user_id', example: 'yochoi', description: 'mute인지 확인할 유저아이디' })
+  @ApiQuery({ name: 'nick', example: 'yochoi', description: 'mute인지 확인할 유저닉네임' })
   @ApiQuery({ name: 'channel_id', example: 1, description: 'mute인지 확인할 채널아이디' })
   @Get()
-  isMute(@Query() q){
-    return this.muteService.isMute(q.user_id, q.channel_id);
+  async isMute(@Query() q){
+    let user;
+    user = await this.usersService.readUsers(q.nick, 'nick');
+    return await this.muteService.isMute(user.user_id, q.channel_id);
+    // return this.muteService.isMute(q.user_id, q.channel_id);
   }
 
   @ApiOperation({ summary: '한 유저의 모든 mute 제거', description: '회원 탈퇴시 에만 사용됨'})

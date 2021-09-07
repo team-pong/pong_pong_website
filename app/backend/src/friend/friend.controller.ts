@@ -4,6 +4,7 @@ import { FriendDto1 } from 'src/dto/friend';
 import { UsersDto5 } from 'src/dto/users';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { SessionService } from 'src/session/session.service';
+import { UsersService } from 'src/users/users.service';
 import { FriendService } from './friend.service';
 
 @ApiTags('Friend')
@@ -14,14 +15,21 @@ export class FriendController {
     private friendService: FriendService,
     @Inject(forwardRef(() => SessionService))
     private sessionService: SessionService,
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
   ){}
 
   @ApiOperation({ summary: '친구 추가'})
   @ApiResponse({ type: ErrMsgDto, description: '친구 추가 실패시 실패 이유' })
-  @ApiBody({ type: FriendDto1, description: '내 유저 아이디, 친구 추가할 유저 아이디' })
+  // @ApiBody({ type: FriendDto1, description: '내 유저 아이디, 친구 추가할 유저 아이디' })
+  @ApiBody({ type: FriendDto1, description: '내 유저 닉네임, 친구 추가할 유저 닉네임' })
   @Post()
-  createFriend(@Body() b: FriendDto1){
-    return this.friendService.createFriend(b.user_id, b.friend_id);
+  async createFriend(@Body() b: FriendDto1){
+    let user, friend;
+    user = await this.usersService.readUsers(b.user_nick, 'nick');
+    friend = await this.usersService.readUsers(b.friend_nick, 'nick');
+    return this.friendService.createFriend(user.user_id, friend.user_id);
+    // return this.friendService.createFriend(b.user_id, b.friend_id);
   }
 
   @ApiOperation({ summary: '해당 유저의 모든 친구 검색'})
@@ -59,23 +67,38 @@ export class FriendController {
       이미 친구 추가한 유저 이면 true, 아니면 false
       확인 실패시 실패 이유 반환
     ` })
-  @ApiQuery({ name: 'user_id', example: 'jinbkim' ,description: 'friend인지 확인할 유저아이디' })
-  @ApiQuery({ name: 'friend_id', example: 'donglee' ,description: 'friend인지 확인할 상대아이디' })
+  // @ApiQuery({ name: 'user_id', example: 'jinbkim' ,description: 'friend인지 확인할 유저아이디' })
+  // @ApiQuery({ name: 'friend_id', example: 'donglee' ,description: 'friend인지 확인할 상대아이디' })
+  @ApiQuery({ name: 'user_nick', example: 'jinbkim' ,description: 'friend인지 확인할 유저 닉네임' })
+  @ApiQuery({ name: 'friend_nick', example: 'donglee' ,description: 'friend인지 확인할 상대 닉네임' })
   @Get()
-  isFriend(@Query() q){
-    return this.friendService.isFriend(q.user_id, q.friend_id);
+  async isFriend(@Query() q){
+    let user, friend;
+    user = await this.usersService.readUsers(q.user_nick, 'nick');
+    friend = await this.usersService.readUsers(q.friend_nick, 'nick');
+    return this.friendService.isFriend(user.user_id, friend.user_id);
+    // return this.friendService.isFriend(q.user_id, q.friend_id);
   }
 
   @ApiOperation({ summary: '친구 삭제'})
   @ApiResponse({ type: ErrMsgDto, description: 'friend 삭제 실패시 실패 이유' })
-  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '내 유저 아이디' })
-  @ApiQuery({ name: 'friend_id', example: 'donglee', description: '친구 삭제할 유저 아이디' })
+  // @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '내 유저 아이디' })
+  // @ApiQuery({ name: 'friend_id', example: 'donglee', description: '친구 삭제할 유저 아이디' })
+  @ApiQuery({ name: 'user_nick', example: 'jinbkim', description: '내 유저 닉네임' })
+  @ApiQuery({ name: 'friend_nick', example: 'donglee', description: '친구 삭제할 유저 닉네임' })
   @Delete()
-  deleteFriend(@Query() q){
-    return this.friendService.deleteFriend(q.user_id, q.friend_id);
+  async deleteFriend(@Query() q){
+    let user, friend;
+    user = await this.usersService.readUsers(q.user_nick, 'nick');
+    friend = await this.usersService.readUsers(q.friend_nick, 'nick');
+    return this.friendService.deleteFriend(user.user_id, friend.user_id);
+    // return this.friendService.deleteFriend(q.user_id, q.friend_id);
   }
-  @ApiOperation({ summary: '해당 유저 관련 모든 친구 관계 삭제'})
-  @ApiResponse({ type: ErrMsgDto, description: '모든 친구 관계 삭제 실패시 실패 이유' })
+  @ApiOperation({ 
+    summary: `해당 유저 관련 모든 친구 관계 삭제`,
+    description : `회원 탈퇴시 에만 사용됨`
+  })
+  @ApiResponse({ type: ErrMsgDto, description: `모든 친구 관계 삭제 실패시 실패 이유` })
   @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '모든 친구 관계를 삭제할 유저 아이디' })
   @Delete('all')
   deleteAllFriend(@Query() q){

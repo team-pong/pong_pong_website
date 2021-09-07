@@ -1,17 +1,27 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class BlockDto1{
-  @ApiProperty({
+  // @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: '내 유저 아이디',
+	// })
+	// public user_id: string;
+	@ApiProperty({
 		example: 'jinbkim',
-		description: '내 유저 아이디',
+		description: '내 유저 닉네임',
 	})
-	public user_id: string;
+	public user_nick: string;
 
+	// @ApiProperty({
+	// 	example: 'donglee',
+	// 	description: '차단 유저 아이디',
+	// })
+	// public block_id: string;
 	@ApiProperty({
 		example: 'donglee',
-		description: '차단 유저 아이디',
+		description: '차단 유저 닉네임',
 	})
-	public block_id: string;
+	public block_nick: string;
 }
 
 // export class BlockDto2{
