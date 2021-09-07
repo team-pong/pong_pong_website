@@ -4,6 +4,7 @@ import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Client } from 'pg';
+import { SocketAdapter } from './adapter';
 
 declare module 'express-session' {
   export interface SessionData {
@@ -14,6 +15,8 @@ declare module 'express-session' {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+	app.useWebSocketAdapter(new SocketAdapter(app));
 
   const config = new DocumentBuilder()
   .setTitle('ft_transcendence API')
@@ -39,11 +42,11 @@ async function bootstrap() {
   };
 
   app.enableCors({
-    "origin": ["http://localhost:3000", "http://127.0.0.1:3000"],
-    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-    "preflightContinue": false,
-    "optionsSuccessStatus": 204,
-    "credentials": true,
+  	origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+    credentials: true,
   });
 
   app.use(
