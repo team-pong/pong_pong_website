@@ -94,29 +94,30 @@ const ChatRoomContent: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<Set
               <div  key={idx}
                     className="chat-user"
                     onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position)}>
-                <img src={value.avatar_url} alt={value.nick} />
-                <span>{value.nick}</span>
-                {value.position === "owner" && <img id="position" src={"/public/crown.png"} alt="owner"/>}
-                {value.position === "admin" && <img id="position" src={"/public/knight.png"} alt="admin"/>}
-                {value.position === "mute" && <img id="position" src={"/public/mute.png"} alt="mute"/>}
+                <img className="chat-room-user-img" src={value.avatar_url} alt={value.nick} />
+                <span className="chat-room-user-nick" >{value.nick}</span>
+                {value.position === "owner" && <img className="position" src={"/public/crown.png"} alt="owner"/>}
+                {value.position === "admin" && <img className="position" src={"/public/knight.png"} alt="admin"/>}
+                {value.position === "mute" && <img className="position" src={"/public/mute.png"} alt="mute"/>}
               </div>
             );
           })
         }
         <div id="chat-room-menu">
-          <Link to="/mainpage/chat/invite"><img src="/public/plus.svg" alt="invite" /></Link>
-          <Link to="/mainpage/chat/config"><img src="/public/tools.svg" alt="config" /></Link>
+          <Link to="/mainpage/chat/invite"><img className="chat-menu-img" src="/public/plus.svg" alt="invite" /></Link>
+          <Link to="/mainpage/chat/config"><img className="chat-menu-img" src="/public/tools.svg" alt="config" /></Link>
         </div>
       </div>
-      <form>
+      <form className="chat-msg-form">
         <textarea
+          className="chat-msg-textarea"
           placeholder="대화내용 입력"
           rows={4}
           cols={50}
           value={message}
           onKeyDown={(e) => controllTextAreaKeyDown(e, message, setMessage, chatLog, setChatLog)}
           onChange={({target: {value}}) => setMessage(value)}/>
-        <button onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
+        <button className="chat-msg-btn" onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
       </form>
       {contextMenu.isOpen && <ChatContextMenu
                                 x={contextMenu.x}

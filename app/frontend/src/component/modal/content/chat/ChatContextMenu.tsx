@@ -20,17 +20,17 @@ const ConditionalContextMenu: FC<{myPosition: string, targetPosition: string}> =
     case "owner":
       return (
         <>
-          {targetPosition === "admin" ? <li>관리자 해임</li> : <li>관리자 임명</li>}
-          <li>유저 밴</li>
-          {targetPosition === "mute" ? <li>뮤트 해제</li> :<li>유저 뮤트</li>}
+          {targetPosition === "admin" ? <li className="chat-context-li">관리자 해임</li> : <li className="chat-context-li">관리자 임명</li>}
+          <li className="chat-context-li">유저 밴</li>
+          {targetPosition === "mute" ? <li className="chat-context-li">뮤트 해제</li> :<li className="chat-context-li">유저 뮤트</li>}
         </>
       );
     case "admin":
       if ((targetPosition !== "owner") && (targetPosition !== "admin")) {
         return (
           <>
-            <li>유저 밴</li>
-            {targetPosition === "mute" ? <li>뮤트 해제</li> :<li>유저 뮤트</li>}
+            <li className="chat-context-li">유저 밴</li>
+            {targetPosition === "mute" ? <li className="chat-context-li">뮤트 해제</li> :<li className="chat-context-li">유저 뮤트</li>}
           </>
         );
       }
@@ -50,8 +50,8 @@ const ChatContextMenu: FC<chatContextMenuProps> = ({x, y, myPosition, targetPosi
       })
     }}>
       <ul id="context-menu" style={{ top: y, left: x, }}>
-        <li>프로필 보기</li>
-        <li>대전 신청</li>
+        <li className="chat-context-li">프로필 보기</li>
+        <li className="chat-context-li">대전 신청</li>
         <ConditionalContextMenu myPosition={myPosition} targetPosition={targetPosition} />
       </ul>
     </div>

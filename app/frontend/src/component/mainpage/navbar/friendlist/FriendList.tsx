@@ -38,29 +38,31 @@ const FriendList: FC<friendListProps> = (props): JSX.Element => {
   const friendListGenerator = (friend: friend, keyIdx: number) => {
     return (
       <div className="friend" key={keyIdx} onClick={(e) => friendOnClick(e, friend.name)}>
-        <img src={friend.avatarURL}/>{friend.name}
+        <img className="flg-friend-avatar" src={friend.avatarURL}/>{friend.name}
       </div>
     );
   };
 
+  const detectOutSide = (e: any) => {
+    if (!document.getElementById("context-menu")) return;
+    if (!document.getElementById("context-menu").contains(e.target)) setContextMenuInfo({
+      isOpen: false,
+      target: "",
+      xPos: 0,
+      yPos: 0
+    })
+  }
+
+  const detectESC = (e: KeyboardEvent) => {
+    if (e.key === "Escape") setContextMenuInfo({
+      isOpen: false,
+      target: "",
+      xPos: 0,
+      yPos: 0
+    })
+  };
+  
   useEffect(() => {
-    const detectOutSide = (e: any) => {
-      if (!document.getElementById("context-menu")) return;
-      if (!document.getElementById("context-menu").contains(e.target)) setContextMenuInfo({
-        isOpen: false,
-        target: "",
-        xPos: 0,
-        yPos: 0
-      })
-    }
-    const detectESC = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setContextMenuInfo({
-        isOpen: false,
-        target: "",
-        xPos: 0,
-        yPos: 0
-      })
-    };
     addEventListener("keyup", detectESC);
     addEventListener("mousedown", detectOutSide);
     return (() => {

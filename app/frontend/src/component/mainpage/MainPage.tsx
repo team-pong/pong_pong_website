@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Modal, { ChatContent, RecordContent } from '../modal/Modal'
 import NavBar from './navbar/NavBar'
 import "/src/scss/mainpage/MainPage.scss";
@@ -6,7 +6,6 @@ import "/src/scss/mainpage/MainPage-media.scss";
 import "/src/scss/mainpage/MainPage-mobile.scss";
 import EasyFetch from '../../utils/EasyFetch';
 import { testFriendList } from '../../dummydata/testFriendList';
-import MyProfileContent from "../modal/content/myprofile/MyProfileContent";
 import { Link, Route, Switch } from "react-router-dom";
 import Loading from "../loading/Loading";
 
@@ -18,10 +17,7 @@ import Loading from "../loading/Loading";
 const MainPage = ({match}): JSX.Element => {
   return (
     <>
-      <NavBar
-        avatarImgUrl="https://cdn.intra.42.fr/users/medium_yochoi.png"
-        friends={testFriendList}
-      />
+      <NavBar friends={testFriendList} />
       <main>
         <div id="button-container">
           <Link
@@ -30,7 +26,7 @@ const MainPage = ({match}): JSX.Element => {
             className="buttons"
             id="record">
             전적
-            <span>게임 전적을 보려면 누르세요!</span>
+            <span className="mp-explain-span">게임 전적을 보려면 누르세요!</span>
           </Link>
           <Link
             to={`${match.path}/chat`}
@@ -38,7 +34,7 @@ const MainPage = ({match}): JSX.Element => {
             className="buttons"
             id="chat">
             채팅
-            <span>친구와 채팅을 하려면 누르세요!</span>
+            <span className="mp-explain-span">친구와 채팅을 하려면 누르세요!</span>
           </Link>
           <Link
             to=""
@@ -46,11 +42,10 @@ const MainPage = ({match}): JSX.Element => {
             className="buttons"
             id="game">
               게임
-              <span>게임을 하려면 누르세요!</span>
+            <span className="mp-explain-span">게임을 하려면 누르세요!</span>
           </Link>
         </div>
         <Switch>
-          <Route path={`${match.path}/myprofile`}><Modal id={Date.now()} content={<MyProfileContent />} smallModal/></Route>
           <Route path={`${match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
           <Route path={`${match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
         </Switch>

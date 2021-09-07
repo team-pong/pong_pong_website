@@ -23,9 +23,9 @@ const ChatRoomList: FC<chatRoomListProps> = ({search, type, setChatRoomInfo}): J
 
   const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
     return (
-      <li key={idx} onClick={() => setChatRoomInfo({...chatRoom})}>
-        <span>{chatRoom.title}{chatRoom.type === "protected" ? <img src="/public/lock.svg" alt="비밀방" /> : <></>}</span>
-        <span>{chatRoom.current_people}/{chatRoom.max_people}</span>
+      <li className="chat-generator-li" key={idx} onClick={() => setChatRoomInfo({...chatRoom})}>
+        <span className="chat-generator-span">{chatRoom.title}{chatRoom.type === "protected" ? <img className="chat-generator-lock-img" src="/public/lock.svg" alt="비밀방" /> : <></>}</span>
+        <span className="chat-generator-span">{chatRoom.current_people}/{chatRoom.max_people}</span>
       </li>
     );
   }
@@ -88,30 +88,31 @@ const ChatMain: FC<{setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({se
     <div id="chat-main">
       <div id="search">
         <input
+          className="chat-search-input"
           type="text"
           placeholder="검색하려는 채팅방 이름을 입력해 주세요"
           value={searchInputValue}
           spellCheck={false}
           onChange={({target: {value}}) => setSearchInputValue(value)} 
           onKeyDown={(e) => {if (e.key === "Enter") setChatRoomToFind(searchInputValue)}} /><span className="input-border" />
-        <button onClick={() => setChatRoomToFind(searchInputValue)}><img src="/public/search.svg" alt="검색"/></button>
+        <button className="chat-search-button" onClick={() => setChatRoomToFind(searchInputValue)}><img className="chat-search-img" src="/public/search.svg" alt="검색"/></button>
       </div>
       <ul id="chat-room-selector">
-        <li onClick={() => setChatRoomSelector("all")}>
-            <input type="radio" name="all" checked={chatRoomSelector === "all"} onChange={() => {}}/>
-            <label>전체</label>
+        <li className="chat-room-li" onClick={() => setChatRoomSelector("all")}>
+            <input className="chat-room-input" type="radio" name="all" checked={chatRoomSelector === "all"} onChange={() => {}}/>
+            <label className="chat-room-label">전체</label>
         </li>
-        <li onClick={() => setChatRoomSelector("public")}>
-            <input type="radio" name="public" checked={chatRoomSelector === "public"} onChange={() => {}}/>
-            <label>공개방</label>
+        <li className="chat-room-li" onClick={() => setChatRoomSelector("public")}>
+            <input className="chat-room-input" type="radio" name="public" checked={chatRoomSelector === "public"} onChange={() => {}}/>
+            <label className="chat-room-label">공개방</label>
         </li>
-        <li onClick={() => setChatRoomSelector("protected")}>
-            <input type="radio" name="protected" checked={chatRoomSelector === "protected"} onChange={() => {}}/>
-            <label>비밀방</label>
+        <li className="chat-room-li" onClick={() => setChatRoomSelector("protected")}>
+            <input className="chat-room-input" type="radio" name="protected" checked={chatRoomSelector === "protected"} onChange={() => {}}/>
+            <label className="chat-room-label">비밀방</label>
         </li>
       </ul>
       <ChatRoomList search={chatRoomToFind} type={chatRoomSelector} setChatRoomInfo={setChatRoomInfo}/>
-      <button>채팅방 만들기</button>
+      <button className="chat-room-btn">채팅방 만들기</button>
     </div>
   );
 }
