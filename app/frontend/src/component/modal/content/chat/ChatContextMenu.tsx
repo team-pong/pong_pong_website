@@ -6,7 +6,13 @@ interface chatContextMenuProps {
   y: number,
   myPosition: string, /* "owner" || "admin" || "user" */
   targetPosition: string,
-  closer: Dispatch<SetStateAction<any>>
+  closer: Dispatch<SetStateAction<{
+    isOpen: boolean,
+    x: number,
+    y: number,
+    target: string,
+    targetPosition: string
+  }>>
 }
 
 const ConditionalContextMenu: FC<{myPosition: string, targetPosition: string}> = ({myPosition, targetPosition}) => {
