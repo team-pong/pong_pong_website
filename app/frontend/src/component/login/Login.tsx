@@ -102,10 +102,20 @@ const Login = (): JSX.Element => {
       + `&response_type=code`;
   };
 
+  const loginTest1 = () => {
+    window.location.href = "http://127.0.0.1:3001/session/test_user01";
+  }
+
+  const loginTest2 = () => {
+    window.location.href = "http://127.0.0.1:3001/session/test_user02";
+  }
+
   return (
     <section id="loginSection">
       <BackGroundPingPongSVG />
       <button id="button" onClick={loginOnClick}>LOGIN</button>
+      <button onClick={loginTest1}>login with test account 01</button>
+      <button onClick={loginTest2}>login with test account 02</button>
     </section>
   );
 };

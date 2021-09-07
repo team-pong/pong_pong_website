@@ -30,6 +30,20 @@ export class SessionService {
 
     ){}
 
+	/*!
+	 * @brief 테스트 유저용 로그인 함수 (42api를 거치지 않음)
+	 * @detail 게임 매칭이 2인이라서 혼자 테스트하려면 2개 계정이 있어야해서 만듬
+	 * @todo production 환경에서 삭제되어야함
+	 */ 
+	public async tester_login(req: Request, user_id: string, nickname: string) {
+		try {
+			await this.usersService.createUsers(user_id, nickname, 'tester_avatar.url');
+			await this.saveSession(req.session, user_id, 'tester_token');
+		} catch (err) {
+			console.log('tester user login error:', err);
+		}
+	}
+
   async getToken(loginCodeDto: LoginCodeDto) {
     const { code } = loginCodeDto;
     const type = "authorization_code";
