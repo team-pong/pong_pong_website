@@ -134,12 +134,29 @@
         margin-top: 30px;
         color: white;
         opacity: 0.6;
+        
+        .delimiter {
+          margin-left: 10px;
+          margin-right: 10px;
+        }
+
+        .profile-stat-detail {
+          width: 20px;
+          height: 20px;
+          margin-left: 10px;
+          vertical-align: text-bottom;
+          transform: scale(1);
+          transition: 0.1s all ease-in-out;
+        }
+
+        .profile-stat-detail:hover {
+          opacity: 1;
+          transform: scale(1.1);
+          transition: 0.2s all ease-in-out;
+          cursor: pointer;
+        }
       }
 
-      .delimiter {
-        margin-left: 10px;
-        margin-right: 10px;
-      }
 
       #user-title {
         margin-top: 5px;

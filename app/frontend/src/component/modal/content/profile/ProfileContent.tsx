@@ -294,11 +294,14 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
               <span className="mf-nick">{`${nick}`}</span>
             </div>
             <div id="user-stat">
-              <span id="win">{userInfo.win_games} 승</span>
+              <span>{userInfo.win_games} 승</span>
               <span className="delimiter">|</span>
-              <span id="lose">{userInfo.loss_games} 패</span>
+              <span>{userInfo.loss_games} 패</span>
               <span className="delimiter">|</span>
-              <span id="score">{userInfo.ladder_level} 점</span>
+              <span>{userInfo.ladder_level} 점</span>
+              <Link to={`${props.match.url}/record`}>
+                <img className="profile-stat-detail" src="/public/search.svg" alt="상세전적보기" />
+              </Link>
             </div>
             <div id="user-title">{setAchievementStr(userInfo.ladder_level)}
               <img id="user-achievement-img" src={setAchievementImg(userInfo.ladder_level)} alt="타이틀로고" />
@@ -314,6 +317,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
             <span className="pr-explain">클릭하면 해당 유저를 차단합니다.</span>
           </div>          
         </div>
+        <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
       </div>      
     );
   } else {
