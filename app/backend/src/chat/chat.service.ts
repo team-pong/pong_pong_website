@@ -1,20 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatDto2 } from 'src/dto/chat';
 import { ErrMsgDto } from 'src/dto/utility';
+import { Admin } from 'src/entities/admin';
 import { Chat } from 'src/entities/chat';
 import { ChatUsers } from 'src/entities/chat-users';
 import { Users } from 'src/entities/users';
 import { err0, err10, err13, err15, err2, err24, err4, err6, err8, err9 } from 'src/err';
+import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { ChatGateway } from './chat.gateway';
 
 @Injectable()
 export class ChatService {
   constructor(
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(ChatUsers) private chatUsersRepo: Repository<ChatUsers>,
+    @InjectRepository(Admin) private adminRepo: Repository<Admin>,
+
     private chatGateway: ChatGateway,
     ){}
 
@@ -76,7 +82,9 @@ export class ChatService {
     if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널이면
       return new ErrMsgDto(err4);
     const chanel = await this.chatRepo.find({channel_id: channel_id});  // 채널 찾기
-    return chanel[0].owner_id; 
+    
+    return await this.usersService.readUsers(chanel[0].owner_id , 'user_id');
+    // return chanel[0].owner_id; 
   }
   async readPeople(channel_id: number){
     if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널이면
@@ -108,7 +116,10 @@ export class ChatService {
       return new ErrMsgDto(err2);
     if (await this.chatUsersRepo.count({channel_id: channel_id, user_id: owner_id}) === 0)  // 채널에 해당 유저가 없으면
       return new ErrMsgDto(err13);
-    await this.chatRepo.save({channel_id: channel_id, owner_id: owner_id});
+    if (await this.adminRepo.count({user_id: owner_id}) != 0)  // owner가 되려는 유저가 admin 이면
+      await this.adminRepo.delete({channel_id: channel_id, user_id: owner_id});
+    // await this.chatRepo.save({channel_id: channel_id, owner_id: owner_id});
+    await this.chatRepo.update(channel_id, {owner_id: owner_id});
     return new ErrMsgDto(err0);
   }
 

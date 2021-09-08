@@ -36,9 +36,6 @@ export class FriendService {
     let user;
     // let friendList = { friendList: Array<string>() };
     let friendList = { friendList: Array<UsersDto3>() }
-
-
-
     if (type === 'send'){
       user = await this.friendRepo.find({user_id: user_id});  // 해당 유저의 모든 친구 검색
       for (var i in user){

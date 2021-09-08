@@ -1,15 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UsersDto3, UsersDto5 } from 'src/dto/users';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { Admin } from 'src/entities/admin';
 import { Chat } from 'src/entities/chat';
 import { Users } from 'src/entities/users';
 import { err0, err11, err2, err4, err5 } from 'src/err';
+import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class AdminService {
   constructor(
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
     @InjectRepository(Admin) private adminRepo: Repository<Admin>,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
@@ -30,10 +34,17 @@ export class AdminService {
     if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널 이라면
       return new ErrMsgDto(err4);;
     const channel = await this.adminRepo.find({channel_id: channel_id});  // 해당 채널 검색
-    let adminList = { adminList: Array<string>() }
-    for(var i in channel)
-      adminList.adminList[i] = channel[i].user_id;
+
+    let adminList;
+    adminList = { adminList: Array<UsersDto3>() }
+    for (var i in channel)
+      adminList.adminList[i] = await this.usersService.readUsers(channel[i].user_id, 'user_id');
     return adminList;
+    
+    // let adminList = { adminList: Array<string>() }
+    // for(var i in channel)
+    //   adminList.adminList[i] = channel[i].user_id;
+    // return adminList;
   }
   async isAdmin(user_id: string, channel_id: number){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
@@ -47,6 +58,7 @@ export class AdminService {
   }
 
   async deleteAdmin(user_id: string){
+    console.log("user_id : ", user_id);
     if (await this.adminRepo.count({user_id: user_id}) === 0)  // 유저가 admin이 아니면
       return new ErrMsgDto(err11);
     await this.adminRepo.delete({user_id: user_id});

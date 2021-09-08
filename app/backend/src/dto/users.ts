@@ -91,11 +91,16 @@ export class UsersDto3{
 }
 
 export class UsersDto4{
-  @ApiProperty({
+  // @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: '유저 아이디',
+	// })
+	// public user_id: string;
+	@ApiProperty({
 		example: 'jinbkim',
-		description: '유저 아이디',
+		description: '유저 닉네임',
 	})
-	public user_id: string;
+	public nick: string;
 
   @ApiProperty({
 		example: 'game',
