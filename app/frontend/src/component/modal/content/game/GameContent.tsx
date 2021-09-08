@@ -3,6 +3,7 @@ import { Link, Redirect, Route, RouteComponentProps, withRouter } from "react-ro
 import Modal from "../../Modal";
 import GameMatchContent from "./GameMatchContent";
 import GameRoomContent from "./GameRoomContent";
+import "/src/scss/content/game/GameContent.scss";
 
 interface isMatched {
   isMatched: boolean;
@@ -20,8 +21,16 @@ const GameContent: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
 
   return (
     <div id="game-content">
-      <Link to={`${path}/match/normal-match`} >일반 게임</Link>
-      <Link to={`${path}/match/ladder-match`} >레더 게임</Link>
+      <Link
+        to={`${path}/match/normal-match`}
+        className="game-content-match-button">
+          일반 게임
+      </Link>
+      <Link
+        to={`${path}/match/ladder-match`}
+        className="game-content-match-button">
+          레더 게임
+      </Link>
 
       {/* 라우팅 */}
       <Route path={`${path}/match/:matchType`}>
