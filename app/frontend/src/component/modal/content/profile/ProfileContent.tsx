@@ -243,7 +243,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
                   onChange={(e) => setNickToEdit(e.target.value)}
                   onKeyDown={(e) => cancelEditNick(e)} />
               </form>
-              <span className={"mf-nick" + (isEditNickClicked ? " mf-nick-clicked" : "")}>{`${nickToEdit}`}</span>
+              <span className={"mf-nick" + (isEditNickClicked ? " mf-nick-clicked" : "")}>{`${userInfo.nick}`}</span>
               <img
                 id="mf-edit-img"
                 src={isEditNickClicked ? "/public/check.png" : "/public/pencil.png"}
@@ -271,7 +271,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
             <span className="pr-explain">클릭하면 회원님의 모든 데이터가 서버에서 삭제됩니다</span>
           </div>
         </div>
-        <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
+        <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={nick}/>} /></Route>
         <Route path={`${props.match.path}/manageFriend`}><Modal id={Date.now()} smallModal content={<ManageFriendContent nick={userInfo.nick}/>} /></Route>
       </div>
     );
@@ -294,11 +294,14 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
               <span className="mf-nick">{`${nick}`}</span>
             </div>
             <div id="user-stat">
-              <span id="win">{userInfo.win_games} 승</span>
+              <span>{userInfo.win_games} 승</span>
               <span className="delimiter">|</span>
-              <span id="lose">{userInfo.loss_games} 패</span>
+              <span>{userInfo.loss_games} 패</span>
               <span className="delimiter">|</span>
-              <span id="score">{userInfo.ladder_level} 점</span>
+              <span>{userInfo.ladder_level} 점</span>
+              <Link to={`${props.match.url}/record`}>
+                <img className="profile-stat-detail" src="/public/search.svg" alt="상세전적보기" title="상세전적보기"/>
+              </Link>
             </div>
             <div id="user-title">{setAchievementStr(userInfo.ladder_level)}
               <img id="user-achievement-img" src={setAchievementImg(userInfo.ladder_level)} alt="타이틀로고" />
@@ -314,6 +317,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
             <span className="pr-explain">클릭하면 해당 유저를 차단합니다.</span>
           </div>          
         </div>
+        <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={nick}/>} /></Route>
       </div>      
     );
   } else {

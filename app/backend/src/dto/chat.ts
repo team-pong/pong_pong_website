@@ -126,17 +126,22 @@ export class ChatDto5{
 	})
 	public channel_id: number;
 
-  @ApiProperty({
+  // @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: 'owner 유저 아이디',
+	// })
+	// public owner_id: string;
+	@ApiProperty({
 		example: 'jinbkim',
-		description: 'owner 유저 아이디',
+		description: 'owner 유저 닉네임',
 	})
-	public owner_id: string;
+	public owner_nick: string;
 }
 
-export class ChatDto6{
-  @ApiProperty({
-		example: 'jinbkim',
-		description: 'owner 유저 아이디',
-	})
-	public owner_id: string;
-}
+// export class ChatDto6{
+//   @ApiProperty({
+// 		example: 'jinbkim',
+// 		description: 'owner 유저 아이디',
+// 	})
+// 	public owner_id: string;
+// }

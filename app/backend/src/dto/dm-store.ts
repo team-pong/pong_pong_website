@@ -1,17 +1,28 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class DmStoreDto1{
-  @ApiProperty({
+  // @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: 'dm 보낸 유저 아이디',
+	// })
+	// public sender_id: string;
+
+	// @ApiProperty({
+	// 	example: 'donglee',
+	// 	description: 'dm 받은 유저 아이디',
+	// })
+	// public receiver_id: string;
+	@ApiProperty({
 		example: 'jinbkim',
-		description: 'dm 보낸 유저 아이디',
+		description: 'dm 보낸 유저 닉네임',
 	})
-	public sender_id: string;
+	public sender_nick: string;
 
 	@ApiProperty({
 		example: 'donglee',
-		description: 'dm 받은 유저 아이디',
+		description: 'dm 받은 유저 닉네임',
 	})
-	public receiver_id: string;
+	public receiver_nick: string;
 
   @ApiProperty({
 		example: '안뇽~',
@@ -21,17 +32,28 @@ export class DmStoreDto1{
 }
 
 export class DmStoreDto2{
-  @ApiProperty({
+  // @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: 'dm 보낸 유저 아이디',
+	// })
+	// public sender_id: string;
+
+	// @ApiProperty({
+	// 	example: 'donglee',
+	// 	description: 'dm 받은 유저 아이디',
+	// })
+	// public receiver_id: string;
+	@ApiProperty({
 		example: 'jinbkim',
-		description: 'dm 보낸 유저 아이디',
+		description: 'dm 보낸 유저 닉네임',
 	})
-	public sender_id: string;
+	public sender_nick: string;
 
 	@ApiProperty({
 		example: 'donglee',
-		description: 'dm 받은 유저 아이디',
+		description: 'dm 받은 유저 닉네임',
 	})
-	public receiver_id: string;
+	public receiver_nick: string;
 
   @ApiProperty({
 		example: '안뇽~',
@@ -48,27 +70,28 @@ export class DmStoreDto2{
 
 export class DmStoreDto3{
 	@ApiProperty({
-		example: ` [
-      {
-          "sender_id": "jinbkim",
-          "receiver_id": "donglee",
-          "content": "님아 머해?",
-          "createdAt": "2021-07-31T11:46:42.213Z"
-      },
-      {
-          "sender_id": "jinbkim",
-          "receiver_id": "donglee",
-          "content": "안녕",
-          "createdAt": "2021-07-31T11:44:45.749Z"
-      },
-      {
-          "sender_id": "donglee",
-          "receiver_id": "jinbkim",
-          "content": "나도 안녕",
-          "createdAt": "2021-07-31T11:44:45.749Z"
-      }
+		example: `[
+    {
+      "sender_id": "jinbkim",
+      "receiver_id": "donglee",
+      "content": "ㅠㅠ",
+      "createdAt": "2021-09-03T01:40:59.575Z"
+    },
+    {
+      "sender_id": "jinbkim",
+      "receiver_id": "donglee",
+      "content": "안녕",
+      "createdAt": "2021-09-03T01:02:08.420Z"
+    },
+    {
+      "sender_id": "donglee",
+      "receiver_id": "jinbkim",
+      "content": "나도 안녕",
+      "createdAt": "2021-09-03T01:02:08.420Z"
+    }
   ]`,
-		description: 'DM 보낸 유저 아이디, 받은 유저 아이디, 내용, 보낸 시간 데이터들의 배열',
+		// description: 'DM 보낸 유저 아이디, 받은 유저 아이디, 내용, 보낸 시간 데이터들의 배열',
+		description: 'DM 보낸 유저 닉네임, 받은 유저 닉네임, 내용, 보낸 시간 데이터들의 배열',
 	})
 	public dmList: DmStoreDto2[];
 }

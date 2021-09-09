@@ -1,17 +1,28 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class FriendDto1{
-  @ApiProperty({
+  // @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: '내 유저 아이디',
+	// })
+	// public user_id: string;
+
+	// @ApiProperty({
+	// 	example: 'donglee',
+	// 	description: '친구 유저 아이디',
+	// })
+	// public friend_id: string;
+	@ApiProperty({
 		example: 'jinbkim',
-		description: '내 유저 아이디',
+		description: '내 유저 닉네임',
 	})
-	public user_id: string;
+	public user_nick: string;
 
 	@ApiProperty({
 		example: 'donglee',
-		description: '친구 유저 아이디',
+		description: '친구 유저 닉네임',
 	})
-	public friend_id: string;
+	public friend_nick: string;
 }
 
 // export class FriendDto2{

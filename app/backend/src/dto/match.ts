@@ -1,17 +1,28 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class MatchDto1{
-  @ApiProperty({
+  // @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: '승자 아이디',
+	// })
+	// public winner_id: string;
+
+	// @ApiProperty({
+	// 	example: 'donglee',
+	// 	description: '패자 아이디',
+	// })
+	// public loser_id: string;
+	@ApiProperty({
 		example: 'jinbkim',
-		description: '승자 아이디',
+		description: '승자 닉네임',
 	})
-	public winner_id: string;
+	public winner_nick: string;
 
 	@ApiProperty({
 		example: 'donglee',
-		description: '패자 아이디',
+		description: '패자 닉네임',
 	})
-	public loser_id: string;
+	public loser_nick: string;
 
   @ApiProperty({
 		example: 3,

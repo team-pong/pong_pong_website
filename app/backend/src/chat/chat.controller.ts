@@ -1,14 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Param, Post, Query, Req, Res } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
-import { ChatDto1, ChatDto3, ChatDto4, ChatDto5, ChatDto6 } from 'src/dto/chat';
+import { ChatDto1, ChatDto3, ChatDto4, ChatDto5 } from 'src/dto/chat';
+import { UsersDto3 } from 'src/dto/users';
 import { ErrMsgDto } from 'src/dto/utility';
+import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 
 @ApiTags('Chat')
 @Controller('chat')
 export class ChatController {
   constructor(
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
     private chatService: ChatService
   ) {}
 
@@ -38,9 +42,10 @@ export class ChatController {
 
   @ApiOperation({ summary: '채널 owner 검색'})
   @ApiResponse({ 
-    type: ChatDto6, 
+    // type: ChatDto6, 
+    type: UsersDto3, 
     description: `
-      해당 채널의 owner 아이디
+      해당 채널의 owner 유저 객체
       검색 실패시 실패 이유 반환
     ` })
   @ApiQuery({ name: 'channel_id', example: 1, description: '채널 아이디' })
@@ -58,10 +63,14 @@ export class ChatController {
   }
   @ApiOperation({ summary: '채널 owner 변경'})
   @ApiResponse({ type: ErrMsgDto, description: '채널 owner 실패시 실패이유' })
-  @ApiBody({ type: ChatDto5, description: 'owner 변경할 채널 아이디, 유저 아이디' })
+  // @ApiBody({ type: ChatDto5, description: 'owner 변경할 채널 아이디, 유저 아이디' })
+  @ApiBody({ type: ChatDto5, description: 'owner 변경할 채널 아이디, 유저 닉네임' })
   @Post('owner')
-  updateOwner(@Body() b: ChatDto5){
-    return this.chatService.updateOwner(b.channel_id, b.owner_id);
+  async updateOwner(@Body() b: ChatDto5){
+    let user;
+    user = await this.usersService.readUsers(b.owner_nick, 'nick');
+    return await this.chatService.updateOwner(b.channel_id, user.user_id);
+    // return this.chatService.updateOwner(b.channel_id, b.owner_id);
   }
 
   @ApiOperation({ summary: '채널 제거'})

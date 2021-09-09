@@ -52,17 +52,25 @@ export class UsersController {
 
   @ApiOperation({ summary: '유저 상태 변경'})
   @ApiResponse({ type: ErrMsgDto, description: '유저 상태 변경 실패시 실패 이유' })
-  @ApiBody({ type: UsersDto4, description: '변경할 유저 아이디, 유저 상태' })
+  // @ApiBody({ type: UsersDto4, description: '변경할 유저 아이디, 유저 상태' })
+  @ApiBody({ type: UsersDto4, description: '변경할 유저 닉네임, 유저 상태' })
   @Post('status')
-  updateStatus(@Body() b: UsersDto4){
-    return this.usersService.updateStatus(b.user_id, b.status);
+  async updateStatus(@Body() b: UsersDto4){
+    let user;
+    user = await this.usersService.readUsers(b.nick, 'nick');
+    return await this.usersService.updateStatus(user.user_id, b.status);
+    // return this.usersService.updateStatus(b.user_id, b.status);
   }
 
   @ApiOperation({ summary: '유저 제거'})
   @ApiResponse({ type: ErrMsgDto, description: '유저 제거 실패시 실패 이유' })
-  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '제거할 유저 아이디' })
+  // @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '제거할 유저 아이디' })
+  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '제거할 유저 닉네임' })
   @Delete()
-  deleteUsers(@Query() q){
-    return this.usersService.deleteUsers(q.user_id);
+  async deleteUsers(@Query() q){
+    let user;
+    user = await this.usersService.readUsers(q.nick, 'nick');
+    return await this.usersService.deleteUsers(user.user_id);
+    // return this.usersService.deleteUsers(q.user_id);
   }
 }

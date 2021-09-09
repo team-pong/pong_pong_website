@@ -36,7 +36,7 @@ export class createInitialData implements Seeder {
 			.execute();			
 		await connection
 			.createQueryBuilder().insert().into(Chat)
-			.values([{owner_id: 'yochoi', title: '아무나', type: 'public', passwd: '', max_people: 10}, {owner_id: 'jinwkim', title: '아무나 와보렴', type: 'protected', passwd: '1234', max_people: 5}, {owner_id: 'hjing', title: '심심하니깐', type: 'private', passwd: '', max_people: 3}])
+			.values([{owner_id: 'yochoi', title: '아무나', type: 'public', passwd: '', max_people: 10}, {owner_id: 'jinwkim', title: '아무나 와보렴', type: 'protected', passwd: '1234', max_people: 5}, {owner_id: 'hjung', title: '심심하니깐', type: 'private', passwd: '', max_people: 3}])
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(DmStore)
