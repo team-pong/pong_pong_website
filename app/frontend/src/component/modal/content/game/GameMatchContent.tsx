@@ -16,8 +16,8 @@ interface gameMatchContentProps
 const GameMatchContent: FC<gameMatchContentProps> = ({match: {params}, setIsMatched}): JSX.Element => {
 
   useEffect(() => {
-    const socket = io("http://127.0.0.1:3001/game");
-    socket.emit(params.matchType.split('-')[0], {withCredentials: true});
+    const socket = io("http://127.0.0.1:3001/game", {withCredentials: true});
+    socket.emit(params.matchType.split('-')[0]);
     socket.on("matched", (roomId: string, opponent: string) => {
       setIsMatched({isMatched: true, roomId, opponent});
     });
