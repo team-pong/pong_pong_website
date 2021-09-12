@@ -3,6 +3,7 @@ import { Link, Redirect, Route, RouteComponentProps, withRouter } from "react-ro
 import Modal from "../../Modal";
 import GameMatchContent from "./GameMatchContent";
 import GameRoomContent from "./GameRoomContent";
+import GameOptionContent from "./GameOptionContent";
 import "/src/scss/content/game/GameContent.scss";
 
 interface isMatched {
