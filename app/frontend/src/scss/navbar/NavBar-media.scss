@@ -14,7 +14,7 @@
     .avatar {
       padding: 0.5em;
       position: relative;
-      img {
+      img#avatarImg {
         width: 90px - 30px;
       }
 
@@ -128,7 +128,7 @@
         font-size: 1em;
       }
 
-      img {
+      img#avatarImg {
         width: 90px - 30px;
       }
     }
@@ -155,7 +155,7 @@
     .avatar {
       text-align: left;
       padding: 10px;
-      img {
+      img#avatarImg {
         width: 68px;
         height: 68px;
         display: inline;
