@@ -33,3 +33,11 @@ html {
     overflow: hidden;
   }
 }
+
+// 브라우저가 mozilla면 다른 폰트 사용
+
+@-moz-document url-prefix() {
+  html {
+    font-family: 'Helvetica Neue', sans-serif;
+  }
+}
