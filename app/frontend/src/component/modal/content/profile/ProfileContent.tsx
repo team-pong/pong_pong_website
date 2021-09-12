@@ -1,4 +1,4 @@
-import React, { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-router-dom";
 import "/src/scss/content/profile/ProfileContent.scss";
 import Modal from "../../Modal";
@@ -43,6 +43,8 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
   const [nickToEdit, setNickToEdit] = useState("");
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
+
+  const avatarImgRef = useRef(null);
 
   //url parameter로 넘어오는 nick 문자열 저장
   const { nick } = useParams<{nick: string}>();
@@ -228,7 +230,11 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
             </Link>
           </div>
           <div id="avatar-container">
-            <img className="pr-avatar" src={userInfo.avatar_url} alt="프로필사진" />
+            <img className="pr-avatar"
+              ref={avatarImgRef}
+              src={userInfo.avatar_url}
+              onError={() => {avatarImgRef.current.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="}}
+              alt="프로필사진" />
           </div>
           <div id="user-info">
             <div id="user-id">

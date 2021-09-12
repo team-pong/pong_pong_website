@@ -1,4 +1,4 @@
-import { FC, SetStateAction, useEffect, useState } from "react";
+import { FC, useEffect, useState, useRef } from "react";
 import { Link, Route, RouteComponentProps, withRouter } from "react-router-dom";
 import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
@@ -39,6 +39,8 @@ const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
   const [myNick, setMyNick] = useState("");
   const [myAvatar, setMyAvatar] = useState("");
 
+  const avatarImgRef = useRef(null);
+
   /*!
    * @author donglee
    * @brief API /user 에서 프로필 정보를 요청해서 state에 저장함
@@ -64,7 +66,11 @@ const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
           <Link to={`${props.match.url}/profile/${userInfo.nick}`}>
           <img
             id="avatarImg"
+            ref={avatarImgRef}
             src={userInfo.avatar_url}
+            onError={() => {
+              avatarImgRef.current.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+            }}
             alt="Avatar" />
           </Link>
           <h2>{myNick}</h2>
