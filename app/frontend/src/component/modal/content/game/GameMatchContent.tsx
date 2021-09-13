@@ -17,8 +17,8 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params}, setIsMatc
 
   useEffect(() => {
     const socket = io("http://127.0.0.1:3001/game", {withCredentials: true});
-    socket.emit(params.matchType.split('-')[0]);
-    socket.on("matched", (roomId: string, opponent: string) => {
+    socket.emit(params.matchType);
+    socket.on("matched", ({roomId, opponent}) => {
       setIsMatched({isMatched: true, roomId, opponent});
     });
     return (() => {socket.disconnect();});
@@ -27,8 +27,8 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params}, setIsMatc
   return (
     <div id="game-match-content">
       <Loading width={400} height={300} color="#62C375"/>
-      {params.matchType === "normal-match" && "일반 게임 찾는중..."}
-      {params.matchType === "ladder-match" && "레더 게임 찾는중..."}
+      {params.matchType === "normal" && "일반 게임 찾는중..."}
+      {params.matchType === "ladder" && "레더 게임 찾는중..."}
     </div>
   );
 }

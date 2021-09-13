@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import { RouteComponentProps, useHistory, withRouter } from "react-router";
 import "/src/scss/content/game/GameOptionContent.scss";
 
 const IMG_BLACK: string = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
@@ -22,16 +23,18 @@ function getMapImg(mapType: MAP): string {
   }
 }
 
-const GameOptionContent: FC = () => {
+const GameOptionContent: FC<RouteComponentProps> = ({match: {url}}) => {
 
   const [selectedMap, setSelectedMap] = useState<MAP>(MAP.map0);
+
+  const history = useHistory();
 
   return (
     <div id="game-option-content">
       <img
         className="map-preview"
         src={getMapImg(selectedMap)} />
-      <form className="map-select-form" onSubmit={() => console.log("onsubmit")}>
+      <form className="map-select-form">
         <label className="map-selectors">
           <label onClick={() => setSelectedMap(MAP.map0)}>
             <input type="radio" checked={selectedMap === MAP.map0} onChange={() => {}}/>맵 0
@@ -43,10 +46,10 @@ const GameOptionContent: FC = () => {
             <input type="radio" checked={selectedMap === MAP.map2} onChange={() => {}}/>맵 2
           </label>
         </label>
-        <input type="submit" value="게임 찾기" />
+        <button onClick={() => {history.push(`${url}/${selectedMap}`)}}>게임 찾기</button>
       </form>
     </div>
   );
 }
 
-export default GameOptionContent;
+export default withRouter(GameOptionContent);
