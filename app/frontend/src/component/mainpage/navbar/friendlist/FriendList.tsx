@@ -5,7 +5,6 @@ import ContextMenu from '../contextmenu/ContextMenu'
 /*!
  * @author yochoi
  * @brief friend list 를 div로 감싸 반환하는 FC
- * @param[in] friends friend 객체의 배열
  */
 
 interface Friend {

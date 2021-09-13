@@ -13,7 +13,6 @@ import ProfileContent from "../../modal/content/profile/ProfileContent";
  * @author donglee
  * @brief 좌측에 NavBar가 상시 나타나있음
  *        NavBar 버튼들을 누르면 router로 url을 변경해주면서 모달이 뜨게 함
- * @param[in] friends: 테스트용 친구목록
  */
 
 interface UserInfo {
