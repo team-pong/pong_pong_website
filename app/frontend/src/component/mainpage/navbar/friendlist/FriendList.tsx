@@ -1,23 +1,24 @@
 import { useState, useEffect, FC, MouseEvent } from 'react'
+import EasyFetch from '../../../../utils/EasyFetch';
 import ContextMenu from '../contextmenu/ContextMenu'
 
 /*!
  * @author yochoi
  * @brief friend list 를 div로 감싸 반환하는 FC
- * @param[in] friends friend 객체의 배열
  */
 
-interface friend {
-  name: string,
-  state: string,
-  avatarURL: string
+interface Friend {
+	user_id: string;
+	nick: string;
+	avatar_url: string;
+	total_games: number;
+	win_games: number;
+	loss_games: number;
+	ladder_level: number;
+	status: string;
 }
 
-interface friendListProps {
-  friends: friend[]
-}
-
-const FriendList: FC<friendListProps> = (props): JSX.Element => {
+const FriendList: FC = (props): JSX.Element => {
 
   const [contextMenuInfo, setContextMenuInfo] = useState<{isOpen: boolean, target: string, xPos: number, yPos: number}>({
     isOpen: false,
@@ -25,6 +26,7 @@ const FriendList: FC<friendListProps> = (props): JSX.Element => {
     xPos: 0,
     yPos: 0
   });
+  const [friendList, setFriendList] = useState<Friend[]>(null);
 
   const friendOnClick = (e: MouseEvent, target: string) => {
     setContextMenuInfo({
@@ -35,10 +37,10 @@ const FriendList: FC<friendListProps> = (props): JSX.Element => {
     });
   }
 
-  const friendListGenerator = (friend: friend, keyIdx: number) => {
+  const friendListGenerator = (friend: Friend, keyIdx: number) => {
     return (
-      <div className="friend" key={keyIdx} onClick={(e) => friendOnClick(e, friend.name)}>
-        <img className="flg-friend-avatar" src={friend.avatarURL}/>{friend.name}
+      <div className="friend" key={keyIdx} onClick={(e) => friendOnClick(e, friend.nick)}>
+        <img className="flg-friend-avatar" src={friend.avatar_url}/>{friend.nick}
       </div>
     );
   };
@@ -62,7 +64,15 @@ const FriendList: FC<friendListProps> = (props): JSX.Element => {
     })
   };
   
+  const getFriendList = async () => {
+    const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend/list");
+    const res = await (await easyfetch.fetch()).json();
+
+    setFriendList(res.friendList);
+  };
+
   useEffect(() => {
+    getFriendList();
     addEventListener("keyup", detectESC);
     addEventListener("mousedown", detectOutSide);
     return (() => {
@@ -71,12 +81,16 @@ const FriendList: FC<friendListProps> = (props): JSX.Element => {
     });
   }, []);
 
-  return (
-    <div id="friend-list-container">
-      {props.friends.map(friendListGenerator)}
-      {contextMenuInfo.isOpen ? <ContextMenu target={contextMenuInfo.target} x={contextMenuInfo.xPos} y={contextMenuInfo.yPos}/> : <></>}
-    </div>
-  );
+  if (friendList) {
+    return (
+      <div id="friend-list-container">
+        {friendList.map(friendListGenerator)}
+        {contextMenuInfo.isOpen ? <ContextMenu target={contextMenuInfo.target} x={contextMenuInfo.xPos} y={contextMenuInfo.yPos}/> : <></>}
+      </div>
+    );
+  } else {
+    return (<h1>Loading...</h1>);
+  }
 }
 
 export default FriendList;
