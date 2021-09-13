@@ -6,11 +6,11 @@ export class BlockDto1{
 	// 	description: '내 유저 아이디',
 	// })
 	// public user_id: string;
-	@ApiProperty({
-		example: 'jinbkim',
-		description: '내 유저 닉네임',
-	})
-	public user_nick: string;
+	// @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: '내 유저 닉네임',
+	// })
+	// public user_nick: string;
 
 	// @ApiProperty({
 	// 	example: 'donglee',
