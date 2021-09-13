@@ -23,7 +23,7 @@ const MainPage = ({match}): JSX.Element => {
       <main>
         <div id="button-container">
           <Link
-            to={`${match.url}/profile/donglee`}
+            to={`${match.url}/record`}
             style={{textDecoration: "none"}}
             className="buttons"
             id="record">
