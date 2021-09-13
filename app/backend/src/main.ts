@@ -52,7 +52,7 @@ async function bootstrap() {
       secret: 'pong-secret',
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 60 * 1000, sameSite: "strict", httpOnly: true}
+      cookie: { maxAge: 60 * 1000 * 360, sameSite: "strict", httpOnly: true} // 
     }),
   );
 
