@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import EasyFetch from "../../../../utils/EasyFetch";
 import "/src/scss/content/profile/ManageFriendContent.scss";
-import { testBlockedList } from "../../../../dummydata/testBlockedList";
 import { setAchievementStr, setAchievementImg } from "../../../../utils/setAchievement";
 
 interface Friend {
@@ -85,10 +84,10 @@ const BlockedList: React.FC<{nick: string}> = ({nick}) => {
 	};
 
 	const getBlockedList = async () => {
-		// const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nick}`);
-		// const res =  await (await easyfetch.fetch()).json();
+		const easyfetch = new EasyFetch("http://127.0.0.1:3001/block");
+		const res =  await (await easyfetch.fetch()).json();
 		
-		setBlockedList(testBlockedList);
+		setBlockedList(res.blockList);
 	};
 
 	useEffect(() => {
