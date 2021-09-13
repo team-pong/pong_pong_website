@@ -1,0 +1,58 @@
+/*!
+ * @author yochoi
+ * @brief MainPage style
+          Screen: 400px ~ 900px
+ */
+
+@media screen and (max-width: 900px) and (min-width: 750px) {
+  main {
+    #button-container {
+      margin-left: 90px;
+    }
+  }
+}
+
+/*!
+ * @author yochoi
+ * @brief MainPage style
+          Screen: 700px ~ 750px
+ */
+
+@media screen and (max-width: 750px) and (min-width: 700px) {
+  main {
+    #button-container {
+      margin-left: 0;
+    }
+  }
+}
+
+/*!
+ * @author yochoi
+ * @brief MainPage style
+          Screen: 0px ~ 700px
+ */
+
+@media screen and (max-width: 700px) {
+  main {
+    #button-container {
+      margin: 0;
+      height: calc(100% - 303.4px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      #record,
+      #chat,
+      #game {
+        width: 80%;
+        height: 25vh;
+        margin: 10px;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+}

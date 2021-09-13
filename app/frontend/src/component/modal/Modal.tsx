@@ -1,34 +1,61 @@
-import { FC } from 'react';
+import React, { FC, ReactElement } from "react";
 import "/src/scss/Modal.scss";
-
-import ConfigContent from './content/ConfigContent'
-
-interface modalProps {
-  content: FC,
-  display: boolean,
-  handleClose: () => void
-};
+import ChatContent from './content/chat/ChatContent';
+import RecordContent from './content/record/RecordContent';
+import GameContent from "./content/game/GameContent";
+import { RouteComponentProps, withRouter } from "react-router";
 
 /*!
- * @author yochoi
- * @brief 함수 컴포넌트를 모달 형태로 띄워주는 컴포넌트
- * @param[in] props.content 모달 안에 들어갈 함수형 컴포넌트
- * @param[in] props.display 모달을 display 할지 여부, 상위 컴포넌트에서 State로 컨트롤 해야함
- * @param[in] props.handleClose 상위 컴포넌트의 modalDisplay State를 컨트롤 해줄 함수
- */
+* @author yochoi, donglee
+* @brief FC를 Modal 형태로 띄워주는 컴포넌트
+* @param[in] content: Modal 안에 들어갈 함수형 컴포넌트
+* @param[in] modalSize?: true이면 width: 400px, height: 500px
+* @param[in] id: css 태그를 특정하기 위한 id (시간값)
+*/
 
-const Modal = (props: modalProps): JSX.Element => {
+interface modalProps {
+  content: ReactElement;
+  smallModal?: boolean;
+  id: number;
+}
 
-  const display: string = `${props.display ? 'display-block' : 'display-none'}`;
+const Modal: FC<modalProps & RouteComponentProps> = ({ history, content, smallModal, id }): JSX.Element => {
+
+  const modalId = String(id); //css className=modal 요소의 id
+  const contentId = String(id + 1); //css className=content 요소의 id
+  const modalCloserId = String(id + 2); //css className=modalCloser 요소의 id
+
+  /*!
+  * @author donglee
+  * @brief 모달 컴포넌트를 종료할 때 실행하는 함수.
+  *        history 객체를 이용해서 뒤로가기를 실행시킴.
+  */
+  const closer = (e?: any) => {
+    if (e) e.stopPropagation();  //detectOutsideOfModal 함수를 부르지 않기 위함.
+    history.goBack();
+  }
+  
+  const detectOutsideOfModal = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (e.target === e.currentTarget) {
+      closer(e);
+    }
+  };
 
   return (
-    <div className={"modal " + display}>
-      <div className="modal content">
-        <img src="./public/closeWindow.png" onClick={props.handleClose} alt="close" />
-        {props.content({})}
+    <div className="modal" id={modalId} onClick={detectOutsideOfModal}>
+      <div className={["content", smallModal && "small-content"].join(" ")} id={contentId}>
+        <img
+          className="modal-closer"
+          id={modalCloserId}
+          src="/public/close-window.png"
+          onClick={closer}
+          alt="close"/>
+        {content}
       </div>
     </div>
   );
-}
+};
 
-export { Modal, ConfigContent };
+export default withRouter(Modal);
+export { ChatContent, RecordContent, GameContent };

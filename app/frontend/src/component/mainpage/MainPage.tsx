@@ -1,43 +1,56 @@
-import { useState, useEffect } from "react";
-import { Modal } from '../modal/Modal'
+import { useEffect, useState } from "react";
+import Modal, { ChatContent, RecordContent, GameContent } from '../modal/Modal'
 import NavBar from './navbar/NavBar'
-import { testFriendList } from './dummyData'
+import "/src/scss/mainpage/MainPage.scss";
+import "/src/scss/mainpage/MainPage-media.scss";
+import "/src/scss/mainpage/MainPage-mobile.scss";
+import EasyFetch from '../../utils/EasyFetch';
+import { testFriendList } from '../../dummydata/testFriendList';
+import { Link, Route, Switch } from "react-router-dom";
+import Loading from "../loading/Loading";
 
-const MainPage = (): JSX.Element => {
+/*!
+ * @author yochoi, donglee
+ * @brief NavBar를 상시 보이게 하고 Record, Match-game, Chat 모달 버튼이 있는 메인페이지
+ */
 
-  const [modalDisplay, setModalDisplay] = useState(false);
-
-  useEffect(() => {
-
-    const postAuthCodeToBackend = async () => {
-      let searchParams: URLSearchParams = new URLSearchParams(window.location.search);
-      const fetchHeader = new Headers();
-      fetchHeader.append('Content-Type', 'application/json');
-      fetchHeader.append('Accept', 'application/json');
-      const fetchOption: any = {
-        method: 'POST',
-        headers: fetchHeader,
-        origin: "http://127.0.0.1:3000",
-        credentials: 'include',
-        body: JSON.stringify({ code: searchParams.get('code') })
-      }
-      await fetch('http://127.0.0.1:3001/api/oauth', fetchOption)
-    }
-
-    try {
-      postAuthCodeToBackend();
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
-
+const MainPage = ({match}): JSX.Element => {
   return (
     <>
-      <NavBar
-        avartarImgUrl="https://static.coindesk.com/wp-content/uploads/2021/04/dogecoin.jpg"
-        friends={testFriendList} />
-      <button onClick={() => setModalDisplay(!modalDisplay)}>모달 display test</button>
-      <Modal content={() => <h1>content</h1>} display={modalDisplay} handleClose={() => setModalDisplay(false)} />
+      <NavBar friends={testFriendList} />
+      <main>
+        <div id="button-container">
+          <Link
+            to={`${match.url}/record`}
+            style={{textDecoration: "none"}}
+            className="buttons"
+            id="record">
+            전적
+            <span className="mp-explain-span">게임 전적을 보려면 누르세요!</span>
+          </Link>
+          <Link
+            to={`${match.path}/chat`}
+            style={{textDecoration: "none"}}
+            className="buttons"
+            id="chat">
+            채팅
+            <span className="mp-explain-span">친구와 채팅을 하려면 누르세요!</span>
+          </Link>
+          <Link
+            to={`${match.path}/game`}
+            style={{textDecoration: "none"}}
+            className="buttons"
+            id="game">
+              게임
+            <span className="mp-explain-span">게임을 하려면 누르세요!</span>
+          </Link>
+        </div>
+        <Switch>
+          <Route path={`${match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
+          <Route path={`${match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
+          <Route path={`${match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route>
+        </Switch>
+      </main>
     </>
   );
 }

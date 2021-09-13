@@ -1,0 +1,197 @@
+#context-menu {
+  margin: 0;
+  padding: 2px 0;
+  position: fixed;
+  background: #4ba37a;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgb(0 0 0 / 15%);
+  font-size: 13px;
+  outline: 0;
+  max-width: 250px;
+  min-width: 125px;
+  .cm-list {
+    color: #fff;
+    text-align: -webkit-match-parent;
+    padding: 6px 12px;
+    list-style: none;
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+.menu {
+  background: #282438;
+  color: #fff;
+  height: 100vh;
+  width: 240px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  outline: none;
+  overflow-y: auto;
+
+  .avatar {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 2em 0.5em;
+    text-align: center;
+
+    #avatarImg {
+      width: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid #ffea92;
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
+      opacity: 0.9;
+      transform: scale(1);
+      transition: .1s all ease-in-out;
+    }
+
+    #avatarImg:hover {
+      opacity: 1;
+      transform: scale(1.1);
+      transition: .2s all ease-in-out;
+      cursor: pointer;
+    }
+
+    h2 {
+      font-weight: normal;
+      margin-top: 5px;
+      margin-bottom: 0;
+    }
+  }
+
+  .nav-ul {
+    list-style: none;
+    padding: 0.5em 0;
+    margin: 0;
+
+    #friend-list-container {
+      max-height: 350px;
+      overflow-y: scroll;
+
+      .friend {
+        padding-top: 5px;
+        padding-left: calc(0.5em + 23px);
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+        .flg-friend-avatar {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          vertical-align: middle;
+          margin-right: 5px;
+        }
+      }
+    }
+
+    .nav-list-button {
+      padding: 1em;
+      font-size: 0.95em;
+      transition: all 0.15s linear;
+      cursor: pointer;
+
+      .nav-list-span {
+        margin-left: 35px;
+      }
+
+      .nav-list-img {
+        position: absolute;
+        width: 23px;
+        height: 23px;
+        margin-right: 10px;
+      }
+
+      #icon-plus {
+        position: absolute;
+        margin-right: 10px;
+        width: 23px;
+        height: 23px;
+        right: 0%;
+        &:hover {
+          opacity: 0.6;
+        }
+      }
+
+      #input-add-friend {
+        width: 100%;
+        padding: 8px 13px;
+        line-height: 25px;
+        font-size: 8px;
+        font-weight: 500;
+        font-family: inherit;
+        border-radius: 6px;
+        -webkit-appearance: none;
+        color: #99a3ba;
+        border: 1px solid #cdd9ed;
+        background: #fff;
+        transition: border 0.3s ease;
+
+        &::placeholder {
+          color: #cbd1dc;
+        }
+
+        &:focus {
+          outline: none;
+          border-color: #bdc2ca;
+        }
+      }
+
+      #form-add-friend {
+        position: relative;
+        display: flex;
+        width: 100%;
+        margin-top: 10px;
+        #submit-button,
+        #input-add-friend {
+          white-space: nowrap;
+          &:not(:first-child):not(:last-child) {
+            border-radius: 0;
+          }
+          &:first-child {
+            border-radius: 6px 0 0 6px;
+          }
+          &:last-child {
+            border-radius: 0 6px 6px 0;
+          }
+          &:not(:first-child) {
+            margin-left: -1px;
+          }
+        }
+
+        #input-add-friend {
+          position: relative;
+          flex: 1 1 auto;
+          width: 1%;
+        }
+
+        #submit-button {
+          text-align: center;
+          padding: 8px 12px;
+          font-size: 13px;
+          line-height: 25px;
+          color: #99a3ba;
+          background: #eef4ff;
+          border: 1px solid #cdd9ed;
+          transition: background 0.3s ease, border 0.3s ease, color 0.3s ease;
+        }
+        
+        #submit-button:hover {
+          color: #6d7483;
+          background: #88c3f3;
+          border-color: #bdc2ca;
+        }
+      }
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+}
