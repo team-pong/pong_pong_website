@@ -23,18 +23,21 @@ const GameContent: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   return (
     <div id="game-content">
       <Link
-        to={`${path}/match/normal-match`}
+        to={`${path}/match/normal`}
         className="game-content-match-button">
           일반 게임
       </Link>
       <Link
-        to={`${path}/match/ladder-match`}
+        to={`${path}/match/ladder`}
         className="game-content-match-button">
           레더 게임
       </Link>
 
       {/* 라우팅 */}
       <Route path={`${path}/match/:matchType`}>
+        <Modal id={Date.now()} content={<GameOptionContent />}/>
+      </Route>
+      <Route path={`${path}/match/:matchType/:map`}>
         <Modal id={Date.now()} smallModal content={<GameMatchContent setIsMatched={setIsMatched}/>}/>
       </Route>
       <Route path={`${path}/game/:roomId`}>
