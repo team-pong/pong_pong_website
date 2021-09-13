@@ -109,9 +109,6 @@ const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
           {/* </Link> */}
         </ul>
         <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent myNickSetter={setMyNick} myAvatarSetter={setMyAvatar}/>} smallModal/></Route>
-        <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
-        <Route path={`${props.match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
-        {/* <Route path={`${props.match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route> */}
       </nav>
     );
   } else {
