@@ -1,17 +1,28 @@
-import { Controller, Post, Body, Get, Delete, Query, forwardRef, Inject } from '@nestjs/common';
+import { Controller, Post, Body, Get, Delete, Query, forwardRef, Inject, Req } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BanService } from './ban.service';
 import { BanDto1 } from 'src/dto/ban';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from 'src/users/users.service';
+import { SessionService } from 'src/session/session.service';
+import { ChatService } from 'src/chat/chat.service';
+import { err26, err27 } from 'src/err';
+import { Request } from 'express';
+import { AdminService } from 'src/admin/admin.service';
 
 @ApiTags('Ban')
 @Controller('ban')
 export class BanController {
   constructor(
+    private banService: BanService,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
-    private banService: BanService
+    @Inject(forwardRef(() => SessionService))
+    private sessionService: SessionService,
+    @Inject(forwardRef(() => ChatService))
+    private chatService: ChatService,
+    @Inject(forwardRef(() => AdminService))
+    private adminService: AdminService,
     ){}
 
   @ApiOperation({ summary: 'ban 설정'})
@@ -19,8 +30,15 @@ export class BanController {
   // @ApiBody({ type: BanDto1, description: 'ban 설정할 채널아이디, 유저아이디' })
   @ApiBody({ type: BanDto1, description: 'ban 설정할 채널아이디, 유저닉네임' })
   @Post()
-  async createBan(@Body() b: BanDto1){
-    let user;
+  async createBan(@Body() b: BanDto1, @Req() req: Request){
+    let user, user_id, owner, isAdmin;
+
+    user_id = await this.sessionService.readUserId(req.sessionID);
+    owner = await this.chatService.readOwner(b.channel_id);
+    isAdmin = await this.adminService.isAdmin(user_id, b.channel_id);
+    if (user_id != owner.user_id && !isAdmin.bool) // 사용자가 owner가 아니고, admin도 아니면
+      return new ErrMsgDto(err27);
+
     user = await this.usersService.readUsers(b.nick, 'nick');
     return await this.banService.createBan(user.user_id, b.channel_id);
     // return this.banService.createBan(b.user_id, b.channel_id);
