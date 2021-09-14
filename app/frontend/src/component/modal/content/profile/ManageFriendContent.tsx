@@ -18,8 +18,20 @@ const FriendList: React.FC = () => {
 
 	const [friendList, setFriendList] = useState<Friend[]>();
 
-	const deleteFriend = (nick: string) => {
-		console.log(`${nick} delete`);
+  /*!
+   * @author donglee
+   * @brief 친구 삭제 POST 요청 후 성공하면 state를 해당 친구를 제거한 상태로 업데이트한다
+   */	
+	const deleteFriend = async (nick: string) => {
+		const easyfetch = new EasyFetch(`http://127.0.0.1:3001/friend?friend_nick=${nick}`, "DELETE");
+		const res = await (await easyfetch.fetch()).json();
+
+		if (res.err_msg !== "Success") {
+			alert(res.err_msg);
+		} else {
+			const updatedList = friendList.filter((friend) => friend.nick !== nick);
+			setFriendList(updatedList);
+    }
 	};
 
   /*!
