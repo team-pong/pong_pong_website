@@ -71,7 +71,7 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
           <h2>{myNick}</h2>
         </header>
         <ul className="nav-ul">
-          <li className="nav-list-button" onClick={() => setIsFriendListOpen(!isFriendListOpen)}>
+          <li className="nav-list-button" id="nav-friend" onClick={() => setIsFriendListOpen(!isFriendListOpen)}>
             <img className="nav-list-img" src="/public/users.svg"/>
             <span className="nav-list-span">친구</span>
             <img 
