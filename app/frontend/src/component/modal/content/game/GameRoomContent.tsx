@@ -1,9 +1,10 @@
 import { FC } from "react";
-import { RouteComponentProps, withRouter } from "react-router-dom";
+import { RouteComponentProps, withRouter, useHistory } from "react-router-dom";
 
 const GameRoomContent: FC<RouteComponentProps> = ({match: {params}}) => {
+  const history = useHistory();
   return (
-    <>roomID: {(params as any).roomId}</>
+    <>roomID: {(params as any).roomId}<button onClick={() => {history.goBack();history.goBack();}}>돌아가기</button></>
   );
 };
 

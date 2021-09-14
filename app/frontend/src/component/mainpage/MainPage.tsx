@@ -8,6 +8,7 @@ import EasyFetch from '../../utils/EasyFetch';
 import { testFriendList } from '../../dummydata/testFriendList';
 import { Link, Route, Switch } from "react-router-dom";
 import Loading from "../loading/Loading";
+import ProfileContent from "../modal/content/profile/ProfileContent";
 
 /*!
  * @author yochoi, donglee
@@ -15,13 +16,14 @@ import Loading from "../loading/Loading";
  */
 
 const MainPage = ({match}): JSX.Element => {
+
   return (
     <>
       <NavBar friends={testFriendList} />
       <main>
         <div id="button-container">
           <Link
-            to={`${match.url}/record`}
+            to={`${match.url}/profile/donglee`}
             style={{textDecoration: "none"}}
             className="buttons"
             id="record">
@@ -29,7 +31,7 @@ const MainPage = ({match}): JSX.Element => {
             <span className="mp-explain-span">게임 전적을 보려면 누르세요!</span>
           </Link>
           <Link
-            to={`${match.path}/chat`}
+            to={`${match.url}/chat`}
             style={{textDecoration: "none"}}
             className="buttons"
             id="chat">
