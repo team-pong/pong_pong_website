@@ -57,8 +57,16 @@ export class AdminService {
       return new Bool(false);
   }
 
-  async deleteAdmin(user_id: string){
-    console.log("user_id : ", user_id);
+  async deleteAdmin(user_id: string, channel_id: number){
+    if (await this.adminRepo.count({user_id: user_id}) === 0)  // 유저가 admin이 아니면
+      return new ErrMsgDto(err11);
+    if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널 이라면
+      return new ErrMsgDto(err4);
+    await this.adminRepo.delete({user_id: user_id, channel_id: channel_id});
+    return new ErrMsgDto(err0);
+  }
+
+  async deleteAllAdmin(user_id: string){
     if (await this.adminRepo.count({user_id: user_id}) === 0)  // 유저가 admin이 아니면
       return new ErrMsgDto(err11);
     await this.adminRepo.delete({user_id: user_id});
