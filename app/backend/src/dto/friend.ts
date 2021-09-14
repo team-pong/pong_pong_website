@@ -12,11 +12,11 @@ export class FriendDto1{
 	// 	description: '친구 유저 아이디',
 	// })
 	// public friend_id: string;
-	@ApiProperty({
-		example: 'jinbkim',
-		description: '내 유저 닉네임',
-	})
-	public user_nick: string;
+	// @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: '내 유저 닉네임',
+	// })
+	// public user_nick: string;
 
 	@ApiProperty({
 		example: 'donglee',
