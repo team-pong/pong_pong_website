@@ -4,15 +4,19 @@ import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { UsersDto3 } from 'src/dto/users';
 import { Friend } from 'src/entities/friend';
 import { Users } from 'src/entities/users';
-import { err0, err16, err17, err2, err25} from 'src/err';
+import { err0, err16, err17, err2, err25, err28, err3} from 'src/err';
 import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
+import { BlockService } from 'src/block/block.service';
 
 @Injectable()
 export class FriendService {
   constructor(
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    @Inject(forwardRef(() => BlockService))
+    private blockService: BlockService,
+    
     @InjectRepository(Friend) private friendRepo: Repository<Friend>,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
   ){}
@@ -24,6 +28,14 @@ export class FriendService {
       return new ErrMsgDto(err2);
     if (await this.friendRepo.count({user_id: user_id, friend_id: friend_id}))  // 이미 친구 이면
       return new ErrMsgDto(err16);
+
+    if (user_id == friend_id)  // 자기자신을 추가할려 할때
+      return new ErrMsgDto(err28);
+    let isBlock;
+    isBlock = await this.blockService.isBlock(user_id, friend_id);
+    if (isBlock.bool)  // 이미 차단한 유저 이면
+      return new ErrMsgDto(err3);
+  
     await this.friendRepo.save({user_id: user_id, friend_id: friend_id});
     return new ErrMsgDto(err0);
   }

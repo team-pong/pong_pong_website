@@ -26,7 +26,8 @@ const err24 = "현재 인원이 최대 인원보다 큽니다.";
 const err25 = "존재하지 않는 세션입니다.";
 const err26 = "해당 유저는 방장이 아닙니다.";
 const err27 = "해당 유저는 방장 혹은 관리자가 아닙니다.";
+const err28 = "자기 자신을 친추할 수 없습니다.";
 
 
 
-export {err0, err1, err2, err3, err4, err5, err6, err7, err8, err9, err10, err11, err12, err13, err14, err15, err16, err17, err18, err19, err20, err21, err22, err23, err24, err25, err26, err27};
+export {err0, err1, err2, err3, err4, err5, err6, err7, err8, err9, err10, err11, err12, err13, err14, err15, err16, err17, err18, err19, err20, err21, err22, err23, err24, err25, err26, err27, err28};
