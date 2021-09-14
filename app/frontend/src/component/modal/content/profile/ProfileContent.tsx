@@ -43,6 +43,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
   const [nickToEdit, setNickToEdit] = useState("");
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
+  const [isBlockedFriend, setIsBlockedFriend] = useState(false);
 
   const avatarImgRef = useRef(null);
 
@@ -162,14 +163,37 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
     form.requestSubmit();
   };
 
+  /*!
+   * @author donglee
+   * @brief 친구 추가 POST 요청 후 버튼을 '친구 삭제'로 바꾸기 위해서 state 업데이트
+   */
   const addFriend = async () => {
-    console.log(`add ${nick}`);
-    /* 친구 추가 후에 성공하면 isAlradyFriend state true로 설정 */
+    const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend", "POST");
+		const body = {
+			"friend_nick": nick
+		};
+		const res = await (await easyfetch.fetch(body)).json();
+
+		if (res.err_msg !== "Success") {
+			alert(res.err_msg);
+		} else {
+      setIsAlreadyFriend(true);
+    }
   };
 
+  /*!
+   * @author donglee
+   * @brief 친구 삭제 DELETE 요청 후 버튼을 '친구 추가'로 바꾸기 위해서 state 업데이트
+   */
   const deleteFriend = async () => {
-    console.log(`delete ${nick}`);
-    /* 친구 삭제 후에 성공하면 isAlradyFriend state false로 설정 */
+    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/friend?friend_nick=${nick}`, "DELETE");
+		const res = await (await easyfetch.fetch()).json();
+
+		if (res.err_msg !== "Success") {
+			alert(res.err_msg);
+		} else {
+      setIsAlreadyFriend(false);
+    }
   };
 
   const sendMessage = () => {
@@ -180,9 +204,69 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
     console.log(`request match to ${nick}`);
   }
 
-  const blockFriend = () => {
-    console.log(`block ${nick}`);
+  /*!
+   * @author donglee
+   * @brief 친구 차단 후 state 설정(차단하면 친구에서 삭제되므로 isAlreadyFriend state도 설정함)
+   */
+  const blockFriend = async () => {
+    const easyfetch = new EasyFetch("http://127.0.0.1:3001/block", "POST");
+		const body = {
+			"block_nick": nick,
+		};
+		const res = await (await easyfetch.fetch(body)).json();
+
+		if (res.err_msg !== "Success") {
+			alert("사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.");
+		} else {
+      setIsBlockedFriend(true);
+      setIsAlreadyFriend(false);
+		}
   }
+
+  /*!
+   * @author donglee
+   * @brief 친구 차단 해제 후 state 설정
+   */
+  const unblockFriend = async () => {
+    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/block?block_nick=${nick}`, "DELETE");
+		const res = await (await easyfetch.fetch()).json();
+
+		if (res.err_msg !== "Success") {
+			alert("사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.");
+		} else {
+      setIsBlockedFriend(false);
+		}
+  };
+
+  /*!
+   * @author donglee
+   * @brief 이미 친구인지 아닌지를 먼저 검사해서 state를 설정한다
+   */
+  const getIsAlreadyFriend = async () => {
+    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/friend?friend_nick=${nick}`);
+		const res = await (await easyfetch.fetch()).json();
+
+    if (res.bool) {
+      setIsAlreadyFriend(true);
+    } else {
+      setIsAlreadyFriend(false);
+    }
+  };
+
+  /*!
+   * @author donglee
+   * @brief 이미 차단한 친구인지 아닌지를 먼저 검사해서 state를 설정한다
+   */
+  const getIsBlockedFriend = async () => {
+    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/block/isBlock?block_nick=${nick}`);
+		const res = await (await easyfetch.fetch()).json();
+
+    if (res.bool) {
+      setIsBlockedFriend(true);
+    } else {
+      setIsBlockedFriend(false);
+    }
+  };
 
  /*!
   * @author donglee
@@ -201,16 +285,14 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
   /*!
    * @author donglee
    * @detail DB에서 정보를 얻어온 이후에 nickToEdit state를 업데이트한다
+   *         이미 친구인지, 차단한 친구인지 정보를 받아온다
    */
   useEffect(() => {
     getUserInfo()
       .then((res) => {setNickToEdit(res.nick); return res;});
     if (!isMyProfile) {
-      // const easyfetch = new EasyFetch(`http://localhost:3001/friend?friend_id=${user_nick}&user_id=${mynick}`)
-      // const res = await (await easyfetch.fetch()).json();
-      // return res;
-      // .then((res) => {setIsAlreadyFriend(true)})
-      /* API GET call and then set the state  */
+      getIsAlreadyFriend();
+      getIsBlockedFriend();
     }
   }, []);
 
@@ -316,11 +398,14 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
         </div>
         <div id="lower-part">
           <div id="blank"></div>
-          <div id="delete-user" onClick={blockFriend}>
+          <div id="delete-user" onClick={!isBlockedFriend ? blockFriend : unblockFriend}>
             <div id="delete-icon">
-              <img className="pr-trash-btn" src="/public/block.png" alt="차단" />
+              <img className="pr-trash-btn" src={!isBlockedFriend ? "/public/block.png" : "/public/unlock.png"} />
             </div>
-            <span className="pr-explain">클릭하면 해당 유저를 차단합니다.</span>
+            {!isBlockedFriend ?
+              <span className="pr-explain">클릭하면 해당 유저를 차단합니다.</span>
+              : <span className="pr-explain">클릭하면 해당 유저를 차단 해제합니다.</span>
+            }
           </div>          
         </div>
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={nick}/>} /></Route>

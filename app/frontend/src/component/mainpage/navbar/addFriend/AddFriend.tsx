@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import EasyFetch from "../../../../utils/EasyFetch";
 
 /*!
  * @author donglee
@@ -14,11 +15,22 @@ interface AddFriendProps {
 const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
 	const [nicknameToFind, setNicknameToFind] = useState("");
 
-  const addFriend = (e: React.SyntheticEvent) => {
+	/*!
+ 	 * @author donglee
+ 	 * @brief 친구 추가 POST 요청
+ 	 */
+  const addFriend = async (e: React.SyntheticEvent) => {
     e.preventDefault(); //문서 새로고침을 방지하기 위함
 
-		console.log("nicknameToFind: ", nicknameToFind);
-    /* TODO: DB에 매치되는 user를 친구로 등록하는 로직 */
+		const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend", "POST");
+		const body = {
+			"friend_nick": nicknameToFind
+		};
+		const res = await (await easyfetch.fetch(body)).json();
+
+		if (res.err_msg !== "Success") {
+			alert(res.err_msg);
+		}
   };
 
 	/*!
@@ -65,6 +77,8 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
         type="type"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
 				autoComplete="off"
+				minLength={2}
+				maxLength={10}
         required
         placeholder="추가할 닉네임을 입력하세요"
 				value={nicknameToFind}
