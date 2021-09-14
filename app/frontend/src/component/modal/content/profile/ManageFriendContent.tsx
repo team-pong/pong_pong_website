@@ -22,8 +22,16 @@ const FriendList: React.FC = () => {
 		console.log(`${nick} delete`);
 	};
 
-	const blockFriend = (nick: string) => {
-		console.log(`${nick} block`);
+	const blockFriend = async (nick: string) => {
+		const easyfetch = new EasyFetch("http://127.0.0.1:3001/block", "POST");
+		const body = {
+			"block_nick": nick,
+		};
+		const res = await (await easyfetch.fetch(body)).json();
+		if (res !== "Success") {
+			alert("사용자의 이름이 변경됐을 수 있습니다. 다시 시도하십시오.");
+		}
+		// getFriendList();
 	};
 
 	const getFriendList = async () => {
@@ -79,8 +87,12 @@ const BlockedList: React.FC<{nick: string}> = ({nick}) => {
 	
 	const [blockedList, setBlockedList] = useState<Friend[]>();
 
-	const unblockFriend = (nick: string) => {
-		console.log(`${nick} unblock!`);
+	const unblockFriend = async (nick: string) => {
+		const easyfetch = new EasyFetch(`http://127.0.0.1:3001/block?block_nick=${nick}`, "DELETE");
+		const res = await (await easyfetch.fetch()).json();
+		if (res !== "Success") {
+			alert("사용자의 이름이 변경됐을 수 있습니다. 다시 시도하십시오.");
+		}
 	};
 
 	const getBlockedList = async () => {
