@@ -1,4 +1,5 @@
 import { useState, useEffect, FC, MouseEvent } from 'react'
+import Loading from '../../../loading/Loading';
 import EasyFetch from '../../../../utils/EasyFetch';
 import ContextMenu from '../contextmenu/ContextMenu'
 
@@ -81,15 +82,21 @@ const FriendList: FC = (props): JSX.Element => {
     });
   }, []);
 
-  if (friendList) {
+  if (friendList === null || friendList === undefined) {
+    return (<Loading width={240} height={35}/>);
+  } else if (friendList.length === 0) {
+    return (<div style={{
+      height: "35px",
+      lineHeight: "35px",
+      textAlign: "center"
+    }}>친구 없음</div>);
+  } else {
     return (
       <div id="friend-list-container">
         {friendList.map(friendListGenerator)}
         {contextMenuInfo.isOpen ? <ContextMenu target={contextMenuInfo.target} x={contextMenuInfo.xPos} y={contextMenuInfo.yPos}/> : <></>}
       </div>
     );
-  } else {
-    return (<h1>Loading...</h1>);
   }
 }
 
