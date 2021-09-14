@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import { Link } from 'react-router-dom';
 
 /*!
  * @author yochoi
@@ -16,6 +17,11 @@ interface contextMenuProps {
 const ContextMenu: FC<contextMenuProps> = ({target, x, y}): JSX.Element => {
   return (
     <ul id="context-menu" style={{ top: y, left: x, }}>
+      <Link
+        to={`mainpage/profile/${target}`}
+        style={{textDecoration: "none"}}>
+        <li className="cm-list">프로필 보기</li>
+      </Link>
       <li className="cm-list" onClick={() => console.log(`message to ${target}`)}>메세지 보내기</li>
       <li className="cm-list" onClick={() => console.log(`delete ${target}`)}>친구 삭제하기</li>
     </ul>
