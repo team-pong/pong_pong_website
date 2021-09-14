@@ -30,6 +30,8 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
 
 		if (res.err_msg !== "Success") {
 			alert(res.err_msg);
+		} else {
+			props.setState(false);
 		}
   };
 
