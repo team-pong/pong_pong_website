@@ -6,7 +6,7 @@ import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from 'src/users/users.service';
 import { SessionService } from 'src/session/session.service';
 import { ChatService } from 'src/chat/chat.service';
-import { err26, err27 } from 'src/err';
+import { err27 } from 'src/err';
 import { Request } from 'express';
 import { AdminService } from 'src/admin/admin.service';
 
