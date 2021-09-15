@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BlockModule } from 'src/block/block.module';
 import { Achievements } from 'src/entities/achievements';
 import { Admin } from 'src/entities/admin';
 import { Ban } from 'src/entities/ban';
@@ -35,6 +36,7 @@ import { FriendService } from './friend.service';
     ]),
     forwardRef(() => UsersModule),
     forwardRef(() => SessionModule),
+    forwardRef(() => BlockModule),
   ],
   controllers: [FriendController],
   providers: [FriendService],

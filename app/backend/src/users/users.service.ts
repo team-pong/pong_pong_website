@@ -84,7 +84,7 @@ export class UsersService {
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저이면
       return new ErrMsgDto(err2);
     await this.achievementsService.deleteAllAchievements(user_id);
-    await this.adminService.deleteAdmin(user_id);
+    await this.adminService.deleteAllAdmin(user_id);
     await this.banService.deleteBan(user_id);
     await this.blockService.deleteAllBlock(user_id);
     await this.dmStoreService.deleteDmStore(user_id);
