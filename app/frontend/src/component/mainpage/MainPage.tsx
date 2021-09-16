@@ -4,11 +4,7 @@ import NavBar from './navbar/NavBar'
 import "/src/scss/mainpage/MainPage.scss";
 import "/src/scss/mainpage/MainPage-media.scss";
 import "/src/scss/mainpage/MainPage-mobile.scss";
-import EasyFetch from '../../utils/EasyFetch';
-import { testFriendList } from '../../dummydata/testFriendList';
 import { Link, Route, Switch } from "react-router-dom";
-import Loading from "../loading/Loading";
-import ProfileContent from "../modal/content/profile/ProfileContent";
 
 /*!
  * @author yochoi, donglee
@@ -19,11 +15,11 @@ const MainPage = ({match}): JSX.Element => {
 
   return (
     <>
-      <NavBar friends={testFriendList} />
+      <NavBar />
       <main>
         <div id="button-container">
           <Link
-            to={`${match.url}/profile/donglee`}
+            to={`${match.url}/record`}
             style={{textDecoration: "none"}}
             className="buttons"
             id="record">

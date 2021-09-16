@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { testFriendListMyProfile } from "../../../../dummydata/testFriendListMyProfile";
 import EasyFetch from "../../../../utils/EasyFetch";
 import "/src/scss/content/profile/ManageFriendContent.scss";
-import { testBlockedList } from "../../../../dummydata/testBlockedList";
 import { setAchievementStr, setAchievementImg } from "../../../../utils/setAchievement";
 
 interface Friend {
@@ -29,11 +27,10 @@ const FriendList: React.FC = () => {
 	};
 
 	const getFriendList = async () => {
-		//session id로 쿼리를 만들어야 하는데 session id를 어디서 어떻게 구할 수 있을까?
-		// const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nick}`);
-		// const res = await (await EasyFetch.fetch()).json();
+		const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend/list");
+		const res = await (await easyfetch.fetch()).json();
 
-		setFriendList(testFriendListMyProfile);
+		setFriendList(res.friendList);
 	}
 
 	useEffect(() => {
@@ -87,10 +84,10 @@ const BlockedList: React.FC<{nick: string}> = ({nick}) => {
 	};
 
 	const getBlockedList = async () => {
-		// const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nick}`);
-		// const res =  await (await easyfetch.fetch()).json();
+		const easyfetch = new EasyFetch("http://127.0.0.1:3001/block");
+		const res =  await (await easyfetch.fetch()).json();
 		
-		setBlockedList(testBlockedList);
+		setBlockedList(res.blockList);
 	};
 
 	useEffect(() => {

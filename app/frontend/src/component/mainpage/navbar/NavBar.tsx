@@ -5,7 +5,7 @@ import FriendList from "./friendlist/FriendList";
 import "/src/scss/navbar/NavBar.scss";
 import "/src/scss/navbar/NavBar-media.scss";
 import "/src/scss/navbar/NavBar-mobile.scss";
-import Modal, { ChatContent, RecordContent, GameContent } from "../../modal/Modal";
+import Modal from "../../modal/Modal";
 import EasyFetch from "../../../utils/EasyFetch";
 import ProfileContent from "../../modal/content/profile/ProfileContent";
 
@@ -13,12 +13,7 @@ import ProfileContent from "../../modal/content/profile/ProfileContent";
  * @author donglee
  * @brief 좌측에 NavBar가 상시 나타나있음
  *        NavBar 버튼들을 누르면 router로 url을 변경해주면서 모달이 뜨게 함
- * @param[in] friends: 테스트용 친구목록
  */
-
-interface navBarProps {
-  friends: { name: string; state: string; avatarURL: string }[];
-};
 
 interface UserInfo {
   user_id: string;
@@ -31,7 +26,7 @@ interface UserInfo {
   status: string;
 }
 
-const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
+const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
 
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
@@ -88,7 +83,7 @@ const NavBar: FC<navBarProps & RouteComponentProps> = (props): JSX.Element => {
               src="/public/plus.svg"/>
             {isAddFriendOpen ? <AddFriend setState={setIsAddFriendOpen}/> : <></>}
           </li>
-          {isFriendListOpen ? <FriendList friends={props.friends}/> : <></>}
+          {isFriendListOpen ? <FriendList/> : <></>}
           <Link to={`${props.match.url}/record`} style={{color: "inherit", textDecoration: "none"}}>
             <li className="nav-list-button">
               <img className="nav-list-img" src="/public/line-graph.svg"/>
