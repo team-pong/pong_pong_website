@@ -77,12 +77,24 @@
         &:hover {
           background-color: rgba(0, 0, 0, 0.1);
         }
-        .flg-friend-avatar {
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          vertical-align: middle;
-          margin-right: 5px;
+        div.flg-icon-container {
+          display: inline-block;
+          position: relative;
+          img.flg-friend-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 5px;
+          }
+          img.flg-friend-status {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            bottom: 0;
+            right: 0;
+            position: absolute;
+          }
         }
       }
     }
