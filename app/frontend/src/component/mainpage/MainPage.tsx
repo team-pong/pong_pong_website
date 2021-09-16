@@ -41,6 +41,7 @@ const MainPage = ({match}): JSX.Element => {
               게임
             <span className="mp-explain-span">게임을 하려면 누르세요!</span>
           </Link>
+          <button id="dm"><img className="dm-img" src="/public/chat-reverse.svg" /></button>
         </div>
         <Switch>
           <Route path={`${match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
