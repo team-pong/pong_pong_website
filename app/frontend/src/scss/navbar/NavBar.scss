@@ -80,6 +80,7 @@
         div.flg-icon-container {
           display: inline-block;
           position: relative;
+          overflow: hidden;
           img.flg-friend-avatar {
             width: 30px;
             height: 30px;
@@ -88,10 +89,10 @@
             margin-right: 5px;
           }
           img.flg-friend-status {
-            width: 15px;
-            height: 15px;
+            width: 25px;
+            height: 25px;
             border-radius: 50%;
-            bottom: 0;
+            bottom: -7px;
             right: 0;
             position: absolute;
           }
