@@ -1,0 +1,54 @@
+@import "../../colors.scss";
+
+@keyframes notice-animation-in {
+  0% {
+    transform: rotateX(90deg);
+  }
+  50% {
+    transform: rotateX(0deg);
+  }
+  75% {
+    transform: rotateX(-30deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+@keyframes notice-animation-out {
+  0% {
+    transform: rotateX(0deg);
+  }
+  50% {
+    transform: rotateX(-30deg);
+  }
+  75% {
+    transform: rotateX(0deg);
+  }
+  100% {
+    transform: rotateX(90deg);
+  }
+}
+
+div.notice {
+  position: fixed;
+  display: none;
+  background-color: $green;
+  color: #fff;
+  width: 312px;
+  height: 64px;
+  top: 1em;
+  right: 1em;
+  text-align: center;
+  line-height: 64px;
+}
+div.notice.inactive {
+  display: block;
+  transform: rotateX(90deg);
+  animation: notice-animation-out 1s;
+}
+div.notice.active {
+  display: block;
+  transform: rotateX(0deg);
+  animation: notice-animation-in 1s;
+}
