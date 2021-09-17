@@ -1,0 +1,43 @@
+@keyframes dm-in {
+  0% {
+    opacity: 0;
+    bottom: 1em;
+  }
+  100% {
+    opacity: 1;
+    bottom: calc(1em + 60px);
+  }
+}
+
+@keyframes dm-out {
+  0% {
+    opacity: 1;
+    bottom: calc(1em + 60px);
+  }
+  100% {
+    opacity: 0;
+    bottom: 1em;
+  }
+}
+
+div.dm {
+  position: absolute;
+  bottom: 1em;
+  right: 1em;
+  background-color: red;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  transition: all 1s;
+  &.in {
+    opacity: 1;
+    width: 350px;
+    height: 650px;
+    bottom: calc(1em + 60px);
+    animation: dm-in 1s;
+  }
+  &.out {
+    opacity: 0;
+    animation: dm-out 1s;
+  }
+}

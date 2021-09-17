@@ -1,5 +1,29 @@
 @import "../../colors.scss";
 
+@keyframes dm-animation {
+  0% {
+    width: 30px;
+    height: 30px;
+  }
+  50% {
+    width: 35px;
+    height: 35px;
+  }
+  100% {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@keyframes dm-closer-animation {
+  0% {
+    transform: rotate(45deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
 main {
   height: 100vh;
   #button-container {
@@ -30,7 +54,7 @@ main {
     //   font-size: 0.4em;
     //   display: block;
     //   margin: 10px 0;
-      // �̰� �Ƹ��� ���� �� �� ������?
+      // 이게 아마도 내가 한 거 같은데?
 
     #record {
       background-color: #854EF6;
@@ -65,19 +89,28 @@ main {
         background-color: #3a8a4a;
       }
     }
-    button#dm {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      position: fixed;
-      bottom: 1em;
-      right: 1em;
-      background-color: #282438;
-      border: 1px solid #fff;
-      img.dm-img {
-        width: 30px;
-        height: 30px;
-        margin-top: 8px;
+    section#dm-section {
+      button#dm-controll-button {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        position: fixed;
+        bottom: 1em;
+        right: 1em;
+        background-color: #282438;
+        border: 1px solid #fff;
+        cursor: pointer;
+        img.dm-img {
+          width: 30px;
+          height: 30px;
+          margin-top: 5px;
+          &.dm {
+            animation: dm-animation .25s;
+          }
+          &.closer {
+            animation: dm-closer-animation .25s;
+          }
+        }
       }
     }
   }
