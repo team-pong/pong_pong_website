@@ -66,16 +66,18 @@ main {
       }
     }
     button#dm {
-      width: 100px;
-      height: 100px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       position: fixed;
       bottom: 1em;
       right: 1em;
       background-color: #282438;
+      border: 1px solid #fff;
       img.dm-img {
-        width: 70px;
-        height: 70px;
+        width: 30px;
+        height: 30px;
+        margin-top: 8px;
       }
     }
   }
