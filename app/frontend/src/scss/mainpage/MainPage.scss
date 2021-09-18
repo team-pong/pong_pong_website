@@ -77,13 +77,13 @@ main {
       }
     }
     section#dm-section {
+      position: fixed;
+      bottom: 1em;
+      right: 1em;
       button#dm-controll-button {
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        position: fixed;
-        bottom: 1em;
-        right: 1em;
         background-color: #282438;
         border: 1px solid #fff;
         cursor: pointer;
