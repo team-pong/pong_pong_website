@@ -1,17 +1,29 @@
-import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AdminService } from 'src/admin/admin.service';
+import { ChatService } from 'src/chat/chat.service';
 import { MuteDto1 } from 'src/dto/mute';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
+import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
 import { MuteService } from './mute.service';
+import { Request } from 'express';
+import { err27 } from 'src/err';
 
 @ApiTags('Mute')
 @Controller('mute')
 export class MuteController {
   constructor(
+    private muteService: MuteService,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
-    private muteService: MuteService
+    @Inject(forwardRef(() => SessionService))
+    private sessionService: SessionService,
+    @Inject(forwardRef(() => ChatService))
+    private chatService: ChatService,
+    @Inject(forwardRef(() => AdminService))
+    private adminService: AdminService,
+
   ){}
 
   @ApiOperation({ summary: 'mute 설정'})
@@ -19,8 +31,15 @@ export class MuteController {
   // @ApiBody({ type: MuteDto1, description: 'mute 설정할 채널아이디, 유저아이디' })
   @ApiBody({ type: MuteDto1, description: 'mute 설정할 채널아이디, 유저 닉네임' })
   @Post()
-  async createMute(@Body() b: MuteDto1){
-    let user;
+  async createMute(@Body() b: MuteDto1, @Req() req: Request){
+    let user, user_id, owner, isAdmin;
+
+    user_id = await this.sessionService.readUserId(req.sessionID);
+    owner = await this.chatService.readOwner(b.channel_id);
+    isAdmin = await this.adminService.isAdmin(user_id, b.channel_id);
+    if (user_id != owner.user_id && !isAdmin.bool) // 사용자가 owner가 아니고, admin도 아니면
+      return new ErrMsgDto(err27);
+
     user = await this.usersService.readUsers(b.nick, 'nick');
     return await this.muteService.createMute(user.user_id, b.channel_id);
     // return this.muteService.createMute(b.user_id, b.channel_id);

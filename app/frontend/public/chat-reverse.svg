@@ -1,0 +1,13 @@
+<svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g id="Below">
+    <rect id="Rectangle 2" x="19" y="15.3575" width="2" height="7.726" rx="1" fill="white"/>
+    <rect id="Rectangle 3" width="2.10814" height="11.815" rx="1" transform="matrix(0.770044 -0.637991 0.811357 0.584551 10 16.345)" fill="white"/>
+  </g>
+  <g id="Above">
+    <rect id="Rectangle 4" width="2" height="17" rx="1" fill="white"/>
+    <rect id="Rectangle 5" width="23" height="2.26667" rx="1" fill="white"/>
+    <rect id="Rectangle 6" x="21" width="2" height="17" rx="1" fill="white"/>
+    <rect id="Rectangle 7" y="14.7333" width="12" height="2.26667" rx="1" fill="white"/>
+    <rect id="Rectangle 8" x="19" y="14.7333" width="4" height="2.26667" rx="1" fill="white"/>
+  </g>
+</svg>

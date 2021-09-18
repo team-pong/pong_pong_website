@@ -12,11 +12,11 @@ export class DmStoreDto1{
 	// 	description: 'dm 받은 유저 아이디',
 	// })
 	// public receiver_id: string;
-	@ApiProperty({
-		example: 'jinbkim',
-		description: 'dm 보낸 유저 닉네임',
-	})
-	public sender_nick: string;
+	// @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: 'dm 보낸 유저 닉네임',
+	// })
+	// public sender_nick: string;
 
 	@ApiProperty({
 		example: 'donglee',
