@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
  * @param[in] y context menu의 y 좌표
  */
 
+/* TODO: 각각의 기능들 구현; 삭제 했을 때 바로 사라져야 한다. */
 interface contextMenuProps {
   target: string,
   x: number,
