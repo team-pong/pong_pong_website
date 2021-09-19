@@ -42,7 +42,6 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
 		if (!res.err_msg) {
 			const updatedList = JSON.parse(JSON.stringify(props.friendList));
 			updatedList.push(res);
-			console.log("friendList: ", props.friendList, "updated: ", updatedList);
 			props.setFriendList(updatedList);
 		} else {
 			alert("에러! 다시 시도하십시오.");
