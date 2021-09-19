@@ -1,4 +1,5 @@
 import { useState, useEffect, FC, MouseEvent, Dispatch, SetStateAction } from 'react'
+import EasyFetch from '../../../../utils/EasyFetch';
 import Loading from '../../../loading/Loading';
 import ContextMenu from '../contextmenu/ContextMenu'
 
@@ -69,8 +70,20 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
       yPos: 0
     })
   };
+
+  /*!
+   * @author donglee
+   * @brief FriendList, AddFriend 컴포넌트와 state를 공유하기 위해 이 컴포넌트에서 FriendList를 가져옴
+   */
+  const getFriendList = async () => {
+    const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend/list");
+    const res = await (await easyfetch.fetch()).json();
+
+    setFriendList(res.friendList);
+  };
   
   useEffect(() => {
+    getFriendList();
     addEventListener("keyup", detectESC);
     addEventListener("mousedown", detectOutSide);
     return (() => {
