@@ -6,6 +6,7 @@ import "/src/scss/mainpage/MainPage-media.scss";
 import "/src/scss/mainpage/MainPage-mobile.scss";
 import { useState } from 'react';
 import { Link, Route, Switch } from "react-router-dom";
+import Notice from '../notice/Notice';
 
 /*!
  * @author yochoi, donglee
@@ -15,6 +16,7 @@ import { Link, Route, Switch } from "react-router-dom";
 const MainPage = ({match}): JSX.Element => {
 
   const [isDmOpen, setIsDmOpen] = useState(false);
+  const [isNoticeOpen, setIsNoticeOpen] = useState(false);
 
   return (
     <>
@@ -45,6 +47,12 @@ const MainPage = ({match}): JSX.Element => {
               게임
             <span className="mp-explain-span">게임을 하려면 누르세요!</span>
           </Link>
+          <button onClick={() => setIsNoticeOpen(true)}>asdf</button>
+          <Notice 
+            seconds={3}
+            content="notice"
+            isNoticeOpen={isNoticeOpen}
+            setIsNoticeOpen={setIsNoticeOpen}/>
           <section id="dm-section">
             <Dm isDmOpen={isDmOpen}/>
             <button id="dm-controll-button" onClick={() => setIsDmOpen(!isDmOpen)}>
