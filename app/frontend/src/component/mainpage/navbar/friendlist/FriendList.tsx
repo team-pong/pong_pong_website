@@ -73,7 +73,7 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
 
   /*!
    * @author donglee
-   * @brief FriendList, AddFriend 컴포넌트와 state를 공유하기 위해 이 컴포넌트에서 FriendList를 가져옴
+   * @brief 이 컴포넌트를 새로 열 때마다 백엔드에서 친구목록 정보를 가져옴
    */
   const getFriendList = async () => {
     const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend/list");
