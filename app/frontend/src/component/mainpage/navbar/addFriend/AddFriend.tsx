@@ -1,19 +1,53 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import EasyFetch from "../../../../utils/EasyFetch";
 
 /*!
  * @author donglee
  * @brief "icon-plus" (+ 이미지 로고) 를 클릭했을 때 친구 추가 UI를 보여주는 FC
  * @param[in] setState 이 컴포넌트를 보여줄 지 말지를 정하는 상위컴포넌트(NavBar.tsx)의 stateSetter
+ * @param[in] friendList 친구 추가 시에 state를 업데이트 할 때 사용하기 위해 NavBar에서 오는 state
+ * @param[in] setFriendList 친구 추가 시에 state를 업데이트 할 때 사용하기 위해 NavBar에서 오는 stateSetter
  * @detail SEC키를 받거나, 다른 부분을 클릭하면 컴포넌트를 언마운트함.
  */
 
+interface Friend {
+	user_id: string;
+	nick: string;
+	avatar_url: string;
+	total_games: number;
+	win_games: number;
+	loss_games: number;
+	ladder_level: number;
+	status: string;
+}
+
 interface AddFriendProps {
 	setState: React.Dispatch<React.SetStateAction<boolean>>;
+	friendList: Friend[];
+  setFriendList: Dispatch<SetStateAction<Friend[]>>;
 }
 
 const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
 	const [nicknameToFind, setNicknameToFind] = useState("");
+
+	/*!
+ 	 * @author donglee
+ 	 * @brief 추가한 정보를 GET 요청 후 friendList 깊은 복사를 하고 state 업데이트
+	 *				state 업데이트 시 즉시 변화가 반영됨
+ 	 */
+	const updateState = async () => {
+		const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nicknameToFind}`);
+		const res = await (await easyfetch.fetch()).json();
+
+		if (!res.err_msg) {
+			const updatedList = JSON.parse(JSON.stringify(props.friendList));
+			updatedList.push(res);
+			console.log("friendList: ", props.friendList, "updated: ", updatedList);
+			props.setFriendList(updatedList);
+		} else {
+			alert("에러! 다시 시도하십시오.");
+		}
+	};
 
 	/*!
  	 * @author donglee
@@ -28,9 +62,10 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
 		};
 		const res = await (await easyfetch.fetch(body)).json();
 
-		if (res.err_msg !== "Success") {
+		if (res.err_msg !== "에러가 없습니다.") {
 			alert(res.err_msg);
 		} else {
+			updateState();
 			props.setState(false);
 		}
   };
