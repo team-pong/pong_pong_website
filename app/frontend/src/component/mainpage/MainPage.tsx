@@ -47,12 +47,6 @@ const MainPage = ({match}): JSX.Element => {
               게임
             <span className="mp-explain-span">게임을 하려면 누르세요!</span>
           </Link>
-          <button onClick={() => setIsNoticeOpen(true)}>asdf</button>
-          <Notice 
-            seconds={3}
-            content="notice"
-            isNoticeOpen={isNoticeOpen}
-            setIsNoticeOpen={setIsNoticeOpen}/>
           <section id="dm-section">
             <Dm isDmOpen={isDmOpen}/>
             <button id="dm-controll-button" onClick={() => setIsDmOpen(!isDmOpen)}>
