@@ -6,6 +6,7 @@ import "/src/scss/mainpage/MainPage-media.scss";
 import "/src/scss/mainpage/MainPage-mobile.scss";
 import { useState } from 'react';
 import { Link, Route, Switch } from "react-router-dom";
+import Notice from '../notice/Notice';
 
 /*!
  * @author yochoi, donglee
