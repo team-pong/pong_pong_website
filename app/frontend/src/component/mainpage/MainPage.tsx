@@ -16,7 +16,6 @@ import Notice from '../notice/Notice';
 const MainPage = ({match}): JSX.Element => {
 
   const [isDmOpen, setIsDmOpen] = useState(false);
-  const [isNoticeOpen, setIsNoticeOpen] = useState(false);
 
   return (
     <>

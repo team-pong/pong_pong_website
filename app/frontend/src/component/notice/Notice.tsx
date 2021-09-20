@@ -44,13 +44,13 @@ const Notice: FC<NoticeProps> = ({
   const noticeRef = useRef<HTMLDivElement>(null);
   const progressBarAnimation = useRef<HTMLDivElement>(null);
 
-  function openNotice() {
+  const openNotice = () => {
     setTimeout(() => setIsNoticeOpen(false), seconds * 1000);
     noticeRef.current.className = "notice active";
     progressBarAnimation.current.style.animation = `notice-progress-animation ${seconds}s linear`;
   }
 
-  function closeNotice() {
+  const closeNotice = () => {
     noticeRef.current.className = "notice inactive";
     progressBarAnimation.current.style.animation = "";
   }
@@ -73,7 +73,7 @@ const Notice: FC<NoticeProps> = ({
         className="close-notice"
         src="/public/DM-closer.svg"
         alt="close notice"
-        onClick={() => closeNotice()}/>
+        onClick={closeNotice}/>
       {content}
       <div className="notice-progress-bar" style={{backgroundColor: backgroundColor}}>
         <div className="current" ref={progressBarAnimation}></div>
