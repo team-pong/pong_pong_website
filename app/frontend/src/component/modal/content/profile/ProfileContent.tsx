@@ -100,7 +100,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
     }
     const res = await (await easyfetch.fetch(body)).json();
     
-    if (res.err_msg !== "Success") {
+    if (res.err_msg !== "에러가 없습니다.") {
       alert(`"${nickToEdit}" 은(는) 이미 존재하는 닉네임입니다.`);
       setNickToEdit(userInfo.nick);
       return ;
@@ -174,7 +174,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
 		};
 		const res = await (await easyfetch.fetch(body)).json();
 
-		if (res.err_msg !== "Success") {
+		if (res.err_msg !== "에러가 없습니다.") {
 			alert(res.err_msg);
 		} else {
       setIsAlreadyFriend(true);
@@ -189,7 +189,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
     const easyfetch = new EasyFetch(`http://127.0.0.1:3001/friend?friend_nick=${nick}`, "DELETE");
 		const res = await (await easyfetch.fetch()).json();
 
-		if (res.err_msg !== "Success") {
+		if (res.err_msg !== "에러가 없습니다.") {
 			alert(res.err_msg);
 		} else {
       setIsAlreadyFriend(false);
@@ -215,7 +215,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
 		};
 		const res = await (await easyfetch.fetch(body)).json();
 
-		if (res.err_msg !== "Success") {
+		if (res.err_msg !== "에러가 없습니다.") {
 			alert("사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.");
 		} else {
       setIsBlockedFriend(true);
@@ -231,7 +231,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
     const easyfetch = new EasyFetch(`http://127.0.0.1:3001/block?block_nick=${nick}`, "DELETE");
 		const res = await (await easyfetch.fetch()).json();
 
-		if (res.err_msg !== "Success") {
+		if (res.err_msg !== "에러가 없습니다.") {
 			alert("사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.");
 		} else {
       setIsBlockedFriend(false);

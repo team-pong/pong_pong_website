@@ -33,6 +33,7 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [myNick, setMyNick] = useState("");
   const [myAvatar, setMyAvatar] = useState("");
+  const [friendList, setFriendList] = useState<UserInfo[]>(null);
 
   const avatarImgRef = useRef(null);
 
@@ -49,9 +50,21 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
     return res;
   };
 
+  /*!
+   * @author donglee
+   * @brief FriendList, AddFriend 컴포넌트와 state를 공유하기 위해 이 컴포넌트에서 FriendList를 가져옴
+   */
+  const getFriendList = async () => {
+    const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend/list");
+    const res = await (await easyfetch.fetch()).json();
+
+    setFriendList(res.friendList);
+  };
+
   useEffect(() => {
     getUserInfo()
       .then((res) => setMyNick(res.nick));
+    getFriendList();
   },[]);
 
   if (userInfo) {
@@ -81,9 +94,9 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
                 setIsAddFriendOpen(!isAddFriendOpen);
               }}
               src="/public/plus.svg"/>
-            {isAddFriendOpen ? <AddFriend setState={setIsAddFriendOpen}/> : <></>}
+            {isAddFriendOpen ? <AddFriend setState={setIsAddFriendOpen} friendList={friendList} setFriendList={setFriendList} /> : <></>}
           </li>
-          {isFriendListOpen ? <FriendList/> : <></>}
+          {isFriendListOpen ? <FriendList friendList={friendList} setFriendList={setFriendList} /> : <></>}
           <Link to={`${props.match.url}/record`} style={{color: "inherit", textDecoration: "none"}}>
             <li className="nav-list-button">
               <img className="nav-list-img" src="/public/line-graph.svg"/>

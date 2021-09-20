@@ -18,8 +18,20 @@ const FriendList: React.FC = () => {
 
 	const [friendList, setFriendList] = useState<Friend[]>();
 
-	const deleteFriend = (nick: string) => {
-		console.log(`${nick} delete`);
+  /*!
+   * @author donglee
+   * @brief 친구 삭제 POST 요청 후 성공하면 state를 해당 친구를 제거한 상태로 업데이트한다
+   */	
+	const deleteFriend = async (nick: string) => {
+		const easyfetch = new EasyFetch(`http://127.0.0.1:3001/friend?friend_nick=${nick}`, "DELETE");
+		const res = await (await easyfetch.fetch()).json();
+
+		if (res.err_msg !== "에러가 없습니다.") {
+			alert(res.err_msg);
+		} else {
+			const updatedList = friendList.filter((friend) => friend.nick !== nick);
+			setFriendList(updatedList);
+    }
 	};
 
   /*!
@@ -33,7 +45,7 @@ const FriendList: React.FC = () => {
 		};
 		const res = await (await easyfetch.fetch(body)).json();
 
-		if (res.err_msg !== "Success") {
+		if (res.err_msg !== "에러가 없습니다.") {
 			alert("사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.");
 		} else {
 			const updatedList = friendList.filter((friend) => friend.nick !== nick);
@@ -98,7 +110,7 @@ const BlockedList: React.FC = () => {
 		const easyfetch = new EasyFetch(`http://127.0.0.1:3001/block?block_nick=${nick}`, "DELETE");
 		const res = await (await easyfetch.fetch()).json();
 		
-		if (res.err_msg !== "Success") {
+		if (res.err_msg !== "에러가 없습니다.") {
 			alert("사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.");
 		} else {
 			const updatedList = blockedList.filter((friend) => friend.nick !== nick);
