@@ -42,7 +42,7 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
    */
   const getUserInfo = async () => {
     //test session id로 받아와야 하는데 일단 donglee꺼 받아옴
-    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users/user?user_id=donglee`);
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/user?user_id=donglee`);
     const res = await (await easyfetch.fetch()).json();
 
     setUserInfo(res);

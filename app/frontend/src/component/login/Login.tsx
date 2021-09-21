@@ -103,11 +103,11 @@ const Login = (): JSX.Element => {
   };
 
   const loginTest1 = () => {
-    window.location.href = "http://127.0.0.1:3001/session/test_user01";
+    window.location.href = `${global.BE_HOST}/session/test_user01`;
   }
 
   const loginTest2 = () => {
-    window.location.href = "http://127.0.0.1:3001/session/test_user02";
+    window.location.href = `${global.BE_HOST}/session/test_user02`;
   }
 
   return (

@@ -66,7 +66,7 @@ const FriendList: FC = (props): JSX.Element => {
   };
   
   const getFriendList = async () => {
-    const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend/list");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
     const res = await (await easyfetch.fetch()).json();
 
     setFriendList(res.friendList);

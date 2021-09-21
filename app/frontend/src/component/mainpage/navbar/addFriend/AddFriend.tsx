@@ -22,7 +22,7 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
   const addFriend = async (e: React.SyntheticEvent) => {
     e.preventDefault(); //문서 새로고침을 방지하기 위함
 
-		const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend", "POST");
+		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend`, "POST");
 		const body = {
 			"friend_nick": nicknameToFind
 		};
