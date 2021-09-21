@@ -1,10 +1,12 @@
-import { useState, useEffect, FC, MouseEvent } from 'react'
-import Loading from '../../../loading/Loading';
+import { useState, useEffect, FC, MouseEvent, Dispatch, SetStateAction } from 'react'
 import EasyFetch from '../../../../utils/EasyFetch';
+import Loading from '../../../loading/Loading';
 import ContextMenu from '../contextmenu/ContextMenu'
 
 /*!
  * @author yochoi
+ * @param[in] friendList ContextMenu 컴포넌트에 NavBar의 state를 넘겨주기 위함
+ * @param[in] setFriendList ContextMenu 컴포넌트에 NavBar의 stateSetter를 넘겨주기 위함
  * @brief friend list 를 div로 감싸 반환하는 FC
  */
 
@@ -19,7 +21,12 @@ interface Friend {
 	status: string;
 }
 
-const FriendList: FC = (props): JSX.Element => {
+interface FriendListProps {
+  friendList: Friend[];
+  setFriendList: Dispatch<SetStateAction<Friend[]>>;
+}
+
+const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Element => {
 
   const [contextMenuInfo, setContextMenuInfo] = useState<{isOpen: boolean, target: string, xPos: number, yPos: number}>({
     isOpen: false,
@@ -27,7 +34,6 @@ const FriendList: FC = (props): JSX.Element => {
     xPos: 0,
     yPos: 0
   });
-  const [friendList, setFriendList] = useState<Friend[]>(null);
 
   const friendOnClick = (e: MouseEvent, target: string) => {
     setContextMenuInfo({
@@ -64,14 +70,18 @@ const FriendList: FC = (props): JSX.Element => {
       yPos: 0
     })
   };
-  
+
+  /*!
+   * @author donglee
+   * @brief 이 컴포넌트를 새로 열 때마다 백엔드에서 친구목록 정보를 가져옴
+   */
   const getFriendList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
     const res = await (await easyfetch.fetch()).json();
 
     setFriendList(res.friendList);
   };
-
+  
   useEffect(() => {
     getFriendList();
     addEventListener("keyup", detectESC);
@@ -94,7 +104,15 @@ const FriendList: FC = (props): JSX.Element => {
     return (
       <div id="friend-list-container">
         {friendList.map(friendListGenerator)}
-        {contextMenuInfo.isOpen ? <ContextMenu target={contextMenuInfo.target} x={contextMenuInfo.xPos} y={contextMenuInfo.yPos}/> : <></>}
+        {contextMenuInfo.isOpen ?
+          <ContextMenu
+            target={contextMenuInfo.target}
+            x={contextMenuInfo.xPos}
+            y={contextMenuInfo.yPos}
+            setContextMenuInfo={setContextMenuInfo}
+            friendList={friendList}
+            setFriendList={setFriendList} />
+            : <></>}
       </div>
     );
   }

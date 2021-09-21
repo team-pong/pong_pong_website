@@ -1,6 +1,8 @@
-import { Body, Controller, Delete, forwardRef, Get, Inject, Param, Post, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Param, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
+import { NotLoggedInGuard } from 'src/auth/not-logged-in.guard';
 import { ChatDto1, ChatDto3, ChatDto4, ChatDto5 } from 'src/dto/chat';
 import { UsersDto3 } from 'src/dto/users';
 import { ErrMsgDto } from 'src/dto/utility';
@@ -8,6 +10,7 @@ import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 
 @ApiTags('Chat')
+@UseGuards(new LoggedInGuard())
 @Controller('chat')
 export class ChatController {
   constructor(
