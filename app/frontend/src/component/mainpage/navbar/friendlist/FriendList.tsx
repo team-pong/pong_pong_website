@@ -93,7 +93,7 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
   }, []);
 
   if (friendList === null || friendList === undefined) {
-    return (<Loading width={240} height={35}/>);
+    return (<Loading width={240} height={35} color="#fff"/>);
   } else if (friendList.length === 0) {
     return (<div style={{
       height: "35px",
