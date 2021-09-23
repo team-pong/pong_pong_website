@@ -25,6 +25,7 @@ export class ChatService {
     ){}
 
   async createChat(owner_id: string, title: string, type: string, passwd: string, max_people: number){
+    console.log('create chat 함수 시작', owner_id, title, type, passwd, max_people);
     if (await this.usersRepo.count({user_id: owner_id}) === 0)  // 존재하지 않은 유저 라면
       return new ErrMsgDto(err2);
     if (type != 'public' && type != 'protected' && type != 'private')  // 존재하지 않은 방 타입이면
