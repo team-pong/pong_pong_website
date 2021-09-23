@@ -10,7 +10,6 @@ import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 
 @ApiTags('Chat')
-@UseGuards(new LoggedInGuard())
 @Controller('chat')
 export class ChatController {
   constructor(
