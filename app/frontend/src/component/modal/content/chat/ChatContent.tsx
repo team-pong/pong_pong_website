@@ -1,7 +1,10 @@
-import { FC, Dispatch, SetStateAction, useEffect, useState } from "react";
+import { FC, Dispatch, SetStateAction, useEffect, useState, useCallback } from "react";
 import "/src/scss/content/chat/ChatContent.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import ChatRoomContent from "./ChatRoomContent";
+import { Link, Route } from "react-router-dom";
+import Modal from "../../Modal";
+import MakeChatRoom from "./MakeChatRoom";
 
 interface chatRoom {
   title: string,
@@ -112,7 +115,10 @@ const ChatMain: FC<{setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({se
         </li>
       </ul>
       <ChatRoomList search={chatRoomToFind} type={chatRoomSelector} setChatRoomInfo={setChatRoomInfo}/>
-      <button className="chat-room-btn">채팅방 만들기</button>
+      <Link to={`/mainpage/chat/makechat`}>
+        <button className="chat-room-btn">채팅방 만들기</button>
+      </Link>
+      <Route path={`/mainpage/chat/makechat`}><Modal id={Date.now()} content={<MakeChatRoom />} smallModal/></Route>
     </div>
   );
 }
@@ -122,7 +128,7 @@ const ChatMain: FC<{setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({se
  * @brief 상황에 따라 content를 보여주는 컴포넌트
  */
 
-const ChatContent: FC = (): JSX.Element => {
+const ChatContent: FC = (props): JSX.Element => {
 
   const [chatRoomInfo, setChatRoomInfo] = useState<chatRoom>({title: "", type: "", max_people: 0, current_people: 0});
 
