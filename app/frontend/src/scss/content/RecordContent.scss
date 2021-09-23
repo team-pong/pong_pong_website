@@ -18,7 +18,8 @@
 }
 
 #record-content {
-  width: 80%;
+  width: 640px;
+  height: 555px;
   margin: 45px auto auto auto;
   #search {
     .record-search-input {
@@ -99,40 +100,37 @@
     }
   }
   #record-close {
-    margin-top: 10px;
-    height: 60vh;
-    #motd {
-      display: inline-flex;
-      flex-direction: column;
-      height: 100%;
-      #message {
-        margin-top: 20px;
-        display: inline-block;
-        width: 300px;
-        height: 33%;
-        background-color: $green;
-        border-radius: 12px;
-        #you-know-that {
-          border-bottom: 3px solid green;
-          width: calc(100% - 40px);
-          margin: auto;
-          margin-top: 3px;
-          padding: 10px;
-          color: #fff;
-        }
+    width: 100%;
+    height: calc(100% - 38px);
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-template-columns: auto auto;
+    justify-items: center;
+    .message {
+      display: block;
+      width: 300px;
+      margin: 10px;
+      background-color: $green;
+      border-radius: 12px;
+      .you-know-that {
+        border-bottom: 3px solid green;
+        width: calc(100% - 40px);
+        margin: auto;
+        margin-top: 3px;
+        padding: 10px;
+        color: #fff;
       }
     }
     #ladder-rank {
-      margin: 0;
-      padding: 0;
-      margin-top: 20px;
       width: 300px;
-      height: calc(100% - 20px);
-      float: right;
+      height: calc(100% - 38px);
+      margin: auto;
+      padding: 0;
       background-color: $green;
       border-radius: 12px;
       overflow-y: scroll;
       overflow-x: hidden;
+      grid-row: 1 / 4;
       .record-ladder-li {
         list-style: none;
         color: $green;
