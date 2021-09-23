@@ -35,8 +35,11 @@ export class ChatService {
       return new ErrMsgDto(err15);
     if (await this.chatUsersRepo.count({user_id: owner_id}))  // 이미 다른방에 있는 유저 라면
       return new ErrMsgDto(err9);
+    console.log('chatRepo.save 함수 전');
     const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people});
+    console.log("채널 저장")
     await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 owner 추가
+    console.log("유저 저장")
     return {channel_id: newChat.channel_id};
     // return new ErrMsgDto(err0);
   }
