@@ -25,6 +25,7 @@ export class ChatController {
   @ApiBody({ type: ChatDto1, description: '채널 owner, 제목, 타입, 비밀번호, 최대인원' })
   @Post()
   creatChat(@Body() b: ChatDto1, @Req() req: Request, @Res() res: Response){
+    console.log("POST 요청 도착", b);
     return this.chatService.createChat(req.session.userid, b.title, b.type, b.passwd, b.max_people);
   }
 
