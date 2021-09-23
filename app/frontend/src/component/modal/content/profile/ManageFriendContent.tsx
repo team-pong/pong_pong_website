@@ -39,7 +39,7 @@ const FriendList: React.FC = () => {
    * @brief 친구 차단 POST 요청 후 성공하면 state를 해당 친구를 제거한 상태로 업데이트한다
    */
 	const blockFriend = async (nick: string) => {
-		const easyfetch = new EasyFetch("http://127.0.0.1:3001/block", "POST");
+		const easyfetch = new EasyFetch(`${global.BE_HOST}/block`, "POST");
 		const body = {
 			"block_nick": nick,
 		};
@@ -54,7 +54,7 @@ const FriendList: React.FC = () => {
 	};
 
 	const getFriendList = async () => {
-		const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend/list");
+		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
 		const res = await (await easyfetch.fetch()).json();
 
 		setFriendList(res.friendList);
@@ -107,7 +107,7 @@ const BlockedList: React.FC = () => {
 	const [blockedList, setBlockedList] = useState<Friend[]>();
 
 	const unblockFriend = async (nick: string) => {
-		const easyfetch = new EasyFetch(`http://127.0.0.1:3001/block?block_nick=${nick}`, "DELETE");
+		const easyfetch = new EasyFetch(`${global.BE_HOST}/block?block_nick=${nick}`, "DELETE");
 		const res = await (await easyfetch.fetch()).json();
 		
 		if (res.err_msg !== "에러가 없습니다.") {
@@ -119,7 +119,7 @@ const BlockedList: React.FC = () => {
 	};
 
 	const getBlockedList = async () => {
-		const easyfetch = new EasyFetch("http://127.0.0.1:3001/block");
+		const easyfetch = new EasyFetch(`${global.BE_HOST}/block`);
 		const res =  await (await easyfetch.fetch()).json();
 		
 		setBlockedList(res.blockList);

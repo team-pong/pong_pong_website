@@ -122,7 +122,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
       targetNick = nick;
     }
     /* TODO: session id로 유저의 정보를 받아오도록 해야 함 */
-    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users/user?user_id=${targetNick}`);
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/user?user_id=${targetNick}`);
     const res = await (await easyfetch.fetch()).json();
 
     setUserInfo(res);
@@ -168,7 +168,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    * @brief 친구 추가 POST 요청 후 버튼을 '친구 삭제'로 바꾸기 위해서 state 업데이트
    */
   const addFriend = async () => {
-    const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend", "POST");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/friend`, "POST");
 		const body = {
 			"friend_nick": nick
 		};
@@ -186,7 +186,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    * @brief 친구 삭제 DELETE 요청 후 버튼을 '친구 추가'로 바꾸기 위해서 state 업데이트
    */
   const deleteFriend = async () => {
-    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/friend?friend_nick=${nick}`, "DELETE");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`, "DELETE");
 		const res = await (await easyfetch.fetch()).json();
 
 		if (res.err_msg !== "에러가 없습니다.") {
@@ -209,7 +209,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    * @brief 친구 차단 후 state 설정(차단하면 친구에서 삭제되므로 isAlreadyFriend state도 설정함)
    */
   const blockFriend = async () => {
-    const easyfetch = new EasyFetch("http://127.0.0.1:3001/block", "POST");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/block`, "POST");
 		const body = {
 			"block_nick": nick,
 		};
@@ -228,7 +228,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    * @brief 친구 차단 해제 후 state 설정
    */
   const unblockFriend = async () => {
-    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/block?block_nick=${nick}`, "DELETE");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/block?block_nick=${nick}`, "DELETE");
 		const res = await (await easyfetch.fetch()).json();
 
 		if (res.err_msg !== "에러가 없습니다.") {
@@ -243,7 +243,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    * @brief 이미 친구인지 아닌지를 먼저 검사해서 state를 설정한다
    */
   const getIsAlreadyFriend = async () => {
-    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/friend?friend_nick=${nick}`);
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`);
 		const res = await (await easyfetch.fetch()).json();
 
     if (res.bool) {
@@ -258,7 +258,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    * @brief 이미 차단한 친구인지 아닌지를 먼저 검사해서 state를 설정한다
    */
   const getIsBlockedFriend = async () => {
-    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/block/isBlock?block_nick=${nick}`);
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/block/isBlock?block_nick=${nick}`);
 		const res = await (await easyfetch.fetch()).json();
 
     if (res.bool) {

@@ -33,13 +33,13 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
     let apiAddress: string = "";
     switch (type) {
       case "normal":
-        apiAddress = `http://127.0.0.1:3001/match/general?nick=${target}`
+        apiAddress = `${global.BE_HOST}/match/general?nick=${target}`
         break;
       case "ladder":
-        apiAddress = `http://127.0.0.1:3001/match/ranked?nick=${target}`
+        apiAddress = `${global.BE_HOST}/match/ranked?nick=${target}`
         break;
       default:
-        apiAddress = `http://127.0.0.1:3001/match?nick=${target}`
+        apiAddress = `${global.BE_HOST}/match?nick=${target}`
         break;
     };
     const easyfetch = new EasyFetch(apiAddress);
@@ -202,9 +202,9 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
     if (nickNameToFind || nick) {
       let easyfetch = null;
       if (nick) {
-        easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nick}`);  
+        easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nick}`);  
       } else {
-        easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nickNameToFind}`);
+        easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nickNameToFind}`);
       }
       const res = await (await easyfetch.fetch()).json();
       if (res.err_msg) {

@@ -76,7 +76,7 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
    * @brief 이 컴포넌트를 새로 열 때마다 백엔드에서 친구목록 정보를 가져옴
    */
   const getFriendList = async () => {
-    const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend/list");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
     const res = await (await easyfetch.fetch()).json();
 
     setFriendList(res.friendList);
