@@ -23,8 +23,7 @@ export class ChatController {
   @ApiResponse({ type: ErrMsgDto, description: '채널 생성 실패시 실패이유' })
   @ApiBody({ type: ChatDto1, description: '채널 owner, 제목, 타입, 비밀번호, 최대인원' })
   @Post()
-  creatChat(@Body() b: ChatDto1, @Req() req: Request, @Res() res: Response){
-    console.log("POST 요청 도착", b);
+  creatChat(@Body() b: ChatDto1, @Req() req: Request){
     return this.chatService.createChat(req.session.userid, b.title, b.type, b.passwd, b.max_people);
   }
 

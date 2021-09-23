@@ -24,8 +24,7 @@ export class ChatService {
     private chatGateway: ChatGateway,
     ){}
 
-  async createChat(owner_id: string, title: string, type: string, passwd: string, max_people: number){
-    console.log('create chat 함수 시작', owner_id, title, type, passwd, max_people);
+  async createChat(owner_id: string, title: string, type: string, passwd: string, max_people: number) {
     if (await this.usersRepo.count({user_id: owner_id}) === 0)  // 존재하지 않은 유저 라면
       return new ErrMsgDto(err2);
     if (type != 'public' && type != 'protected' && type != 'private')  // 존재하지 않은 방 타입이면
@@ -34,15 +33,11 @@ export class ChatService {
       return new ErrMsgDto(err10);
     if (20 < max_people)  // 채널 최대 인원의 최대값 보다 크면
       return new ErrMsgDto(err15);
-    if (await this.chatUsersRepo.count({user_id: owner_id}))  // 이미 다른방에 있는 유저 라면
-      return new ErrMsgDto(err9);
-    console.log('chatRepo.save 함수 전');
+    // if (await this.chatUsersRepo.count({user_id: owner_id}))
+    //   return new ErrMsgDto(err9);
     const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people});
-    console.log("채널 저장")
     await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 owner 추가
-    console.log("유저 저장")
     return {channel_id: newChat.channel_id};
-    // return new ErrMsgDto(err0);
   }
 
   async readChat(){
