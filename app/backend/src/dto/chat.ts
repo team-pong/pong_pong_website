@@ -1,12 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class ChatDto1{
-  @ApiProperty({
-		example: 'jinbkim',
-		description: 'owner 유저 아이디',
-	})
-	public owner_id: string;
-
 	@ApiProperty({
 		example: '아무나 와보던가',
 		description: '방 제목',
