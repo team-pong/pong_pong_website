@@ -3,9 +3,9 @@ import EasyFetch from "../../../../utils/EasyFetch";
 
 const MakeChatRoom: FC = (props): JSX.Element => {
 
-  const makeChatRoom = async (e) => {
+  const makeChatRoom = (e) => {
+    console.log("cubsuimt1");
     e.preventDefault();
-    
   };
 
   const test = async () => {
@@ -28,13 +28,16 @@ const MakeChatRoom: FC = (props): JSX.Element => {
   return (
     <>
       <form onSubmit={makeChatRoom}>
-        <label htmlFor="mc-chat-title"></label>
-        대화방 이름 :<input id="mc-chat-title" type="text"/>
-        대화방 타입 :<input id="mc-chat-type" type="text"/>
-        비밀번호: <input id="mc-chat-password" type="text"/>
-        최대인원: <input id="mc-chat-max" type="number"/>
+        <label htmlFor="mc-chat-title">대화방 이름 :</label>
+        <input id="mc-chat-title" type="text"/>
+        <label htmlFor="mc-chat-type">대화방 타입 :</label>
+        <input id="mc-chat-type" type="text"/>
+        <label htmlFor="mc-chat-password">비밀번호: </label>
+        <input id="mc-chat-password" type="text"/>
+        <label htmlFor="mc-chat-max">최대인원: </label>
+        <input id="mc-chat-max" type="number"/>
+        <input type="submit" value="adfs"/>
       </form>
-      <button>만들기</button>
     </>
   );
 };
