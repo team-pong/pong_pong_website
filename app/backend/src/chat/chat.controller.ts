@@ -22,7 +22,7 @@ export class ChatController {
   @ApiBody({ type: ChatDto1, description: '채널 owner, 제목, 타입, 비밀번호, 최대인원' })
   @Post()
   creatChat(@Body() b: ChatDto1, @Req() req: Request, @Res() res: Response){
-    return this.chatService.createChat(b.owner_id, b.title, b.type, b.passwd, b.max_people);
+    return this.chatService.createChat(req.session.userid, b.title, b.type, b.passwd, b.max_people);
   }
 
   @ApiOperation({ summary: '모든 채널 검색'})
