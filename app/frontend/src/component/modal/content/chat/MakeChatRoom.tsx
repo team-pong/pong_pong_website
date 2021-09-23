@@ -13,7 +13,7 @@ const MakeChatRoom: FC = (props): JSX.Element => {
     const body = {
       "title": "아무나 와보던가",
       "type": "public",
-      "passwd": "1234",
+      "passwd": "",
       "max_people": 10
     };
     const res = await (await easyfetch.fetch(body)).json();
