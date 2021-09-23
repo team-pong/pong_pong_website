@@ -1,10 +1,29 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
+import EasyFetch from "../../../../utils/EasyFetch";
 
 const MakeChatRoom: FC = (props): JSX.Element => {
 
-  const makeChatRoom = (e) => {
-    console.log("tesT: ",  e);
+  const makeChatRoom = async (e) => {
+    e.preventDefault();
+    
   };
+
+  const test = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/chat`, "POST");
+    const body = {
+      "title": "아무나 와보던가",
+      "type": "public",
+      "passwd": "1234",
+      "max_people": 10
+    };
+    const res = await (await easyfetch.fetch(body)).json();
+
+    console.log("res: ", res);
+  };
+
+  useEffect(() => {
+    test();
+  }, []);
 
   return (
     <>
