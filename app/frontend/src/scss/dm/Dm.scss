@@ -12,10 +12,17 @@
 @keyframes dm-out {
   0% {
     opacity: 1;
+    height: 650px;
     bottom: calc(1em + 60px);
+  }
+  99% {
+    opacity: 0;
+    height: 650px;
+    bottom: 1em;
   }
   100% {
     opacity: 0;
+    height: 0px;
     bottom: 1em;
   }
 }
@@ -24,20 +31,20 @@ div.dm {
   position: absolute;
   bottom: 1em;
   right: 1em;
-  background-color: red;
-  width: 0;
-  height: 0;
+  background-color: #fff;
+  width: 350px;
+  height: 0px;
   opacity: 0;
-  transition: all 1s;
+  border-radius: 10px;
   &.in {
     opacity: 1;
-    width: 350px;
     height: 650px;
     bottom: calc(1em + 60px);
     animation: dm-in 1s;
   }
   &.out {
     opacity: 0;
+    height: 0px;
     animation: dm-out 1s;
   }
 }
