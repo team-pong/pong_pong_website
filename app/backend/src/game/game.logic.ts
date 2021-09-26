@@ -13,9 +13,9 @@ export class GameLogic {
     _direction : [number, number] = [0, 0] // 공의 진행 방향, 추후 속도를 적용할 수도 있음
     _ball : [number, number] = [0, 0] // ball의 중심 좌표, 반지름은 front와 협의하는걸로 설정함
     _bar00 : [number, number, number, number] = [0, 0, 0, 0]// 왼쪽 Bar의 좌표, 왼쪽 상단과 우측 하단 값
-    _bar00_pre : [number, number, number, number];
+    _bar00_pre : [number, number, number, number] = [0, 0, 0, 0];
     _bar01 : [number, number, number,number] = [0, 0, 0, 0]// 우측 Bar의 좌표
-    _bar01_pre : [number, number, number, number];
+    _bar01_pre : [number, number, number, number] = [0, 0, 0, 0];
     _speed : number;
     _correction : number;
     _server : Server;
@@ -60,13 +60,13 @@ export class GameLogic {
         }
         if (pos) {
             this._bar00_pre = this._bar00;
-            if (this._bar00[1] + dirValue > 0 || this._bar00[3] + dirValue < this._bottomWall) {
+            if (this._bar00[1] + dirValue > 0 && this._bar00[3] + dirValue < this._bottomWall) {
                 this._bar00[1] += dirValue;
                 this._bar00[3] += dirValue;
             }
         } else {
             this._bar01_pre = this._bar01;
-            if (this._bar01[1] + dirValue > 0 || this._bar01[3] + dirValue < this._bottomWall) {
+            if (this._bar01[1] + dirValue > 0 && this._bar01[3] + dirValue < this._bottomWall) {
                 this._bar01[1] += dirValue;
                 this._bar01[3] += dirValue;
             }
@@ -134,23 +134,22 @@ export class GameLogic {
         if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [left, this._ball[1]])) {
             const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
             this._direction[0] *= -1;
-            if (diff > 0) {
-                // 아래쪽 이동
-                this.rotate(-diff);
-            } else {
-                this.rotate(diff);
-            }
+            // if (diff > 0) {
+            //     // 아래쪽 이동
+            //     this.rotate(-diff);
+            // } else {
+            //     this.rotate(diff);
+            // }
         }
         if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [right, this._ball[1]])) {
-            this._direction[0] *= -1
             const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
             this._direction[0] *= -1;
-            if (diff > 0) {
-                // 아래쪽 이동
-                this.rotate(diff);
-            } else {
-                this.rotate(-diff);
-            }
+            // if (diff > 0) {
+            //     // 아래쪽 이동
+            //     this.rotate(diff);
+            // } else {
+            //     this.rotate(-diff);
+            // }
         }
 
         if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [this._ball[0], up])) {
@@ -160,26 +159,24 @@ export class GameLogic {
             this._direction[1] *= -1
         }
         if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [left, this._ball[1]])) {
-            this._direction[0] *= -1
             const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
             this._direction[0] *= -1;
-            if (diff > 0) {
-                // 아래쪽 이동
-                this.rotate(-diff);
-            } else {
-                this.rotate(diff);
-            }
+            // if (diff > 0) {
+            //     // 아래쪽 이동
+            //     this.rotate(-diff);
+            // } else {
+            //     this.rotate(diff);
+            // }
         }
         if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [right, this._ball[1]])) {
-            this._direction[0] *= -1
             const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
             this._direction[0] *= -1;
-            if (diff > 0) {
-                // 아래쪽 이동
-                this.rotate(diff);
-            } else {
-                this.rotate(-diff);
-            }
+            // if (diff > 0) {
+            //     // 아래쪽 이동
+            //     this.rotate(diff);
+            // } else {
+            //     this.rotate(-diff);
+            // }
         }
     }
 

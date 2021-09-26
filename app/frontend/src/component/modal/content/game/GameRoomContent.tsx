@@ -38,10 +38,10 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   
   const initBall = (x, y) => {
     return new fabric.Circle({
-      left: x,
-      top: y,
+      left: x - 10,
+      top: y - 10,
       fill: 'black',
-      radius: 5,
+      radius: 10,
     })
   }
   
@@ -52,11 +52,14 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    */
   
   const keyDownEvent = (e: KeyboardEvent) => {
+    
     if (e.code === "ArrowDown" && downKey == 0) {
+      console.log('arrow down key pressed');
       socket.emit("keyEvent", {arrowUp: upKey, arrowDown: true});
       setDownKey((downKey) => {return 1});
     }
     else if (e.code === "ArrowUp" && upKey == 0) {
+      console.log('arrow up key pressed');
       socket.emit("keyEvent", {arrowUp: true, arrowDown: downKey});
       setUpKey(() => {return 1});
     }
@@ -64,10 +67,12 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   
   const keyUpEvent = (e: KeyboardEvent) => {
     if (e.code === "ArrowDown") {
+      console.log('arrow down key unpressed');
       socket.emit("keyEvent", {arrowUp: upKey, arrowDown: false});
       setDownKey(() => {return 0});
     }
     else if (e.code === "ArrowUp") {
+      console.log('arrow up key unpressed');
       socket.emit("ketEvent", {arrowUp: false, arrowDown: downKey});
       setUpKey(() => {return 0});
     }
@@ -92,25 +97,18 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    */
   useEffect(() => {
     socket.on("init", (data) => {
-      setCanvas(initCanvas());
+      setCanvas(() => initCanvas());
       setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
       setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
       setBall(initBall(data.ball[0], data.ball[1]));
     })
 
     socket.on("update", (data) => {
-      console.log("updated data", data);
       setLeftY(data.bar00[1]);
       setRightY(data.bar01[1]);
-      setBallX(data.ball[0]);
-      setBallY(data.ball[1]);
+      setBallX(data.ball[0] - 10);
+      setBallY(data.ball[1] - 10);
     })
-
-    if (canvas) {
-      canvas.add(leftBar);
-      canvas.add(rightBar);
-      canvas.add(ball);
-    }
 
     addEventListener("keydown", keyDownEvent);
     addEventListener("keyup", keyUpEvent)
@@ -127,7 +125,6 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    */
   useEffect(() => {
     if (canvas) {
-     
       leftBar.set({top: leftY});
       canvas.add(leftBar);
       canvas.add(rightBar);
@@ -141,14 +138,17 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    */
   useEffect(() => {
     if (canvas) {
-
       rightBar.set({top: rightY});
-      canvas.add(leftBar);
-      canvas.add(rightBar);
-      canvas.add(ball);
       canvas.renderAll();
     }
   }, [rightY]);
+
+  useEffect(() => {
+    if (canvas) {
+      ball.set({left: ballX, top: ballY})
+      canvas.renderAll();
+    }
+  }, [ballX, ballY]);
 
   return (
     <canvas id="myCanvas"></canvas>

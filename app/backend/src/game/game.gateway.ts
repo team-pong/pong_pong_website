@@ -61,6 +61,7 @@ export class GameGateway {
 			// arrowUp : true -> 위 방향키가 눌린 상태
 			// arrowUp : false -> 위 방향키를 뗀 상태
 			playerLeft.socket.on('keyEvent', (e) => {
+				console.log('left player key event:', e);
 				if (e.arrowDown) { // 아랫키 눌림
 					gameLogic.moveBar(false, true);
 				}
@@ -69,7 +70,8 @@ export class GameGateway {
 				}
 			})
 
-			playerRight.socket.on('keyEvnet', (e) => {
+			playerRight.socket.on('keyEvent', (e) => {
+				console.log('right player key event:', e);
 				if (e.arrowDown) { // 아랫키 눌림
 					gameLogic.moveBar(false, false);
 				}
