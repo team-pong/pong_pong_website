@@ -29,7 +29,7 @@
   }
 }
 
-div.dm-list {
+div.dm-container {
   position: absolute;
   bottom: 1em;
   right: 1em;
@@ -58,34 +58,5 @@ div.dm-list {
     color: white;
     line-height: 60px;
     padding-left: 20px;
-  }
-  ul.dm-list-ul {
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-    padding: 0;
-    cursor: pointer;
-    li.dm-list-li {
-      display: grid;
-      grid-template-columns: 50px 70% auto;
-      padding: 10px;
-      list-style: none;
-      img.dm-list-li-avatar {
-        width: 50px;
-        height: 50px;
-        grid-row: 1 / 4;
-      }
-      span.dm-list-li-nick {
-        font-weight: bold;
-        grid-column: 2 / 3; 
-      }
-      span.dm-list-li-last-msg {
-        grid-row: 3 / 4;
-        grid-column: 2 / 3;
-      }
-      &:hover {
-        background-color: darkgray;
-      }
-    }
   }
 }
