@@ -60,13 +60,22 @@ export class GameLogic {
         }
         if (pos) {
             this._bar00_pre = this._bar00;
-            this._bar00[1] += dirValue;
-            this._bar00[3] += dirValue;
+            if (this._bar00[1] + dirValue > 0 || this._bar00[3] + dirValue < this._bottomWall) {
+                this._bar00[1] += dirValue;
+                this._bar00[3] += dirValue;
+            }
         } else {
             this._bar01_pre = this._bar01;
-            this._bar01[1] += dirValue;
-            this._bar01[3] += dirValue;
+            if (this._bar01[1] + dirValue > 0 || this._bar01[3] + dirValue < this._bottomWall) {
+                this._bar01[1] += dirValue;
+                this._bar01[3] += dirValue;
+            }
         }
+    }
+
+    rotate(angle : number) {
+        this._direction[0] = this._direction[0] * Math.cos(angle) - this._direction[1] * Math.sin(angle);
+        this._direction[1] = this._direction[0] * Math.sin(angle) + this._direction[1] * Math.cos(angle);
     }
 
     getJson() {
@@ -124,12 +133,25 @@ export class GameLogic {
         }
         // Bar의 좌측/우측(이전 위치에 따라 보정 적용)
         if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [left, this._ball[1]])) {
-            // const diff = (this._bar00_pre[1] - this._bar00[1]) * this._correction;
-            // this._direction[1]
-            this._direction[0] *= -1
+            const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
+            this._direction[0] *= -1;
+            if (diff > 0) {
+                // 아래쪽 이동
+                this.rotate(-diff);
+            } else {
+                this.rotate(diff);
+            }
         }
         if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [right, this._ball[1]])) {
             this._direction[0] *= -1
+            const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
+            this._direction[0] *= -1;
+            if (diff > 0) {
+                // 아래쪽 이동
+                this.rotate(diff);
+            } else {
+                this.rotate(-diff);
+            }
         }
 
         if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [this._ball[0], up])) {
@@ -140,9 +162,25 @@ export class GameLogic {
         }
         if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [left, this._ball[1]])) {
             this._direction[0] *= -1
+            const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
+            this._direction[0] *= -1;
+            if (diff > 0) {
+                // 아래쪽 이동
+                this.rotate(-diff);
+            } else {
+                this.rotate(diff);
+            }
         }
         if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [right, this._ball[1]])) {
             this._direction[0] *= -1
+            const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
+            this._direction[0] *= -1;
+            if (diff > 0) {
+                // 아래쪽 이동
+                this.rotate(diff);
+            } else {
+                this.rotate(-diff);
+            }
         }
     }
 
