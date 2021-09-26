@@ -55,8 +55,33 @@ export class GameGateway {
 			playerLeft.socket.emit('init', gameLogic.getJson());
 			playerRight.socket.emit('init', gameLogic.getJson());
 			// this.server.to(roomName).emit("init", gameLogic.getJson());
+
+			// arrowDown : true -> 아래 방향키가 눌린 상태
+			// arrowDown : false -> 아래 방향키를 뗀 상태
+			// arrowUp : true -> 위 방향키가 눌린 상태
+			// arrowUp : false -> 위 방향키를 뗀 상태
+			playerLeft.socket.on('keyEvent', (e) => {
+				if (e.arrowDown) { // 아랫키 눌림
+					gameLogic.moveBar(false, true);
+				}
+				if (e.arrowUp) {
+					gameLogic.moveBar(true, true);
+				}
+			})
+
+			playerRight.socket.on('keyEvnet', (e) => {
+				if (e.arrowDown) { // 아랫키 눌림
+					gameLogic.moveBar(false, false);
+				}
+				if (e.arrowUp) {
+					gameLogic.moveBar(true, false);
+				}
+			})
+
 			setInterval(() => {
 				gameLogic.update();
+				playerLeft.socket.emit("update", gameLogic.getJson());
+				playerRight.socket.emit("update", gameLogic.getJson());
 			}, 20)
 		}
 		console.log('waiting:', normal_waiting);

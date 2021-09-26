@@ -53,22 +53,22 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   
   const keyDownEvent = (e: KeyboardEvent) => {
     if (e.code === "ArrowDown" && downKey == 0) {
-      socket.emit("keyEvent", {arrowDown: true});
+      socket.emit("keyEvent", {arrowUp: upKey, arrowDown: true});
       setDownKey((downKey) => {return 1});
     }
     else if (e.code === "ArrowUp" && upKey == 0) {
-      socket.emit("keyEvent", {arrowUp: true});
+      socket.emit("keyEvent", {arrowUp: true, arrowDown: downKey});
       setUpKey(() => {return 1});
     }
   };
   
   const keyUpEvent = (e: KeyboardEvent) => {
     if (e.code === "ArrowDown") {
-      socket.emit("keyEvent", {arrowDown: false});
+      socket.emit("keyEvent", {arrowUp: upKey, arrowDown: false});
       setDownKey(() => {return 0});
     }
     else if (e.code === "ArrowUp") {
-      socket.emit("ketEvent", {arrowUp: false});
+      socket.emit("ketEvent", {arrowUp: false, arrowDown: downKey});
       setUpKey(() => {return 0});
     }
   };
@@ -76,15 +76,15 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   /*!
    * @brief 화살표 키가 눌리거나 떼지는 경우에 서버로 메세지를 보내는 건 여기서 처리
    */
-  useEffect(() => {
-    if (downKey) {
-      setLeftY((leftY) => {return leftY + 5});
-    }
-    else if (upKey) {
-      setLeftY((leftY) => {return leftY - 5});
-    }
-    // 서버로 내 state 보내기
-  }, [downKey, upKey])
+  // useEffect(() => {
+  //   if (downKey) {
+  //     setLeftY((leftY) => {return leftY + 5});
+  //   }
+  //   else if (upKey) {
+  //     setLeftY((leftY) => {return leftY - 5});
+  //   }
+  //   // 서버로 내 state 보내기
+  // }, [downKey, upKey])
   
   /*!
    * @brief 캔버스 초기화
@@ -96,6 +96,14 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
       setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
       setBall(initBall(data.ball[0], data.ball[1]));
+    })
+
+    socket.on("update", (data) => {
+      console.log("updated data", data);
+      setLeftY(data.bar00[1]);
+      setRightY(data.bar01[1]);
+      setBallX(data.ball[0]);
+      setBallY(data.ball[1]);
     })
 
     if (canvas) {
@@ -119,8 +127,8 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    */
   useEffect(() => {
     if (canvas) {
-      // socket.emit('')
-      leftBar.set({top: leftY - 5});
+     
+      leftBar.set({top: leftY});
       canvas.add(leftBar);
       canvas.add(rightBar);
       canvas.add(ball);
@@ -133,7 +141,8 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    */
   useEffect(() => {
     if (canvas) {
-      rightBar.set({top: rightY - 5});
+
+      rightBar.set({top: rightY});
       canvas.add(leftBar);
       canvas.add(rightBar);
       canvas.add(ball);
