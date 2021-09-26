@@ -1,4 +1,6 @@
-@keyframes dm-in {
+@import "../../colors.scss";
+
+@keyframes dm-list-in {
   0% {
     opacity: 0;
     bottom: 1em;
@@ -9,7 +11,7 @@
   }
 }
 
-@keyframes dm-out {
+@keyframes dm-list-out {
   0% {
     opacity: 1;
     height: 650px;
@@ -27,7 +29,7 @@
   }
 }
 
-div.dm {
+div.dm-list {
   position: absolute;
   bottom: 1em;
   right: 1em;
@@ -36,15 +38,54 @@ div.dm {
   height: 0px;
   opacity: 0;
   border-radius: 10px;
+  overflow: auto;
   &.in {
     opacity: 1;
     height: 650px;
     bottom: calc(1em + 60px);
-    animation: dm-in 1s;
+    animation: dm-list-in 1s;
   }
   &.out {
     opacity: 0;
     height: 0px;
-    animation: dm-out 1s;
+    animation: dm-list-out 1s;
+  }
+  .top-bar {
+    background-color: #FEC04C;
+    font-weight: bold;
+    font-size: 15pt;
+    height: 60px;
+    color: white;
+    line-height: 60px;
+    padding-left: 20px;
+  }
+  ul.dm-list-ul {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    li.dm-list-li {
+      display: grid;
+      grid-template-columns: 50px 70% auto;
+      padding: 10px;
+      list-style: none;
+      img.dm-list-li-avatar {
+        width: 50px;
+        height: 50px;
+        grid-row: 1 / 4;
+      }
+      span.dm-list-li-nick {
+        font-weight: bold;
+        grid-column: 2 / 3; 
+      }
+      span.dm-list-li-last-msg {
+        grid-row: 3 / 4;
+        grid-column: 2 / 3;
+      }
+      &:hover {
+        background-color: darkgray;
+      }
+    }
   }
 }
