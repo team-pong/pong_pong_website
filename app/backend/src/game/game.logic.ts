@@ -17,6 +17,7 @@ export class GameLogic {
     _bar01 : [number, number, number,number] = [0, 0, 0, 0]// 우측 Bar의 좌표
     _bar01_pre : [number, number, number, number];
     _speed : number;
+    _correction : number;
     _server : Server;
 
     constructor(
@@ -44,13 +45,28 @@ export class GameLogic {
         this._direction[1] = (init / init)
 
         this._speed = 3;
+        this._correction = 0.1;
         this._server = server;
     }
 
     // dir이 true라면 위로, false면 아래로
     // pos가 true라면 왼쪽(00), false면 오른쪽(01)
     moveBar(dir : boolean, pos : boolean) {
-
+        let dirValue;
+        if (dir) {
+            dirValue = 5;
+        } else {
+            dirValue = -5;
+        }
+        if (pos) {
+            this._bar00_pre = this._bar00;
+            this._bar00[1] += dirValue;
+            this._bar00[3] += dirValue;
+        } else {
+            this._bar01_pre = this._bar01;
+            this._bar01[1] += dirValue;
+            this._bar01[3] += dirValue;
+        }
     }
 
     getJson() {
@@ -105,6 +121,7 @@ export class GameLogic {
         if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [this._ball[0], down])) {
             this._direction[1] *= -1
         }
+        // Bar의 좌측/우측(이전 위치에 따라 보정 적용)
         if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [left, this._ball[1]])) {
             this._direction[0] *= -1
         }

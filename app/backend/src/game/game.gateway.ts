@@ -55,15 +55,12 @@ export class GameGateway {
 			playerLeft.socket.emit('init', gameLogic.getJson());
 			playerRight.socket.emit('init', gameLogic.getJson());
 			// this.server.to(roomName).emit("init", gameLogic.getJson());
-
 			setInterval(() => {
 				gameLogic.update();
 			}, 20)
 		}
 		console.log('waiting:', normal_waiting);
   }
-
-
 
 	@SubscribeMessage('ladder')
 	async handdleMessage(@ConnectedSocket() socket: Socket) {
