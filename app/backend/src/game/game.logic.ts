@@ -84,9 +84,9 @@ export class GameLogic {
 
     update() {
         // direction 방향으로 공을 이동
+        this.checkCollision(10)
         this._ball[0] += this._direction[0] * this._speed;
         this._ball[1] += this._direction[1] * this._speed;
-        this.checkCollision(10)
         if (this.isScored(10) != Scored.NONE) {
         }
     }
@@ -101,10 +101,12 @@ export class GameLogic {
     }
 
     checkCollision(radius : number) {
-        const up = this._ball[1] - radius;
-        const down = this._ball[1] + radius;
-        const left = this._ball[0] - radius;
-        const right = this._ball[0] + radius;
+        const ballX = this._ball[0] + this._direction[0] * this._speed;
+        const ballY = this._ball[1] + this._direction[1] * this._speed;
+        const up = ballY - radius;
+        const down = ballY + radius;
+        const left = ballX - radius;
+        const right = ballX + radius;
 
         if (up <= 0) {
             // direction 전환
@@ -124,59 +126,31 @@ export class GameLogic {
         // 여기까지
 
         // bar 0 = 좌측 상단의 x, 1 = y, 2 = 우측 하단의 x, 3 = y
-        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [this._ball[0], up])) {
+        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, up])) {
             this._direction[1] *= -1
         }
-        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [this._ball[0], down])) {
+        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, down])) {
             this._direction[1] *= -1
         }
         // Bar의 좌측/우측(이전 위치에 따라 보정 적용)
-        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [left, this._ball[1]])) {
-            const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
+        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [left, ballY])) {
             this._direction[0] *= -1;
-            // if (diff > 0) {
-            //     // 아래쪽 이동
-            //     this.rotate(-diff);
-            // } else {
-            //     this.rotate(diff);
-            // }
         }
-        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [right, this._ball[1]])) {
-            const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
+        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [right, ballY])) {
             this._direction[0] *= -1;
-            // if (diff > 0) {
-            //     // 아래쪽 이동
-            //     this.rotate(diff);
-            // } else {
-            //     this.rotate(-diff);
-            // }
         }
 
-        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [this._ball[0], up])) {
-            this._direction[1] *= -1
+        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, up])) {
+            this._direction[1] *= -1;
         }
-        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [this._ball[0], down])) {
-            this._direction[1] *= -1
+        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, down])) {
+            this._direction[1] *= -1;
         }
-        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [left, this._ball[1]])) {
-            const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
+        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [left, ballY])) {
             this._direction[0] *= -1;
-            // if (diff > 0) {
-            //     // 아래쪽 이동
-            //     this.rotate(-diff);
-            // } else {
-            //     this.rotate(diff);
-            // }
         }
-        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [right, this._ball[1]])) {
-            const diff = (this._bar00[1] - this._bar00_pre[1]) * this._correction;
+        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [right, ballY])) {
             this._direction[0] *= -1;
-            // if (diff > 0) {
-            //     // 아래쪽 이동
-            //     this.rotate(diff);
-            // } else {
-            //     this.rotate(-diff);
-            // }
         }
     }
 
