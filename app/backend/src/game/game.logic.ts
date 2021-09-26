@@ -54,9 +54,9 @@ export class GameLogic {
     moveBar(dir : boolean, pos : boolean) {
         let dirValue;
         if (dir) {
-            dirValue = 5;
-        } else {
             dirValue = -5;
+        } else {
+            dirValue = 5;
         }
         if (pos) {
             this._bar00_pre = this._bar00;
