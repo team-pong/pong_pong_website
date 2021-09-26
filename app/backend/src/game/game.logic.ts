@@ -19,6 +19,7 @@ export class GameLogic {
     _speed : number;
     _correction : number;
     _server : Server;
+    _iscollision : Boolean;
 
     constructor(
         width : number,
@@ -47,6 +48,7 @@ export class GameLogic {
         this._speed = 3;
         this._correction = 0.1;
         this._server = server;
+        this._iscollision = false;
     }
 
     // dir이 true라면 위로, false면 아래로
@@ -110,47 +112,57 @@ export class GameLogic {
 
         if (up <= 0) {
             // direction 전환
-            this._direction[1] *= -1
-        }
-        if (down >= this._bottomWall) {
+            this._direction[1] *= -1;
+        } else if (down >= this._bottomWall) {
             // direction 전환
-            this._direction[1] *= -1
-        }
-        // 추후 제거 필요
-        if (left <= 0) {
-            this._direction[0] *= -1;
-        }
-        if (right >= this._rightWall) {
-            this._direction[0] *= -1;
-        }
-        // 여기까지
-
-        // bar 0 = 좌측 상단의 x, 1 = y, 2 = 우측 하단의 x, 3 = y
-        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, up])) {
-            this._direction[1] *= -1
-        }
-        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, down])) {
-            this._direction[1] *= -1
-        }
-        // Bar의 좌측/우측(이전 위치에 따라 보정 적용)
-        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [left, ballY])) {
-            this._direction[0] *= -1;
-        }
-        if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [right, ballY])) {
-            this._direction[0] *= -1;
-        }
-
-        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, up])) {
             this._direction[1] *= -1;
-        }
-        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, down])) {
-            this._direction[1] *= -1;
-        }
-        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [left, ballY])) {
+        } else if (left <= 0) { // 추후 제거 필요
             this._direction[0] *= -1;
-        }
-        if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [right, ballY])) {
+        } else if (right >= this._rightWall) {
             this._direction[0] *= -1;
+            // 여기 까지
+        } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, up])) { // bar 0 = 좌측 상단의 x, 1 = y, 2 = 우측 하단의 x, 3 = y
+            if (this._iscollision == false) {
+                this._direction[1] *= -1
+                this._iscollision = true;
+            }
+        } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, down])) {
+            if (this._iscollision == false) {
+                this._direction[1] *= -1
+                this._iscollision = true;
+            }
+        } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [left, ballY])) {
+            if (this._iscollision == false) {
+                this._direction[0] *= -1;
+                this._iscollision = true;
+            }
+        } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [right, ballY])) {
+            if (this._iscollision == false) {
+                this._direction[0] *= -1;
+                this._iscollision = true;
+            }
+        } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, up])) {
+            if (this._iscollision == false) {
+                this._direction[1] *= -1;
+                this._iscollision = true;
+            }
+        } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, down])) {
+            if (this._iscollision == false) {
+                this._direction[1] *= -1;
+                this._iscollision = true;
+            }
+        } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [left, ballY])) {
+            if (this._iscollision == false) {
+                this._direction[0] *= -1;
+                this._iscollision = true;
+            }
+        } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [right, ballY])) {
+            if (this._iscollision == false) {
+                this._direction[0] *= -1;
+                this._iscollision = true;
+            }
+        } else {
+            this._iscollision = false;
         }
     }
 
