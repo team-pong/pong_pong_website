@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Link, Redirect, Route, RouteComponentProps, withRouter } from "react-router-dom";
 import Modal from "../../Modal";
 import GameMatchContent from "./GameMatchContent";
@@ -10,6 +10,8 @@ interface isMatched {
   isMatched: boolean;
   roomId: string;
   opponent: string;
+  position: string;
+  socket: any;
 }
 
 const GameContent: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
@@ -17,8 +19,14 @@ const GameContent: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   const [isMatched, setIsMatched] = useState<isMatched>({
     isMatched: false,
     roomId: "",
-    opponent: ""
+    opponent: "",
+    position: "",
+    socket: null
   });
+
+  useEffect(() => {
+    return (() => {isMatched.socket?.disconnect()});
+  }, []);
 
   return (
     <div id="game-content">
@@ -41,7 +49,7 @@ const GameContent: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
         <Modal id={Date.now()} smallModal content={<GameMatchContent setIsMatched={setIsMatched}/>}/>
       </Route>
       <Route path={`${path}/game/:roomId`}>
-        <Modal id={Date.now()} content={<GameRoomContent />} />
+        <Modal id={Date.now()} content={<GameRoomContent socket={isMatched.socket}/>} />
       </Route>
 
       {/* 매치가 됐을 경우 game room 으로 redirect */}

@@ -42,17 +42,22 @@ export class GameGateway {
 		if (normal_waiting.length >= 2) {
 			console.log('매칭 완료');
 			const gameLogic = new GameLogic(700, 300, 1, this.server);
+			const playerLeft = normal_waiting[0];
+			const playerRight = normal_waiting[1];
 
-			const roomName: string = normal_waiting[0].id + normal_waiting[1].id;
-			normal_waiting[0].socket.join(roomName);
-			normal_waiting[1].socket.join(roomName);
-			normal_waiting[0].socket.emit('matched', {roomId: roomName, opponent: normal_waiting[1].id});
-			normal_waiting[1].socket.emit('matched', {roomId: roomName, opponent: normal_waiting[0].id});
+			const roomName: string = playerLeft.id + playerRight.id;
+			playerLeft.socket.join(roomName);
+			playerRight.socket.join(roomName);
+			playerLeft.socket.emit('matched', {roomId: roomName, opponent: normal_waiting[1].id, position: 'left'});
+			playerRight.socket.emit('matched', {roomId: roomName, opponent: normal_waiting[0].id, position: 'right'});
 			normal_waiting.splice(0, 2);
+
+			playerLeft.socket.emit('init', gameLogic.getJson());
+			playerRight.socket.emit('init', gameLogic.getJson());
+			// this.server.to(roomName).emit("init", gameLogic.getJson());
 
 			setInterval(() => {
 				gameLogic.update();
-				this.server.to(roomName).emit("update", gameLogic.getJson());
 			}, 20)
 		}
 		console.log('waiting:', normal_waiting);

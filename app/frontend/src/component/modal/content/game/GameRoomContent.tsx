@@ -3,7 +3,7 @@ import { FC, useState, useEffect } from "react";
 import { RouteComponentProps, withRouter, useHistory } from "react-router-dom";
 import { io } from "socket.io-client";
 
-const GameRoomContent: FC<RouteComponentProps> = ({match: {params}}) => {
+const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
   const [canvas, setCanvas] = useState<fabric.Canvas>();
   const [canvasWidth, setCanvasWidth] = useState(700);
   const [canvasHeight, setCanvasHeight] = useState(300);
@@ -24,30 +24,22 @@ const GameRoomContent: FC<RouteComponentProps> = ({match: {params}}) => {
     return new fabric.Canvas('myCanvas', {width: canvasWidth, height: canvasHeight, backgroundColor: 'gray'});
   };
   
-  const initLeftBar = () => {
+  const initBar = (x, y, width, height) => {
+    width = width - x;
+    height = height - y;
     return new fabric.Rect({
-      left: 10,
-      top: leftY,
+      left: x,
+      top: y,
       fill: 'black',
-      width: 15,
-      height: 100,
+      width: width,
+      height: height,
     });
   }
   
-  const initRightBar = () => {
-    return new fabric.Rect({
-      left: canvasWidth - 25,
-      top: leftY,
-      fill: 'black',
-      width: 15,
-      height: 100,
-    });
-  }
-  
-  const initBall = () => {
+  const initBall = (x, y) => {
     return new fabric.Circle({
-      left: ballX,
-      top: ballY,
+      left: x,
+      top: y,
       fill: 'black',
       radius: 5,
     })
@@ -56,22 +48,27 @@ const GameRoomContent: FC<RouteComponentProps> = ({match: {params}}) => {
   /*!
    * @brief 키보드 이벤트
    *        키의 눌림 상태를 변경한다.
+   *        여기서 서버로 상태를 전송
    */
   
   const keyDownEvent = (e: KeyboardEvent) => {
     if (e.code === "ArrowDown" && downKey == 0) {
+      socket.emit("keyEvent", {arrowDown: true});
       setDownKey((downKey) => {return 1});
     }
-    else if (e.code === "ArrowUp") {
+    else if (e.code === "ArrowUp" && upKey == 0) {
+      socket.emit("keyEvent", {arrowUp: true});
       setUpKey(() => {return 1});
     }
   };
   
   const keyUpEvent = (e: KeyboardEvent) => {
     if (e.code === "ArrowDown") {
+      socket.emit("keyEvent", {arrowDown: false});
       setDownKey(() => {return 0});
     }
     else if (e.code === "ArrowUp") {
+      socket.emit("ketEvent", {arrowUp: false});
       setUpKey(() => {return 0});
     }
   };
@@ -94,16 +91,12 @@ const GameRoomContent: FC<RouteComponentProps> = ({match: {params}}) => {
    *        맨 처음 배경과 양쪽 바, 공을 그려준다
    */
   useEffect(() => {
-    const socket = io("http://127.0.0.1:3001/game", {withCredentials: true});
-    // socket.emit(params.matchType);
-    // socket.on("matched", ({roomId, opponent}) => {
-    //   setIsMatched({isMatched: true, roomId, opponent});
-    // });
-
-    setCanvas(initCanvas());
-    setLeftBar(initLeftBar());
-    setRightBar(initRightBar());
-    setBall(initBall());
+    socket.on("init", (data) => {
+      setCanvas(initCanvas());
+      setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
+      setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
+      setBall(initBall(data.ball[0], data.ball[1]));
+    })
 
     if (canvas) {
       canvas.add(leftBar);
@@ -126,6 +119,7 @@ const GameRoomContent: FC<RouteComponentProps> = ({match: {params}}) => {
    */
   useEffect(() => {
     if (canvas) {
+      // socket.emit('')
       leftBar.set({top: leftY - 5});
       canvas.add(leftBar);
       canvas.add(rightBar);

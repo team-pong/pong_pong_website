@@ -27,13 +27,13 @@ export class GameLogic {
         this._bottomWall = height;
         this._rightWall = width;
 
-        this._ball[0] = width / 2
-        this._ball[1] = height / 2
+        this._ball[0] = width / 2 // ballX
+        this._ball[1] = height / 2 // ballY
 
-        this._bar00[0] = 100
-        this._bar00[1] = height / 3
-        this._bar00[2] = 150
-        this._bar00[3] = (height / 3) * 2
+        this._bar00[0] = 100 // left
+        this._bar00[1] = height / 3 // top
+        this._bar00[2] = 150 // left + width
+        this._bar00[3] = (height / 3) * 2 // top + height
 
         this._bar01[0] = width - 150
         this._bar01[1] = height / 3
@@ -63,7 +63,6 @@ export class GameLogic {
         this._ball[1] += this._direction[1] * this._speed;
         this.checkCollision(10)
         if (this.isScored(10) != Scored.NONE) {
-            Logger.log("score!")
         }
     }
 
@@ -101,36 +100,28 @@ export class GameLogic {
 
         // bar 0 = 좌측 상단의 x, 1 = y, 2 = 우측 하단의 x, 3 = y
         if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [this._ball[0], up])) {
-            Logger.log("00up")
             this._direction[1] *= -1
         }
         if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [this._ball[0], down])) {
-            Logger.log("00down")
             this._direction[1] *= -1
         }
         if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [left, this._ball[1]])) {
-            Logger.log("00left")
             this._direction[0] *= -1
         }
         if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [right, this._ball[1]])) {
-            Logger.log("00right")
             this._direction[0] *= -1
         }
 
         if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [this._ball[0], up])) {
-            Logger.log("01up")
             this._direction[1] *= -1
         }
         if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [this._ball[0], down])) {
-            Logger.log("01down")
             this._direction[1] *= -1
         }
         if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [left, this._ball[1]])) {
-            Logger.log("01left")
             this._direction[0] *= -1
         }
         if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [right, this._ball[1]])) {
-            Logger.log("01right")
             this._direction[0] *= -1
         }
     }

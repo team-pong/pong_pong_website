@@ -10,6 +10,8 @@ interface gameMatchContentProps
     isMatched: boolean;
     roomId: string;
     opponent: string;
+    position: string;
+    socket: any;
   }>>;
 }
 
@@ -18,10 +20,9 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params}, setIsMatc
   useEffect(() => {
     const socket = io("http://127.0.0.1:3001/game", {withCredentials: true});
     socket.emit(params.matchType);
-    socket.on("matched", ({roomId, opponent}) => {
-      setIsMatched({isMatched: true, roomId, opponent});
+    socket.on("matched", ({roomId, opponent, position}) => {
+      setIsMatched({isMatched: true, roomId, opponent, position, socket});
     });
-    return (() => {socket.disconnect();});
   }, []);
 
   return (
