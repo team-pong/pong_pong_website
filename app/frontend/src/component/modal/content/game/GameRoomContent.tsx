@@ -16,6 +16,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const [rightY, setRightY] = useState(150);
   const [downKey, setDownKey] = useState(0);
   const [upKey, setUpKey] = useState(0);
+  const [init, setInit] = useState(0);
   
   /*!
    * @brief canvas와 양쪽 사이드바, 공 초기 설정
@@ -79,28 +80,16 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   };
   
   /*!
-   * @brief 화살표 키가 눌리거나 떼지는 경우에 서버로 메세지를 보내는 건 여기서 처리
-   */
-  // useEffect(() => {
-  //   if (downKey) {
-  //     setLeftY((leftY) => {return leftY + 5});
-  //   }
-  //   else if (upKey) {
-  //     setLeftY((leftY) => {return leftY - 5});
-  //   }
-  //   // 서버로 내 state 보내기
-  // }, [downKey, upKey])
-  
-  /*!
    * @brief 캔버스 초기화
    *        맨 처음 배경과 양쪽 바, 공을 그려준다
    */
   useEffect(() => {
     socket.on("init", (data) => {
-      setCanvas(() => initCanvas());
+      setCanvas(initCanvas());
       setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
       setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
       setBall(initBall(data.ball[0], data.ball[1]));
+      setInit(1);
     })
 
     socket.on("update", (data) => {
@@ -116,9 +105,17 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     return (() => {
       socket.disconnect();
       removeEventListener("keydown", keyDownEvent);
-      removeEventListener("keydown", keyUpEvent);
+      removeEventListener("keyup", keyUpEvent);
     })
   }, []);
+
+  useEffect(() => {
+    if (init) {
+      canvas.add(ball);
+      canvas.add(leftBar);
+      canvas.add(rightBar);
+    }
+  }, [init])
   
   /*!
    * @brief 왼쪽 막대가 움직이는 경우 처리
@@ -126,9 +123,6 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   useEffect(() => {
     if (canvas) {
       leftBar.set({top: leftY});
-      canvas.add(leftBar);
-      canvas.add(rightBar);
-      canvas.add(ball);
       canvas.renderAll();
     }
   }, [leftY]);
