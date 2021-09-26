@@ -20,9 +20,9 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
       <ul className="dm-room-ul">
         {dmLog?.map((msg, idx) => {
           return (
-            <li key={idx} className={`chat-log ${msg.from === "me" ? "me" : "other"}`}>
-              <span className="chat-log-time">{msg.time}</span>
-              <span className="chat-log-msg">{msg.msg}</span>
+            <li key={idx} className={`dm-log ${msg.from === "me" ? "me" : "other"}`}>
+              <span className="dm-log-msg">{msg.msg}</span>
+              <span className="dm-log-time">{msg.time}</span>
             </li>
           );
         })}

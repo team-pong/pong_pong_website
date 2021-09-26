@@ -59,8 +59,36 @@ export const testDMLog: DMLog[] = [
     msg: "asdf 안녕",
     from: "me"
   }, {
-    time: "오전 8:10",
-    msg: "이건 가장 오래된 메세지",
+    time: "오전 8:08",
+    msg: "안녕",
     from: "me"
+  }, {
+    time: "오전 8:08",
+    msg: "그려",
+    from: "jinwkim"
+  }, {
+    time: "오전 8:08",
+    msg: "ㄴㅁㄹ",
+    from: "jinwkim"
+  }, {
+    time: "오전 8:08",
+    msg: "ㄹㄹㄹ",
+    from: "me"
+  }, {
+    time: "오전 8:08",
+    msg: "ㄴㄴ",
+    from: "me"
+  }, {
+    time: "오전 8:08",
+    msg: "뮬ㅊㄱㄷㅈ",
+    from: "jinwkim"
+  }, {
+    time: "오전 8:08",
+    msg: "ㅠㅑㅓㅐㅓ",
+    from: "jinwkim"
+  }, {
+    time: "오전 8:00",
+    msg: "이건 가장 오래된 메세지",
+    from: "jinwkim"
   }
 ];
