@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, Dispatch, SetStateAction } from "react";
 import "../../../scss/dm/DmList.scss";
 import { testDMList, DM } from "../../../dummydata/testDM";
 
@@ -15,7 +15,11 @@ function msgFormatter(msg: string): string {
   return (msg);
 }
 
-const DmList: FC = (): JSX.Element => {
+interface DmListProps {
+  setDmTarget: Dispatch<SetStateAction<string>>;
+}
+
+const DmList: FC<DmListProps> = ({setDmTarget}): JSX.Element => {
 
   const [dmList, setDmList] = useState<DM[]>(null);
 
@@ -33,7 +37,10 @@ const DmList: FC = (): JSX.Element => {
       {
         dmList?.map((dm, idx) => {
           return (
-            <li key={idx} className="dm-list-li">
+            <li
+              key={idx}
+              className="dm-list-li"
+              onClick={() => setDmTarget(dm.target.nick)}>
               <img
                 className="dm-list-li-avatar"
                 src={dm.target.avatar_url}

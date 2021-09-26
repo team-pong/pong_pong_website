@@ -1,16 +1,19 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import DmList from "./DmList";
+import DmRoom from "./DmRoom";
 import "/src/scss/dm/Dm.scss";
 
 const Dm: FC<{isDmOpen: boolean}> = ({isDmOpen}): JSX.Element => {
 
   const dmRef = useRef<HTMLDivElement>(null);
+  const [dmTarget, setDmTarget] = useState("");
 
   useEffect(() => {
     if (isDmOpen) {
       dmRef.current.className = "dm-container in";
     } else {
       dmRef.current.className = "dm-container out";
+      setDmTarget("");
     }
   }, [isDmOpen]);
 
@@ -29,7 +32,7 @@ const Dm: FC<{isDmOpen: boolean}> = ({isDmOpen}): JSX.Element => {
       <div className="top-bar">
         <span>개인 메세지</span>
       </div>
-      <DmList />
+      {dmTarget === "" ? <DmList setDmTarget={setDmTarget}/> : <DmRoom dmTarget={dmTarget}/>}
     </div>
   )
 }
