@@ -13,7 +13,7 @@ const Dm: FC<{isDmOpen: boolean}> = ({isDmOpen}): JSX.Element => {
       dmRef.current.className = "dm-container in";
     } else {
       dmRef.current.className = "dm-container out";
-      setDmTarget("");
+      setTimeout(() => setDmTarget(""), 1000);
     }
   }, [isDmOpen]);
 
@@ -30,7 +30,13 @@ const Dm: FC<{isDmOpen: boolean}> = ({isDmOpen}): JSX.Element => {
   return (
     <div className="dm-container" ref={dmRef}>
       <div className="top-bar">
-        <span>개인 메세지</span>
+        <span>
+          {
+            dmTarget === ""
+            ? <>개인 메세지</>
+            : <>{dmTarget}</>
+          }
+        </span>
       </div>
       {dmTarget === "" ? <DmList setDmTarget={setDmTarget}/> : <DmRoom dmTarget={dmTarget}/>}
     </div>

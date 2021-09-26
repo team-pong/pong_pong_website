@@ -51,6 +51,8 @@ div.dm-container {
     animation: dm-list-out 1s;
   }
   .top-bar {
+    position: sticky;
+    top: 0;
     background-color: #FEC04C;
     font-weight: bold;
     font-size: 15pt;
