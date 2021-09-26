@@ -4,6 +4,7 @@ import { WebSocketServer, OnGatewayConnection, SubscribeMessage, WebSocketGatewa
 import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
 import { SessionService } from 'src/session/session.service';
+import { GameLogic } from './game.logic';
 
 class WaitUser {
 	constructor(
@@ -12,8 +13,8 @@ class WaitUser {
 	) {}
 }
 
-var normal_waiting: WaitUser[] = [];
 
+var normal_waiting: WaitUser[] = [];
 
 /*!
  * @brief 게임 연결용 웹소켓
@@ -40,15 +41,24 @@ export class GameGateway {
 		// 2인 이상시 매칭
 		if (normal_waiting.length >= 2) {
 			console.log('매칭 완료');
+			const gameLogic = new GameLogic(700, 300, 1, this.server);
+
 			const roomName: string = normal_waiting[0].id + normal_waiting[1].id;
 			normal_waiting[0].socket.join(roomName);
 			normal_waiting[1].socket.join(roomName);
 			normal_waiting[0].socket.emit('matched', {roomId: roomName, opponent: normal_waiting[1].id});
 			normal_waiting[1].socket.emit('matched', {roomId: roomName, opponent: normal_waiting[0].id});
 			normal_waiting.splice(0, 2);
+
+			setInterval(() => {
+				gameLogic.update();
+				this.server.to(roomName).emit("update", gameLogic.getJson());
+			}, 20)
 		}
 		console.log('waiting:', normal_waiting);
   }
+
+
 
 	@SubscribeMessage('ladder')
 	async handdleMessage(@ConnectedSocket() socket: Socket) {

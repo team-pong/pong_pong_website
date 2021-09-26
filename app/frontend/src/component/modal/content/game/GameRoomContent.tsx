@@ -1,6 +1,7 @@
 import { fabric } from "fabric";
 import { FC, useState, useEffect } from "react";
 import { RouteComponentProps, withRouter, useHistory } from "react-router-dom";
+import { io } from "socket.io-client";
 
 const GameRoomContent: FC<RouteComponentProps> = ({match: {params}}) => {
   const [canvas, setCanvas] = useState<fabric.Canvas>();
@@ -93,6 +94,12 @@ const GameRoomContent: FC<RouteComponentProps> = ({match: {params}}) => {
    *        맨 처음 배경과 양쪽 바, 공을 그려준다
    */
   useEffect(() => {
+    const socket = io("http://127.0.0.1:3001/game", {withCredentials: true});
+    // socket.emit(params.matchType);
+    // socket.on("matched", ({roomId, opponent}) => {
+    //   setIsMatched({isMatched: true, roomId, opponent});
+    // });
+
     setCanvas(initCanvas());
     setLeftBar(initLeftBar());
     setRightBar(initRightBar());
@@ -108,6 +115,7 @@ const GameRoomContent: FC<RouteComponentProps> = ({match: {params}}) => {
     addEventListener("keyup", keyUpEvent)
 
     return (() => {
+      socket.disconnect();
       removeEventListener("keydown", keyDownEvent);
       removeEventListener("keydown", keyUpEvent);
     })
