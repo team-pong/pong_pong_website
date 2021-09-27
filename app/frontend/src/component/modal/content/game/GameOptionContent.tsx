@@ -32,6 +32,10 @@ const GameOptionContent: FC<RouteComponentProps> = ({match: {url}}) => {
   return (
     <div id="game-option-content">
       <img
+        className="game-option-closer" 
+        src="/public/arrow.svg"
+        onClick={() => history.goBack()} />
+      <img
         className="map-preview"
         src={getMapImg(selectedMap)} />
       <form className="map-select-form">
