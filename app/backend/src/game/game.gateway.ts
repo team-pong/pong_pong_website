@@ -41,7 +41,7 @@ export class GameGateway {
 		// 2인 이상시 매칭
 		if (normal_waiting.length >= 2) {
 			console.log('매칭 완료');
-			const gameLogic = new GameLogic(700, 300, 1, this.server);
+			const gameLogic = new GameLogic(700, 450, 1, this.server);
 			const playerLeft = normal_waiting[0];
 			const playerRight = normal_waiting[1];
 

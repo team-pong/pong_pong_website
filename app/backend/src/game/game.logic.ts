@@ -32,14 +32,14 @@ export class GameLogic {
         this._ball[0] = width / 2 // ballX
         this._ball[1] = height / 2 // ballY
 
-        this._bar00[0] = 100 // left
+        this._bar00[0] = 50 // left
         this._bar00[1] = height / 3 // top
-        this._bar00[2] = 150 // left + width
+        this._bar00[2] = 60 // left + width
         this._bar00[3] = (height / 3) * 2 // top + height
 
-        this._bar01[0] = width - 150
+        this._bar01[0] = width - 60
         this._bar01[1] = height / 3
-        this._bar01[2] = width - 100
+        this._bar01[2] = width - 50
         this._bar01[3] = (height / 3) * 2
 
         this._direction[0] = (init / init)

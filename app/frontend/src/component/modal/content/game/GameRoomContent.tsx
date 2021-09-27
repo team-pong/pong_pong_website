@@ -1,12 +1,15 @@
 import { fabric } from "fabric";
 import { FC, useState, useEffect } from "react";
 import { RouteComponentProps, withRouter, useHistory } from "react-router-dom";
+import "/src/scss/content/game/GameRoomContent.scss";
 import { io } from "socket.io-client";
+
+
 
 const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
   const [canvasWidth, setCanvasWidth] = useState(700);
-  const [canvasHeight, setCanvasHeight] = useState(300);
+  const [canvasHeight, setCanvasHeight] = useState(450);
   const [leftBar, setLeftBar] = useState<fabric.Rect>();
   const [rightBar, setRightBar] = useState<fabric.Rect>(); 
   const [ball, setBall] = useState<fabric.Circle>();
@@ -22,7 +25,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    * @brief canvas와 양쪽 사이드바, 공 초기 설정
    */
   const initCanvas = () => {
-    return new fabric.StaticCanvas('myCanvas', {width: canvasWidth, height: canvasHeight, backgroundColor: 'gray'});
+    return new fabric.StaticCanvas('ping-pong', {width: canvasWidth, height: canvasHeight, backgroundColor: "white"});
   };
   
   const initBar = (x, y, width, height) => {
@@ -145,7 +148,12 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   }, [ballX, ballY]);
 
   return (
-    <canvas id="myCanvas"></canvas>
+    <>
+    <div className="ingame-match-info"></div>
+    <div className="ingame-side-bar"></div>
+    <div className="ingame-footer"></div>
+    <canvas id="ping-pong"></canvas>
+    </>
   );
 };
 
