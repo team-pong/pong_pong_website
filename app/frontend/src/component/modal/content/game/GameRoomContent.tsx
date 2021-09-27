@@ -4,7 +4,7 @@ import { RouteComponentProps, withRouter, useHistory } from "react-router-dom";
 import { io } from "socket.io-client";
 
 const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
-  const [canvas, setCanvas] = useState<fabric.Canvas>();
+  const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
   const [canvasWidth, setCanvasWidth] = useState(700);
   const [canvasHeight, setCanvasHeight] = useState(300);
   const [leftBar, setLeftBar] = useState<fabric.Rect>();
@@ -22,7 +22,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    * @brief canvas와 양쪽 사이드바, 공 초기 설정
    */
   const initCanvas = () => {
-    return new fabric.Canvas('myCanvas', {width: canvasWidth, height: canvasHeight, backgroundColor: 'gray'});
+    return new fabric.StaticCanvas('myCanvas', {width: canvasWidth, height: canvasHeight, backgroundColor: 'gray'});
   };
   
   const initBar = (x, y, width, height) => {

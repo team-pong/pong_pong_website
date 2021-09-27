@@ -80,7 +80,8 @@ export class GameGateway {
 				}
 			})
 
-			setInterval(() => {
+			// 점수처리 추가, 득점시 초기화, 게임 종료메세지
+			const interval = setInterval(() => {
 				gameLogic.update();
 				playerLeft.socket.emit("update", gameLogic.getJson());
 				playerRight.socket.emit("update", gameLogic.getJson());
