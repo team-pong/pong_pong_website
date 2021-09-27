@@ -73,7 +73,7 @@ export class GameGateway {
 				rPlayerNickname: playerRight.id,
 				rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
 				rPlayerScore: 0,
-				viewNumber: socket.client.conn.server.clientsCount
+				viewNumber: socket.client.conn.server.clientsCount - 2,
 			}
 
 			playerLeft.socket.emit('init', gameLogic.getJson(), userInfo);

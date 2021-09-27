@@ -188,10 +188,8 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       </div>
     </div>
     <div className="ingame-side-bar">
-      <div className="view-number">{matchInfo.viewNumber}</div>
-      <div className="give-up">
-        <button>기권</button>
-      </div>
+      <div className="view-number">view {matchInfo.viewNumber}</div>
+      <button className="give-up">기권</button>
     </div>
     <div className="ingame-footer"></div>
     <canvas id="ping-pong"></canvas>
