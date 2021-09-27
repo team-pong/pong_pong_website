@@ -4,7 +4,15 @@ import { RouteComponentProps, withRouter, useHistory } from "react-router-dom";
 import "/src/scss/content/game/GameRoomContent.scss";
 import { io } from "socket.io-client";
 
-
+interface MatchInfo {
+  lPlayerNickname: string,
+  lPlayerAvatarUrl: string,
+  lPlayerScore: number,
+  rPlayerNickname: string,
+  rPlayerAvatarUrl: string,
+  rPlayerScore: number,
+  viewNumber: number,
+}
 
 const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
@@ -20,7 +28,16 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const [downKey, setDownKey] = useState(0);
   const [upKey, setUpKey] = useState(0);
   const [init, setInit] = useState(0);
-  
+
+  const [matchInfo, setMatchInfo] = useState<MatchInfo>({
+    lPlayerNickname: '',
+    lPlayerAvatarUrl: '',
+    lPlayerScore: 0,
+    rPlayerNickname: '',
+    rPlayerAvatarUrl: '',
+    rPlayerScore: 0,
+    viewNumber: 0,
+  });
   /*!
    * @brief canvas와 양쪽 사이드바, 공 초기 설정
    */
@@ -102,6 +119,10 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       setBallY(data.ball[1] - 10);
     })
 
+    socket.on("setMatchInfo", (data: MatchInfo) => {
+      setMatchInfo(data);
+    })
+
     addEventListener("keydown", keyDownEvent);
     addEventListener("keyup", keyUpEvent)
 
@@ -147,10 +168,31 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     }
   }, [ballX, ballY]);
 
+  // useEffect(() => {
+    
+  // }, [matchInfo])
+
   return (
     <>
-    <div className="ingame-match-info"></div>
-    <div className="ingame-side-bar"></div>
+    <div className="ingame-match-info">
+      <div className="left-player">
+        <div className="left-player-profile"><img src={matchInfo.lPlayerAvatarUrl}/></div>
+        <div className="left-player-nickname">{matchInfo.lPlayerNickname}</div>
+        <div className="left-player-score">{matchInfo.lPlayerScore}</div>
+      </div>
+      vs
+      <div className="right-player">
+        <div className="right-player-score">{matchInfo.rPlayerScore}</div>
+        <div className="right-player-nickname">{matchInfo.rPlayerNickname}</div>
+        <div className="right-player-profile"><img src={matchInfo.rPlayerAvatarUrl}/></div>
+      </div>
+    </div>
+    <div className="ingame-side-bar">
+      <div className="view-number">{matchInfo.viewNumber}</div>
+      <div className="give-up">
+        <button>기권</button>
+      </div>
+    </div>
     <div className="ingame-footer"></div>
     <canvas id="ping-pong"></canvas>
     </>

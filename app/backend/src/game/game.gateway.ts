@@ -1,9 +1,11 @@
 import { Req } from '@nestjs/common';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import { ConnectedSocket, OnGatewayDisconnect } from '@nestjs/websockets';
 import { WebSocketServer, OnGatewayConnection, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
 import { SessionService } from 'src/session/session.service';
+import { UsersService } from 'src/users/users.service';
 import { GameLogic } from './game.logic';
 
 class WaitUser {
@@ -13,6 +15,15 @@ class WaitUser {
 	) {}
 }
 
+interface MatchInfo {
+  lPlayerNickname: string,
+  lPlayerAvatarUrl: string,
+  lPlayerScore: number,
+  rPlayerNickname: string,
+  rPlayerAvatarUrl: string,
+  rPlayerScore: number,
+  viewNumber: number,
+}
 
 var normal_waiting: WaitUser[] = [];
 
@@ -26,6 +37,7 @@ var normal_waiting: WaitUser[] = [];
 export class GameGateway {
 	constructor(
 		private sessionService: SessionService, // readUserId 함수 쓰려고 가져옴
+		private usersService: UsersService,
 	) {}
 
 	@WebSocketServer()public server: Server;
@@ -41,6 +53,7 @@ export class GameGateway {
 		// 2인 이상시 매칭
 		if (normal_waiting.length >= 2) {
 			console.log('매칭 완료');
+			
 			const gameLogic = new GameLogic(700, 450, 1, this.server);
 			const playerLeft = normal_waiting[0];
 			const playerRight = normal_waiting[1];
@@ -52,10 +65,23 @@ export class GameGateway {
 			playerRight.socket.emit('matched', {roomId: roomName, opponent: normal_waiting[0].id, position: 'right'});
 			normal_waiting.splice(0, 2);
 
-			playerLeft.socket.emit('init', gameLogic.getJson());
-			playerRight.socket.emit('init', gameLogic.getJson());
+			const ret = gameLogic.getJson();
+			const userInfo: MatchInfo = {
+				lPlayerNickname: playerLeft.id,
+				lPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerLeft.id),
+				lPlayerScore: 0,
+				rPlayerNickname: playerRight.id,
+				rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
+				rPlayerScore: 0,
+				viewNumber: socket.client.conn.server.clientsCount
+			}
+
+			playerLeft.socket.emit('init', gameLogic.getJson(), userInfo);
+			playerRight.socket.emit('init', gameLogic.getJson(), userInfo);
 			// this.server.to(roomName).emit("init", gameLogic.getJson());
 
+			playerLeft.socket.emit('setMatchInfo', userInfo);
+			playerRight.socket.emit('setMatchInfo', userInfo);
 			// arrowDown : true -> 아래 방향키가 눌린 상태
 			// arrowDown : false -> 아래 방향키를 뗀 상태
 			// arrowUp : true -> 위 방향키가 눌린 상태

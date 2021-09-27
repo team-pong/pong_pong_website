@@ -1,7 +1,76 @@
+div.ingame-match-info {
+	display: flex;
+	width: 720px;
+	line-height: 168%;
+	justify-content: space-around;
+	font-size: 30px;
+}
+
+div.left-player {
+	display: flex;
+	justify-content: space-around;
+}
+
+div.right-player {
+	display: flex;
+	justify-content: space-around;
+}
+
+div.ingame-side-bar {
+	position: absolute;
+	right: 0;
+	width: 60px;
+	height: 500px;
+}
+
+div.ingame-footer {
+	position: absolute;
+	bottom: 0;
+	width: 700px;
+	height: 30px;
+}
+
+div.left-player-nickname {
+	font-size: 20px;
+	margin-left: 40px;
+}
+
+div.left-player-score {
+	font-size: 30px;
+	margin-left: 100px;
+}
+
+div.left-player-profile {
+	width: 50px;
+	height: 50px;
+	img {
+		width: 50px;
+		height: 50px;
+	}
+}
+
+div.right-player-nickname {
+	font-size: 20px;
+	margin-right: 40px;
+}
+
+div.right-player-score {
+	font-size: 30px;
+	margin-right: 100px;
+}
+
+div.right-player-profile {
+	width: 50px;
+	height: 50px;
+	img {
+		width: 50px;
+		height: 50px;
+	}
+}
+
 canvas#ping-pong {
 	width: 700px;
 	height: 450px;
 	border: 10px gray solid;
-	margin-top: 100px;
 	margin-left: 10px;
 }
