@@ -34,7 +34,10 @@ const Dm: FC<{isDmOpen: boolean}> = ({isDmOpen}): JSX.Element => {
           {
             dmTarget === ""
             ? <>개인 메세지</>
-            : <>{dmTarget}</>
+            : <><img
+                  src="/public/arrow.svg"
+                  alt="뒤로가기"
+                  onClick={() => setDmTarget("")} />{dmTarget}</>
           }
         </span>
       </div>

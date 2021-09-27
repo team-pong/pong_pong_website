@@ -59,6 +59,22 @@ div.dm-container {
     height: 60px;
     color: white;
     line-height: 60px;
-    padding-left: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    span {
+      img {
+        position: absolute;
+        top: 15px;
+        left: 10px;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        animation: arrow-button-animation-in 0.5s;
+        &:hover {
+          animation: arrow-button-animation-out 0.5s;
+        }
+      }
+    }
   }
 }
