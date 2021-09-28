@@ -70,7 +70,7 @@ export class ChatUsersService {
       if (channel.owner_id == user_id){  // 나간 사람이 owner이라면
         const newOwner = await this.chatUsersRepo.findOne({channel_id: channel_id});  // 채널에 남은 인원중 아무나 뽑기
         await this.chatService.updateOwner(channel_id, newOwner.user_id);
-        // await axios.post('http://127.0.0.1:3001/chat/owner', {channel_id: channel_id, owner_id: newOwner.user_id}) // owner변경
+        // await axios.post(`${process.env.BACKEND_SERVER_URL}/chat/owner`, {channel_id: channel_id, owner_id: newOwner.user_id}) // owner변경
       }
     }
     return new ErrMsgDto(err0);
