@@ -1,6 +1,6 @@
 div.dm-room {
   height: calc(100% - 160px);
-  ul.dm-room-ul {
+  ul.dm-log-list {
     margin: 0;
     padding: 0;
     height: 99%;
@@ -13,7 +13,6 @@ div.dm-room {
       display: flex;
       span.dm-log-time {
         font-size: .5em;
-        margin-top: 6px;
         opacity: .5;
       }
       span.dm-log-msg {
@@ -52,6 +51,7 @@ div.dm-room {
       height: 60px;
       border: none;
       resize: none;
+      font-family: inherit;
       &:focus {
         outline: none;
       }
@@ -59,6 +59,12 @@ div.dm-room {
     button.dm-msg-button {
       width: 20%;
       height: 60px;
+      border: none;
+      border-radius: 5px;
+      &:enabled {
+        background-color: #FEC04C;
+        cursor: pointer;
+      }
     }
   }
 }
