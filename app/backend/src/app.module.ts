@@ -16,6 +16,7 @@ import { DmStoreModule } from './dm-store/dm-store.module';
 import { SessionModule } from './session/session.module';
 import { ChatUsersModule } from './chat-users/chat-users.module';
 import { BlockModule } from './block/block.module';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { BlockModule } from './block/block.module';
     DmStoreModule, 
     SessionModule,
     ChatUsersModule,
-    BlockModule
+    BlockModule,
+    GameModule
   ],
   controllers: [AppController],
   providers: [AppService],

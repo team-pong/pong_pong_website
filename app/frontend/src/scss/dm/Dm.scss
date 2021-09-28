@@ -1,4 +1,6 @@
-@keyframes dm-in {
+@import "../../colors.scss";
+
+@keyframes dm-list-in {
   0% {
     opacity: 0;
     bottom: 1em;
@@ -9,35 +11,54 @@
   }
 }
 
-@keyframes dm-out {
+@keyframes dm-list-out {
   0% {
     opacity: 1;
+    height: 650px;
     bottom: calc(1em + 60px);
+  }
+  99% {
+    opacity: 0;
+    height: 650px;
+    bottom: 1em;
   }
   100% {
     opacity: 0;
+    height: 0px;
     bottom: 1em;
   }
 }
 
-div.dm {
+div.dm-container {
   position: absolute;
   bottom: 1em;
   right: 1em;
-  background-color: red;
-  width: 0;
-  height: 0;
+  background-color: #fff;
+  width: 350px;
+  height: 0px;
   opacity: 0;
-  transition: all 1s;
+  border-radius: 10px;
+  overflow: auto;
   &.in {
     opacity: 1;
-    width: 350px;
     height: 650px;
     bottom: calc(1em + 60px);
-    animation: dm-in 1s;
+    animation: dm-list-in 1s;
   }
   &.out {
     opacity: 0;
-    animation: dm-out 1s;
+    height: 0px;
+    animation: dm-list-out 1s;
+  }
+  .top-bar {
+    position: sticky;
+    top: 0;
+    background-color: #FEC04C;
+    font-weight: bold;
+    font-size: 15pt;
+    height: 60px;
+    color: white;
+    line-height: 60px;
+    padding-left: 20px;
   }
 }

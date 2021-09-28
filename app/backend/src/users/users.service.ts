@@ -94,4 +94,9 @@ export class UsersService {
     await this.usersRepo.delete({user_id: user_id});
     return new ErrMsgDto(err0);
   }
+
+  async getAvatarUrl(user_id: string) {
+    const user = await this.usersRepo.findOne({user_id: user_id});
+    return (user.avatar_url);
+  }
 }

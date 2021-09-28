@@ -1,15 +1,19 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
+import DmList from "./DmList";
+import DmRoom from "./DmRoom";
 import "/src/scss/dm/Dm.scss";
 
 const Dm: FC<{isDmOpen: boolean}> = ({isDmOpen}): JSX.Element => {
 
   const dmRef = useRef<HTMLDivElement>(null);
+  const [dmTarget, setDmTarget] = useState("");
 
   useEffect(() => {
     if (isDmOpen) {
-      dmRef.current.className = "dm in";
+      dmRef.current.className = "dm-container in";
     } else {
-      dmRef.current.className = "dm out";
+      dmRef.current.className = "dm-container out";
+      setTimeout(() => setDmTarget(""), 1000);
     }
   }, [isDmOpen]);
 
@@ -20,11 +24,21 @@ const Dm: FC<{isDmOpen: boolean}> = ({isDmOpen}): JSX.Element => {
   *        애니메이션이 실행됨
   */
   useEffect(() => {
-    dmRef.current.className = "dm";
+    dmRef.current.className = "dm-container";
   }, []);
 
   return (
-    <div className="dm" ref={dmRef}>
+    <div className="dm-container" ref={dmRef}>
+      <div className="top-bar">
+        <span>
+          {
+            dmTarget === ""
+            ? <>개인 메세지</>
+            : <>{dmTarget}</>
+          }
+        </span>
+      </div>
+      {dmTarget === "" ? <DmList setDmTarget={setDmTarget}/> : <DmRoom dmTarget={dmTarget}/>}
     </div>
   )
 }
