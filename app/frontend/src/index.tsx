@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-global.BE_HOST = "http://127.0.0.1:3001";
+global.BE_HOST = "http://127.0.0.1";
 
 const element =
   <React.StrictMode>

@@ -20,7 +20,7 @@ export class SessionController {
 	@Get("/test_user01")
 	async tester_login01(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
 		await this.sessionService.tester_login(request, 'tester01', 'test_user_01');
-		return response.redirect('http://127.0.0.1:3000/mainpage')
+		return response.redirect('http://127.0.0.1/mainpage')
 	}
 
 	/*!
@@ -31,7 +31,7 @@ export class SessionController {
 	@Get("/test_user02")
 	async tester_login02(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
 		await this.sessionService.tester_login(request, 'tester02', 'test_user_02');
-		return response.redirect('http://127.0.0.1:3000/mainpage')
+		return response.redirect('http://127.0.0.1/mainpage')
 	}
 
   @ApiOperation({ summary: '42로그인 페이지에서 이 주소로 코드를 전송'})
@@ -40,7 +40,7 @@ export class SessionController {
     try {
       if (LoginCodeDto)
         await this.sessionService.login(loginCodeDto, request, response);
-      return response.redirect('http://127.0.0.1:3000/mainpage')
+      return response.redirect('http://127.0.0.1/mainpage')
     } catch (err){
       console.log("get42UserInfo Err: ", err);
     }
@@ -50,7 +50,7 @@ export class SessionController {
   @UseGuards(new NotLoggedInGuard())
   @Post("/oauth")
   public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
-    return response.redirect('http://127.0.0.1:3000/mainpage')
+    return response.redirect('http://127.0.0.1/mainpage')
   }
 
   @ApiOperation({ summary: '입력받은 세션 ID와 토큰이 유효한지 체크해서 Body에 결과를 담는다' })
