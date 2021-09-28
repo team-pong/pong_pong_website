@@ -1,0 +1,68 @@
+div.mc-container {
+	margin: 30px;
+
+	div.mc-content-container {
+		margin-top: 20px;
+
+		input#mc-title {
+			display: block;
+			width: 318px;
+			height: 30px;
+			margin-top: 10px;
+			border: solid 1px rgb(136, 136, 136);
+    	border-radius: 6px;
+			padding: 0 10px;
+		}
+
+		div.mc-type-container {
+			display: flex;
+			justify-content: space-between;
+			margin-top: 10px;
+		
+			label.mc-type-label {
+				border: solid 2px rgb(136, 136, 136);
+				padding: 10px 20px;
+				border-radius: 6px;
+				color: rgb(136, 136, 136);
+				cursor: pointer;
+			}
+			
+			input.mc-type {
+				display: none;
+			}
+			
+			input.mc-type[type=radio]:checked + label {
+				color: rgb(49, 100, 255);
+				background-color: rgb(242, 245, 255);
+				border: solid 2px rgb(49, 100, 255);
+				border-radius: 6px;
+			}
+		}
+
+		input#mc-password {
+			display: block;
+			width: 318px;
+			height: 30px;
+			margin-top: 10px;
+			border: solid 1px rgb(136, 136, 136);
+    	border-radius: 6px;
+			padding: 0 10px;
+		}
+
+		select#mc-max {
+			display: block;
+			width: 341px;
+			height: 30px;
+			margin-top: 10px;
+			border: solid 1px rgb(136, 136, 136);
+    	border-radius: 6px;
+			padding: 0 10px;
+		
+			option.mc-option {
+				width: 100px;
+			}
+		}
+	}
+}
+
+

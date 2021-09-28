@@ -33,31 +33,43 @@ const MakeChatRoom: FC = (props): JSX.Element => {
     console.log("Submmit");
   };
 
-  const onValueChange = (e) => {
+  const selectType = (e) => {
     setType(e.target.value);
   }
-  /* TODO: 도대체 어떻게 해야 라디오를 적절하게 사용할 수 있는 것인가 시팔 */
+
   return (
-    <>
+    <div className="mc-container">
       <h2>채팅방 만들기</h2>
-      <form onSubmit={makeChatRoom}>
-        <div>채팅방 이름</div>
-        <input type="text" value={title} onChange={e => setTitle(e.target.value)}/>
-        <div>공개범위</div>
-        <label htmlFor="mc-public">
-          <input type="radio" id="mc-public" value="public" checked={type === "public"} onClick={() => setType("public")} />
-          공개방
-        </label>
-        <label htmlFor="mc-protected">
-          <input type="radio" id="mc-protected" value="protected" checked={type === "protected"} onClick={() => setType("protected")} />
-          비공개방
-        </label>
-        <label htmlFor="mc-secret">
-          <input type="radio" id="mc-secret" value="secret" checked={type === "secret"} onClick={() => setType("secret")} />
-          시크릿방
-        </label>
-      </form>
-    </>
+      <div className="mc-content-container">
+        <label htmlFor="mc-title">채팅방 이름:</label>
+        <input type="text" id="mc-title"/>
+      </div>
+      <div className="mc-content-container">
+        <label>공개 범위:</label>
+        <div className="mc-type-container">
+          <input className="mc-type" type="radio" id="mc-public" value="public" checked={type === "public"} onChange={() => {}} />
+          <label className="mc-type-label" htmlFor="mc-public" onClick={() => setType("public")}>공개방</label>
+          <input className="mc-type" type="radio" id="mc-protected" value="protected" checked={type === "protected"} onChange={() => {}} />
+          <label className="mc-type-label" htmlFor="mc-protected" onClick={() => setType("protected")}>비공개방</label>
+          <input className="mc-type" type="radio" id="mc-secret" value="secret" checked={type === "secret"} onChange={() => {}} />        
+          <label className="mc-type-label" htmlFor="mc-secret" onClick={() => setType("secret")}>비밀방</label>
+        </div>
+      </div>
+      <div className="mc-content-container">
+        <label htmlFor="mc-password">비밀번호:</label>
+        <input id="mc-password" type="password" required minLength={4} maxLength={10} placeholder="비밀번호를 입력하세요." size={10}/>
+      </div>
+      <div className="mc-content-container">
+        <label htmlFor="mc-max">최대 인원:</label>
+        <select name="mc-max" id="mc-max" required>
+          <option className="mc-option" value="2">2명</option>
+          <option className="mc-option" value="4">4명</option>
+          <option className="mc-option" value="6">6명</option>
+          <option className="mc-option" value="8">8명</option>
+          <option className="mc-option" value="10">10명</option>
+        </select>
+      </div>
+    </div>
   );
 };
 
