@@ -1,0 +1,26 @@
+@import "../../../colors.scss";
+
+div#game-content {
+  margin: 40px;
+  margin-bottom: 0;
+  width: auto;
+  width: calc(100% - 80px);
+  height: 90%;
+  a.game-content-match-button {
+    margin: 5px;
+    width: 100%;
+    height: 50%;
+    background-color: $green;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    font-size: xx-large;
+    border-radius: 15px;
+    color: #fff;
+    transition-duration: 0.5s;
+    &:hover {
+      background-color: #4d9b5d;
+    }
+  }
+}
