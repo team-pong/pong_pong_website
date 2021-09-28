@@ -39,7 +39,7 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
    *  @breif 전송 버튼을 눌렀을 때 dmLog를 갱신함
    *  @todo socket을 이용한 BE 연동
   */
-  const sendButtonClick = (e: React.FormEvent) => {
+  const sendDm = (e: React.FormEvent) => {
     e.preventDefault();
     if (textAreaMsg === "") return ;
     setDmLog([{
@@ -49,6 +49,15 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
     }, ...dmLog]);
     setTextAreaMsg("");
   }
+
+  const controllTextAreaKeyDown = (e: React.KeyboardEvent) => {
+    const keyCode = e.key;
+
+    if (keyCode === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendDm(e as React.FormEvent);
+    }
+  };
 
   useEffect(() => {
     setDmLog(testDMLog);
@@ -64,11 +73,12 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
           rows={4}
           cols={50}
           value={textAreaMsg}
-          onChange={({target: {value}}) => setTextAreaMsg(value)}/>
+          onChange={({target: {value}}) => setTextAreaMsg(value)}
+          onKeyDown={controllTextAreaKeyDown}/>
         <button
           className="dm-msg-button"
           disabled={textAreaMsg === ""}
-          onClick={sendButtonClick}>전송</button>
+          onClick={sendDm}>전송</button>
       </form>
     </div>
   );
