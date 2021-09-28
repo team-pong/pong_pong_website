@@ -29,15 +29,27 @@ div.mc-container {
 			
 			input.mc-type {
 				display: none;
-			}
-			
-			input.mc-type[type=radio]:checked + label {
+      }
+
+			input.mc-type[type=radio]:checked + label{
 				color: rgb(49, 100, 255);
 				background-color: rgb(242, 245, 255);
 				border: solid 2px rgb(49, 100, 255);
 				border-radius: 6px;
-			}
+      }
 		}
+
+    span.mc-explain {
+      display: none;
+      
+    }
+
+    span.mc-explain-selected {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: rgb(136, 136, 136);
+    }
 
 		input#mc-password {
 			display: block;
@@ -62,7 +74,25 @@ div.mc-container {
 				width: 100px;
 			}
 		}
-	}
+  }
+
+  button.mc-make {
+    position: fixed;
+    top: 65%;
+    width: 341px;
+    height: 35px;
+    color: #fff;
+    font-size: 1rem;
+    background-color: #3164ff;
+    border: solid 2px #3164ff;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  button.mc-make:hover {
+    background-color: rgb(242, 245, 255);
+    color: rgb(49, 100, 255);
+  }
 }
 
 
