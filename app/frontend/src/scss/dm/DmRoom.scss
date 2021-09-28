@@ -1,6 +1,6 @@
 div.dm-room {
   height: calc(100% - 160px);
-  ul.dm-room-ul {
+  ul.dm-log-list {
     margin: 0;
     padding: 0;
     height: 99%;
@@ -51,6 +51,7 @@ div.dm-room {
       height: 60px;
       border: none;
       resize: none;
+      font-family: inherit;
       &:focus {
         outline: none;
       }

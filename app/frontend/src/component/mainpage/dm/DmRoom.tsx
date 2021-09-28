@@ -2,6 +2,30 @@ import React, { FC, useEffect, useState, Dispatch, SetStateAction } from "react"
 import "../../../scss/dm/DmRoom.scss";
 import { testDMLog, DMLog } from "../../../dummydata/testDM";
 
+const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
+  return (
+    <ul className="dm-log-list">
+      {dmLog?.map((msg, idx) => {
+        return (
+          <li key={idx} className={`dm-log ${msg.from === "me" ? "me" : "other"}`}>
+            <span className="dm-log-msg">
+              {
+                /*! @author yochoi
+                  *  @breif 문자열(챗로그)에 개행이 있으면 br태그로 줄바꿈해주는 부분
+                  */
+                msg.msg.split('\n').map((chatlog, idx) => {
+                  return (<span key={idx}>{chatlog}<br /></span>);
+                })
+              }
+            </span>
+            <span className="dm-log-time">{msg.time}</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 interface DmRoomProps {
   dmTarget: string;
 }
@@ -32,25 +56,7 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
 
   return (
     <div className="dm-room">
-      <ul className="dm-room-ul">
-        {dmLog?.map((msg, idx) => {
-          return (
-            <li key={idx} className={`dm-log ${msg.from === "me" ? "me" : "other"}`}>
-              <span className="dm-log-msg">
-                {
-                  /*! @author yochoi
-                   *  @breif 문자열(챗로그)에 개행이 있으면 br태그로 줄바꿈해주는 부분
-                   */
-                  msg.msg.split('\n').map((chatlog, idx) => {
-                    return (<span key={idx}>{chatlog}<br /></span>);
-                  })
-                }
-              </span>
-              <span className="dm-log-time">{msg.time}</span>
-            </li>
-          );
-        })}
-      </ul>
+      <DmLogList dmLog={dmLog} />
       <form className="dm-form">
         <textarea
           className="dm-msg-textarea"
