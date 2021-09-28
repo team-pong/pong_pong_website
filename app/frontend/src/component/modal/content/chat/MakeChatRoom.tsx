@@ -4,55 +4,49 @@ import EasyFetch from "../../../../utils/EasyFetch";
 
 const MakeChatRoom: FC = (props): JSX.Element => {
 
-  // const makeChatRoom = (e) => {
-  //   e.preventDefault();
-  //   console.log("cubsuimt1");
-  // };
-
-  // const test = async () => {
-  //   const easyfetch = new EasyFetch(`${global.BE_HOST}/chat`, "POST");
-  //   const body = {
-  //     "title": "아무나 와보던가",
-  //     "type": "public",
-  //     "passwd": "",
-  //     "max_people": 10
-  //   };
-  //   const res = await (await easyfetch.fetch(body)).json();
-
-  //   console.log("res: ", res);
-  // };
-
   const [title, setTitle] = useState("");
   const [type, setType] = useState("public");
   const [password, setPassword] = useState("");
   const [max, setMax] = useState(2);
 
-  // useEffect(() => {
-  //   test();
-  // }, []);
+  /*!
+   * @author donglee
+   * @brief 대화방 이름과 비밀번호의 글자수가 유효한지 검사
+   */
+  const checkFormat = () => {
+    if (title.length < 2) {
+      alert("대화방 이름은 두 자 이상이어야 합니다.");
+      return false;
+    }
+    if (type === "protected" && password.length < 4) {
+      alert("비밀번호는 4자 이상이어야 합니다.");
+      return false;
+    }
+    return true;
+  }
 
   const makeChatRoom = () => {
-    console.log("Submmit");
+    if (checkFormat()) {
+      console.log("submiT! ", title, type, password, max);
+    }
   };
-
-  const selectType = (e) => {
-    setType(e.target.value);
-  }
 
   return (
     <div className="mc-container">
       <h2>채팅방 만들기</h2>
       <div className="mc-content-container">
         <label htmlFor="mc-title">채팅방 이름:</label>
-        <input
-          type="text"
-          id="mc-title"
-          placeholder="대화방 이름을 입력하세요."
-          required
-          minLength={2}
-          maxLength={20}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}/>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <input
+            type="text"
+            id="mc-title"
+            placeholder="대화방 이름을 입력하세요."
+            required
+            minLength={2}
+            maxLength={20}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}/>
+        </form>
       </div>
       <div className="mc-content-container">
         <label>공개 범위:</label>
@@ -101,18 +95,20 @@ const MakeChatRoom: FC = (props): JSX.Element => {
           비밀방은 어떤 목록에서도 보이지 않고 초대하고 싶은 사람들만 초대해서 대화를 할 수 있습니다
         </span>
       </div>
-      <div className="mc-content-container">
+      <div className={"mc-password-container" + (type === "protected" ? " mc-password-selected" : "") }>
         <label htmlFor="mc-password">비밀번호:</label>
-        <input
-          id="mc-password"
-          type="password"
-          required
-          minLength={4}
-          maxLength={10}
-          placeholder="비밀번호를 입력하세요."
-          size={10}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}/>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <input
+            id="mc-password"
+            type="password"
+            required
+            minLength={4}
+            maxLength={10}
+            placeholder="비밀번호를 입력하세요."
+            size={10}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}/>
+        </form>
       </div>
       <div className="mc-content-container">
         <label htmlFor="mc-max">최대 인원:</label>
@@ -124,7 +120,7 @@ const MakeChatRoom: FC = (props): JSX.Element => {
           <option className="mc-option" value={10}>10명</option>
         </select>
       </div>
-      <button className="mc-make">만들기</button>
+      <button className="mc-make" onClick={makeChatRoom}>만들기</button>
     </div>
   );
 };

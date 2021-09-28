@@ -51,16 +51,6 @@ div.mc-container {
       color: rgb(136, 136, 136);
     }
 
-		input#mc-password {
-			display: block;
-			width: 318px;
-			height: 30px;
-			margin-top: 10px;
-			border: solid 1px rgb(136, 136, 136);
-    	border-radius: 6px;
-			padding: 0 10px;
-		}
-
 		select#mc-max {
 			display: block;
 			width: 341px;
@@ -74,6 +64,25 @@ div.mc-container {
 				width: 100px;
 			}
 		}
+  }
+
+  div.mc-password-container {
+    display: none;
+    margin-top: 20px;
+
+    input#mc-password {
+			display: block;
+			width: 318px;
+			height: 30px;
+			margin-top: 10px;
+			border: solid 1px rgb(136, 136, 136);
+    	border-radius: 6px;
+			padding: 0 10px;
+		}
+  }
+
+  div.mc-password-selected {
+    display: block;
   }
 
   button.mc-make {
