@@ -92,7 +92,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    */
   const changeNick = async (e: FormEvent) => {
     e.preventDefault();
-    const easyfetch = new EasyFetch("http://localhost:3001/users/info", "POST");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/info`, "POST");
     const body = {
       "user_id": userInfo.user_id,
       "nick": nickToEdit,
