@@ -23,7 +23,7 @@ const FriendList: React.FC = () => {
    * @brief 친구 삭제 POST 요청 후 성공하면 state를 해당 친구를 제거한 상태로 업데이트한다
    */	
 	const deleteFriend = async (nick: string) => {
-		const easyfetch = new EasyFetch(`http://127.0.0.1:3001/friend?friend_nick=${nick}`, "DELETE");
+		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`, "DELETE");
 		const res = await (await easyfetch.fetch()).json();
 
 		if (res.err_msg !== "에러가 없습니다.") {

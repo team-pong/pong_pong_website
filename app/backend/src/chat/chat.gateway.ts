@@ -29,7 +29,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { headers: {referer} } = req;
     const channel_id = referer.split('/')[referer.split('/').length - 1];
     const user_id = socket.data.userid;
-    axios.post(`http://127.0.0.1:3001/chat-users`, {user_id: user_id, channel_id: channel_id});
+    axios.post(`${process.env.BACKEND_SERVER_URL}/chat-users`, {user_id: user_id, channel_id: channel_id});
     console.log(`user: ${user_id}, channel: ${channel_id}`);
     socket.join(channel_id);
     socket.to(channel_id).emit('message', {
@@ -37,7 +37,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       chat: `${user_id}님이 입장하셨습니다.`
     });
     
-    const userList = await axios.get(`http://127.0.0.1:3001/chat-users?channel_id=${channel_id}`);
+    const userList = await axios.get(`${process.env.BACKEND_SERVER_URL}/chat-users?channel_id=${channel_id}`);
     socket.to(channel_id).emit('userList', userList.data.chatUsersList);
     
     socket.on('disconnect', () => {
@@ -45,9 +45,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       socket.leave(channel_id);
       const userCount = 0;
       if (userCount == 0) {
-        axios.delete(`http://127.0.0.1:3001/chat?channel_id=${channel_id}`);
+        axios.delete(`${process.env.BACKEND_SERVER_URL}/chat?channel_id=${channel_id}`);
       } else {
-        axios.delete(`http://127.0.0.1:3001/chat-users?channel_id=${channel_id}&user_id=${user_id}`)
+        axios.delete(`${process.env.BACKEND_SERVER_URL}/chat-users?channel_id=${channel_id}&user_id=${user_id}`)
         socket.to(channel_id).emit('message', {
           user: 'system',
           chat: `${user_id} 님이 퇴장하셨습니다.`,
