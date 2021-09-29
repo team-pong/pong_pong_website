@@ -98,20 +98,22 @@ const ChatMain: FC<{setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({se
           spellCheck={false}
           onChange={({target: {value}}) => setSearchInputValue(value)} 
           onKeyDown={(e) => {if (e.key === "Enter") setChatRoomToFind(searchInputValue)}} /><span className="input-border" />
-        <button className="chat-search-button" onClick={() => setChatRoomToFind(searchInputValue)}><img className="chat-search-img" src="/public/search.svg" alt="검색"/></button>
+        <button className="chat-search-button" onClick={() => setChatRoomToFind(searchInputValue)}>
+          <img className="chat-search-img" src="/public/search.svg" alt="검색"/>
+        </button>
       </div>
       <ul id="chat-room-selector">
         <li className="chat-room-li" onClick={() => setChatRoomSelector("all")}>
-            <input className="chat-room-input" type="radio" name="all" checked={chatRoomSelector === "all"} onChange={() => {}}/>
-            <label className="chat-room-label">전체</label>
+          <input className="chat-room-input" type="radio" name="all" checked={chatRoomSelector === "all"} onChange={() => {}}/>
+          <label className="chat-room-label">전체</label>
         </li>
         <li className="chat-room-li" onClick={() => setChatRoomSelector("public")}>
-            <input className="chat-room-input" type="radio" name="public" checked={chatRoomSelector === "public"} onChange={() => {}}/>
-            <label className="chat-room-label">공개방</label>
+          <input className="chat-room-input" type="radio" name="public" checked={chatRoomSelector === "public"} onChange={() => {}}/>
+          <label className="chat-room-label">공개방</label>
         </li>
         <li className="chat-room-li" onClick={() => setChatRoomSelector("protected")}>
-            <input className="chat-room-input" type="radio" name="protected" checked={chatRoomSelector === "protected"} onChange={() => {}}/>
-            <label className="chat-room-label">비밀방</label>
+          <input className="chat-room-input" type="radio" name="protected" checked={chatRoomSelector === "protected"} onChange={() => {}}/>
+          <label className="chat-room-label">비밀방</label>
         </li>
       </ul>
       <ChatRoomList search={chatRoomToFind} type={chatRoomSelector} setChatRoomInfo={setChatRoomInfo}/>
