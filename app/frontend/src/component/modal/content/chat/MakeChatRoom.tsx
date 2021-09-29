@@ -25,9 +25,18 @@ const MakeChatRoom: FC = (props): JSX.Element => {
     return true;
   }
 
-  const makeChatRoom = () => {
+  const makeChatRoom = async () => {
     if (checkFormat()) {
-      console.log("submiT! ", title, type, password, max);
+      const easyfetch = new EasyFetch(`${global.BE_HOST}/chat`, "POST");
+      const body = {
+        "title": title,
+        "type": type,
+        "passwd": password,
+        "max_people": max,
+      };
+      const res = await (await easyfetch.fetch(body)).json();
+
+      console.log("res: ", res);
     }
   };
 
@@ -43,7 +52,7 @@ const MakeChatRoom: FC = (props): JSX.Element => {
             placeholder="대화방 이름을 입력하세요."
             required
             minLength={2}
-            maxLength={20}
+            maxLength={25}
             value={title}
             onChange={(e) => setTitle(e.target.value)}/>
         </form>
