@@ -1,6 +1,7 @@
 import { useState, useEffect, FC, MouseEvent, Dispatch, SetStateAction } from 'react'
 import EasyFetch from '../../../../utils/EasyFetch';
 import Loading from '../../../loading/Loading';
+import NoResult from '../../../noresult/NoResult';
 import ContextMenu from '../contextmenu/ContextMenu'
 
 /*!
@@ -95,11 +96,11 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
   if (friendList === null || friendList === undefined) {
     return (<Loading width={240} height={35} color="#fff"/>);
   } else if (friendList.length === 0) {
-    return (<div style={{
-      height: "35px",
-      lineHeight: "35px",
-      textAlign: "center"
-    }}>친구 없음</div>);
+    return (<NoResult
+              width="30px"
+              height="30px"
+              text="친구 없음"
+              style={{marginLeft: "30px"}}/>);
   } else {
     return (
       <div id="friend-list-container">
