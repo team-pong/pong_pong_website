@@ -1,4 +1,5 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import NoResult from "../../../noresult/NoResult";
 import CircleChart from "../../../chart/CircleChart";
 import BarChart from "../../../chart/BarChart";
 import "/src/scss/content/RecordContent.scss";
@@ -260,8 +261,7 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
         isRecordOpen === recordState.noResult &&
         <div id="no-result">
           <img src="/public/arrow.svg" className="arrow-button" onClick={() => setIsRecordOpen(recordState.close)}/>
-          <img src="/public/exclamation-mark.svg" id="no-result-img" alt="Exclamation mark" />
-          <span className="record-no-result-span">검색 결과가 없습니다</span>
+          <NoResult style={{width: "80px", height: "80px"}} />
         </div>
       }
     </div>
