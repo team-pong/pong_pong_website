@@ -257,7 +257,7 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
         isRecordOpen === recordState.noResult &&
         <div id="no-result">
           <img src="/public/arrow.svg" className="arrow-button" onClick={() => setIsRecordOpen(recordState.close)}/>
-          <NoResult width="80px" height="80px" />
+          <NoResult style={{width: "80px", height: "80px"}} />
         </div>
       }
     </div>

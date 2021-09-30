@@ -97,10 +97,11 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
     return (<Loading width={240} height={35} color="#fff"/>);
   } else if (friendList.length === 0) {
     return (<NoResult
-              width="30px"
-              height="30px"
               text="친구 없음"
-              style={{marginLeft: "30px"}}/>);
+              style={{
+                width: "30px",
+                height: "30px",
+                marginLeft: "30px"}}/>);
   } else {
     return (
       <div id="friend-list-container">
