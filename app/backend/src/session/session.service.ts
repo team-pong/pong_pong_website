@@ -49,7 +49,7 @@ export class SessionService {
     const { code } = loginCodeDto;
     const type = "authorization_code";
     const getTokenUrl = "https://api.intra.42.fr/oauth/token";
-    const redirectUrl = "http://127.0.0.1:3001/session/oauth"
+    const redirectUrl = `${process.env.BACKEND_SERVER_URL}/session/oauth`;
     const requestBody = {
       grant_type: type,
       client_id: process.env.CLIENT_ID,

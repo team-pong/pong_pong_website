@@ -1,10 +1,14 @@
-import { Body, Controller, Delete, forwardRef, Get, Inject, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Param, Post, Query, Req } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AdminDto1 } from 'src/dto/admin';
 import { UsersDto5 } from 'src/dto/users';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
+import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
 import { AdminService } from './admin.service';
+import { Request } from 'express';
+import { ChatService } from 'src/chat/chat.service';
+import { err26 } from 'src/err';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -13,6 +17,10 @@ export class AdminController {
     private adminService: AdminService,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    @Inject(forwardRef(() => SessionService))
+    private sessionService: SessionService,
+    @Inject(forwardRef(() => ChatService))
+    private chatService: ChatService,
     ){}
 
   @ApiOperation({ summary: 'admin 설정'})
@@ -20,8 +28,14 @@ export class AdminController {
   // @ApiBody({ type: AdminDto1, description: 'admin 설정할 채널아이디, 유저아이디' })
   @ApiBody({ type: AdminDto1, description: 'admin 설정할 채널아이디, 유저닉네임' })
   @Post()
-  async createAdmin(@Body() b: AdminDto1){
-    let user;
+  async createAdmin(@Body() b: AdminDto1, @Req() req: Request){
+    let user, user_id, owner;
+
+    user_id = await this.sessionService.readUserId(req.sessionID);
+    owner = await this.chatService.readOwner(b.channel_id);
+    if (user_id != owner.user_id) // 사용자가 owner가 아니면
+      return new ErrMsgDto(err26);
+
     user = await this.usersService.readUsers(b.nick, 'nick');
     return await this.adminService.createAdmin(user.user_id, b.channel_id);
     // return this.adminService.createAdmin(b.user_id, b.channel_id);
@@ -61,11 +75,18 @@ export class AdminController {
   @ApiResponse({ type: ErrMsgDto, description: 'admin 제거 실패시 실패 이유' })
   // @ApiQuery({ name:'user_id', example: 'jinbkim', description: 'admin 제거할 유저아이디' })
   @ApiQuery({ name:'nick', example: 'jinbkim', description: 'admin 제거할 유저 닉네임' })
+  @ApiQuery({ name: 'channel_id', example: 1, description: 'admin 제거할 채널아이디' })
   @Delete()
-  async deleteAdmin(@Query() q){
-    let user;
+  async deleteAdmin(@Query() q, @Req() req: Request){
+    let user, user_id, owner;
+
+    user_id = await this.sessionService.readUserId(req.sessionID);
+    owner = await this.chatService.readOwner(q.channel_id);
+    if (user_id != owner.user_id) // 사용자가 owner가 아니면
+      return new ErrMsgDto(err26);
+
     user = await this.usersService.readUsers(q.nick, 'nick');
-    return await this.adminService.deleteAdmin(user.user_id);
+    return await this.adminService.deleteAdmin(user.user_id, q.channel_id);
     // return this.adminService.deleteAdmin(q.user_id);
   }
 }

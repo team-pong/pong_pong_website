@@ -18,16 +18,43 @@ const FriendList: React.FC = () => {
 
 	const [friendList, setFriendList] = useState<Friend[]>();
 
-	const deleteFriend = (nick: string) => {
-		console.log(`${nick} delete`);
+  /*!
+   * @author donglee
+   * @brief 친구 삭제 POST 요청 후 성공하면 state를 해당 친구를 제거한 상태로 업데이트한다
+   */	
+	const deleteFriend = async (nick: string) => {
+		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`, "DELETE");
+		const res = await (await easyfetch.fetch()).json();
+
+		if (res.err_msg !== "에러가 없습니다.") {
+			alert(res.err_msg);
+		} else {
+			const updatedList = friendList.filter((friend) => friend.nick !== nick);
+			setFriendList(updatedList);
+    }
 	};
 
-	const blockFriend = (nick: string) => {
-		console.log(`${nick} block`);
+  /*!
+   * @author donglee
+   * @brief 친구 차단 POST 요청 후 성공하면 state를 해당 친구를 제거한 상태로 업데이트한다
+   */
+	const blockFriend = async (nick: string) => {
+		const easyfetch = new EasyFetch(`${global.BE_HOST}/block`, "POST");
+		const body = {
+			"block_nick": nick,
+		};
+		const res = await (await easyfetch.fetch(body)).json();
+
+		if (res.err_msg !== "에러가 없습니다.") {
+			alert("사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.");
+		} else {
+			const updatedList = friendList.filter((friend) => friend.nick !== nick);
+			setFriendList(updatedList);
+		}
 	};
 
 	const getFriendList = async () => {
-		const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend/list");
+		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
 		const res = await (await easyfetch.fetch()).json();
 
 		setFriendList(res.friendList);
@@ -45,7 +72,7 @@ const FriendList: React.FC = () => {
 						<li key={key}>
 							<div className="fl-user-info">
 								<img className="fl-avatar" src={friend.avatar_url} alt="프로필" />
-								<div>
+								<div className="fl-user-info-text">
 									<span className="fl-nickname">{friend.nick}</span>
 									<span className="fl-title">{setAchievementStr(friend.ladder_level)}</span>
 									<img className="fl-title-icon" src={setAchievementImg(friend.ladder_level)} alt="타이틀로고" />
@@ -75,16 +102,24 @@ const FriendList: React.FC = () => {
 	}
 }
 
-const BlockedList: React.FC<{nick: string}> = ({nick}) => {
+const BlockedList: React.FC = () => {
 	
 	const [blockedList, setBlockedList] = useState<Friend[]>();
 
-	const unblockFriend = (nick: string) => {
-		console.log(`${nick} unblock!`);
+	const unblockFriend = async (nick: string) => {
+		const easyfetch = new EasyFetch(`${global.BE_HOST}/block?block_nick=${nick}`, "DELETE");
+		const res = await (await easyfetch.fetch()).json();
+		
+		if (res.err_msg !== "에러가 없습니다.") {
+			alert("사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.");
+		} else {
+			const updatedList = blockedList.filter((friend) => friend.nick !== nick);
+			setBlockedList(updatedList);
+		}
 	};
 
 	const getBlockedList = async () => {
-		const easyfetch = new EasyFetch("http://127.0.0.1:3001/block");
+		const easyfetch = new EasyFetch(`${global.BE_HOST}/block`);
 		const res =  await (await easyfetch.fetch()).json();
 		
 		setBlockedList(res.blockList);
@@ -102,7 +137,7 @@ const BlockedList: React.FC<{nick: string}> = ({nick}) => {
 						<li key={key}>
 							<div className="fl-user-info">
 								<img className="fl-avatar" src={blocked.avatar_url} alt="프로필" />
-								<div>
+								<div className="fl-user-info-text">
 									<span className="fl-nickname">{blocked.nick}</span>
 									<span className="fl-title">{setAchievementStr(blocked.ladder_level)}</span>
 									<img className="fl-title-icon" src={setAchievementImg(blocked.ladder_level)} alt="타이틀로고" />
@@ -145,7 +180,7 @@ const ManageFriendContent: React.FC<{nick: string}> = ({nick}) => {
 			</div>
 			<div className="selected-list">
 				{!isBlockedSelected && <FriendList />}
-				{isBlockedSelected && <BlockedList nick={nick}/>}
+				{isBlockedSelected && <BlockedList />}
 			</div>
 		</div>
   );

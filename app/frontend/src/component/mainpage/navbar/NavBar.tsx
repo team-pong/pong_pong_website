@@ -33,6 +33,7 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [myNick, setMyNick] = useState("");
   const [myAvatar, setMyAvatar] = useState("");
+  const [friendList, setFriendList] = useState<UserInfo[]>(null);
 
   const avatarImgRef = useRef(null);
 
@@ -42,16 +43,28 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
    */
   const getUserInfo = async () => {
     //test session id로 받아와야 하는데 일단 donglee꺼 받아옴
-    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users/user?user_id=donglee`);
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/user?user_id=donglee`);
     const res = await (await easyfetch.fetch()).json();
 
     setUserInfo(res);
     return res;
   };
 
+  /*!
+   * @author donglee
+   * @brief FriendList, AddFriend 컴포넌트와 state를 공유하기 위해 이 컴포넌트에서 FriendList를 가져옴
+   */
+  const getFriendList = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}friend/list`);
+    const res = await (await easyfetch.fetch()).json();
+
+    setFriendList(res.friendList);
+  };
+
   useEffect(() => {
     getUserInfo()
       .then((res) => setMyNick(res.nick));
+    getFriendList();
   },[]);
 
   if (userInfo) {
@@ -71,7 +84,7 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
           <h2>{myNick}</h2>
         </header>
         <ul className="nav-ul">
-          <li className="nav-list-button" onClick={() => setIsFriendListOpen(!isFriendListOpen)}>
+          <li className="nav-list-button" id="nav-friend" onClick={() => setIsFriendListOpen(!isFriendListOpen)}>
             <img className="nav-list-img" src="/public/users.svg"/>
             <span className="nav-list-span">친구</span>
             <img 
@@ -81,9 +94,9 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
                 setIsAddFriendOpen(!isAddFriendOpen);
               }}
               src="/public/plus.svg"/>
-            {isAddFriendOpen ? <AddFriend setState={setIsAddFriendOpen}/> : <></>}
+            {isAddFriendOpen ? <AddFriend setState={setIsAddFriendOpen} friendList={friendList} setFriendList={setFriendList} /> : <></>}
           </li>
-          {isFriendListOpen ? <FriendList/> : <></>}
+          {isFriendListOpen ? <FriendList friendList={friendList} setFriendList={setFriendList} /> : <></>}
           <Link to={`${props.match.url}/record`} style={{color: "inherit", textDecoration: "none"}}>
             <li className="nav-list-button">
               <img className="nav-list-img" src="/public/line-graph.svg"/>
@@ -96,12 +109,12 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
               <span className="nav-list-span">채팅</span>
             </li>
           </Link>
-          {/* <Link to={`${props.match.url}/game`} style={{color: "inherit", textDecoration: "none"}}> */}
+          <Link to={`${props.match.url}/game`} style={{color: "inherit", textDecoration: "none"}}>
             <li className="nav-list-button">
               <img className="nav-list-img" src="/public/controller-play.svg"/>
               <span className="nav-list-span">게임하기</span>
             </li>
-          {/* </Link> */}
+          </Link>
         </ul>
         <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent myNickSetter={setMyNick} myAvatarSetter={setMyAvatar}/>} smallModal/></Route>
       </nav>

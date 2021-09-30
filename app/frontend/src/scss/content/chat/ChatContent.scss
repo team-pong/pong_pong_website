@@ -33,10 +33,12 @@
 }
 
 #chat-main {
-  width: 80%;
+  width: 640px;
+  height: 555px;
   margin: 45px auto auto auto;
   #search {
     .chat-search-input {
+      font-size: 15pt;
       width: 80%;
       height: 35px;
       margin: 0;
@@ -65,8 +67,8 @@
     .chat-search-button {
       width: 15%;
       height: 39px;
+      float: right;
       margin: 0;
-      margin-left: 30px;
       padding: 0;
       vertical-align: middle;
       background-color: $green;
@@ -78,7 +80,7 @@
         padding-top: 2px;
       }
       &:hover {
-        img {
+        .chat-search-img {
           animation: search-button-animation 0.5s 2 alternate;
         }
       }

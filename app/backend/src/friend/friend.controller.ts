@@ -23,13 +23,15 @@ export class FriendController {
   @ApiOperation({ summary: '친구 추가'})
   @ApiResponse({ type: ErrMsgDto, description: '친구 추가 실패시 실패 이유' })
   // @ApiBody({ type: FriendDto1, description: '내 유저 아이디, 친구 추가할 유저 아이디' })
-  @ApiBody({ type: FriendDto1, description: '내 유저 닉네임, 친구 추가할 유저 닉네임' })
+  // @ApiBody({ type: FriendDto1, description: '내 유저 닉네임, 친구 추가할 유저 닉네임' })
+  @ApiBody({ type: FriendDto1, description: '친구 추가할 유저 닉네임' })
   @Post()
-  async createFriend(@Body() b: FriendDto1){
-    let user, friend;
-    user = await this.usersService.readUsers(b.user_nick, 'nick');
+  async createFriend(@Body() b: FriendDto1, @Req() req: Request){
+    let user_id, friend;
+    // user = await this.usersService.readUsers(b.user_nick, 'nick');
+    user_id = await this.sessionService.readUserId(req.sessionID);
     friend = await this.usersService.readUsers(b.friend_nick, 'nick');
-    return this.friendService.createFriend(user.user_id, friend.user_id);
+    return this.friendService.createFriend(user_id, friend.user_id);
     // return this.friendService.createFriend(b.user_id, b.friend_id);
   }
 
@@ -53,19 +55,21 @@ export class FriendController {
     let user_id = await this.sessionService.readUserId(req.sessionID);
     return this.friendService.readFriend(user_id, 'send');
   }
-  @ApiOperation({ summary: '해당 유저를 친구 추가한 모든 유저 검색'})
-  @ApiResponse({ 
-    // type: FriendDto2, 
-    type: UsersDto5,
-    description: `
-      해당 유저를 친구 추가한 유저 객체 배열
-      검색 실패시 실패 이유 반환
-    ` })
-  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '자신을 친구 추가한 모든 유저들을 검색할 유저 아이디'})
-  @Get('list2')
-  readFriend2(@Query() q){
-    return this.friendService.readFriend(q.user_id, 'receive');
-  }
+
+  // @ApiOperation({ summary: '해당 유저를 친구 추가한 모든 유저 검색'})
+  // @ApiResponse({ 
+  //   // type: FriendDto2, 
+  //   type: UsersDto5,
+  //   description: `
+  //     해당 유저를 친구 추가한 유저 객체 배열
+  //     검색 실패시 실패 이유 반환
+  //   ` })
+  // @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '자신을 친구 추가한 모든 유저들을 검색할 유저 아이디'})
+  // @Get('list2')
+  // readFriend2(@Query() q){
+  //   return this.friendService.readFriend(q.user_id, 'receive');
+  // }
+
   @ApiOperation({ summary: '해당 유저가 친구 추가한 유저 인지 확인'})
   @ApiResponse({ 
     type: Bool, 
@@ -75,14 +79,15 @@ export class FriendController {
     ` })
   // @ApiQuery({ name: 'user_id', example: 'jinbkim' ,description: 'friend인지 확인할 유저아이디' })
   // @ApiQuery({ name: 'friend_id', example: 'donglee' ,description: 'friend인지 확인할 상대아이디' })
-  @ApiQuery({ name: 'user_nick', example: 'jinbkim' ,description: 'friend인지 확인할 유저 닉네임' })
+  // @ApiQuery({ name: 'user_nick', example: 'jinbkim' ,description: 'friend인지 확인할 유저 닉네임' })
   @ApiQuery({ name: 'friend_nick', example: 'donglee' ,description: 'friend인지 확인할 상대 닉네임' })
   @Get()
-  async isFriend(@Query() q){
-    let user, friend;
-    user = await this.usersService.readUsers(q.user_nick, 'nick');
+  async isFriend(@Query() q, @Req() req: Request){
+    let user_id, friend;
+    // user = await this.usersService.readUsers(q.user_nick, 'nick');
+    user_id = await this.sessionService.readUserId(req.sessionID);
     friend = await this.usersService.readUsers(q.friend_nick, 'nick');
-    return this.friendService.isFriend(user.user_id, friend.user_id);
+    return this.friendService.isFriend(user_id, friend.user_id);
     // return this.friendService.isFriend(q.user_id, q.friend_id);
   }
 
@@ -90,14 +95,15 @@ export class FriendController {
   @ApiResponse({ type: ErrMsgDto, description: 'friend 삭제 실패시 실패 이유' })
   // @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '내 유저 아이디' })
   // @ApiQuery({ name: 'friend_id', example: 'donglee', description: '친구 삭제할 유저 아이디' })
-  @ApiQuery({ name: 'user_nick', example: 'jinbkim', description: '내 유저 닉네임' })
+  // @ApiQuery({ name: 'user_nick', example: 'jinbkim', description: '내 유저 닉네임' })
   @ApiQuery({ name: 'friend_nick', example: 'donglee', description: '친구 삭제할 유저 닉네임' })
   @Delete()
-  async deleteFriend(@Query() q){
-    let user, friend;
-    user = await this.usersService.readUsers(q.user_nick, 'nick');
+  async deleteFriend(@Query() q, @Req() req: Request){
+    let user_id, friend;
+    // user = await this.usersService.readUsers(q.user_nick, 'nick');
+    user_id = await this.sessionService.readUserId(req.sessionID);
     friend = await this.usersService.readUsers(q.friend_nick, 'nick');
-    return this.friendService.deleteFriend(user.user_id, friend.user_id);
+    return this.friendService.deleteFriend(user_id, friend.user_id);
     // return this.friendService.deleteFriend(q.user_id, q.friend_id);
   }
   @ApiOperation({ 

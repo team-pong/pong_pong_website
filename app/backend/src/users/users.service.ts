@@ -84,7 +84,7 @@ export class UsersService {
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저이면
       return new ErrMsgDto(err2);
     await this.achievementsService.deleteAllAchievements(user_id);
-    await this.adminService.deleteAdmin(user_id);
+    await this.adminService.deleteAllAdmin(user_id);
     await this.banService.deleteBan(user_id);
     await this.blockService.deleteAllBlock(user_id);
     await this.dmStoreService.deleteDmStore(user_id);
@@ -93,5 +93,10 @@ export class UsersService {
     await this.muteService.deleteMute(user_id);
     await this.usersRepo.delete({user_id: user_id});
     return new ErrMsgDto(err0);
+  }
+
+  async getAvatarUrl(user_id: string) {
+    const user = await this.usersRepo.findOne({user_id: user_id});
+    return (user.avatar_url);
   }
 }

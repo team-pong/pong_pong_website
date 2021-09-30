@@ -1,29 +1,36 @@
-import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { string } from 'joi';
 import { DmStoreDto1, DmStoreDto3 } from 'src/dto/dm-store';
+import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
 import { DmStoreService } from './dm-store.service';
+import { Request } from 'express';
 
 @ApiTags('DM-Store')
 @Controller('dm-store')
 export class DmStoreController {
   constructor(
+    private dmStoreService: DmStoreService,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
-    private dmStoreService: DmStoreService,
+    @Inject(forwardRef(() => SessionService))
+    private sessionService: SessionService,
   ){}
 
   @ApiOperation({ summary: 'DM 저장'})
   @ApiResponse({ type: string, description: 'DM 저장 실패시 실패 이유' })
   // @ApiBody({ type: DmStoreDto1, description: 'DM 보낸 유저 아이디, 받은 유저 아이디, 내용' })
-  @ApiBody({ type: DmStoreDto1, description: 'DM 보낸 유저 닉네임, 받은 유저 닉네임, 내용' })
+  // @ApiBody({ type: DmStoreDto1, description: 'DM 보낸 유저 닉네임, 받은 유저 닉네임, 내용' })
+  @ApiBody({ type: DmStoreDto1, description: '받은 유저 닉네임, 내용' })
   @Post()
-  async createDmStore(@Body() b: DmStoreDto1){
-    let sender, receiver;
-    sender = await this.usersService.readUsers(b.sender_nick, 'nick');
+  async createDmStore(@Body() b: DmStoreDto1, @Req() req: Request){
+    let user_id, receiver;
+    // sender = await this.usersService.readUsers(b.sender_nick, 'nick');
+    user_id = await this.sessionService.readUserId(req.sessionID);
     receiver = await this.usersService.readUsers(b.receiver_nick, 'nick');
-    return this.dmStoreService.createDmStore(sender.user_id, receiver.user_id, b.content);
+    return this.dmStoreService.createDmStore(user_id, receiver.user_id, b.content);
+    // return this.dmStoreService.createDmStore(sender.user_id, receiver.user_id, b.content);
     // return this.dmStoreService.createDmStore(b.sender_id, b.receiver_id, b.content);
   }
 
@@ -36,14 +43,16 @@ export class DmStoreController {
     `})
   // @ApiQuery({ name: 'user_id', example: 'jinbkim', description: 'DM 로그 검색할 유저 아이디' })
   // @ApiQuery({ name: 'other_id', example: 'donglee', description: 'DM 로그 검색할 상대 아이디' })
-  @ApiQuery({ name: 'sender_nick', example: 'jinbkim', description: 'DM 로그 검색할 유저 닉네임' })
+  // @ApiQuery({ name: 'sender_nick', example: 'jinbkim', description: 'DM 로그 검색할 유저 닉네임' })
   @ApiQuery({ name: 'receiver_nick', example: 'donglee', description: 'DM 로그 검색할 상대 닉네임' })
   @Get()
-  async readDmStore(@Query() q){
-    let sender, receiver;
-    sender = await this.usersService.readUsers(q.sender_nick, 'nick');
+  async readDmStore(@Query() q, @Req() req: Request){
+    let user_id, receiver;
+    // sender = await this.usersService.readUsers(q.sender_nick, 'nick');
+    user_id = await this.sessionService.readUserId(req.sessionID);
     receiver = await this.usersService.readUsers(q.receiver_nick, 'nick');
-    return await this.dmStoreService.readDmStore(sender.user_id, receiver.user_id);
+    return await this.dmStoreService.readDmStore(user_id, receiver.user_id);
+    // return await this.dmStoreService.readDmStore(sender.user_id, receiver.user_id);
     // return this.dmStoreService.readDmStore(q.user_id, q.other_id);
   }
 
