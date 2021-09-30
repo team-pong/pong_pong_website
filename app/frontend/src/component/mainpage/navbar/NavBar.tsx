@@ -1,5 +1,6 @@
 import { FC, useEffect, useState, useRef } from "react";
 import { Link, Route, RouteComponentProps, withRouter } from "react-router-dom";
+import { io } from "socket.io-client";
 import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
 import "/src/scss/navbar/NavBar.scss";
@@ -65,6 +66,17 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
     getUserInfo()
       .then((res) => setMyNick(res.nick));
     getFriendList();
+    const socket = io(`${global.BE_HOST}/global`);
+    socket.on("online", ({user_id}) => {
+      getFriendList();
+    });
+    socket.on("offline", ({user_id}) => {
+      getFriendList();
+    });
+    socket.on("ongame", ({user_id}) => {
+      getFriendList();
+    });
+    return (() => {socket.disconnect()});
   },[]);
 
   if (userInfo) {

@@ -60,10 +60,13 @@ export class GlobalGateway {
   // 2. 로그아웃시 나를 친추한 사람의 소켓에 오프라인 메세지 전송
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
     let friend_id: string;
+    console.log('disconnected', socket.nsp.name);
 
     // 소켓맵에서 내 소켓 찾기
     for (let i in socketMap) {
+      console.log('for in')
       if (socketMap[i] == socket.id) {
+        console.log('if in')
         // 내 친구에게 오프라인 메세지 전송
         const friend_list = await this.friendRepo.find({friend_id: i});
         for (let i in friend_list) {
@@ -78,6 +81,5 @@ export class GlobalGateway {
         return ;
       }
     }
-    console.log('disconnected', socket.nsp.name);
   }
 }
