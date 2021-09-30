@@ -87,42 +87,14 @@
         animation: arrow-button-animation-out 0.5s;
       }
     }
-
-    img#no-result-img {
-      width: 80px;
-      height: 80px;
-      vertical-align: middle;
-      margin-right: 20px;
-    }
-    
-    .record-no-result-span {
-      color: #bebebe;
-    }
   }
   #record-close {
     width: 100%;
     height: calc(100% - 38px);
     display: grid;
-    grid-template-rows: auto auto;
-    grid-template-columns: auto auto;
     justify-items: center;
-    .message {
-      display: block;
-      width: 300px;
-      margin: 10px;
-      background-color: $green;
-      border-radius: 12px;
-      .you-know-that {
-        border-bottom: 3px solid green;
-        width: calc(100% - 40px);
-        margin: auto;
-        margin-top: 3px;
-        padding: 10px;
-        color: #fff;
-      }
-    }
     #ladder-rank {
-      width: 300px;
+      width: 90%;
       height: calc(100% - 38px);
       margin: auto;
       padding: 0;
@@ -130,15 +102,13 @@
       border-radius: 12px;
       overflow-y: scroll;
       overflow-x: hidden;
-      grid-row: 1 / 4;
       .record-ladder-li {
         list-style: none;
         color: $green;
         margin: 10px;
-        width: 270px;
         background-color: #fff;
         border-radius: 12px;
-        display: inline-flex;
+        display: flex;
         justify-content: space-between;
         .record-ladder-img {
           width: 40px;
@@ -146,7 +116,7 @@
           padding: 5px;
           border-radius: 50%;
         }
-        #nick {
+        span.record-ladder-text {
           width: 55px;
           margin-top: 12px;
         }
