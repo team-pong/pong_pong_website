@@ -55,7 +55,7 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
    * @brief FriendList, AddFriend 컴포넌트와 state를 공유하기 위해 이 컴포넌트에서 FriendList를 가져옴
    */
   const getFriendList = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}friend/list`);
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
     const res = await (await easyfetch.fetch()).json();
 
     setFriendList(res.friendList);
