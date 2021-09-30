@@ -73,6 +73,8 @@ export class GlobalGateway {
         }
         // 소켓맵에서 내 소켓 제거
         delete socketMap[i];
+        // DB에서 상태 변경
+        this.usersRepo.update(i, {status: 'offline'});
         return ;
       }
     }
