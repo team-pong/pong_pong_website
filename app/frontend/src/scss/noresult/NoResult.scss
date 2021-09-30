@@ -1,0 +1,12 @@
+div.no-result {
+  display: inline;
+  img.no-result-img {
+    width: inherit;
+    height: inherit;
+    vertical-align: middle;
+    margin-right: 1em;
+  }
+  span.no-result-span {
+    font-size: 1em;
+  }
+}
