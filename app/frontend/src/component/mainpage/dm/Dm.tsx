@@ -13,7 +13,7 @@ const Dm: FC<{isDmOpen: boolean}> = ({isDmOpen}): JSX.Element => {
       dmRef.current.className = "dm-container in";
     } else {
       dmRef.current.className = "dm-container out";
-      setTimeout(() => setDmTarget(""), 1000);
+      setTimeout(() => setDmTarget(""), 500);
     }
   }, [isDmOpen]);
 
