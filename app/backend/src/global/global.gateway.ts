@@ -38,9 +38,11 @@ export class GlobalGateway {
 
   // 1. 로그인 한 경우 자기를 친구추가한 사람 중 온라인인 사람에게 online status 전송
   // 문제: 그 사람의 소켓을 어떻게 가져올것인가? (소켓 연결시 소켓 맵에 저장)
-  async handleConnection(@ConnectedSocket() socket: Socket, ) {
+  async handleConnection(@ConnectedSocket() socket: Socket) {
     const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
     const userid = await this.sessionService.readUserId(sid);
+
+    await this.usersRepo.update(userid, {status: 'online'});
     socketMap[userid] = socket.id;
     console.log('socket connected', sid, userid);
     const friend_list = await this.friendRepo.find({friend_id: userid});
@@ -67,8 +69,11 @@ export class GlobalGateway {
       console.log('for in')
       if (socketMap[i] == socket.id) {
         console.log('if in')
+        // DB에서 상태 변경
+        await this.usersRepo.update(i, {status: 'offline'});
         // 내 친구에게 오프라인 메세지 전송
-        const friend_list = await this.friendRepo.find({friend_id: i});
+        const friend_list = await this.friendRepo.find({friend_id: "tester01"});
+        console.log('friend List', friend_list)
         for (let i in friend_list) {
           console.log(i, friend_list[i]);
           friend_id = friend_list[i].user_id;
@@ -76,8 +81,6 @@ export class GlobalGateway {
         }
         // 소켓맵에서 내 소켓 제거
         delete socketMap[i];
-        // DB에서 상태 변경
-        this.usersRepo.update(i, {status: 'offline'});
         return ;
       }
     }
