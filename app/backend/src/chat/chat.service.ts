@@ -35,9 +35,16 @@ export class ChatService {
       return new ErrMsgDto(err15);
     // if (await this.chatUsersRepo.count({user_id: owner_id}))
     //   return new ErrMsgDto(err9);
-    const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people});
+    const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people, current_people: 1});
     await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 owner 추가
-    return {channel_id: newChat.channel_id};
+
+    let chatRoom = new ChatDto2();
+    chatRoom.channel_id = newChat.channel_id;
+    chatRoom.title = newChat.title;
+    chatRoom.type = newChat.type;
+    chatRoom.current_people = 1;
+    chatRoom.max_people = newChat.max_people;
+    return {chatRoom};
   }
 
   async readChat(){
