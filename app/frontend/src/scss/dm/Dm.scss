@@ -14,12 +14,12 @@
 @keyframes dm-list-out {
   0% {
     opacity: 1;
-    height: 650px;
+    height: 70vh;
     bottom: calc(1em + 60px);
   }
   99% {
     opacity: 0;
-    height: 650px;
+    height: 70vh;
     bottom: 1em;
   }
   100% {
@@ -36,12 +36,13 @@ div.dm-container {
   background-color: #fff;
   width: 350px;
   height: 0px;
+  max-height: 650px;
   opacity: 0;
   border-radius: 10px;
   overflow: auto;
   &.in {
     opacity: 1;
-    height: 650px;
+    height: 70vh;
     bottom: calc(1em + 60px);
     animation: dm-list-in .5s;
   }
