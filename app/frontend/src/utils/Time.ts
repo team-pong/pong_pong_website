@@ -55,8 +55,7 @@ export default class Time {
 
   getRelativeTime(): string {
     const currentTime = new Time(new Date().toString());
-    console.log("과거: " + this.month);
-    console.log("현재: " + currentTime.month);
+
     if ((+currentTime.year - +this.year) >= 1) {
       return (`${+currentTime.year - +this.year} 년 전`);
     } else if ((+currentTime.month - +this.month) >= 1) {
