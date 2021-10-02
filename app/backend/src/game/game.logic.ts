@@ -148,7 +148,29 @@ export class GameLogic {
     }
 
     /*!
+     * @brief 원과 원의 충돌 체크
+                circle은 공의 좌표, col이 장애물의 좌표
+     */
+    isCollisionCC(circle : [number, number], radius : number, col : [number, number], colRadius : number) : Boolean {
+        const distX = circle[0] - col[0];
+        const distY = circle[1] - col[1];
+        const distance = Math.sqrt((distX * distX) + (distY * distY));
+        if (distance <= (radius + colRadius)) {
+            if (this._iscollision == false) {
+                this._direction[0] *= -1;
+                this._direction[1] *= -1;
+                console.log("collision circle");
+                this._iscollision = true;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /*!
      * @brief 원과 사각형의 충돌 체크
+                circle은 공의 좌표, square는 바 또는 장애물의 좌표
      */
 
     isCollisionSC(circle : [number, number], radius : number, square : [number, number, number, number]) : Boolean {
@@ -182,7 +204,15 @@ export class GameLogic {
             if (this._iscollision == false) {
                 this._iscollision = true;
                 if (horizonEdge != Edge.NONE) this._direction[0] *= -1;
-                if (verticalEdge != Edge.NONE) this._direction[1] *= -1;
+                if (verticalEdge != Edge.NONE) {
+                    if (verticalEdge == Edge.TOP && this._direction[1] < 0) {
+                        console.log("문제 있는 그 부분");
+                    } else if (verticalEdge == Edge.BOTTOM && this._direction[1] > 0) {
+                        console.log("문제 있는 그 부분");
+                    } else {
+                        this._direction[1] *= -1;
+                    }
+                }
                 console.log("collision bar: " + horizonEdge + " " + verticalEdge);
             }
             return true;
