@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChatDto2 } from 'src/dto/chat';
+import { ChatDto2, ChatDto6 } from 'src/dto/chat';
 import { ErrMsgDto } from 'src/dto/utility';
 import { Admin } from 'src/entities/admin';
 import { Chat } from 'src/entities/chat';
@@ -35,9 +35,16 @@ export class ChatService {
       return new ErrMsgDto(err15);
     // if (await this.chatUsersRepo.count({user_id: owner_id}))
     //   return new ErrMsgDto(err9);
-    const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people});
+    const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people, current_people: 1});
     await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 owner 추가
-    return {channel_id: newChat.channel_id};
+
+    let chatRoom = new ChatDto2();
+    chatRoom.channel_id = newChat.channel_id;
+    chatRoom.title = newChat.title;
+    chatRoom.type = newChat.type;
+    chatRoom.current_people = 1;
+    chatRoom.max_people = newChat.max_people;
+    return {chatRoom};
   }
 
   async readChat(){
@@ -59,6 +66,27 @@ export class ChatService {
     }
     return chatList;
   }
+
+  async readOneChat(channel_id: number){
+    if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널이면
+      return new ErrMsgDto(err4);
+    const chanel = await this.chatRepo.find({channel_id: channel_id});  // 채널 찾기
+
+    let chatRoom = new ChatDto6();
+    chatRoom.title = chanel[0].title;
+    chatRoom.type = chanel[0].type;
+    chatRoom.passwd = chanel[0].passwd;
+    chatRoom.max_people = chanel[0].max_people;
+    let current_people;
+    current_people = await this.readPeople(channel_id);
+    chatRoom.current_people = current_people;
+    let owner = await this.usersService.readUsers(chanel[0].owner_id, 'user_id');
+    chatRoom.owner_nick = owner["nick"];
+    chatRoom.channel_id = chanel[0].channel_id;
+    return chatRoom;
+  }
+
+
   async readTitle(title: string){
     const chat = await this.chatRepo.find();  // 모든 채널
     let chatList = { chatList: Array<ChatDto2>() }

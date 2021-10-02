@@ -21,6 +21,7 @@ import { DmStoreModule } from 'src/dm-store/dm-store.module';
 import { FriendModule } from 'src/friend/friend.module';
 import { MatchModule } from 'src/match/match.module';
 import { MuteModule } from 'src/mute/mute.module';
+import { SessionModule } from 'src/session/session.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { MuteModule } from 'src/mute/mute.module';
     forwardRef(() => FriendModule),
     forwardRef(() => MatchModule),
     forwardRef(() => MuteModule),
+    forwardRef(() => SessionModule),
   ],
   controllers: [UsersController],
   providers: [UsersService],
