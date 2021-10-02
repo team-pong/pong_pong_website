@@ -227,11 +227,11 @@ export class GameGateway {
 	}
 
 	handleDisconnect(@ConnectedSocket() socket: Socket) {
-		console.log('Game 웹소켓 연결 해제', socket_infos[socket.id].uid);
-		if (!socket_infos[socket.id].rid) {
+		console.log('Game 웹소켓 연결 해제', socket_infos[socket.id]?.uid);
+		if (!socket_infos[socket.id]?.rid) {
 			for (let i = 0; i < normal_waiting.length; i++) {
 				if (normal_waiting[i].socket.id === socket.id)  {
-					console.log('delete waiting queue', socket_infos[socket.id].uid);
+					console.log('delete waiting queue', socket_infos[socket.id]?.uid);
 					normal_waiting.splice(i, 1);
 					i--;
 					delete socket_infos[socket.id];
