@@ -1,4 +1,6 @@
-@keyframes dm-in {
+@import "../../colors.scss";
+
+@keyframes dm-list-in {
   0% {
     opacity: 0;
     bottom: 1em;
@@ -9,35 +11,71 @@
   }
 }
 
-@keyframes dm-out {
+@keyframes dm-list-out {
   0% {
     opacity: 1;
+    height: 70vh;
     bottom: calc(1em + 60px);
+  }
+  99% {
+    opacity: 0;
+    height: 70vh;
+    bottom: 1em;
   }
   100% {
     opacity: 0;
+    height: 0px;
     bottom: 1em;
   }
 }
 
-div.dm {
+div.dm-container {
   position: absolute;
   bottom: 1em;
   right: 1em;
-  background-color: red;
-  width: 0;
-  height: 0;
+  background-color: #fff;
+  width: 350px;
+  height: 0px;
+  max-height: 650px;
   opacity: 0;
-  transition: all 1s;
+  border-radius: 10px;
+  overflow: auto;
   &.in {
     opacity: 1;
-    width: 350px;
-    height: 650px;
+    height: 70vh;
     bottom: calc(1em + 60px);
-    animation: dm-in 1s;
+    animation: dm-list-in .5s;
   }
   &.out {
     opacity: 0;
-    animation: dm-out 1s;
+    height: 0px;
+    animation: dm-list-out .5s;
+  }
+  .top-bar {
+    position: sticky;
+    top: 0;
+    background-color: #FEC04C;
+    font-weight: bold;
+    font-size: 15pt;
+    height: 60px;
+    color: white;
+    line-height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    span {
+      img {
+        position: absolute;
+        top: 15px;
+        left: 10px;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        animation: arrow-button-animation-in 0.5s;
+        &:hover {
+          animation: arrow-button-animation-out 0.5s;
+        }
+      }
+    }
   }
 }

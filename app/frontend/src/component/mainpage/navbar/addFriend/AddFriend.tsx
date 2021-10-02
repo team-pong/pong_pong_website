@@ -36,7 +36,7 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
   *        state 업데이트 시 즉시 변화가 반영됨
   */
   const updateState = async () => {
-    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nicknameToFind}`);
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nicknameToFind}`);
     const res = await (await easyfetch.fetch()).json();
 
     if (!res.err_msg) {
@@ -55,7 +55,7 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
   const addFriend = async (e: React.SyntheticEvent) => {
     e.preventDefault(); //문서 새로고침을 방지하기 위함
 
-    const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend", "POST");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/friend`, "POST");
     const body = {
       "friend_nick": nicknameToFind
     };

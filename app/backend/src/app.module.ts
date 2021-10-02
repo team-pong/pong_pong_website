@@ -17,6 +17,8 @@ import { SessionModule } from './session/session.module';
 import { ChatUsersModule } from './chat-users/chat-users.module';
 import { BlockModule } from './block/block.module';
 import { GameModule } from './game/game.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -34,7 +36,10 @@ import { GameModule } from './game/game.module';
     SessionModule,
     ChatUsersModule,
     BlockModule,
-    GameModule
+    GameModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'client'),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

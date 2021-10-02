@@ -50,10 +50,10 @@ const ChatRoomList: FC<chatRoomListProps> = ({search, type, setChatRoomInfo}): J
     setPublicChatRoom([]);
     setProtectedChatRoom([]);
     if (search === "") {
-      const easyfetch = new EasyFetch('http://127.0.0.1:3001/chat');
+      const easyfetch = new EasyFetch(`${global.BE_HOST}/chat`);
       res = await (await easyfetch.fetch()).json();
     } else {
-      const easyfetch = new EasyFetch(`http://127.0.0.1:3001/chat/title?title=${search}`);
+      const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/title?title=${search}`);
       res = await (await easyfetch.fetch()).json();
     }
     return (res.chatList);

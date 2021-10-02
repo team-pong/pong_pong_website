@@ -1,9 +1,9 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import NoResult from "../../../noresult/NoResult";
 import CircleChart from "../../../chart/CircleChart";
 import BarChart from "../../../chart/BarChart";
 import "/src/scss/content/RecordContent.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
-import ladderRank from '../../../../dummydata/testLadderRank';
 
 interface matchLog {
   user_score: number,
@@ -33,13 +33,13 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
     let apiAddress: string = "";
     switch (type) {
       case "normal":
-        apiAddress = `http://127.0.0.1:3001/match/general?nick=${target}`
+        apiAddress = `${global.BE_HOST}/match/general?nick=${target}`
         break;
       case "ladder":
-        apiAddress = `http://127.0.0.1:3001/match/ranked?nick=${target}`
+        apiAddress = `${global.BE_HOST}/match/ranked?nick=${target}`
         break;
       default:
-        apiAddress = `http://127.0.0.1:3001/match?nick=${target}`
+        apiAddress = `${global.BE_HOST}/match?nick=${target}`
         break;
     };
     const easyfetch = new EasyFetch(apiAddress);
@@ -141,31 +141,34 @@ const RecordOpen: FC<{
 }
 
 const RecordClose: FC = (): JSX.Element => {
+
+  const [ladderRanking, setLadderRanking] = useState<any>([]);
+
+  const getLadderRanking = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/match/ranking`);
+    setLadderRanking(await ((await easyfetch.fetch()).json()));
+  }
+
+  useEffect(() => {
+    getLadderRanking();
+  }, []);
+
   return (
     <div id="record-close">
-      <div id="motd">
-        <div id="message">
-          <div id="you-know-that">알고계셨나요?</div>
-          <span id="content"></span>
-        </div>
-        <div id="message">
-          <div id="you-know-that">알고계셨나요?</div>
-          <span id="content"></span>
-        </div>
-        <div id="message">
-          <div id="you-know-that">알고계셨나요?</div>
-          <span id="content"></span>
-        </div>
-      </div>
       <ul id="ladder-rank">
         {
-          ladderRank.rank.map((user, i) => {
+          ladderRanking.rankList?.map((user, i) => {
+            let winPercentage = Math.floor(user.win_games / (user.win_games + user.loss_games)) * 100;
+            let lossPercentage = Math.floor(user.loss_games / (user.win_games + user.loss_games)) * 100;
+            if (isNaN(winPercentage)) winPercentage = 0;
+            if (isNaN(lossPercentage)) lossPercentage = 0;
             return (
               <li className="record-ladder-li" key={i}>
+                <span className="record-ladder-text">{i}등</span>
                 <img className="record-ladder-img" src={user.avatar_url}/>
-                <span id="nick">{user.nick}</span>
-                <BarChart left={user.win} right={user.loss} />
-                <span id="percentage">{Math.floor((user.win / (user.win + user.loss)) * 100)}%</span>
+                <span className="record-ladder-text">{user.nick}</span>
+                <BarChart left={winPercentage} right={lossPercentage} />
+                <span id="percentage">{winPercentage}%</span>
               </li>
             );
           })
@@ -204,9 +207,9 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
     if (nickNameToFind || nick) {
       let easyfetch = null;
       if (nick) {
-        easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nick}`);  
+        easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nick}`);  
       } else {
-        easyfetch = new EasyFetch(`http://127.0.0.1:3001/users?nick=${nickNameToFind}`);
+        easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nickNameToFind}`);
       }
       const res = await (await easyfetch.fetch()).json();
       if (res.err_msg) {
@@ -258,8 +261,7 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
         isRecordOpen === recordState.noResult &&
         <div id="no-result">
           <img src="/public/arrow.svg" className="arrow-button" onClick={() => setIsRecordOpen(recordState.close)}/>
-          <img src="/public/exclamation-mark.svg" id="no-result-img" alt="Exclamation mark" />
-          <span className="record-no-result-span">검색 결과가 없습니다</span>
+          <NoResult style={{width: "80px", height: "80px"}} />
         </div>
       }
     </div>

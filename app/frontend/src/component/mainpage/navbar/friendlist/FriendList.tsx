@@ -1,6 +1,7 @@
 import { useState, useEffect, FC, MouseEvent, Dispatch, SetStateAction } from 'react'
 import EasyFetch from '../../../../utils/EasyFetch';
 import Loading from '../../../loading/Loading';
+import NoResult from '../../../noresult/NoResult';
 import ContextMenu from '../contextmenu/ContextMenu'
 
 /*!
@@ -76,7 +77,7 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
    * @brief 이 컴포넌트를 새로 열 때마다 백엔드에서 친구목록 정보를 가져옴
    */
   const getFriendList = async () => {
-    const easyfetch = new EasyFetch("http://127.0.0.1:3001/friend/list");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
     const res = await (await easyfetch.fetch()).json();
 
     setFriendList(res.friendList);
@@ -95,11 +96,12 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
   if (friendList === null || friendList === undefined) {
     return (<Loading width={240} height={35} color="#fff"/>);
   } else if (friendList.length === 0) {
-    return (<div style={{
-      height: "35px",
-      lineHeight: "35px",
-      textAlign: "center"
-    }}>친구 없음</div>);
+    return (<NoResult
+              text="친구 없음"
+              style={{
+                width: "30px",
+                height: "30px",
+                marginLeft: "30px"}}/>);
   } else {
     return (
       <div id="friend-list-container">

@@ -18,7 +18,8 @@
 }
 
 #record-content {
-  width: 80%;
+  width: 640px;
+  height: 555px;
   margin: 45px auto auto auto;
   #search {
     .record-search-input {
@@ -86,49 +87,17 @@
         animation: arrow-button-animation-out 0.5s;
       }
     }
-
-    img#no-result-img {
-      width: 80px;
-      height: 80px;
-      vertical-align: middle;
-      margin-right: 20px;
-    }
-    
-    .record-no-result-span {
-      color: #bebebe;
-    }
   }
   #record-close {
-    margin-top: 10px;
-    height: 60vh;
-    #motd {
-      display: inline-flex;
-      flex-direction: column;
-      height: 100%;
-      #message {
-        margin-top: 20px;
-        display: inline-block;
-        width: 300px;
-        height: 33%;
-        background-color: $green;
-        border-radius: 12px;
-        #you-know-that {
-          border-bottom: 3px solid green;
-          width: calc(100% - 40px);
-          margin: auto;
-          margin-top: 3px;
-          padding: 10px;
-          color: #fff;
-        }
-      }
-    }
+    width: 100%;
+    height: calc(100% - 38px);
+    display: grid;
+    justify-items: center;
     #ladder-rank {
-      margin: 0;
+      width: 90%;
+      height: calc(100% - 38px);
+      margin: auto;
       padding: 0;
-      margin-top: 20px;
-      width: 300px;
-      height: calc(100% - 20px);
-      float: right;
       background-color: $green;
       border-radius: 12px;
       overflow-y: scroll;
@@ -137,10 +106,9 @@
         list-style: none;
         color: $green;
         margin: 10px;
-        width: 270px;
         background-color: #fff;
         border-radius: 12px;
-        display: inline-flex;
+        display: flex;
         justify-content: space-between;
         .record-ladder-img {
           width: 40px;
@@ -148,7 +116,7 @@
           padding: 5px;
           border-radius: 50%;
         }
-        #nick {
+        span.record-ladder-text {
           width: 55px;
           margin-top: 12px;
         }

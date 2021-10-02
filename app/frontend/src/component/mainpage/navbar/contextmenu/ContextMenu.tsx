@@ -40,7 +40,7 @@ const ContextMenu: FC<contextMenuProps> =
   * @brief: 친구 삭제 DELETE 요청 후 state 업데이트 하고 contextmenu 닫기
   */
   const deleteFriend = async () => {
-    const easyfetch = new EasyFetch(`http://127.0.0.1:3001/friend?friend_nick=${target}`, "DELETE");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${target}`, "DELETE");
     const res = await (await easyfetch.fetch()).json();
     
     if (res.err_msg === "에러가 없습니다.") {
@@ -63,7 +63,7 @@ const ContextMenu: FC<contextMenuProps> =
   * @brief 친구 차단 POST 요청 후 state 업데이트 하고 contextmenu 닫기
   */
   const blockFriend = async () => {
-    const easyfetch = new EasyFetch("http://127.0.0.1:3001/block", "POST");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/block`, "POST");
     const body = {
       "block_nick": target,
     };
