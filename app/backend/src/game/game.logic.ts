@@ -79,8 +79,10 @@ export class GameLogic {
             }
         }, 20);
         if (pos) {
+            clearInterval(this._leftBarMovement);
             this._leftBarMovement = interval;
         } else {
+            clearInterval(this._rightBarMovement);
             this._rightBarMovement = interval;
         }
     }

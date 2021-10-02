@@ -88,29 +88,41 @@ export class GameGateway {
 			// arrowUp : false -> 위 방향키를 뗀 상태
 			playerLeft.socket.on('keyEvent', (e) => {
 				console.log('left player key event:', e);
-				if (e.arrowDown) { // 아랫키 눌림
+				if (e.arrowDown === true) { // 아랫키 눌림
 					gameLogic.moveBar(false, true);
 				} else if (e.arrowDown === false) {
 					clearInterval(gameLogic._leftBarMovement);
+					if (e.arrowUp === 1) {
+						gameLogic.moveBar(true, true);
+					}
 				}
-				if (e.arrowUp) {
+				if (e.arrowUp === true) {
 					gameLogic.moveBar(true, true);
 				} else if (e.arrowUp === false) {
 					clearInterval(gameLogic._leftBarMovement);
+					if (e.arrowDown === 1) {
+						gameLogic.moveBar(false, true);
+					}
 				}
 			})
 
 			playerRight.socket.on('keyEvent', (e) => {
 				console.log('right player key event:', e);
-				if (e.arrowDown) { // 아랫키 눌림
+				if (e.arrowDown === true) { // 아랫키 눌림
 					gameLogic.moveBar(false, false);
 				} else if (e.arrowDown === false) {
 					clearInterval(gameLogic._rightBarMovement);
+					if (e.arrowUp === 1) {
+						gameLogic.moveBar(true, false);
+					}
 				}
-				if (e.arrowUp) {
+				if (e.arrowUp ===  true) {
 					gameLogic.moveBar(true, false);
 				} else if (e.arrowUp === false) {
 					clearInterval(gameLogic._rightBarMovement);
+					if (e.arrowDown === 1) {
+						gameLogic.moveBar(false, false);
+					}
 				}
 			})
 
