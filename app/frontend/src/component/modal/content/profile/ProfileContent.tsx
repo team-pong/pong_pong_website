@@ -111,17 +111,10 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
 
   /*!
    * @author donglee
-   * @brief API /user 에서 프로필 정보를 요청해서 state에 저장함
+   * @brief API /users 에서 프로필 정보를 요청해서 state에 저장함
    */
   const getUserInfo = async (): Promise<UserInfo> => {
-    let targetNick = "";
-    if (isMyProfile) {
-      targetNick = "donglee";
-    } else {
-      targetNick = nick;
-    }
-    /* TODO: session id로 유저의 정보를 받아오도록 해야 함 */
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/user?user_id=${targetNick}`);
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nick}`);
     const res = await (await easyfetch.fetch()).json();
 
     setUserInfo(res);
@@ -267,6 +260,10 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
     }
   };
 
+  /*!
+   * @author donglee
+   * @detail 프로필을 열 때 가장 먼저 나의 프로필인지 다른 사용자것인지를 판별
+   */
   const setMineOrOthers = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
     const res = await (await easyfetch.fetch()).json();

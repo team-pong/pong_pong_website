@@ -60,6 +60,10 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
     setFriendList(res.friendList);
   };
 
+  /*!
+   * @author donglee
+   * @brief Profile에서 닉네임 변경 시 NavBar에서도 userInfo를 업데이트 함
+   */
   useEffect(() => {
     if (userInfo) {
       const updatedUserInfo = {...userInfo};
@@ -67,7 +71,7 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
       updatedUserInfo.nick = myNick;
       setUserInfo(updatedUserInfo);
     }
-  }, [myNick, myAvatar])
+  }, [myNick])
 
   useEffect(() => {
     getUserInfo()
@@ -75,7 +79,6 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
     getFriendList();
   },[]);
 
-  /* nick을 바꾸면 NavBar에서는 최신화되지 않아서 다시 들어갈 때 다른 사용자라고 판단함 */
   if (userInfo) {
     return (
       <nav className="menu">
