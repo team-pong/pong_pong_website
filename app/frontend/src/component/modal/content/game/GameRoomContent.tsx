@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, useRef } from "react";
 import { RouteComponentProps, withRouter, useHistory } from "react-router-dom";
 import "/src/scss/content/game/GameRoomContent.scss";
 import { io } from "socket.io-client";
@@ -25,8 +25,6 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const [ballY, setBallY] = useState(150);
   const [leftY, setLeftY] = useState(150);
   const [rightY, setRightY] = useState(150);
-  const [downKey, setDownKey] = useState(0);
-  const [upKey, setUpKey] = useState(0);
   const [init, setInit] = useState(0);
 
   const [matchInfo, setMatchInfo] = useState<MatchInfo>({
@@ -38,6 +36,23 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     rPlayerScore: 0,
     viewNumber: 0,
   });
+
+
+  const [downKey, _setDownKey] = useState(0);
+  const downKeyRef = useRef(downKey)
+  const [upKey, _setUpKey] = useState(0);
+  const upKeyRef = useRef(upKey);
+
+  const setDownKey = (x) => {
+    downKeyRef.current = x;
+    _setDownKey(x);
+  }
+
+  const setUpKey = (x) => {
+    upKeyRef.current = x;
+    _setUpKey(x);
+  }
+
   /*!
    * @brief canvas와 양쪽 사이드바, 공 초기 설정
    */
@@ -74,15 +89,15 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   
   const keyDownEvent = (e: KeyboardEvent) => {
     
-    if (e.code === "ArrowDown" && downKey == 0) {
+    if (e.code === "ArrowDown" && downKeyRef.current == 0) {
       console.log('arrow down key pressed');
       socket.emit("keyEvent", {arrowUp: upKey, arrowDown: true});
-      setDownKey((downKey) => {return 1});
+      setDownKey(1);
     }
-    else if (e.code === "ArrowUp" && upKey == 0) {
+    else if (e.code === "ArrowUp" && upKeyRef.current == 0) {
       console.log('arrow up key pressed');
       socket.emit("keyEvent", {arrowUp: true, arrowDown: downKey});
-      setUpKey(() => {return 1});
+      setUpKey(1);
     }
   };
   
@@ -90,12 +105,12 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     if (e.code === "ArrowDown") {
       console.log('arrow down key unpressed');
       socket.emit("keyEvent", {arrowUp: upKey, arrowDown: false});
-      setDownKey(() => {return 0});
+      setDownKey(0);
     }
     else if (e.code === "ArrowUp") {
       console.log('arrow up key unpressed');
       socket.emit("ketEvent", {arrowUp: false, arrowDown: downKey});
-      setUpKey(() => {return 0});
+      setUpKey(0);
     }
   };
   
