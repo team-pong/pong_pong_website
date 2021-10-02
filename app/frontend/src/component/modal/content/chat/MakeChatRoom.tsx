@@ -14,7 +14,6 @@ const MakeChatRoom: FC = (): JSX.Element => {
   const [type, setType] = useState("public");
   const [password, setPassword] = useState("");
   const [max, setMax] = useState(2);
-
   const [channelId, setChannelId] = useState("");
 
   /*!
@@ -49,7 +48,7 @@ const MakeChatRoom: FC = (): JSX.Element => {
       const res = await (await easyfetch.fetch(body)).json();
 
       if (!res.err_msg) {
-        setChannelId(res.channel_id);
+        setChannelId(res.chatRoom.channel_id);
       } else {
         alert(res.err_msg);
       }

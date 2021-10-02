@@ -19,11 +19,7 @@ interface chatRoomListProps {
   type: string,
 };
 
-const ChatRoomList: FC<chatRoomListProps> =
-  ({
-    search,
-    type,
-  }): JSX.Element => {
+const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
 
   const [publicChatRoom, setPublicChatRoom] = useState<chatRoom[]>([]);
   const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
@@ -140,7 +136,7 @@ const ChatContent: FC = (): JSX.Element => {
         </Link>
         <Route path={`/mainpage/chat/makechat`}>
           <Modal id={Date.now()} content={<MakeChatRoom />} smallModal/>
-        </Route>        
+        </Route>
       </div>
     );
   } else {
