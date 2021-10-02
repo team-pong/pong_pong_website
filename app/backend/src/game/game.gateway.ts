@@ -4,6 +4,7 @@ import { ConnectedSocket, OnGatewayDisconnect } from '@nestjs/websockets';
 import { WebSocketServer, OnGatewayConnection, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
+import { MatchService } from 'src/match/match.service';
 import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
 import { Scored, GameLogic } from './game.logic';
@@ -30,11 +31,12 @@ interface socketInfo {
 	sid: string, // session id
 	uid: string, // user id
 	rid: string, // room id
+	match: MatchInfo,
 }
 
 var normal_waiting: WaitUser[] = [];
 
-var socket_infos = {};
+var socket_infos: {[key: string]: socketInfo} = {};
 
 /*!
  * @brief 게임 연결용 웹소켓
@@ -47,6 +49,7 @@ export class GameGateway {
 	constructor(
 		private sessionService: SessionService, // readUserId 함수 쓰려고 가져옴
 		private usersService: UsersService,
+		private matchService: MatchService,
 	) {}
 
 	@WebSocketServer()public server: Server;
@@ -58,7 +61,7 @@ export class GameGateway {
 		// sid로 유저 아이디 찾기
 		const userid = await this.sessionService.readUserId(sid);
 
-		socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null};
+		socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null};
 		// 큐에 넣기
 		normal_waiting.push(new WaitUser(userid, socket));
 		// 2인 이상시 매칭
@@ -89,6 +92,8 @@ export class GameGateway {
 				rPlayerScore: 0,
 				viewNumber: 0,
 			}
+			socket_infos[playerLeft.socket.id].match = userInfo;
+			socket_infos[playerRight.socket.id].match = userInfo;
 
 			playerLeft.socket.emit('init', gameLogic.getJson(), userInfo);
 			playerRight.socket.emit('init', gameLogic.getJson(), userInfo);
@@ -172,10 +177,37 @@ export class GameGateway {
 				}
 			}, 20)
 			// gamsScore ㅇㅣㄹ정 값 되면 update interval 제거
-			// 
+			
+			/*
+			 * 게임 중 연결 끊은 경우
+			 * 1. 인터벌, 리스너 등 자원 해제
+			 * 2. 탈주 패배 기록
+			 * 3. disconnected 메세지 브로드캐스팅
+			 * 4. 탈주자 소켓 정보 삭제
+			 */
 			socket.on("disconnect", () => {
-				console.log('이벤트 리스너 제거 작업');
-				console.log('인터벌 제거 작업');
+				clearInterval(updateInterval);
+				clearInterval(gameLogic._leftBarMovement);
+				clearInterval(gameLogic._rightBarMovement);
+				playerRight.socket.removeAllListeners();
+				playerLeft.socket.removeAllListeners();
+
+				const match = socket_infos[socket.id].match;
+				let loser;
+				let winner;
+				if (match.lPlayerNickname == socket_infos[socket.id].uid) {
+					loser = match.lPlayerNickname;
+					winner = match.rPlayerNickname;
+					this.matchService.createMatch(winner, loser, gameLogic._score[0], gameLogic._score[1], 'normal', 0);
+				} else {
+					loser = match.rPlayerNickname;
+					winner = match.lPlayerNickname;
+					this.matchService.createMatch(winner, loser, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
+				}
+
+				console.log('broadcast disconnected message');
+				socket.broadcast.emit("disconnected", {id: socket_infos[socket.id]?.uid});
+				delete socket_infos[socket.id];
 			})
 		}
 		console.log('waiting:', normal_waiting);
@@ -205,14 +237,6 @@ export class GameGateway {
 
 				return ;
 			}
-		}
-		/*
-		 * 게임 도중 탈주 한 경우 처리 
-		*/
-		if (socket_infos[socket.id].rid) {
-			console.log('broadcast disconnected message');
-			socket.broadcast.emit("disconnected", {id: socket_infos[socket.id]?.uid});
-			delete socket_infos[socket.id];
 		}
 	}
 }
