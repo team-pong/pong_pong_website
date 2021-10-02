@@ -96,14 +96,37 @@ export class GameLogic {
         return { bar00:this._bar00, bar01:this._bar01, ball:this._ball}
     }
 
+    initGame() {
+        console.log("init game");
+        this._ball[0] = this._rightWall / 2 // ballX
+        this._ball[1] = this._bottomWall / 2 // ballY
+
+        this._bar00[0] = 50 // left
+        this._bar00[1] = this._bottomWall / 3 // top
+        this._bar00[2] = 60 // left + width
+        this._bar00[3] = (this._bottomWall / 3) * 2 // top + this._bottomWall
+
+        this._bar01[0] = this._rightWall - 60
+        this._bar01[1] = this._bottomWall / 3
+        this._bar01[2] = this._rightWall - 50
+        this._bar01[3] = (this._bottomWall / 3) * 2
+
+        this._direction[0] = (1 / 1)
+        this._direction[1] = (1 / 1)
+
+        this._iscollision = false;
+        this._score = Scored.NONE;
+    }
+
     update() {
         // direction 방향으로 공을 이동
         const score = this.isScored(10);
-        this.checkCollision(10)
-        this._ball[0] += this._direction[0] * this._speed;
-        this._ball[1] += this._direction[1] * this._speed;
         if (score != Scored.NONE) {
             this._score = score;
+        } else {
+            this.checkCollision(10)
+            this._ball[0] += this._direction[0] * this._speed;
+            this._ball[1] += this._direction[1] * this._speed;
         }
     }
 
@@ -130,10 +153,6 @@ export class GameLogic {
         } else if (down >= this._bottomWall) {
             // direction 전환
             this._direction[1] *= -1;
-        } else if (right >= this._rightWall) {
-            this._direction[0] *= -1;
-        } else if (left <= 0) {
-            this._direction[0] *= -1;
         } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, up])) { // bar 0 = 좌측 상단의 x, 1 = y, 2 = 우측 하단의 x, 3 = y
             if (this._iscollision == false) {
                 this._direction[1] *= -1
@@ -181,10 +200,10 @@ export class GameLogic {
 
     isScored(radius : number) {
         if (this._ball[0] + radius >= this._rightWall) {
-            return Scored.PLAYER01
+            return Scored.PLAYER00
         }
         if (this._ball[0] - radius <= 0) {
-            return Scored.PLAYER00
+            return Scored.PLAYER01
         }
         return Scored.NONE
     }
