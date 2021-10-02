@@ -91,12 +91,12 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     
     if (e.code === "ArrowDown" && downKeyRef.current == 0) {
       console.log('arrow down key pressed');
-      socket.emit("keyEvent", {arrowUp: upKey, arrowDown: true});
+      socket.emit("keyEvent", {arrowUp: upKeyRef.current, arrowDown: true});
       setDownKey(1);
     }
     else if (e.code === "ArrowUp" && upKeyRef.current == 0) {
       console.log('arrow up key pressed');
-      socket.emit("keyEvent", {arrowUp: true, arrowDown: downKey});
+      socket.emit("keyEvent", {arrowUp: true, arrowDown: downKeyRef.current});
       setUpKey(1);
     }
   };
@@ -104,12 +104,12 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const keyUpEvent = (e: KeyboardEvent) => {
     if (e.code === "ArrowDown") {
       console.log('arrow down key unpressed');
-      socket.emit("keyEvent", {arrowUp: upKey, arrowDown: false});
+      socket.emit("keyEvent", {arrowUp: upKeyRef.current, arrowDown: false});
       setDownKey(0);
     }
     else if (e.code === "ArrowUp") {
       console.log('arrow up key unpressed');
-      socket.emit("ketEvent", {arrowUp: false, arrowDown: downKey});
+      socket.emit("keyEvent", {arrowUp: false, arrowDown: downKeyRef.current});
       setUpKey(0);
     }
   };
