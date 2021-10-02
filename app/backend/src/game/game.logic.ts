@@ -7,6 +7,14 @@ export enum Scored {
     NONE
 }
 
+enum Edge {
+    NONE,
+    LEFT,
+    RIGHT,
+    TOP,
+    BOTTOM
+}
+
 export class GameLogic {
     _rightWall : number;
     _bottomWall : number;
@@ -139,6 +147,80 @@ export class GameLogic {
         return false
     }
 
+    /*!
+     * @brief 원과 원의 충돌 체크
+                circle은 공의 좌표, col이 장애물의 좌표
+     */
+    isCollisionCC(circle : [number, number], radius : number, col : [number, number], colRadius : number) : Boolean {
+        const distX = circle[0] - col[0];
+        const distY = circle[1] - col[1];
+        const distance = Math.sqrt((distX * distX) + (distY * distY));
+        if (distance <= (radius + colRadius)) {
+            if (this._iscollision == false) {
+                this._direction[0] *= -1;
+                this._direction[1] *= -1;
+                console.log("collision circle");
+                this._iscollision = true;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /*!
+     * @brief 원과 사각형의 충돌 체크
+                circle은 공의 좌표, square는 바 또는 장애물의 좌표
+     */
+
+    isCollisionSC(circle : [number, number], radius : number, square : [number, number, number, number]) : Boolean {
+        let edgeX = circle[0];
+        let edgeY = circle[1];
+        const squareWidth = Math.abs(square[2] - square[0]);
+        const squareHeight = (square[3] - square[1]);
+        let horizonEdge = Edge.NONE;
+        let verticalEdge = Edge.NONE;
+
+        if (circle[0] < square[0]) {
+            horizonEdge = Edge.LEFT;
+            edgeX = square[0];   
+        } else if (circle[0] >= (square[0] + squareWidth)) {
+            horizonEdge = Edge.RIGHT;
+            edgeX = square[0] + squareWidth;
+        }
+        if (circle[1] < square[1]) {
+            verticalEdge = Edge.TOP;
+            edgeY = square[1];
+        } else if (circle[1] >= (square[1] + squareHeight)) {
+            verticalEdge = Edge.BOTTOM;
+            edgeY = square[1] + squareHeight;
+        }
+
+        const distX = circle[0] - edgeX;
+        const distY = circle[1] - edgeY;
+        const distance = Math.sqrt((distX * distX) + (distY * distY));
+
+        if (distance <= radius) {
+            if (this._iscollision == false) {
+                this._iscollision = true;
+                if (horizonEdge != Edge.NONE) this._direction[0] *= -1;
+                if (verticalEdge != Edge.NONE) {
+                    if (verticalEdge == Edge.TOP && this._direction[1] < 0) {
+                        console.log("문제 있는 그 부분");
+                    } else if (verticalEdge == Edge.BOTTOM && this._direction[1] > 0) {
+                        console.log("문제 있는 그 부분");
+                    } else {
+                        this._direction[1] *= -1;
+                    }
+                }
+                console.log("collision bar: " + horizonEdge + " " + verticalEdge);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     checkCollision(radius : number) {
         const ballX = this._ball[0] + this._direction[0] * this._speed;
         const ballY = this._ball[1] + this._direction[1] * this._speed;
@@ -153,49 +235,54 @@ export class GameLogic {
         } else if (down >= this._bottomWall) {
             // direction 전환
             this._direction[1] *= -1;
-        } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, up])) { // bar 0 = 좌측 상단의 x, 1 = y, 2 = 우측 하단의 x, 3 = y
-            if (this._iscollision == false) {
-                this._direction[1] *= -1
-                this._iscollision = true;
-            }
-        } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, down])) {
-            if (this._iscollision == false) {
-                this._direction[1] *= -1
-                this._iscollision = true;
-            }
-        } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [left, ballY])) {
-            if (this._iscollision == false) {
-                this._direction[0] *= -1;
-                this._iscollision = true;
-            }
-        } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [right, ballY])) {
-            if (this._iscollision == false) {
-                this._direction[0] *= -1;
-                this._iscollision = true;
-            }
-        } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, up])) {
-            if (this._iscollision == false) {
-                this._direction[1] *= -1;
-                this._iscollision = true;
-            }
-        } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, down])) {
-            if (this._iscollision == false) {
-                this._direction[1] *= -1;
-                this._iscollision = true;
-            }
-        } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [left, ballY])) {
-            if (this._iscollision == false) {
-                this._direction[0] *= -1;
-                this._iscollision = true;
-            }
-        } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [right, ballY])) {
-            if (this._iscollision == false) {
-                this._direction[0] *= -1;
-                this._iscollision = true;
-            }
+        } else if (this.isCollisionSC(this._ball, 10, this._bar00)) {
+            // console.log("collision bar00");
+        } else if (this.isCollisionSC(this._ball, 10, this._bar01)) {
+            // console.log("collision bar01");
         } else {
             this._iscollision = false;
         }
+        // else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, up])) { // bar 0 = 좌측 상단의 x, 1 = y, 2 = 우측 하단의 x, 3 = y
+        //     if (this._iscollision == false) {
+        //         this._direction[1] *= -1
+        //         this._iscollision = true;
+        //     }
+        // } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, down])) {
+        //     if (this._iscollision == false) {
+        //         this._direction[1] *= -1
+        //         this._iscollision = true;
+        //     }
+        // } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [left, ballY])) {
+        //     if (this._iscollision == false) {
+        //         this._direction[0] *= -1;
+        //         this._iscollision = true;
+        //     }
+        // } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [right, ballY])) {
+        //     if (this._iscollision == false) {
+        //         this._direction[0] *= -1;
+        //         this._iscollision = true;
+        //     }
+        // } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, up])) {
+        //     if (this._iscollision == false) {
+        //         this._direction[1] *= -1;
+        //         this._iscollision = true;
+        //     }
+        // } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, down])) {
+        //     if (this._iscollision == false) {
+        //         this._direction[1] *= -1;
+        //         this._iscollision = true;
+        //     }
+        // } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [left, ballY])) {
+        //     if (this._iscollision == false) {
+        //         this._direction[0] *= -1;
+        //         this._iscollision = true;
+        //     }
+        // } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [right, ballY])) {
+        //     if (this._iscollision == false) {
+        //         this._direction[0] *= -1;
+        //         this._iscollision = true;
+        //     }
+        // }
     }
 
     isScored(radius : number) {
