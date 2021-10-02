@@ -1,11 +1,11 @@
-import { FC, Dispatch, SetStateAction, useState } from "react";
-import { Link, Route } from "react-router-dom";
+import { FC, Dispatch, SetStateAction, useState, useEffect } from "react";
+import { Link, Route, useParams } from "react-router-dom";
 import Modal from "../../Modal";
 import ChatConfigContent from "./ChatConfigContent";
 import ChatInviteContent from "./ChatInviteContent";
 import ChatContextMenu from "./ChatContextMenu";
 
-interface chatRoom {
+interface ChatRoom {
   title: string,
   type: string,
   current_people: number,
@@ -25,12 +25,10 @@ function submitMessage(message: string, setMessage: Dispatch<SetStateAction<stri
   setMessage("");
 };
 
-function controllTextAreaKeyDown(e: React.KeyboardEvent,
+function controlTextAreaKeyDown(e: React.KeyboardEvent,
                           message: string, setMessage: Dispatch<SetStateAction<string>>,
                           chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
-  const keyCode = e.key;
-
-  if (keyCode === "Enter" && !e.shiftKey) {
+  if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     submitMessage(message, setMessage, chatLog, setChatLog);
   }
@@ -50,7 +48,7 @@ function openContextMenu( e: React.MouseEvent,
   });
 };
 
-const ChatRoomContent: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<SetStateAction<chatRoom>>}> = ({chatRoomInfo, setChatRoomInfo}): JSX.Element => {
+const ChatRoomContent: FC = (): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<{nick: string, avatar_url: string, position: string}[]>(require("../../../../dummydata/testChatRoomLog").chatUsers);
   const [chatLog, setChatLog] = useState(require("../../../../dummydata/testChatRoomLog").chatLog);
@@ -63,10 +61,28 @@ const ChatRoomContent: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<Set
     targetPosition: string
   }>({isOpen: false, x: 0, y: 0, target: "", targetPosition: ""});
 
+  /* TODO: 현재는 test용 dummy 데이터임.
+           백엔드 업데이트 이후 channel_id로 정보를 받아와야 함 */
+  const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>({
+    title: "hello",
+    type: "public",
+    current_people: 4,
+    max_people: 4,
+  });
+  const { channel_id } = useParams<{channel_id: string}>();
+
+  useEffect(() => {
+    /* TODO: channel_id 로 채팅방을 검색한 후에 없으면 없는 방이라고 보여줘야 함 */
+  }, []);
+
   return (
     <div id="chat-room">
       <div id="chat-room-header">
-        <img src="/public/arrow.svg" id="arrow-button" alt="뒤로가기" onClick={() => setChatRoomInfo({title: "", type: "", max_people: 0, current_people: 0})}/>
+        <img
+          src="/public/arrow.svg"
+          id="arrow-button"
+          alt="뒤로가기"
+          onClick={() => history.back()} />
         {chatRoomInfo.title}{chatRoomInfo.type === "protected" ? <img id="lock" src="/public/lock-black.svg" alt="비밀방" /> : <></>}
       </div>
       <div id="chat-room-body">
@@ -115,7 +131,7 @@ const ChatRoomContent: FC<{chatRoomInfo: chatRoom, setChatRoomInfo: Dispatch<Set
           rows={4}
           cols={50}
           value={message}
-          onKeyDown={(e) => controllTextAreaKeyDown(e, message, setMessage, chatLog, setChatLog)}
+          onKeyDown={(e) => controlTextAreaKeyDown(e, message, setMessage, chatLog, setChatLog)}
           onChange={({target: {value}}) => setMessage(value)}/>
         <button className="chat-msg-btn" onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
       </form>
