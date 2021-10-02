@@ -1,7 +1,7 @@
 import { Logger } from "@nestjs/common";
 import { Socket, Server } from "socket.io";
 
-enum Scored {
+export enum Scored {
     PLAYER00,
     PLAYER01,
     NONE
@@ -20,6 +20,9 @@ export class GameLogic {
     _correction : number;
     _server : Server;
     _iscollision : Boolean;
+    _score : Scored = Scored.NONE;
+    _leftBarMovement : NodeJS.Timeout;
+    _rightBarMovement : NodeJS.Timeout;
 
     constructor(
         width : number,
@@ -54,24 +57,31 @@ export class GameLogic {
     // dir이 true라면 위로, false면 아래로
     // pos가 true라면 왼쪽(00), false면 오른쪽(01)
     moveBar(dir : boolean, pos : boolean) {
-        let dirValue;
-        if (dir) {
-            dirValue = -5;
-        } else {
-            dirValue = 5;
-        }
+        const interval = setInterval(() => {
+            let dirValue;
+            if (dir) {
+                dirValue = -5;
+            } else {
+                dirValue = 5;
+            }
+            if (pos) {
+                this._bar00_pre = this._bar00;
+                if (this._bar00[1] + dirValue > 0 && this._bar00[3] + dirValue < this._bottomWall) {
+                    this._bar00[1] += dirValue;
+                    this._bar00[3] += dirValue;
+                }
+            } else {
+                this._bar01_pre = this._bar01;
+                if (this._bar01[1] + dirValue > 0 && this._bar01[3] + dirValue < this._bottomWall) {
+                    this._bar01[1] += dirValue;
+                    this._bar01[3] += dirValue;
+                }
+            }
+        }, 20);
         if (pos) {
-            this._bar00_pre = this._bar00;
-            if (this._bar00[1] + dirValue > 0 && this._bar00[3] + dirValue < this._bottomWall) {
-                this._bar00[1] += dirValue;
-                this._bar00[3] += dirValue;
-            }
+            this._leftBarMovement = interval;
         } else {
-            this._bar01_pre = this._bar01;
-            if (this._bar01[1] + dirValue > 0 && this._bar01[3] + dirValue < this._bottomWall) {
-                this._bar01[1] += dirValue;
-                this._bar01[3] += dirValue;
-            }
+            this._rightBarMovement = interval;
         }
     }
 
@@ -86,10 +96,12 @@ export class GameLogic {
 
     update() {
         // direction 방향으로 공을 이동
+        const score = this.isScored(10);
         this.checkCollision(10)
         this._ball[0] += this._direction[0] * this._speed;
         this._ball[1] += this._direction[1] * this._speed;
-        if (this.isScored(10) != Scored.NONE) {
+        if (score != Scored.NONE) {
+            this._score = score;
         }
     }
 
@@ -116,11 +128,10 @@ export class GameLogic {
         } else if (down >= this._bottomWall) {
             // direction 전환
             this._direction[1] *= -1;
-        } else if (left <= 0) { // 추후 제거 필요
-            this._direction[0] *= -1;
         } else if (right >= this._rightWall) {
             this._direction[0] *= -1;
-            // 여기 까지
+        } else if (left <= 0) {
+            this._direction[0] *= -1;
         } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, up])) { // bar 0 = 좌측 상단의 x, 1 = y, 2 = 우측 하단의 x, 3 = y
             if (this._iscollision == false) {
                 this._direction[1] *= -1

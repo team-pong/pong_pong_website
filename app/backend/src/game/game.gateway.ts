@@ -6,7 +6,7 @@ import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
 import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
-import { GameLogic } from './game.logic';
+import { Scored, GameLogic } from './game.logic';
 
 class WaitUser {
 	constructor(
@@ -90,9 +90,13 @@ export class GameGateway {
 				console.log('left player key event:', e);
 				if (e.arrowDown) { // 아랫키 눌림
 					gameLogic.moveBar(false, true);
+				} else if (e.arrowDown === false) {
+					clearInterval(gameLogic._leftBarMovement);
 				}
 				if (e.arrowUp) {
 					gameLogic.moveBar(true, true);
+				} else if (e.arrowUp === false) {
+					clearInterval(gameLogic._leftBarMovement);
 				}
 			})
 
@@ -100,9 +104,13 @@ export class GameGateway {
 				console.log('right player key event:', e);
 				if (e.arrowDown) { // 아랫키 눌림
 					gameLogic.moveBar(false, false);
+				} else if (e.arrowDown === false) {
+					clearInterval(gameLogic._rightBarMovement);
 				}
 				if (e.arrowUp) {
 					gameLogic.moveBar(true, false);
+				} else if (e.arrowUp === false) {
+					clearInterval(gameLogic._rightBarMovement);
 				}
 			})
 
@@ -111,7 +119,20 @@ export class GameGateway {
 				gameLogic.update();
 				playerLeft.socket.emit("update", gameLogic.getJson());
 				playerRight.socket.emit("update", gameLogic.getJson());
+				if (gameLogic._score == Scored.PLAYER00) {
+					userInfo.lPlayerScore++;
+					// clearInterval(interval);
+					playerLeft.socket.emit('setMatchInfo', userInfo);
+					playerRight.socket.emit('setMatchInfo', userInfo);
+				} else if (gameLogic._score == Scored.PLAYER01) {
+					userInfo.rPlayerScore++;
+					// clearInterval(interval);
+					playerLeft.socket.emit('setMatchInfo', userInfo);
+					playerRight.socket.emit('setMatchInfo', userInfo);
+				}
 			}, 20)
+			// gamsScore ㅇㅣㄹ정 값 되면 update interval 제거
+			// 
 		}
 		console.log('waiting:', normal_waiting);
   }
