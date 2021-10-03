@@ -93,7 +93,7 @@ const ChatRoomContent: FC = (): JSX.Element => {
   }, []);
 
   if (chatRoomInfo) {
-    return (      
+    return (
       <div id="chat-room">
         <div id="chat-room-header">
           <img
