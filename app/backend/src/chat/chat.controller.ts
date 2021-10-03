@@ -3,14 +3,13 @@ import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/s
 import { Request, Response } from 'express';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
 import { NotLoggedInGuard } from 'src/auth/not-logged-in.guard';
-import { ChatDto1, ChatDto3, ChatDto4, ChatDto5 } from 'src/dto/chat';
+import { ChatDto1, ChatDto2, ChatDto3, ChatDto4, ChatDto5, ChatDto6 } from 'src/dto/chat';
 import { UsersDto3 } from 'src/dto/users';
 import { ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 
 @ApiTags('Chat')
-@UseGuards(new LoggedInGuard())
 @Controller('chat')
 export class ChatController {
   constructor(
@@ -21,18 +20,28 @@ export class ChatController {
 
   // @todo owner_id를 프론트에서 보내는게 아닌 백엔드에서 알아 낼 수 있도록 수정 -> 이렇게 하면 api테스트시 어려움
   @ApiOperation({ summary: '채널 생성', description: '채팅방 타입은 public 또는 protected 또는 private 이어야함'})
-  @ApiResponse({ type: ErrMsgDto, description: '채널 생성 실패시 실패이유' })
+  // @ApiResponse({ type: ErrMsgDto, description: '채널 생성 실패시 실패이유' })
+  @ApiResponse({ type: ChatDto2, description: `생성된 채널의 제목, 타입, 현재인원, 최대인원, 채널 아이디` })
   @ApiBody({ type: ChatDto1, description: '채널 owner, 제목, 타입, 비밀번호, 최대인원' })
   @Post()
-  creatChat(@Body() b: ChatDto1, @Req() req: Request, @Res() res: Response){
-    return this.chatService.createChat(b.owner_id, b.title, b.type, b.passwd, b.max_people);
+  creatChat(@Body() b: ChatDto1, @Req() req: Request){
+    return this.chatService.createChat(req.session.userid, b.title, b.type, b.passwd, b.max_people);
   }
 
   @ApiOperation({ summary: '모든 채널 검색'})
   @ApiResponse({ type: ChatDto3, description: `모든 채널의 제목, 타입, 현재인원, 최대인원, 채널 아이디` })
   @Get()
+  @ApiQuery({ name: 'channel_id', })
   readChat(){
     return this.chatService.readChat();
+  }
+
+  @ApiOperation({ summary: '채널 아이디로 채널 검색'})
+  @ApiResponse({ type: ChatDto6, description: `채널의 제목, 타입, 비밀번호, 최대인원, 현재인원, 유저 닉네임, 채널 아이디` })
+  @Get('oneChat')
+  @ApiQuery({ name: 'channel_id', example: 1, description: '채널 아이디' })
+  readOneChat(@Query() q){
+    return this.chatService.readOneChat(q.channel_id);
   }
   
   @ApiOperation({ summary: '제목으로 채널 검색'})

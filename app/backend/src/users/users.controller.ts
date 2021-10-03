@@ -1,13 +1,19 @@
-import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersDto1, UsersDto2, UsersDto3, UsersDto4 } from 'src/dto/users';
 import { ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from './users.service';
+import { Request } from 'express';
+import { SessionService } from 'src/session/session.service';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService){}
+  constructor(
+    private usersService: UsersService,
+    @Inject(forwardRef(() => SessionService))
+    private sessionService: SessionService,
+  ){}
 
   @ApiOperation({ summary: '유저 생성' })
   @ApiResponse({ type: ErrMsgDto, description: '유저 생성 실패시 실패 이유' })
@@ -72,5 +78,18 @@ export class UsersController {
     user = await this.usersService.readUsers(q.nick, 'nick');
     return await this.usersService.deleteUsers(user.user_id);
     // return this.usersService.deleteUsers(q.user_id);
+  }
+
+  @ApiOperation({ summary: '나의 정보 검색'})
+  @ApiResponse({ 
+    type: UsersDto3, 
+    description: `
+      유저의 아이디, 닉네임, 아바타 url, 총 게임수, 이긴 게임수, 진 게임수, 래더점수, 유저의 상태
+      검색 실패시 실패 이유
+    ` })
+  @Get('myself')
+  async getMyInfo(@Req() req: Request){
+    let user_id = await this.sessionService.readUserId(req.sessionID);
+    return await this.usersService.readUsers(user_id, 'user_id');
   }
 }
