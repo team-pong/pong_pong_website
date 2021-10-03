@@ -44,13 +44,12 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
   const [nickToEdit, setNickToEdit] = useState("");
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
   const [isBlockedFriend, setIsBlockedFriend] = useState(false);
+  const [isMyProfile, setIsMyProfile] = useState(false);
 
   const avatarImgRef = useRef(null);
 
   //url parameter로 넘어오는 nick 문자열 저장
   const { nick } = useParams<{nick: string}>();
-  //test 현재 내 nick은 donglee 이고 param으로 들어온 nick은 jinbkim이니까 false
-  const isMyProfile = ("donglee" === nick);
 
   /*!
    * @author donglee
@@ -112,17 +111,10 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
 
   /*!
    * @author donglee
-   * @brief API /user 에서 프로필 정보를 요청해서 state에 저장함
+   * @brief API /users 에서 프로필 정보를 요청해서 state에 저장함
    */
   const getUserInfo = async (): Promise<UserInfo> => {
-    let targetNick = "";
-    if (isMyProfile) {
-      targetNick = "donglee";
-    } else {
-      targetNick = nick;
-    }
-    /* TODO: session id로 유저의 정보를 받아오도록 해야 함 */
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/user?user_id=${targetNick}`);
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nick}`);
     const res = await (await easyfetch.fetch()).json();
 
     setUserInfo(res);
@@ -268,6 +260,19 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
     }
   };
 
+  /*!
+   * @author donglee
+   * @detail 프로필을 열 때 가장 먼저 나의 프로필인지 다른 사용자것인지를 판별
+   */
+  const setMineOrOthers = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
+    const res = await (await easyfetch.fetch()).json();
+
+    if (res.nick === nick) {
+      setIsMyProfile(true);
+    }
+  };
+
  /*!
   * @author donglee
   * @detail 닉네임 수정을 눌렀을 때만 click이벤트리스너를 등록하고
@@ -288,7 +293,8 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    *         이미 친구인지, 차단한 친구인지 정보를 받아온다
    */
   useEffect(() => {
-    getUserInfo()
+    setMineOrOthers()
+      .then(getUserInfo)
       .then((res) => {setNickToEdit(res.nick); return res;});
     if (!isMyProfile) {
       getIsAlreadyFriend();

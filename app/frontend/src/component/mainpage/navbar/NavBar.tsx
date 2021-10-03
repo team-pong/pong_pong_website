@@ -42,8 +42,7 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
    * @brief API /user 에서 프로필 정보를 요청해서 state에 저장함
    */
   const getUserInfo = async () => {
-    //test session id로 받아와야 하는데 일단 donglee꺼 받아옴
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/user?user_id=donglee`);
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
     const res = await (await easyfetch.fetch()).json();
 
     setUserInfo(res);
@@ -60,6 +59,19 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
 
     setFriendList(res.friendList);
   };
+
+  /*!
+   * @author donglee
+   * @brief Profile에서 닉네임 변경 시 NavBar에서도 userInfo를 업데이트 함
+   */
+  useEffect(() => {
+    if (userInfo) {
+      const updatedUserInfo = {...userInfo};
+
+      updatedUserInfo.nick = myNick;
+      setUserInfo(updatedUserInfo);
+    }
+  }, [myNick])
 
   useEffect(() => {
     getUserInfo()
