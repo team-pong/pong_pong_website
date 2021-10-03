@@ -93,7 +93,7 @@ const ChatRoomContent: FC = (): JSX.Element => {
   }, []);
 
   if (chatRoomInfo) {
-    return (
+    return (      
       <div id="chat-room">
         <div id="chat-room-header">
           <img
@@ -166,7 +166,7 @@ const ChatRoomContent: FC = (): JSX.Element => {
   } else if (noResult) {
     return ( <NoResult text="대화방이 존재하지 않습니다."></NoResult> );
   } else {
-    return ( <Loading width={100} height={100} color="grey" /> );
+    return ( <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "43%", top: "10%"}} /> );
   }
 };
 

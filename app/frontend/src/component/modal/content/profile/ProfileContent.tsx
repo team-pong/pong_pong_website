@@ -413,13 +413,15 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
               <span className="pr-explain">클릭하면 해당 유저를 차단합니다.</span>
               : <span className="pr-explain">클릭하면 해당 유저를 차단 해제합니다.</span>
             }
-          </div>          
+          </div>
         </div>
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={nick}/>} /></Route>
-      </div>      
+      </div>
     );
   } else {
-    return ( <Loading width={100} height={100} color="grey"></Loading> );
+    return (
+      <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "38%", top: "40%"}} />
+    );
   }
 };
 

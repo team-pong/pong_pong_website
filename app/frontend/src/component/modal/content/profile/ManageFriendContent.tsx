@@ -72,7 +72,7 @@ const FriendList: React.FC = () => {
 	},[]);
 
 	if (noResult) {
-		return ( <NoResult text="추가한 친구가 없습니다."/> );
+		return ( <NoResult text="추가한 친구가 없습니다." style={{position: "absolute", left: "22%", top: "28%"}}/> );
 	}
 	if (friendList) {
 		return (
@@ -108,7 +108,7 @@ const FriendList: React.FC = () => {
 			</ul>
 		);
 	} else {
-		return ( <Loading width={100} height={100} color="grey" /> );
+		return ( <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "37%"}}/> );
 	}
 }
 
@@ -144,9 +144,8 @@ const BlockedList: React.FC = () => {
 		getBlockedList();
 	},[]);
 
-	/* TODO: 결과없음 디자인이 이상함 */
 	if (noResult) {
-		return ( <NoResult text="차단한 친구가 없습니다."/> );
+		return ( <NoResult text="차단한 친구가 없습니다." style={{position: "absolute", left: "22%", top: "28%"}}/> );
 	}
 	if (blockedList) {
 		return (
@@ -171,7 +170,7 @@ const BlockedList: React.FC = () => {
 			</ul>
 		);
 	} else {
-		return ( <Loading width={100} height={100} color="grey" /> );
+		return ( <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "37%"}}/> );
 	}
 }
 
