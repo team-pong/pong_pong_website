@@ -94,7 +94,7 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
   }, []);
 
   if (friendList === null || friendList === undefined) {
-    return (<Loading width={240} height={35} color="#fff"/>);
+    return (<Loading color="#fff" style={{width: "50px", height: "50px", marginLeft: "50px"}}/>);
   } else if (friendList.length === 0) {
     return (<NoResult
               text="친구 없음"

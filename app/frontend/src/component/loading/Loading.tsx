@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { CSSProperties, FC } from "react";
 
 /*!
  * @author yochoi
@@ -6,8 +6,7 @@ import { FC } from "react";
  */
 
 interface loadingProps {
-  width: number;
-  height: number;
+  style: CSSProperties;
   color: string;
 }
 
@@ -15,7 +14,7 @@ const Loading: FC<loadingProps> = (props): JSX.Element => {
 
   return (
     <svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-      viewBox="0 0 100 100" enableBackground="new 0 0 0 0" xmlSpace="preserve" style={{width: props.width, height: props.height}}>
+      viewBox="0 0 100 100" enableBackground="new 0 0 0 0" xmlSpace="preserve" style={{...props.style}}>
       <circle fill={props.color} stroke="none" cx="30" cy="50" r="6">
         <animate
           attributeName="opacity"

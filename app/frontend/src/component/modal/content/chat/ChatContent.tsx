@@ -5,6 +5,8 @@ import ChatRoomContent from "./ChatRoomContent";
 import { Link, Route } from "react-router-dom";
 import Modal from "../../Modal";
 import MakeChatRoom from "./MakeChatRoom";
+import Loading from "../../../loading/Loading";
+import NoResult from "../../../noresult/NoResult";
 
 interface chatRoom {
   channel_id: number,
@@ -23,6 +25,7 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
 
   const [publicChatRoom, setPublicChatRoom] = useState<chatRoom[]>([]);
   const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
     return (
@@ -74,16 +77,35 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
 
   useEffect(() => {
     getChatRoomList()
-    .then(sortChatRoomList);
+    .then(sortChatRoomList)
+    .then(() => setIsLoading(false));
   }, [search]);
 
-  return (
-    <ul id="chat-room-list">
-      {type === "all" ? [...publicChatRoom, ...protectedChatRoom].map(chatRoomListGenerator) : <></>}
-      {type === "public" ? publicChatRoom.map(chatRoomListGenerator) : <></>}
-      {type === "protected" ? protectedChatRoom.map(chatRoomListGenerator) : <></>}
-    </ul>
-  );
+  if (isLoading) {
+    return (
+      <Loading color="gray" style={{width: "100px", height: "100px", position: "absolute", left: "35%", top: "25%"}}/>
+    )
+  } else {
+    return (
+      <ul id="chat-room-list">
+        {type === "all"
+          ? ([...publicChatRoom, ...protectedChatRoom].map(chatRoomListGenerator).length === 0
+            ? <NoResult style={{display: "block", marginTop: "20px"}}/>
+            : [...publicChatRoom, ...protectedChatRoom].map(chatRoomListGenerator))
+          : <></>}
+        {type === "public"
+          ? (publicChatRoom.map(chatRoomListGenerator).length === 0
+            ? <NoResult style={{display: "block", marginTop: "20px"}}/>
+            : publicChatRoom.map(chatRoomListGenerator))
+          : <></>}
+        {type === "protected"
+          ? (protectedChatRoom.map(chatRoomListGenerator).length === 0
+            ? <NoResult style={{display: "block", marginTop: "20px"}}/>
+            : protectedChatRoom.map(chatRoomListGenerator))
+          : <></>}
+      </ul>
+    );
+  }
 }
 
 /*!

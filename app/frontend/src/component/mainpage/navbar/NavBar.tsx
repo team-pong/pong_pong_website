@@ -8,6 +8,7 @@ import "/src/scss/navbar/NavBar-mobile.scss";
 import Modal from "../../modal/Modal";
 import EasyFetch from "../../../utils/EasyFetch";
 import ProfileContent from "../../modal/content/profile/ProfileContent";
+import Loading from "../../loading/Loading";
 
 /*!
  * @author donglee
@@ -132,7 +133,7 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
       </nav>
     );
   } else {
-    return ( <h1>Loading...</h1> );
+    return ( <Loading color="#fff" style={{width: "70px", height: "70px", marginLeft: "30px"}}/> );
   }
 };
 
