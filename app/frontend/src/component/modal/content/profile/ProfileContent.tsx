@@ -6,6 +6,7 @@ import ManageFriendContent from "./ManageFriendContent";
 import RecordContent from "../record/RecordContent";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
+import Loading from "../../../loading/Loading";
 
 /*!
  * @author donglee
@@ -412,7 +413,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
       </div>      
     );
   } else {
-    return ( <h1>Loading..</h1> );
+    return ( <Loading width={100} height={100} color="grey"></Loading> );
   }
 };
 

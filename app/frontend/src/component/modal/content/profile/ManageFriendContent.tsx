@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import EasyFetch from "../../../../utils/EasyFetch";
 import "/src/scss/content/profile/ManageFriendContent.scss";
 import { setAchievementStr, setAchievementImg } from "../../../../utils/setAchievement";
+import Loading from "../../../loading/Loading";
+import NoResult from "../../../noresult/NoResult";
 
 interface Friend {
 	user_id: string;
@@ -17,6 +19,7 @@ interface Friend {
 const FriendList: React.FC = () => {
 
 	const [friendList, setFriendList] = useState<Friend[]>();
+	const [noResult, setNoResult] = useState(false);
 
   /*!
    * @author donglee
@@ -57,6 +60,10 @@ const FriendList: React.FC = () => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
 		const res = await (await easyfetch.fetch()).json();
 
+		if (res.friendList.length === 0) {
+			setNoResult(true);
+			return ;
+		}
 		setFriendList(res.friendList);
 	}
 
@@ -64,6 +71,9 @@ const FriendList: React.FC = () => {
 		getFriendList();
 	},[]);
 
+	if (noResult) {
+		return ( <NoResult text="추가한 친구가 없습니다."/> );
+	}
 	if (friendList) {
 		return (
 			<ul>
@@ -98,13 +108,14 @@ const FriendList: React.FC = () => {
 			</ul>
 		);
 	} else {
-		return ( <h1>Loading...</h1> );
+		return ( <Loading width={100} height={100} color="grey" /> );
 	}
 }
 
 const BlockedList: React.FC = () => {
 	
 	const [blockedList, setBlockedList] = useState<Friend[]>();
+	const [noResult, setNoResult] = useState(false);
 
 	const unblockFriend = async (nick: string) => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/block?block_nick=${nick}`, "DELETE");
@@ -122,6 +133,10 @@ const BlockedList: React.FC = () => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/block`);
 		const res =  await (await easyfetch.fetch()).json();
 		
+		if (res.blockList.length === 0) {
+			setNoResult(true);
+			return ;
+		}
 		setBlockedList(res.blockList);
 	};
 
@@ -129,6 +144,10 @@ const BlockedList: React.FC = () => {
 		getBlockedList();
 	},[]);
 
+	/* TODO: 결과없음 디자인이 이상함 */
+	if (noResult) {
+		return ( <NoResult text="차단한 친구가 없습니다."/> );
+	}
 	if (blockedList) {
 		return (
 			<ul>
@@ -152,7 +171,7 @@ const BlockedList: React.FC = () => {
 			</ul>
 		);
 	} else {
-		return ( <h1>Loading...</h1> );
+		return ( <Loading width={100} height={100} color="grey" /> );
 	}
 }
 
