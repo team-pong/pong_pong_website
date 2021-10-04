@@ -27,7 +27,7 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params}, setIsMatc
 
   return (
     <div id="game-match-content">
-      <Loading width={400} height={300} color="#62C375"/>
+      <Loading style={{width:400, height:300}} color="#62C375"/>
       {params.matchType === "normal" && "일반 게임 찾는중..."}
       {params.matchType === "ladder" && "레더 게임 찾는중..."}
     </div>
