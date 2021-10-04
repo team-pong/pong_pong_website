@@ -1,6 +1,12 @@
-import React, { FC, useEffect, useState, Dispatch, SetStateAction } from "react";
+import React, { FC, useEffect, useState } from "react";
 import "../../../scss/dm/DmRoom.scss";
-import { testDMLog, DMLog } from "../../../dummydata/testDM";
+import { testDMLog } from "../../../dummydata/testDM";
+
+interface DMLog {
+  time: string,         /* e.g.) "오후 1:42"     */
+  msg: string,          /* e.g.) "반갑다"        */
+  from: string          /* e.g.) "me" || "hna" */
+};
 
 const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
 
