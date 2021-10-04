@@ -5,7 +5,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 const { SourceMapDevToolPlugin } = require("webpack");
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: './src/index.tsx',
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
@@ -30,13 +30,6 @@ module.exports = {
         use: ["style-loader", "css-loader", "sass-loader"],
       }
     ]
-  },
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    historyApiFallback: true,
-    host: 'frontend',
-    port: 3000,
-    public: "0.0.0.0:3000"
   },
   plugins: [
     new SourceMapDevToolPlugin({
