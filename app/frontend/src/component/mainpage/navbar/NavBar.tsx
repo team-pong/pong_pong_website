@@ -27,7 +27,7 @@ interface UserInfo {
   status: string;
 }
 
-const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
+const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProps> = (props): JSX.Element => {
 
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
@@ -66,18 +66,11 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
     getUserInfo()
       .then((res) => setMyNick(res.nick));
     getFriendList();
-    const socket = io(`${global.BE_HOST}/global`);
-    socket.on("online", ({user_id}) => {
-      getFriendList();
-    });
-    socket.on("offline", ({user_id}) => {
-      getFriendList();
-    });
-    socket.on("ongame", ({user_id}) => {
-      getFriendList();
-    });
-    return (() => {socket.disconnect()});
   },[]);
+
+  useEffect(() => {
+    getFriendList();
+  }, [props.update]);
 
   if (userInfo) {
     return (

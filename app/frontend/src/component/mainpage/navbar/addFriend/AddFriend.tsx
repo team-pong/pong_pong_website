@@ -114,7 +114,7 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
         autoComplete="off"
         minLength={2}
-        maxLength={10}
+        maxLength={20}
         required
         placeholder="추가할 닉네임을 입력하세요"
         value={nicknameToFind}
