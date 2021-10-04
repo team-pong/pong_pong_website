@@ -4,27 +4,60 @@ import { testDMLog, DMLog } from "../../../dummydata/testDM";
 
 const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
 
-  const printChatLog = (msg, idx) => {
+  const [sortedDmLog, setSortedDmLog] = useState<Array<DMLog[]>>([]);
+
+  useEffect(() => {
+    let prev = {time: "", from: ""};
+    let result: Array<DMLog[]> = [];
+    let tmp: DMLog[] = [];
+    dmLog?.forEach((dm) => {
+      if (prev.time === "" && prev.from === "") {
+        prev.from = dm.from;
+        prev.time = dm.time;
+        tmp.push(dm);
+        return ;
+      }
+      if (dm.time === prev.time && dm.from === prev.from) {
+        tmp.push(dm);
+        return ;
+      }
+      result.push(tmp);
+      tmp = [];
+      prev.from = dm.from;
+      prev.time = dm.time;
+      tmp.push(dm);
+    });
+    result.push(tmp);
+    setSortedDmLog(result);
+  }, [dmLog]);
+
+  const printChatLog = (msg: DMLog[]) => {
     return (
-      <li key={idx} className={`dm-log ${msg.from === "me" ? "me" : "other"}`}>
-        <span className="dm-log-msg">
-          {
-            /*! @author yochoi
-              *  @breif 문자열(챗로그)에 개행이 있으면 br태그로 줄바꿈해주는 부분
-              */
-            msg.msg.split('\n').map((chatlog, idx) => {
-              return (<span key={idx}>{chatlog}<br /></span>);
-            })
-          }
-        </span>
-        <span className="dm-log-time">{msg.time}</span>
-      </li>
+      <>
+        {msg.map((msg, idx) => {
+          return (
+            <li key={idx} className={`dm-log ${msg.from === "me" ? "me" : "other"}`}>
+              <span className="dm-log-msg">
+                {
+                  /*! @author yochoi
+                    *  @breif 문자열(챗로그)에 개행이 있으면 br태그로 줄바꿈해주는 부분
+                    */
+                  msg.msg.split('\n').map((chatlog, idx) => {
+                    return (<span key={idx}>{chatlog}<br /></span>);
+                  })
+                }
+              </span>
+              {idx === 0 && <span className="dm-log-time">{msg.time}</span>}
+            </li>
+          )
+        })}
+      </>
     );
   }
   
   return (
     <ul className="dm-log-list">
-      {dmLog?.map(printChatLog)}
+      {sortedDmLog.map(printChatLog)}
     </ul>
   );
 }
