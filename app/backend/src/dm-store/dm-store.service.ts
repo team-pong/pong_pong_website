@@ -65,12 +65,10 @@ export class DmStoreService {
 
     let ret = [];
     const dm_list = [];
-    // console.log(a);
 
     // 2. 해당 유저랑 했던 대화중에서 가장 최근 메세지 1개씩만 가져오기
     for (let i of recv_ids) {
       const id = i.sender_id;
-      // console.log(id);
       const last_msg = await this.dmStoreRepo.query(`SELECT * FROM dm_store WHERE (sender_id='${id}' AND receiver_id='${user_id}') ORDER BY created_at DESC LIMIT 1`);
       ret.push(last_msg[0]);
     }
@@ -90,7 +88,6 @@ export class DmStoreService {
 
     for (let i of send_ids) {
       const id = i.receiver_id;
-      // console.log(id);
       const last_msg = await this.dmStoreRepo.query(`SELECT * FROM dm_store WHERE (sender_id='${user_id}' AND receiver_id='${id}') ORDER BY created_at DESC LIMIT 1`);
       ret.push(last_msg[0]);
     }
@@ -106,9 +103,30 @@ export class DmStoreService {
       })
     }
 
-    console.log(dm_list);
+    // 3. 중복 타겟 제거
+    const nums = [];
+    for (let i = 0; i < dm_list.length; i++ ) {
+      for (let j = i + 1; j < dm_list.length; j++ ) {
+        if (dm_list[i].target.nick == dm_list[j].target.nick) {
+          if (Date.parse(dm_list[i].lastMsgTime) < Date.parse(dm_list[j].lastMsgTime)) {
+            nums.push(i);
+          } else {
+            nums.push(j);
+          }
+          continue ;
+        } 
+      }
+    }
 
-    return dm_list;
+    for (let i = dm_list.length - 1; i >= 0; i--) {
+      delete dm_list[nums[i]];
+    }
+
+    const filtered = dm_list.filter(function (el) {
+      return el != null;
+    });
+
+    return filtered;
   }
 
   async deleteDmStore(user_id: string){
