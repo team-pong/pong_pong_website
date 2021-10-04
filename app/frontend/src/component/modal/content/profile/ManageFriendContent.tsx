@@ -21,6 +21,16 @@ const FriendList: React.FC = () => {
 	const [friendList, setFriendList] = useState<Friend[]>();
 	const [noResult, setNoResult] = useState(false);
 
+	/*!
+   * @author donglee
+   * @brief 친구목록이 수정될 때 리스트가 없으면 결과없음을 보여주기 위해 검사함
+   */	
+	const checkListLength = (list: Friend[]) => {
+		if (list.length === 0) {
+			setNoResult(true);
+		}
+	};
+
   /*!
    * @author donglee
    * @brief 친구 삭제 POST 요청 후 성공하면 state를 해당 친구를 제거한 상태로 업데이트한다
@@ -34,6 +44,7 @@ const FriendList: React.FC = () => {
 		} else {
 			const updatedList = friendList.filter((friend) => friend.nick !== nick);
 			setFriendList(updatedList);
+			checkListLength(updatedList);
     }
 	};
 
@@ -53,6 +64,7 @@ const FriendList: React.FC = () => {
 		} else {
 			const updatedList = friendList.filter((friend) => friend.nick !== nick);
 			setFriendList(updatedList);
+			checkListLength(updatedList);
 		}
 	};
 
@@ -126,6 +138,9 @@ const BlockedList: React.FC = () => {
 		} else {
 			const updatedList = blockedList.filter((friend) => friend.nick !== nick);
 			setBlockedList(updatedList);
+			if (updatedList.length === 0) {
+				setNoResult(true);
+			}
 		}
 	};
 
