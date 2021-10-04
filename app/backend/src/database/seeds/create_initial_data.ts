@@ -40,7 +40,17 @@ export class createInitialData implements Seeder {
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(DmStore)
-			.values([{sender_id: 'jinbkim', receiver_id: 'donglee', content: '안녕'}, {sender_id: 'donglee', receiver_id: 'jinbkim', content: '나도 안녕'}, {sender_id: 'jinbkim', receiver_id: 'yochoi', content: '하이하이'}])
+			.values([{sender_id: 'jinbkim', receiver_id: 'donglee', content: '안녕'}, 
+							{sender_id: 'donglee', receiver_id: 'jinbkim', content: '나도 안녕'}, 
+							{sender_id: 'jinbkim', receiver_id: 'yochoi', content: '하이하이'},
+							{sender_id: 'yochoi', receiver_id: 'hna', content: 'ㅎㅇ'},
+							{sender_id: 'hna', receiver_id: 'yochoi', content: 'ㅎㅇㅎㅇ'},
+							{sender_id: 'hna', receiver_id: 'yochoi', content: '핑퐁ㄱㄱ'},
+							{sender_id: 'yochoi', receiver_id: 'hna', content: 'ㄴㄴ'},
+							{sender_id: 'jinwkim', receiver_id: 'yochoi', content: '123123'},
+							{sender_id: 'jinbkim', receiver_id: 'yochoi', content: 'aa'},
+							{sender_id: 'yochoi', receiver_id: 'donglee', content: '핑퐁ㄱㄱ'},
+						])
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(Friend)
