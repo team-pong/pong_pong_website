@@ -1,5 +1,6 @@
 import { FC, useEffect, useState, useRef } from "react";
 import { Link, Route, RouteComponentProps, withRouter } from "react-router-dom";
+import { io } from "socket.io-client";
 import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
 import "/src/scss/navbar/NavBar.scss";
@@ -27,7 +28,7 @@ interface UserInfo {
   status: string;
 }
 
-const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
+const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProps> = (props): JSX.Element => {
 
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
@@ -79,6 +80,10 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
       .then((res) => setMyNick(res.nick));
     getFriendList();
   },[]);
+
+  useEffect(() => {
+    getFriendList();
+  }, [props.update]);
 
   if (userInfo) {
     return (

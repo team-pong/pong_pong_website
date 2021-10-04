@@ -16,6 +16,6 @@ export class Users{
   loss_games: number;
   @Column({default: 1000})
   ladder_level: number;
-	@Column({default: 'on'})
+	@Column({default: 'offline'})
 	status: string;
 }

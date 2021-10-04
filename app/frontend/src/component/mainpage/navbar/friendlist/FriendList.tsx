@@ -48,7 +48,11 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
   const friendListGenerator = (friend: Friend, keyIdx: number) => {
     return (
       <div className="friend" key={keyIdx} onClick={(e) => friendOnClick(e, friend.nick)}>
-        <img className="flg-friend-avatar" src={friend.avatar_url}/>{friend.nick}
+        <div className="flg-icon-container">
+          <img className="flg-friend-avatar" src={friend.avatar_url}/>
+          <img className="flg-friend-status" src={`/public/status/${friend.status}.svg`} />
+        </div>
+        {friend.nick}
       </div>
     );
   };
