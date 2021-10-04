@@ -17,6 +17,7 @@ const MainPage = ({match}): JSX.Element => {
 
   const [isDmOpen, setIsDmOpen] = useState(false);
   const [updateFriendList, setUpdateFriendList] = useState({state: "", user_id: ""});
+  const [unReadMsg, setUnReadMsg] = useState(1);
 
   useEffect(() => {
     const socket = io(`${global.BE_HOST}/global`);
@@ -64,6 +65,7 @@ const MainPage = ({match}): JSX.Element => {
           <section id="dm-section">
             <Dm isDmOpen={isDmOpen}/>
             <button id="dm-controll-button" onClick={() => setIsDmOpen(!isDmOpen)}>
+              {unReadMsg && <div className="un-read-msg">{unReadMsg}</div>}
               {!isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
               {isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
             </button>
