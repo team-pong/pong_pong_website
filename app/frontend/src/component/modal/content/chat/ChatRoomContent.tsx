@@ -7,7 +7,6 @@ import ChatContextMenu from "./ChatContextMenu";
 import EasyFetch from "../../../../utils/EasyFetch";
 import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
-import Notice from "../../../notice/Notice";
 
 interface ChatRoom {
   title: string,
