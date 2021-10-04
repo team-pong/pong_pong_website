@@ -27,11 +27,18 @@ export class DmStoreController {
   async createDmStore(@Body() b: DmStoreDto1, @Req() req: Request){
     let user_id, receiver;
     // sender = await this.usersService.readUsers(b.sender_nick, 'nick');
-    user_id = await this.sessionService.readUserId(req.sessionID);
-    receiver = await this.usersService.readUsers(b.receiver_nick, 'nick');
+    user_id = await this.sessionService.readUserId(req.sessionID); // 요청 보낸 사람
+    receiver = await this.usersService.readUsers(b.receiver_nick, 'nick'); // dm 받을 사람
     return this.dmStoreService.createDmStore(user_id, receiver.user_id, b.content);
     // return this.dmStoreService.createDmStore(sender.user_id, receiver.user_id, b.content);
     // return this.dmStoreService.createDmStore(b.sender_id, b.receiver_id, b.content);
+  }
+
+  @Get('list')
+  async getDmList(@Req() req: Request) {
+    const user_id = await this.sessionService.readUserId(req.sessionID);
+    
+    return this.dmStoreService.getDmListOf(user_id);
   }
 
   @ApiOperation({ summary: 'DM 로그 검색'})

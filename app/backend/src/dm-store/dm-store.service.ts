@@ -1,16 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DmStoreDto2 } from 'src/dto/dm-store';
 import { DmStore } from 'src/entities/dm-store';
 import { Users } from 'src/entities/users';
 import { err0, err2 } from 'src/err';
+import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
+
+interface DM {
+  target: {
+    avatar_url: string,
+    nick: string,
+  },
+  lastMsg: string,
+  lastMsgTime: string,
+}
 
 @Injectable()
 export class DmStoreService {
   constructor(
     @InjectRepository(DmStore) private dmStoreRepo: Repository<DmStore>,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
     ){}
 
   async createDmStore(sender_id: string, receiver_id: string, content: string){
@@ -29,7 +41,7 @@ export class DmStoreService {
       return err2;
     // user_id와 other_id가 관련된 모든 dm 검색
     const dm = await this.dmStoreRepo
-      .query(`SELECT * FROM dm_store WHERE (sender_id='${user_id}' AND receiver_id='${other_id}') OR (sender_id='${other_id}' AND receiver_id='${user_id}') ORDER BY "createdAt" DESC`);
+      .query(`SELECT * FROM dm_store WHERE (sender_id='${user_id}' AND receiver_id='${other_id}') OR (sender_id='${other_id}' AND receiver_id='${user_id}') ORDER BY "created_at" DESC`);
     // dm 보낸 유저 아이디, 받은 유저 아이디, 내용, 보낸 시각 데이터 들을 dmList에 담기
       let dmList = {dmList: Array<DmStoreDto2>()}
     for (var i in dm){
@@ -37,9 +49,66 @@ export class DmStoreService {
       dmList.dmList[i].sender_id = dm[i].sender_id;
       dmList.dmList[i].receiver_id = dm[i].receiver_id;
       dmList.dmList[i].content = dm[i].content;
-      dmList.dmList[i].createdAt = dm[i].createdAt;
+      dmList.dmList[i].created_at = dm[i].created_at;
     }
     return dmList;
+  }
+
+  /*!
+   * DM 맨 처음 컴포넌트에서 가장 최근 메세지들의 목록이 나오는 화면
+   * 
+   */
+  async getDmListOf(user_id: string) {
+    // 1. 나랑 대화했던 상대방 목록 조회
+    const recv_ids = await this.dmStoreRepo.query(`SELECT DISTINCT (sender_id) FROM dm_store WHERE (receiver_id='${user_id}')`);
+    const send_ids = await this.dmStoreRepo.query(`SELECT DISTINCT (receiver_id) FROM dm_store WHERE (sender_id='${user_id}')`);
+
+    let ret = [];
+    const dm_list = [];
+    // console.log(a);
+
+    // 2. 해당 유저랑 했던 대화중에서 가장 최근 메세지 1개씩만 가져오기
+    for (let i of recv_ids) {
+      const id = i.sender_id;
+      // console.log(id);
+      const last_msg = await this.dmStoreRepo.query(`SELECT * FROM dm_store WHERE (sender_id='${id}' AND receiver_id='${user_id}') ORDER BY created_at DESC LIMIT 1`);
+      ret.push(last_msg[0]);
+    }
+
+    for (let msg of ret) {
+      dm_list.push({
+        target: {
+          avatar_url: await this.usersService.getAvatarUrl(msg.sender_id),
+          nick: msg.sender_id,
+        },
+        lastMsg: msg.content,
+        lastMsgTime: (msg.created_at),
+      })
+    }
+
+    ret = [];
+
+    for (let i of send_ids) {
+      const id = i.receiver_id;
+      // console.log(id);
+      const last_msg = await this.dmStoreRepo.query(`SELECT * FROM dm_store WHERE (sender_id='${user_id}' AND receiver_id='${id}') ORDER BY created_at DESC LIMIT 1`);
+      ret.push(last_msg[0]);
+    }
+
+    for (let msg of ret) {
+      dm_list.push({
+        target: {
+          avatar_url: this.usersService.getAvatarUrl(msg.receiver_id),
+          nick: msg.receiver_id,
+        },
+        lastMsg: msg.content,
+        lastMsgTime: msg.created_at,
+      })
+    }
+
+    console.log(dm_list);
+
+    return dm_list;
   }
 
   async deleteDmStore(user_id: string){
