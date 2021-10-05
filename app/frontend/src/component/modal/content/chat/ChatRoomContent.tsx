@@ -7,6 +7,7 @@ import ChatContextMenu from "./ChatContextMenu";
 import EasyFetch from "../../../../utils/EasyFetch";
 import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
+import { io } from "socket.io-client";
 
 interface ChatRoom {
   title: string,
@@ -144,9 +145,16 @@ const ChatRoomContent: FC = (): JSX.Element => {
     return res;
   }
 
+  const connectSocket = () => {
+    const socket = io(`${global.BE_HOST}/chat`);
+
+    socket.emit('join', {room_id: channel_id});
+  } ;
+
   useEffect(() => {
     getChatRoomInfo()
     .then((res) => {if (res.type === "protected") setIsProtected(true)});
+    connectSocket();
   }, []);
 
   if (chatRoomInfo && isProtected) {
