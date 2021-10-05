@@ -27,8 +27,8 @@ export default class Time {
 
   private parseToLocal(time: string) {
     const date = new Date(time);
-    this._localDate = date.toLocaleDateString();
-    this._localTime = date.toLocaleTimeString();
+    this._localDate = date.toLocaleDateString('ko-KR');
+    this._localTime = date.toLocaleTimeString('ko-KR');
   }
 
   private parseDate() {
