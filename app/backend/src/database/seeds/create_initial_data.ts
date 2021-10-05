@@ -52,6 +52,11 @@ export class createInitialData implements Seeder {
 							{sender_id: 'jinwkim', receiver_id: 'yochoi', content: '123123'},
 							{sender_id: 'jinbkim', receiver_id: 'yochoi', content: 'aa'},
 							{sender_id: 'yochoi', receiver_id: 'donglee', content: '핑퐁ㄱㄱ'},
+							{sender_id: 'tester01', receiver_id: 'yochoi', content: '오늘 날씨는?'},
+							{sender_id: 'tester02', receiver_id: 'tester01', content: '테스트 01'},
+							{sender_id: 'tester02', receiver_id: 'tester01', content: '테스트 02'},
+							{sender_id: 'tester01', receiver_id: 'tester02', content: '테스트 03'},
+							{sender_id: 'yochoi', receiver_id: 'tester02', content: '화요일'},
 						])
 			.execute();
 		await connection
