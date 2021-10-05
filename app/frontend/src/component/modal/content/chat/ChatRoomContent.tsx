@@ -9,14 +9,6 @@ import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
 import { io } from "socket.io-client";
 
-interface ChatRoom {
-  title: string,
-  type: string,
-  current_people: number,
-  max_people: number,
-  passwd: string,
-};
-
 function submitMessage(message: string, setMessage: Dispatch<SetStateAction<string>>,
                         chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
   if (message === "") return ;
@@ -105,10 +97,32 @@ const Password: FC<{rightPassword: string, setIsProtected: Dispatch<SetStateActi
   );
 }
 
+interface ChatRoom {
+  title: string,
+  type: string,
+  current_people: number,
+  max_people: number,
+  passwd: string,
+};
+
+interface ChatLog {
+  nick: string,
+  position: string,
+  avatar_url: string,
+  time: number,
+  message: string,
+};
+
+interface ChatUser {
+  nick: string,
+  avatar_url: string,
+  position: string,
+};
+
 const ChatRoomContent: FC = (): JSX.Element => {
 
-  const [chatUsers, setChatUsers] = useState<{nick: string, avatar_url: string, position: string}[]>(require("../../../../dummydata/testChatRoomLog").chatUsers);
-  const [chatLog, setChatLog] = useState(require("../../../../dummydata/testChatRoomLog").chatLog);
+  const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
+  const [chatLog, setChatLog] = useState<ChatLog[]>([]);
   const [message, setMessage] = useState("");
   const [contextMenu, setContextMenu] = useState<{
     isOpen: boolean,
@@ -145,16 +159,23 @@ const ChatRoomContent: FC = (): JSX.Element => {
     return res;
   }
 
+  const helloToChatRoom = async () => {
+    /* TODO: 채팅 입장시 POST 요청 
+      CSS: sticky 저 부분 아래 고정되도록 바꿔야 한다.
+    */
+  }
+
   const connectSocket = () => {
     const socket = io(`${global.BE_HOST}/chat`);
 
     socket.emit('join', {room_id: channel_id});
-  } ;
+  };
 
   useEffect(() => {
     getChatRoomInfo()
     .then((res) => {if (res.type === "protected") setIsProtected(true)})
-    .then(() => connectSocket());
+    .then(() => helloToChatRoom());
+    connectSocket();
   }, []);
 
   if (chatRoomInfo && isProtected) {
