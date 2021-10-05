@@ -1,5 +1,4 @@
 import Modal, { ChatContent, RecordContent, GameContent } from '../modal/Modal';
-import { io } from 'socket.io-client';
 import NavBar from './navbar/NavBar';
 import Dm from './dm/Dm';
 import { useEffect, useState } from "react";
@@ -20,17 +19,15 @@ const MainPage = ({match}): JSX.Element => {
   const [unReadMsg, setUnReadMsg] = useState(1);
 
   useEffect(() => {
-    const socket = io(`${global.BE_HOST}/global`);
-    socket.on("online", ({user_id}) => {
+    global.socket.on("online", ({user_id}) => {
       setUpdateFriendList({state: "online", user_id: user_id});
     });
-    socket.on("offline", ({user_id}) => {
+    global.socket.on("offline", ({user_id}) => {
       setUpdateFriendList({state: "offline", user_id: user_id});
     });
-    socket.on("ongame", ({user_id}) => {
+    global.socket.on("ongame", ({user_id}) => {
       setUpdateFriendList({state: "ongame", user_id: user_id});
     });
-    return (() => {socket.disconnect()});
   }, []);
 
   return (
