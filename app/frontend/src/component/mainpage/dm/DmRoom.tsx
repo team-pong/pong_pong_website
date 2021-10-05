@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useState, useRef } from "react";
 import "../../../scss/dm/DmRoom.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 
@@ -74,7 +74,13 @@ interface DmRoomProps {
 
 const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
 
-  const [dmLog, setDmLog] = useState<DMLog[]>([]);
+  const [dmLog, _setDmLog] = useState<DMLog[]>([]);
+  const dmLogRef = useRef(dmLog);
+  const setDmLog = (x) => {
+    dmLogRef.current = x;
+    _setDmLog(x);
+  }
+
   const [textAreaMsg, setTextAreaMsg] = useState("");
 
   /*! @author yochoi
@@ -107,12 +113,11 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
   useEffect(() => {
     getDmLog();
 
-    global.socket.on("dm", (dm) => {
-      getDmLog();
-    });
-    return (() => global.socket.off("dm", (dm) => {
-      getDmLog();
-    }));
+    const dmOn = (dm) => {
+      setDmLog([{...dm}, ...dmLogRef.current]);
+    }
+    global.socket.on("dm", dmOn);
+    return (() => global.socket.off("dm", dmOn));
   }, []);
 
   return (
