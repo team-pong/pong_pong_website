@@ -65,8 +65,8 @@ export class ChatGateway {
     const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
     const uid = await this.sessionService.readUserId(sid);
 
-    socketMap[sid] = {};
-    socketMap[sid].uid = uid;
+    socketMap[socket.id] = {};
+    socketMap[socket.id].uid = uid;
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket): any {
