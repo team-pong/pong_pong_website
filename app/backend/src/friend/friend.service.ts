@@ -4,7 +4,7 @@ import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { UsersDto3 } from 'src/dto/users';
 import { Friend } from 'src/entities/friend';
 import { Users } from 'src/entities/users';
-import { err0, err16, err17, err2, err25, err28, err3} from 'src/err';
+import { err0, err1, err16, err17, err2, err25, err28, err3} from 'src/err';
 import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
 import { BlockService } from 'src/block/block.service';
@@ -34,7 +34,7 @@ export class FriendService {
     let isBlock;
     isBlock = await this.blockService.isBlock(user_id, friend_id);
     if (isBlock.bool)  // 이미 차단한 유저 이면
-      return new ErrMsgDto(err3);
+      return new ErrMsgDto(err1);
   
     await this.friendRepo.save({user_id: user_id, friend_id: friend_id});
     return new ErrMsgDto(err0);

@@ -1,4 +1,4 @@
-import { FC, Dispatch, SetStateAction, useState, useEffect } from "react";
+import React, { FC, Dispatch, SetStateAction, useState, useEffect } from "react";
 import { Link, Route, useParams } from "react-router-dom";
 import Modal from "../../Modal";
 import ChatConfigContent from "./ChatConfigContent";
@@ -12,7 +12,8 @@ interface ChatRoom {
   title: string,
   type: string,
   current_people: number,
-  max_people: number
+  max_people: number,
+  passwd: string,
 };
 
 function submitMessage(message: string, setMessage: Dispatch<SetStateAction<string>>,
@@ -51,6 +52,58 @@ function openContextMenu( e: React.MouseEvent,
   });
 };
 
+const Password: FC<{rightPassword: string, setIsProtected: Dispatch<SetStateAction<boolean>>}> = ( {rightPassword, setIsProtected} ): JSX.Element => {
+  const [password, setPassword] = useState("");
+
+  /*!
+   * @author donglee
+   * @brief 비밀번호를 입력하면 검증 후 대화방을 보여주거나 입장을 거절함
+   */
+  const submitPassword = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    if (password === rightPassword) {
+      setIsProtected(false);
+    } else {
+      alert("비밀번호가 틀렸습니다.");
+    }
+  };
+
+  /*!
+   * @author donglee
+   * @brief 자동으로 비밀번호 input에 focus함
+   */
+  const inputFocus = () => {
+    const input = document.getElementsByClassName("pw-input")[0] as HTMLInputElement;
+
+    input.focus();
+  }
+
+  useEffect(() => {
+    inputFocus();
+  }, []);
+
+  return (
+    <div className="pw-container">
+      <div className="password-lock-container">
+        <img className="password-lock-img" src="/public/protected.png" alt="자물쇠" />
+      </div>
+      <span className="pw-explain">이 대화방은 비공개방입니다</span>
+      <span className="pw-explain">비밀번호를 입력하세요</span>
+      <form>
+        <input
+          className="pw-input"
+          type="password"
+          minLength={4}
+          maxLength={10}
+          size={10}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onKeyDown={(e) => {if (e.key === "Enter") submitPassword(e)}} />
+      </form>
+    </div>
+  );
+}
+
 const ChatRoomContent: FC = (): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<{nick: string, avatar_url: string, position: string}[]>(require("../../../../dummydata/testChatRoomLog").chatUsers);
@@ -67,6 +120,7 @@ const ChatRoomContent: FC = (): JSX.Element => {
 
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
   const { channel_id } = useParams<{channel_id: string}>();
+  const [isProtected, setIsProtected] = useState(false);
 
   /*!
    * @author donglee
@@ -82,17 +136,24 @@ const ChatRoomContent: FC = (): JSX.Element => {
         type: res.type,
         current_people: res.current_people,
         max_people: res.max_people,
+        passwd: res.passwd,
       });
     } else {
       setNoReult(true);
     }
+    return res;
   }
 
   useEffect(() => {
-    getChatRoomInfo();
+    getChatRoomInfo()
+    .then((res) => {if (res.type === "protected") setIsProtected(true)});
   }, []);
 
-  if (chatRoomInfo) {
+  if (chatRoomInfo && isProtected) {
+    return (
+      <Password rightPassword={chatRoomInfo.passwd} setIsProtected={setIsProtected} />
+    );
+  } else if (chatRoomInfo && !isProtected) {
     return (
       <div id="chat-room">
         <div id="chat-room-header">
@@ -163,11 +224,11 @@ const ChatRoomContent: FC = (): JSX.Element => {
         <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
       </div>
     );
-  } else if (noResult) {
+  } 
+  if (noResult) {
     return ( <NoResult text="대화방이 존재하지 않습니다."></NoResult> );
-  } else {
-    return ( <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "43%", top: "10%"}} /> );
   }
+  return ( <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "43%", top: "10%"}} /> );
 };
 
 export default ChatRoomContent;
