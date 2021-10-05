@@ -1,6 +1,12 @@
-import React, { FC, useEffect, useState, Dispatch, SetStateAction } from "react";
+import React, { FC, useEffect, useState } from "react";
 import "../../../scss/dm/DmRoom.scss";
-import { testDMLog, DMLog } from "../../../dummydata/testDM";
+import EasyFetch from "../../../utils/EasyFetch";
+
+interface DMLog {
+  time: string,         /* e.g.) "오후 1:42"     */
+  msg: string,          /* e.g.) "반갑다"        */
+  from: string          /* e.g.) "me" || "hna" */
+};
 
 const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
 
@@ -10,7 +16,7 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
     let prev = {time: "", from: ""};
     let result: Array<DMLog[]> = [];
     let tmp: DMLog[] = [];
-    dmLog?.forEach((dm) => {
+    dmLog.forEach((dm) => {
       if (prev.time === "" && prev.from === "") {
         prev.from = dm.from;
         prev.time = dm.time;
@@ -68,7 +74,7 @@ interface DmRoomProps {
 
 const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
 
-  const [dmLog, setDmLog] = useState<DMLog[]>(null);
+  const [dmLog, setDmLog] = useState<DMLog[]>([]);
   const [textAreaMsg, setTextAreaMsg] = useState("");
 
   /*! @author yochoi
@@ -95,8 +101,14 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
     }
   };
 
+  const getDmLog = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?receiver_nick=${dmTarget}`);
+    const res = await (await easyfetch.fetch()).json();
+    setDmLog(res);
+  }
+
   useEffect(() => {
-    setDmLog(testDMLog);
+    getDmLog();
   }, []);
 
   return (
