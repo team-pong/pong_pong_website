@@ -4,7 +4,7 @@ import EasyFetch from "../../../utils/EasyFetch";
 import Time from "../../../utils/Time";
 
 interface DMLog {
-  time: string,         /* e.g.) "오후 1:42"     */
+  time: string,         /* e.g.) "2021-07-31T05:41:48.342Z"     */
   msg: string,          /* e.g.) "반갑다"        */
   from: string          /* e.g.) "me" || "hna" */
 };
@@ -13,6 +13,11 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
 
   const [sortedDmLog, setSortedDmLog] = useState<Array<DMLog[]>>([]);
 
+  /*!
+  * @author yochoi
+  * @breif  dmLog를 돌면서 이전 메세지와 같은 사람, 같은 시간에 보낸 메세지면
+  *         같은 그룹으로 묶어주는 함수
+  */
   useEffect(() => {
     let prev = {time: "", from: ""};
     let result: Array<DMLog[]> = [];
@@ -49,8 +54,9 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
             <li key={idx} className={`dm-log ${msg.from === "me" ? "me" : "other"}`}>
               <span className="dm-log-msg">
                 {
-                  /*! @author yochoi
-                    *  @breif 문자열(챗로그)에 개행이 있으면 br태그로 줄바꿈해주는 부분
+                  /*!
+                    * @author yochoi
+                    * @breif 문자열(챗로그)에 개행이 있으면 br태그로 줄바꿈해주는 부분
                     */
                   msg.msg.split('\n').map((chatlog, idx) => {
                     return (<span key={idx}>{chatlog}<br /></span>);
@@ -87,9 +93,9 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
 
   const [textAreaMsg, setTextAreaMsg] = useState("");
 
-  /*! @author yochoi
-   *  @breif 전송 버튼을 눌렀을 때 dmLog를 갱신함
-   *  @todo socket을 이용한 BE 연동
+  /*! 
+   * @author yochoi
+   * @breif 전송 버튼을 눌렀을 때 dmLog를 갱신함
   */
   const sendDm = (e: React.FormEvent) => {
     e.preventDefault();
