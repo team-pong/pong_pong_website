@@ -56,7 +56,7 @@ const MakeChatRoom: FC = (): JSX.Element => {
   };
 
   if (channelId) {
-    return <Redirect to={`/mainpage/chat/${channelId}`}></Redirect>
+    return <Redirect to={{pathname: `/mainpage/chat/${channelId}`, state: {myself: true}}}></Redirect>
   } else {
     return (
       <div className="mc-container">
