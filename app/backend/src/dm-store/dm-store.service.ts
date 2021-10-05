@@ -103,7 +103,7 @@ export class DmStoreService {
     for (let msg of ret) {
       dm_list.push({
         target: {
-          avatar_url: this.usersService.getAvatarUrl(msg.receiver_id),
+          avatar_url: await this.usersService.getAvatarUrl(msg.receiver_id),
           nick: msg.receiver_id,
         },
         lastMsg: msg.content,
