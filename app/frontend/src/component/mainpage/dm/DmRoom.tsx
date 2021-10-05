@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState, useRef } from "react";
 import "../../../scss/dm/DmRoom.scss";
 import EasyFetch from "../../../utils/EasyFetch";
+import Time from "../../../utils/Time";
 
 interface DMLog {
   time: string,         /* e.g.) "오후 1:42"     */
@@ -16,7 +17,10 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
     let prev = {time: "", from: ""};
     let result: Array<DMLog[]> = [];
     let tmp: DMLog[] = [];
+    const date = new Time(new Date().toString());
     dmLog.forEach((dm) => {
+      date.setTime(dm.time);
+      dm.time = `${date.getTimeFormat()} ${date.getHour()}:${date.getMinuate()}`
       if (prev.time === "" && prev.from === "") {
         prev.from = dm.from;
         prev.time = dm.time;
