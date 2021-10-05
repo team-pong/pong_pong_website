@@ -153,8 +153,8 @@ const ChatRoomContent: FC = (): JSX.Element => {
 
   useEffect(() => {
     getChatRoomInfo()
-    .then((res) => {if (res.type === "protected") setIsProtected(true)});
-    connectSocket();
+    .then((res) => {if (res.type === "protected") setIsProtected(true)})
+    .then(() => connectSocket());
   }, []);
 
   if (chatRoomInfo && isProtected) {
