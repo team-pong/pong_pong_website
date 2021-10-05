@@ -16,6 +16,12 @@ interface DM {
   lastMsgTime: string,
 }
 
+export interface DMLog {
+  time: string,
+  msg: string,
+  from: string,
+}
+
 @Injectable()
 export class DmStoreService {
   constructor(
@@ -27,12 +33,13 @@ export class DmStoreService {
 
   async createDmStore(sender_id: string, receiver_id: string, content: string){
     if (await this.usersRepo.count({user_id: sender_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      throw err2;
     if (await this.usersRepo.count({user_id: receiver_id}) === 0)  // 존재하지 않은 유저 라면
-      return err2;
+      throw err2;
     await this.dmStoreRepo.save({sender_id: sender_id, receiver_id: receiver_id, content: content});
     return err0;
   }
+
 
   async readDmStore(user_id: string, other_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
@@ -40,16 +47,17 @@ export class DmStoreService {
     if (await this.usersRepo.count({user_id: other_id}) === 0)  // 존재하지 않은 유저 라면
       return err2;
     // user_id와 other_id가 관련된 모든 dm 검색
-    const dm = await this.dmStoreRepo
+    const dms = await this.dmStoreRepo
       .query(`SELECT * FROM dm_store WHERE (sender_id='${user_id}' AND receiver_id='${other_id}') OR (sender_id='${other_id}' AND receiver_id='${user_id}') ORDER BY "created_at" DESC`);
+
     // dm 보낸 유저 아이디, 받은 유저 아이디, 내용, 보낸 시각 데이터 들을 dmList에 담기
-      let dmList = {dmList: Array<DmStoreDto2>()}
-    for (var i in dm){
-      dmList.dmList.push(new DmStoreDto2());
-      dmList.dmList[i].sender_id = dm[i].sender_id;
-      dmList.dmList[i].receiver_id = dm[i].receiver_id;
-      dmList.dmList[i].content = dm[i].content;
-      dmList.dmList[i].created_at = dm[i].created_at;
+    let dmList: DMLog[] = [];
+    for (let dm of dms){
+      dmList.push({
+        time: dm.created_at,
+        msg: dm.content,
+        from: dm.sender_id == user_id ? "me" : dm.sender_id,
+      });
     }
     return dmList;
   }
