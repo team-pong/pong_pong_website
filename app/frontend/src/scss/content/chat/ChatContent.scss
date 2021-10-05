@@ -235,6 +235,10 @@ div.pw-container {
     border-bottom: 1px solid #62c375;
     text-align: center;
 
+    #lock {
+      margin-left: 5px;
+    }
+
     #arrow-button {
       position: relative;
       float: left;
@@ -265,7 +269,7 @@ div.pw-container {
     display: inline-flex;
     flex-direction: column-reverse;
     position: relative;
-    padding: 0 9px 0 15px;
+    padding: 0 1px 0 15px;
     width: calc(74% - 15px);
     height: 80%;
     border-bottom: 1px solid #62c375;
@@ -313,7 +317,7 @@ div.pw-container {
   #chat-room-users {
     position: relative;
     float: right;
-    width: calc(26% - 20px);
+    width: calc(26% - 12px);
     height: calc(100% - 42px);
     margin-right: 10px;
     border-left: 1px solid #62c375;
