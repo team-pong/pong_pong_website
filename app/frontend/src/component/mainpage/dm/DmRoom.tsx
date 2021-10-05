@@ -84,11 +84,8 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
   const sendDm = (e: React.FormEvent) => {
     e.preventDefault();
     if (textAreaMsg === "") return ;
-    setDmLog([{
-      time: "오후 05:05",
-      msg: textAreaMsg,
-      from: "me"
-    }, ...dmLog]);
+    global.socket.emit("dm", {to: dmTarget, msg: textAreaMsg});
+    getDmLog();
     setTextAreaMsg("");
   }
 
@@ -109,6 +106,13 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
 
   useEffect(() => {
     getDmLog();
+
+    const dmOn = (dm) => {
+      setDmLog([...dmLog, {...dm}]);
+    }
+
+    global.socket.on("dm", dmOn);
+    return (() => global.socket.off("dm", dmOn));
   }, []);
 
   return (
