@@ -121,7 +121,7 @@
     margin-top: 10px;
     padding: 0;
     width: 100%;
-    height: 53vh;
+    height: 400px;
     overflow: auto;
     .chat-generator-li {
       margin-top: 10px;
@@ -140,6 +140,7 @@
         .chat-generator-lock-img {
           width: 15px;
           height: 15px;
+          margin-left: 5px;
         }
       }
       cursor: pointer;
@@ -227,15 +228,19 @@ div.pw-container {
   width: 100%;
   height: 97%;
   #chat-room-header {
-    margin: 10px;
+    padding-bottom: 10px;
+    margin-top: 15px;
+    margin-bottom: 0px;
     font-size: 30px;
-    border-bottom: 1px solid $green;
+    border-bottom: 1px solid #62c375;
     text-align: center;
+
     #arrow-button {
       position: relative;
       float: left;
       width: 30px;
       height: 30px;
+      margin-left: 10px;
       cursor: pointer;
       animation: arrow-button-animation-in 0.5s;
       &:hover {
@@ -261,35 +266,38 @@ div.pw-container {
     flex-direction: column-reverse;
     position: relative;
     padding: 0 9px 0 10px;
-    width: calc(70% - 15px);
+    width: calc(74% - 15px);
     height: 80%;
-    border-bottom: 1px solid $green;
+    border-bottom: 1px solid #62c375;
     overflow: auto;
+
     .chat-room-message {
-      padding: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f8f8f8;
       #message-avatar {
         width: 35px;
         height: 35px;
         border-radius: 4px;
         display: inline-block;
         vertical-align: top;
-        margin-top: 10px;
       }
       #message-content {
         display: inline-block;
         width: calc(100% - 50px);
-        margin: 4px;
-        #message-nick {
-          display: inline-block;
-          width: 100%;
-        }
+        user-select: text;
+        margin-left: 10px;
+        
         #message-body {
-          display: inline-block;
+          display: block;
           white-space: pre-line;
+          line-height: 25px;
         }
       }
-      &:hover {
-        background-color: rgb(230, 230, 230);
+      #message-time {
+        display: inline-block;
+        margin-left: 10px;
+        font-size: 90%;
+        color: #aaa;
       }
     }
   }
@@ -305,13 +313,13 @@ div.pw-container {
   #chat-room-users {
     position: relative;
     float: right;
-    width: calc(30% - 15px);
-    height: calc(100% - 44px);
+    width: calc(26% - 15px);
+    height: calc(100% - 42px);
     margin-right: 10px;
-    border-left: 1px solid $green;
+    border-left: 1px solid #62c375;
     overflow: auto;
     .chat-user {
-      margin: 5px;
+      margin: 10px 5px;
       padding: 5px;
       background-color: rgba(98, 195, 117, 0.3);
       border-radius: 5px;
@@ -345,7 +353,7 @@ div.pw-container {
     #chat-room-menu {
       position: sticky;
       bottom: 0;
-      background-color: $green;
+      background-color: #62c375;
       padding: 5px;
       margin: 5px;
       border-radius: 5px;
@@ -360,18 +368,18 @@ div.pw-container {
     }
   }
   .chat-msg-form {
-    width: calc(70% - 15px);
+    width: calc(74% - 15px);
     height: 10%;
     margin: 10px 10px 0 10px;
     .chat-msg-textarea {
       box-sizing: border-box;
       resize: none;
       margin: 0;
-      padding: 0;
+      padding: 7px;
       width: 79%;
-      height: 100%;
-      font-size: 100%;
-      border: 1px solid $green;
+      height: 110%;
+      font-size: 120%;
+      border: 1px solid #62c375;
       &:focus {
         outline: none;
       }
@@ -381,13 +389,15 @@ div.pw-container {
       position: relative;
       float: right;
       top: 1;
-      border: 1px solid $green;
+      border: 1px solid #62c375;
       width: 20%;
-      height: 100%;
-      background-color: rgba(98, 195, 117, 0.3);
+      height: 110%;
+      background-color: rgba(98,195,117,.3);
       color: gray;
-      transition-duration: 0.3s;
+      transition-duration: .3s;
+      font-size: 1rem;
       cursor: pointer;
+
       &:hover {
         background-color: $green;
         color: white;

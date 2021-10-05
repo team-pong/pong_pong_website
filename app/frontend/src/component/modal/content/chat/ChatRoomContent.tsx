@@ -174,7 +174,8 @@ const ChatRoomContent: FC = (): JSX.Element => {
                 <div key={idx} className="chat-room-message">
                   <img id="message-avatar" src={value.avatar_url}/>
                   <div id="message-content">
-                    <span id="message-nick"><b>{value.nick}</b> {hour}:{minute}</span>
+                    <span id="message-nick"><b>{value.nick}</b></span>
+                    <span id="message-time">{hour}:{minute}</span>
                     <span id="message-body">{value.message}</span>
                   </div>
                 </div>
