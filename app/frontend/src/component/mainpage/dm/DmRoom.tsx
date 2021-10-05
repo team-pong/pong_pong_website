@@ -107,12 +107,12 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
   useEffect(() => {
     getDmLog();
 
-    const dmOn = (dm) => {
-      setDmLog([...dmLog, {...dm}]);
-    }
-
-    global.socket.on("dm", dmOn);
-    return (() => global.socket.off("dm", dmOn));
+    global.socket.on("dm", (dm) => {
+      getDmLog();
+    });
+    return (() => global.socket.off("dm", (dm) => {
+      getDmLog();
+    }));
   }, []);
 
   return (
