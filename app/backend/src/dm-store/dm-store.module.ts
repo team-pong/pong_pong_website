@@ -12,6 +12,7 @@ import { DmStoreService } from './dm-store.service';
     TypeOrmModule.forFeature([DmStore, Users]),
     forwardRef(() => UsersModule),
     forwardRef(() => SessionModule),
+    // UsersModule,
   ],
   controllers: [DmStoreController],
   providers: [DmStoreService],

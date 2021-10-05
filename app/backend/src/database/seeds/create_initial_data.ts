@@ -40,7 +40,24 @@ export class createInitialData implements Seeder {
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(DmStore)
-			.values([{sender_id: 'jinbkim', receiver_id: 'donglee', content: '안녕'}, {sender_id: 'donglee', receiver_id: 'jinbkim', content: '나도 안녕'}, {sender_id: 'jinbkim', receiver_id: 'yochoi', content: '하이하이'}])
+			.values([{sender_id: 'jinbkim', receiver_id: 'donglee', content: '안녕'}, 
+							{sender_id: 'donglee', receiver_id: 'jinbkim', content: '나도 안녕'}, 
+							{sender_id: 'jinbkim', receiver_id: 'yochoi', content: '하이하이'},
+							{sender_id: 'hna', receiver_id: 'jinbkim', content: 'hi'},
+							{sender_id: 'jinwkim', receiver_id: 'hna', content: 'good'},
+							{sender_id: 'yochoi', receiver_id: 'hna', content: 'ㅎㅇ'},
+							{sender_id: 'hna', receiver_id: 'yochoi', content: 'ㅎㅇㅎㅇ'},
+							{sender_id: 'hna', receiver_id: 'yochoi', content: '핑퐁ㄱㄱ'},
+							{sender_id: 'yochoi', receiver_id: 'hna', content: 'ㄴㄴ'},
+							{sender_id: 'jinwkim', receiver_id: 'yochoi', content: '123123'},
+							{sender_id: 'jinbkim', receiver_id: 'yochoi', content: 'aa'},
+							{sender_id: 'yochoi', receiver_id: 'donglee', content: '핑퐁ㄱㄱ'},
+							{sender_id: 'tester01', receiver_id: 'yochoi', content: '오늘 날씨는?'},
+							{sender_id: 'tester02', receiver_id: 'tester01', content: '테스트 01'},
+							{sender_id: 'tester02', receiver_id: 'tester01', content: '테스트 02'},
+							{sender_id: 'tester01', receiver_id: 'tester02', content: '테스트 03'},
+							{sender_id: 'yochoi', receiver_id: 'tester02', content: '화요일'},
+						])
 			.execute();
 		await connection
 			.createQueryBuilder().insert().into(Friend)
@@ -77,6 +94,8 @@ export class createInitialData implements Seeder {
 				{user_id: 'juhlee', nick: 'juhlee', avatar_url: 'https://gravatar.com/avatar/d93441b991723e7ec67159e63c4f997?s=400&d=robohash&r=x'},
 				{user_id: 'hyeonkim', nick: 'hyeonkim', avatar_url: 'https://gravatar.com/avatar/d9341b9901723e7ec67159e63c4f998?s=400&d=robohash&r=x'},
 				{user_id: 'unknown', nick: 'unknown', avatar_url: 'https://gravatar.com/avatar/d9344b9901723e7ec67159e63c4f999?s=400&d=robohash&r=x'},
+				{user_id: 'tester01', nick: 'tester01', avatar_url: 'https://gravatar.com/avatar/d9344b9901723e7ec67159e63c4f199?s=400&d=robohash&r=x'},
+				{user_id: 'tester02', nick: 'tester02', avatar_url: 'https://gravatar.com/avatar/d9344b9901723e7ec67159e63c4f299?s=400&d=robohash&r=x'},
 			])
 			.execute();
 	}

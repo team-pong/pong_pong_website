@@ -27,33 +27,43 @@ export class DmStoreController {
   async createDmStore(@Body() b: DmStoreDto1, @Req() req: Request){
     let user_id, receiver;
     // sender = await this.usersService.readUsers(b.sender_nick, 'nick');
-    user_id = await this.sessionService.readUserId(req.sessionID);
-    receiver = await this.usersService.readUsers(b.receiver_nick, 'nick');
+    user_id = await this.sessionService.readUserId(req.sessionID); // 요청 보낸 사람
+    receiver = await this.usersService.readUsers(b.receiver_nick, 'nick'); // dm 받을 사람
     return this.dmStoreService.createDmStore(user_id, receiver.user_id, b.content);
     // return this.dmStoreService.createDmStore(sender.user_id, receiver.user_id, b.content);
     // return this.dmStoreService.createDmStore(b.sender_id, b.receiver_id, b.content);
   }
 
+  /*!
+   * @brief DM창 처음 켰을때, 나랑 대화중인 상대 목록과 마지막 대화 내용, 시간을 리스트로 보내줌
+  */
+  @ApiOperation({ summary: 'DM 리스트 조회' })
+  @ApiResponse({type: Array, description: ''})
+  @Get('list')
+  async getDmList(@Req() req: Request) {
+    const user_id = await this.sessionService.readUserId(req.sessionID);
+    return this.dmStoreService.getDmListOf(user_id);
+  }
+
   @ApiOperation({ summary: 'DM 로그 검색'})
   @ApiResponse({ 
-    type: DmStoreDto3, 
+    type: Array, 
     description: `
       DM 보낸 유저 닉네임, 받은 유저 닉네임, 내용, 보낸 시간 데이터들의 배열
       검색 실패시 실패 이유 반환
     `})
-  // @ApiQuery({ name: 'user_id', example: 'jinbkim', description: 'DM 로그 검색할 유저 아이디' })
-  // @ApiQuery({ name: 'other_id', example: 'donglee', description: 'DM 로그 검색할 상대 아이디' })
-  // @ApiQuery({ name: 'sender_nick', example: 'jinbkim', description: 'DM 로그 검색할 유저 닉네임' })
   @ApiQuery({ name: 'receiver_nick', example: 'donglee', description: 'DM 로그 검색할 상대 닉네임' })
   @Get()
   async readDmStore(@Query() q, @Req() req: Request){
-    let user_id, receiver;
-    // sender = await this.usersService.readUsers(q.sender_nick, 'nick');
-    user_id = await this.sessionService.readUserId(req.sessionID);
-    receiver = await this.usersService.readUsers(q.receiver_nick, 'nick');
-    return await this.dmStoreService.readDmStore(user_id, receiver.user_id);
-    // return await this.dmStoreService.readDmStore(sender.user_id, receiver.user_id);
-    // return this.dmStoreService.readDmStore(q.user_id, q.other_id);
+    try {
+      const user_id = await this.sessionService.readUserId(req.sessionID);
+      const receiver = await this.usersService.readUsers(q.receiver_nick, 'nick');
+      return await this.dmStoreService.readDmStore(user_id, receiver.user_id);
+    } catch (err) {
+      console.log(err);
+      return err;
+    }
+    
   }
 
   @ApiOperation({ 
