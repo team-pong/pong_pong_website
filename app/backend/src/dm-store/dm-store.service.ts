@@ -33,9 +33,9 @@ export class DmStoreService {
 
   async createDmStore(sender_id: string, receiver_id: string, content: string){
     if (await this.usersRepo.count({user_id: sender_id}) === 0)  // 존재하지 않은 유저 라면
-      throw err2;
+      return err2;
     if (await this.usersRepo.count({user_id: receiver_id}) === 0)  // 존재하지 않은 유저 라면
-      throw err2;
+      return err2;
     await this.dmStoreRepo.save({sender_id: sender_id, receiver_id: receiver_id, content: content});
     return err0;
   }

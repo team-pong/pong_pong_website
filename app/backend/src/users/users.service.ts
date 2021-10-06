@@ -41,12 +41,12 @@ export class UsersService {
     let user;
     if (type == 'nick'){  // 닉네임으로 검색시
       if (await this.usersRepo.count({nick: search}) === 0)  // 찾으려는 닉네임이 없으면
-        throw new ErrMsgDto(err21);;
+        return new ErrMsgDto(err21);;
       user = await this.usersRepo.findOne({nick: search});
     }
     else if (type == 'user_id'){  // 유저 아이디로 검색시
       if (await this.usersRepo.count({user_id: search}) === 0)  // 존재하지 않는 유저 이면
-        throw new ErrMsgDto(err2);
+        return new ErrMsgDto(err2);
       user = await this.usersRepo.findOne({user_id: search});
     }
     // 유저의 아이디, 닉네임, 아바타 url, 총 게임수, 이긴 게임수, 진 게임수, 래더점수, 유저의 상태 데이터 배열을 profile에 담기
