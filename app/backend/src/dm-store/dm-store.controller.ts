@@ -55,15 +55,10 @@ export class DmStoreController {
   @ApiQuery({ name: 'receiver_nick', example: 'donglee', description: 'DM 로그 검색할 상대 닉네임' })
   @Get()
   async readDmStore(@Query() q, @Req() req: Request){
-    try {
-      const user_id = await this.sessionService.readUserId(req.sessionID);
-      const receiver = await this.usersService.readUsers(q.receiver_nick, 'nick');
+      let user_id, receiver;
+      user_id = await this.sessionService.readUserId(req.sessionID);
+      receiver = await this.usersService.readUsers(q.receiver_nick, 'nick');
       return await this.dmStoreService.readDmStore(user_id, receiver.user_id);
-    } catch (err) {
-      console.log(err);
-      return err;
-    }
-    
   }
 
   @ApiOperation({ 
