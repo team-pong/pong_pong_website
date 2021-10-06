@@ -6,11 +6,11 @@ export class ChatUsersDto1{
 	// 	description: '유저 아이디',
 	// })
 	// public user_id: string;
-	@ApiProperty({
-		example: 'jinbkim',
-		description: '유저 닉네임',
-	})
-	public nick: string;
+	// @ApiProperty({
+	// 	example: 'jinbkim',
+	// 	description: '유저 닉네임',
+	// })
+	// public nick: string;
 
 	@ApiProperty({
 		example: 1,

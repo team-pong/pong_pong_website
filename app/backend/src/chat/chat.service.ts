@@ -121,6 +121,18 @@ export class ChatService {
     return people;
   }
 
+  async checkPasswd(channel_id: number, passwd: string){
+    if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널이면
+      return new ErrMsgDto(err4);
+    
+    const chanel = await this.chatRepo.findOne({channel_id: channel_id});  // 채널 찾기
+    if (chanel.title != 'protected')  // 방타입이 protected가 아니면
+      return new ErrMsgDto(err10);
+    if (chanel.passwd == passwd)
+      return true;
+    return false;
+  }
+
   async updateChat(channel_id: number, title: string, type: string, passwd: string, max_people: number){
     if (type != 'public' && type != 'protected' && type != 'private')  // 존재하지 않은 방 타입이면
       return new ErrMsgDto(err6);
