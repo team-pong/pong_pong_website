@@ -173,6 +173,30 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
 
   /*!
    * @author donglee
+   * @brief 대화방 참여 중인 사용자 목록을 불러옴
+   * @TODO: position에 대해서 API에서 어떻게 처리해야 할 지를 알아야 함.
+   */
+  const getChatRoomUsers = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/chat-users?channel_id=${channel_id}`);
+    const res = await (await easyfetch.fetch()).json();
+
+    if (res.chatUsersList) {
+      const updatedUsers: ChatUser[] = [];
+
+      res.chatUsersList.map((user) => {
+        const elem = {
+          nick: user.nick,
+          avatar_url: user.avatar_url,
+          position: "mute", //test
+        };
+        updatedUsers.push(elem);
+      })
+      setChatUsers(updatedUsers);
+    }
+  };
+
+  /*!
+   * @author donglee
    * @brief - 내가 직접 만든 비공개방일 경우에는 Password에 props을 줘서 첫 1회만 비번없이 입장 가능하도록 함
    *        - 채팅방 정보를 받아온 후 비공개방일 경우에는 state를 바꿔서 Password 컴포넌트 렌더링 하도록 함
    */
@@ -183,6 +207,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     connectSocket();
     getChatRoomInfo()
     .then((res) => {if (res.type === "protected") setIsProtected(true)});
+    getChatRoomUsers();
   }, []);
 
   if (chatRoomInfo && isProtected) {

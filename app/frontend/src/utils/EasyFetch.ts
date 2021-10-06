@@ -34,11 +34,11 @@ class EasyFetch {
     if (this.method !== 'GET') {
       fetchOption.body = JSON.stringify(body)
     }
-    const res = await (await fetch(this.targetURL, fetchOption)).json();
-    if(res.err_msg === "존재하지 않는 세션입니다.") {
-      alert("세션이 만료되었습니다.\n다시 로그인 해주세요.");
-      window.location.href = `${global.BE_HOST}`
-    };
+    // const res = await (await fetch(this.targetURL, fetchOption)).json();
+    // if(res.err_msg === "존재하지 않는 세션입니다.") {
+    //   alert("세션이 만료되었습니다.\n다시 로그인 해주세요.");
+    //   window.location.href = `${global.BE_HOST}`
+    // };
     return (fetch(this.targetURL, fetchOption));
   }
 }
