@@ -1,9 +1,11 @@
+@import "../../colors.scss";
+
 #context-menu {
   margin: 0;
   padding: 2px 0;
   position: fixed;
-  background: #4ba37a;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  background: $black;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 2px 5px rgb(0 0 0 / 15%);
   font-size: 13px;
   outline: 0;
@@ -22,7 +24,7 @@
 }
 
 .menu {
-  background: #282438;
+  background: $black;
   color: #fff;
   height: 100vh;
   width: 240px;

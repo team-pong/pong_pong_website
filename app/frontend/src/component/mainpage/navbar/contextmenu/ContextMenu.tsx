@@ -37,7 +37,7 @@ const ContextMenu: FC<contextMenuProps> =
   
   /*!
   * @author donglee
-  * @brief: 친구 삭제 DELETE 요청 후 state 업데이트 하고 contextmenu 닫기
+  * @brief: 친구 삭제 DELETE 요청 후 state 업데이트
   */
   const deleteFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${target}`, "DELETE");
@@ -60,7 +60,7 @@ const ContextMenu: FC<contextMenuProps> =
 
   /*!
   * @author donglee
-  * @brief 친구 차단 POST 요청 후 state 업데이트 하고 contextmenu 닫기
+  * @brief 친구 차단 POST 요청 후 state 업데이트
   */
   const blockFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/block`, "POST");
@@ -75,17 +75,18 @@ const ContextMenu: FC<contextMenuProps> =
       const updatedList = friendList.filter((friend) => friend.nick !== target);
 
       setFriendList(updatedList);
+    }
+  };
+
+  return (
+    <ul id="context-menu" style={{ top: y, left: x, }} onClick={() => {
       setContextMenuInfo({
         isOpen: false,
         target: "",
         xPos: 0,
         yPos: 0
       });
-    }
-  };
-
-  return (
-    <ul id="context-menu" style={{ top: y, left: x, }}>
+    }}>
       <Link
         to={`mainpage/profile/${target}`}
         style={{textDecoration: "none"}}>
