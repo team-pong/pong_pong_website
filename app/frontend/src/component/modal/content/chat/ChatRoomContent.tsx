@@ -165,12 +165,6 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     return res;
   }
 
-  const helloToChatRoom = async () => {
-    /* TODO: 채팅 입장시 POST 요청 
-      CSS: sticky 저 부분 아래 고정되도록 바꿔야 한다.
-    */
-  }
-
   const connectSocket = () => {
     const socket = io(`${global.BE_HOST}/chat`);
 
@@ -186,10 +180,9 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     if (props.location.state) {
       setIsMadeMyself(true);
     }
-    getChatRoomInfo()
-    .then((res) => {if (res.type === "protected") setIsProtected(true)})
-    .then(() => helloToChatRoom());
     connectSocket();
+    getChatRoomInfo()
+    .then((res) => {if (res.type === "protected") setIsProtected(true)});
   }, []);
 
   if (chatRoomInfo && isProtected) {
