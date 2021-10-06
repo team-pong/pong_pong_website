@@ -1,10 +1,12 @@
-import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ChatUsersDto1, ChatUsersDto2 } from 'src/dto/chat-users';
 import { UsersDto5 } from 'src/dto/users';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
+import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatUsersService } from './chat-users.service';
+import { Request } from 'express';
 
 @ApiTags('Chat-users')
 @Controller('chat-users')
@@ -12,18 +14,22 @@ export class ChatUsersController {
   constructor(
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    @Inject(forwardRef(() => SessionService))
+    private sessionService: SessionService,
     private chatUsersService: ChatUsersService
   ){}
 
   @ApiOperation({ summary: '채널에 유저 추가'})
   @ApiResponse({ type: ErrMsgDto, description: '채널에 유저 추가 실패시 실패 이유' })
   // @ApiBody({ type: ChatUsersDto1, description: '채널 아이디, 추가할 유저 아이디' })
-  @ApiBody({ type: ChatUsersDto1, description: '채널 아이디, 추가할 유저 닉네임' })
+  // @ApiBody({ type: ChatUsersDto1, description: '채널 아이디, 추가할 유저 닉네임' })
+  @ApiBody({ type: ChatUsersDto1, description: '채널 아이디' })
   @Post()
-  async createChatUsers(@Body() b: ChatUsersDto1){
-    let user;
-    user = await this.usersService.readUsers(b.nick, 'nick');
-    return await this.chatUsersService.createChatUsers(user.user_id, b.channel_id);
+  async createChatUsers(@Body() b: ChatUsersDto1, @Req() req: Request){
+    let user_id;
+    
+    user_id = await this.sessionService.readUserId(req.sessionID);
+    return await this.chatUsersService.createChatUsers(user_id, b.channel_id);
     // return this.chatUsersService.createChatUsers(b.user_id, b.channel_id);
   }
 
@@ -51,12 +57,13 @@ export class ChatUsersController {
     ` })
   // @ApiQuery({ name: 'user_id', example: 'donglee', description: '채널에서 나갈 유저 아이디' })
   @ApiQuery({ name: 'nick', example: 'donglee', description: '채널에서 나갈 유저 닉네임' })
-  @ApiQuery({ name: 'channel_id', example: 1, description: '채널에서 나갈 채널 아이디' })
+  // @ApiQuery({ name: 'channel_id', example: 1, description: '채널에서 나갈 채널 아이디' })
   @Delete()
-  async deleteChatUsers(@Query() q){
-    let user;
-    user = await this.usersService.readUsers(q.nick, 'nick');
-    return await this.chatUsersService.deleteChatUsers(user.user_id, q.channel_id);
+  async deleteChatUsers(@Query() q, @Req() req: Request){
+    let user_id;
+    
+    user_id = await this.sessionService.readUserId(req.sessionID);
+    return await this.chatUsersService.deleteChatUsers(user_id, q.channel_id);
     // return this.chatUsersService.deleteChatUsers(q.user_id, q.channel_id);
   }
 }

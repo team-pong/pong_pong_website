@@ -90,7 +90,7 @@ export class MatchDto2{
 		example: '2021-07-31T05:41:48.342Z',
 		description: '게임 시간',
 	})
-	public createdAt: Date;
+	public created_at: Date;
 
   @ApiProperty({
 		example: 'general',

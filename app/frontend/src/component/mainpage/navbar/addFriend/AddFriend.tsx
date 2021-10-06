@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import EasyFetch from "../../../../utils/EasyFetch";
+import Notice from "../../../notice/Notice";
 
 /*!
 * @author donglee
@@ -7,7 +8,7 @@ import EasyFetch from "../../../../utils/EasyFetch";
 * @param[in] setState 이 컴포넌트를 보여줄 지 말지를 정하는 상위컴포넌트(NavBar.tsx)의 stateSetter
 * @param[in] friendList 친구 추가 시에 state를 업데이트 할 때 사용하기 위해 NavBar에서 오는 state
 * @param[in] setFriendList 친구 추가 시에 state를 업데이트 할 때 사용하기 위해 NavBar에서 오는 stateSetter
-* @detail SEC키를 받거나, 다른 부분을 클릭하면 컴포넌트를 언마운트함.
+* @detail ESC키를 받거나, 다른 부분을 클릭하면 컴포넌트를 언마운트함.
 */
 
 interface Friend {
@@ -28,7 +29,10 @@ interface AddFriendProps {
 }
 
 const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
+
   const [nicknameToFind, setNicknameToFind] = useState("");
+  const [successNotice, setSuccessNotice] = useState(false);
+  const [failureNotice, setFailureNotice] = useState(false);
 
   /*!
   * @author donglee
@@ -62,10 +66,10 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
     const res = await (await easyfetch.fetch(body)).json();
 
     if (res.err_msg !== "에러가 없습니다.") {
-      alert(res.err_msg);
+      setFailureNotice(true);
     } else {
       updateState();
-      props.setState(false);
+      setSuccessNotice(true);
     }
   };
 
@@ -120,6 +124,18 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
         value={nicknameToFind}
         onChange={(e: React.FormEvent<HTMLInputElement>) => setNicknameToFind(e.currentTarget.value)} />
       <button id="submit-button" onClick={(e: React.MouseEvent<HTMLElement>) => {e.stopPropagation()}}>추가</button>
+      <Notice
+        seconds={3}
+        content="친구 추가에 성공했습니다."
+        backgroundColor="#62C375" //green
+        isNoticeOpen={successNotice}
+        setIsNoticeOpen={setSuccessNotice}/>
+      <Notice
+        seconds={3}
+        content={"친구 추가에 실패했습니다."}
+        backgroundColor="#CE4D36" //red
+        isNoticeOpen={failureNotice}
+        setIsNoticeOpen={setFailureNotice}/>
     </form>
   );
 }

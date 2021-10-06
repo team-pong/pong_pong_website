@@ -5,7 +5,7 @@ import { LoggedInGuard } from 'src/auth/logged-in.guard';
 import { NotLoggedInGuard } from 'src/auth/not-logged-in.guard';
 import { ChatDto1, ChatDto2, ChatDto3, ChatDto4, ChatDto5, ChatDto6 } from 'src/dto/chat';
 import { UsersDto3 } from 'src/dto/users';
-import { ErrMsgDto } from 'src/dto/utility';
+import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 
@@ -64,6 +64,20 @@ export class ChatController {
   @Get('owner')
   readOwner(@Query() q){
     return this.chatService.readOwner(q.channel_id);
+  }
+
+  @ApiOperation({ summary: '해당 채널의 비밀번호가 맞는지 확인'})
+  @ApiResponse({ 
+    type: Bool, 
+    description: `
+      비밀번호가 맞으면 true, 아니면 false
+      확인 실패시 실패 이유 반환
+    ` })
+  @Get('checkPasswd')
+  @ApiQuery({ name: 'passwd', example: '1234', description: '채널 비밀번호' })
+  @ApiQuery({ name: 'channel_id', example: 1, description: '채널 아이디' })
+  checkPasswd(@Query() q){
+    return this.chatService.checkPasswd(q.channel_id, q.passwd);
   }
 
   @ApiOperation({ summary: '채널 설정 변경', description: '채팅방 타입은 public 또는 protected 또는 private 이어야함'})

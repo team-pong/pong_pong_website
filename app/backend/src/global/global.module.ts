@@ -8,6 +8,7 @@ import { UsersModule } from 'src/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from 'src/entities/users';
 import { Friend } from 'src/entities/friend';
+import { DmStoreModule } from 'src/dm-store/dm-store.module';
 
 @Module({
   imports: [
@@ -17,7 +18,9 @@ import { Friend } from 'src/entities/friend';
     ]),
     FriendModule, 
     SessionModule, 
-    UsersModule],
+    UsersModule,
+    DmStoreModule,
+  ],
   controllers: [GlobalController],
   providers: [GlobalService, GlobalGateway],
   exports: [GlobalService],

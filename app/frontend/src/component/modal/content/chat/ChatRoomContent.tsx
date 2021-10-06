@@ -1,5 +1,5 @@
 import React, { FC, Dispatch, SetStateAction, useState, useEffect } from "react";
-import { Link, Route, useParams } from "react-router-dom";
+import { Link, Route, RouteComponentProps, useParams, withRouter } from "react-router-dom";
 import Modal from "../../Modal";
 import ChatConfigContent from "./ChatConfigContent";
 import ChatInviteContent from "./ChatInviteContent";
@@ -45,20 +45,17 @@ function openContextMenu( e: React.MouseEvent,
   });
 };
 
-const Password: FC<{rightPassword: string, setIsProtected: Dispatch<SetStateAction<boolean>>}> = ( {rightPassword, setIsProtected} ): JSX.Element => {
+const Password: FC<{setIsProtected: Dispatch<SetStateAction<boolean>>, isMadeMyself: boolean}>
+  = ({setIsProtected, isMadeMyself}): JSX.Element => {
   const [password, setPassword] = useState("");
 
   /*!
    * @author donglee
-   * @brief 비밀번호를 입력하면 검증 후 대화방을 보여주거나 입장을 거절함
+   * @brief 비밀번호를 입력하면 백엔드 검증 요청 후 대화방을 보여주거나 입장을 거절함
    */
   const submitPassword = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (password === rightPassword) {
-      setIsProtected(false);
-    } else {
-      alert("비밀번호가 틀렸습니다.");
-    }
+    /* TODO: 백엔드에 비밀번호 검증을 API요청하고 결과에 따라 대화방 내부 혹은 알림 메세지를 보여준다. */
   };
 
   /*!
@@ -71,7 +68,15 @@ const Password: FC<{rightPassword: string, setIsProtected: Dispatch<SetStateActi
     input.focus();
   }
 
+  /*!
+   * @author donglee
+   * @brief - 내가 직접 만든 비공개방 첫 입장 시에는 Password 컴포넌트를 보여주지 않음
+   *        - 자동으로 input에 focus함.
+   */
   useEffect(() => {
+    if (isMadeMyself) {
+      setIsProtected(false);
+    }
     inputFocus();
   }, []);
 
@@ -119,7 +124,7 @@ interface ChatUser {
   position: string,
 };
 
-const ChatRoomContent: FC = (): JSX.Element => {
+const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
   const [chatLog, setChatLog] = useState<ChatLog[]>([]);
@@ -136,6 +141,7 @@ const ChatRoomContent: FC = (): JSX.Element => {
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
   const { channel_id } = useParams<{channel_id: string}>();
   const [isProtected, setIsProtected] = useState(false);
+  const [isMadeMyself, setIsMadeMyself] = useState(false);
 
   /*!
    * @author donglee
@@ -171,7 +177,15 @@ const ChatRoomContent: FC = (): JSX.Element => {
     socket.emit('join', {room_id: channel_id});
   };
 
+  /*!
+   * @author donglee
+   * @brief - 내가 직접 만든 비공개방일 경우에는 Password에 props을 줘서 첫 1회만 비번없이 입장 가능하도록 함
+   *        - 채팅방 정보를 받아온 후 비공개방일 경우에는 state를 바꿔서 Password 컴포넌트 렌더링 하도록 함
+   */
   useEffect(() => {
+    if (props.location.state) {
+      setIsMadeMyself(true);
+    }
     getChatRoomInfo()
     .then((res) => {if (res.type === "protected") setIsProtected(true)})
     .then(() => helloToChatRoom());
@@ -180,7 +194,7 @@ const ChatRoomContent: FC = (): JSX.Element => {
 
   if (chatRoomInfo && isProtected) {
     return (
-      <Password rightPassword={chatRoomInfo.passwd} setIsProtected={setIsProtected} />
+      <Password setIsProtected={setIsProtected} isMadeMyself={isMadeMyself} />
     );
   } else if (chatRoomInfo && !isProtected) {
     return (
@@ -261,4 +275,4 @@ const ChatRoomContent: FC = (): JSX.Element => {
   return ( <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "43%", top: "10%"}} /> );
 };
 
-export default ChatRoomContent;
+export default withRouter(ChatRoomContent);
