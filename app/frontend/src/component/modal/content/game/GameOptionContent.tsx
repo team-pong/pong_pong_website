@@ -20,7 +20,7 @@ function getMapImg(mapType: MAP): string {
 }
 
 const GameOptionContent: FC<RouteComponentProps> = ({match: {url}}) => {
-  const [mapSelector, setMapSelector] = useState(3);
+  const [mapSelector, setMapSelector] = useState(0);
   const history = useHistory();
 
   return (
