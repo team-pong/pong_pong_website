@@ -66,8 +66,8 @@ const Password: FC<{
   const submitPassword = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/checkPasswd?channel_id=${channelId}&passwd=${password}`);
-    const res = await (await easyfetch.fetch()).json();
-
+    const res = await easyfetch.fetch();
+ 
     if (res) {
       setIsProtected(false);
     } else {
