@@ -67,10 +67,10 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
 
     if (search === "") {
       const easyfetch = new EasyFetch(`${global.BE_HOST}/chat`);
-      res = await (await easyfetch.fetch()).json();
+      res = await easyfetch.fetch();
     } else {
       const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/title?title=${search}`);
-      res = await (await easyfetch.fetch()).json();
+      res = await easyfetch.fetch();
     }
     return (res.chatList);
   }

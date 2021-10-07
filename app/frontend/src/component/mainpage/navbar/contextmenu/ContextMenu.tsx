@@ -41,7 +41,7 @@ const ContextMenu: FC<contextMenuProps> =
   */
   const deleteFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${target}`, "DELETE");
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch();
     
     if (res.err_msg === "에러가 없습니다.") {
       const updatedList = friendList.filter((friend) => friend.nick !== target);
@@ -67,7 +67,7 @@ const ContextMenu: FC<contextMenuProps> =
     const body = {
       "block_nick": target,
     };
-    const res = await (await easyfetch.fetch(body)).json();
+    const res = await easyfetch.fetch(body);
 
     if (res.err_msg !== "에러가 없습니다.") {
       alert("사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.");
