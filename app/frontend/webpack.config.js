@@ -31,13 +31,6 @@ module.exports = {
       }
     ]
   },
-  devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    historyApiFallback: true,
-    host: 'frontend',
-    port: 3000,
-    public: "0.0.0.0:3000"
-  },
   plugins: [
     new SourceMapDevToolPlugin({
       filename: "[file].map"

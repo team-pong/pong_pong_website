@@ -36,10 +36,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       user: 'system',
       chat: `${user_id}님이 입장하셨습니다.`
     });
-    
+
     const userList = await axios.get(`${process.env.BACKEND_SERVER_URL}/chat-users?channel_id=${channel_id}`);
     socket.to(channel_id).emit('userList', userList.data.chatUsersList);
-    
+
     socket.on('disconnect', () => {
       console.log('Chat 웹소켓 연결 해제')
       socket.leave(channel_id);

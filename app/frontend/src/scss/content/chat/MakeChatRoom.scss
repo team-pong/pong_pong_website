@@ -1,0 +1,107 @@
+div.mc-container {
+	margin: 30px;
+
+	div.mc-content-container {
+		margin-top: 20px;
+
+		input#mc-title {
+			display: block;
+			width: 318px;
+			height: 30px;
+			margin-top: 10px;
+			border: solid 1px rgb(136, 136, 136);
+    	border-radius: 6px;
+			padding: 0 10px;
+		}
+
+		div.mc-type-container {
+			display: flex;
+			justify-content: space-between;
+			margin-top: 10px;
+		
+			label.mc-type-label {
+				border: solid 2px rgb(136, 136, 136);
+				padding: 10px 20px;
+				border-radius: 6px;
+				color: rgb(136, 136, 136);
+				cursor: pointer;
+			}
+			
+			input.mc-type {
+				display: none;
+      }
+
+			input.mc-type[type=radio]:checked + label{
+				color: rgb(49, 100, 255);
+				background-color: rgb(242, 245, 255);
+				border: solid 2px rgb(49, 100, 255);
+				border-radius: 6px;
+      }
+		}
+
+    span.mc-explain {
+      display: none;
+      
+    }
+
+    span.mc-explain-selected {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: rgb(136, 136, 136);
+    }
+
+		select#mc-max {
+			display: block;
+			width: 341px;
+			height: 30px;
+			margin-top: 10px;
+			border: solid 1px rgb(136, 136, 136);
+    	border-radius: 6px;
+			padding: 0 10px;
+		
+			option.mc-option {
+				width: 100px;
+			}
+		}
+  }
+
+  div.mc-password-container {
+    display: none;
+    margin-top: 20px;
+
+    input#mc-password {
+			display: block;
+			width: 318px;
+			height: 30px;
+			margin-top: 10px;
+			border: solid 1px rgb(136, 136, 136);
+    	border-radius: 6px;
+			padding: 0 10px;
+		}
+  }
+
+  div.mc-password-selected {
+    display: block;
+  }
+
+  button.mc-make {
+    position: absolute;
+    top: 465px;
+    width: 341px;
+    height: 35px;
+    color: #fff;
+    font-size: 1rem;
+    background-color: #3164ff;
+    border: solid 2px #3164ff;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  button.mc-make:hover {
+    background-color: rgb(242, 245, 255);
+    color: rgb(49, 100, 255);
+  }
+}
+
+

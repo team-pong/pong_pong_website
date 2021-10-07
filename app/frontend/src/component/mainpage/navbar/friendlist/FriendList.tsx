@@ -48,7 +48,11 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
   const friendListGenerator = (friend: Friend, keyIdx: number) => {
     return (
       <div className="friend" key={keyIdx} onClick={(e) => friendOnClick(e, friend.nick)}>
-        <img className="flg-friend-avatar" src={friend.avatar_url}/>{friend.nick}
+        <div className="flg-icon-container">
+          <img className="flg-friend-avatar" src={friend.avatar_url}/>
+          <img className="flg-friend-status" src={`/public/status/${friend.status}.svg`} />
+        </div>
+        {friend.nick}
       </div>
     );
   };
@@ -78,7 +82,7 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
    */
   const getFriendList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch();
 
     setFriendList(res.friendList);
   };
@@ -94,17 +98,17 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
   }, []);
 
   if (friendList === null || friendList === undefined) {
-    return (<Loading width={240} height={35} color="#fff"/>);
-  } else if (friendList.length === 0) {
-    return (<NoResult
+    return (<Loading color="#fff" style={{width: "50px", height: "50px", marginLeft: "50px"}}/>);
+  } else {
+    return (
+      <div id="friend-list-container">
+        {friendList.length === 0 && 
+            <NoResult
               text="친구 없음"
               style={{
                 width: "30px",
                 height: "30px",
-                marginLeft: "30px"}}/>);
-  } else {
-    return (
-      <div id="friend-list-container">
+                marginLeft: "30px"}}/>}
         {friendList.map(friendListGenerator)}
         {contextMenuInfo.isOpen ?
           <ContextMenu

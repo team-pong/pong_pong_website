@@ -1,6 +1,16 @@
 import { FC, useState, useEffect, Dispatch, SetStateAction } from "react";
 import "../../../scss/dm/DmList.scss";
-import { testDMList, DM } from "../../../dummydata/testDM";
+import EasyFetch from "../../../utils/EasyFetch";
+import Time from "../../../utils/Time";
+
+interface DM {
+  target: {
+    avatar_url: string,
+    nick: string
+  },
+  lastMsg: string,      /* e.g.) "안녕"                    */
+  lastMsgTime: string   /* e.g.) "15분전"                 */
+}
 
 /*!
   * @author yochoi
@@ -21,21 +31,30 @@ interface DmListProps {
 
 const DmList: FC<DmListProps> = ({setDmTarget}): JSX.Element => {
 
-  const [dmList, setDmList] = useState<DM[]>(null);
+  const [dmList, setDmList] = useState<DM[]>([]);
+
+  const getDmList = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/list`);
+    const res: DM[] = await easyfetch.fetch();
+    const parsedRes: DM[] = res.map((val) => {
+      val.lastMsgTime = new Time(val.lastMsgTime).getRelativeTime();
+      return (val);
+    })
+    setDmList(parsedRes);
+  }
 
   /*!
   * @author yochoi
   * @brief DM 리스트를 가져오는 useEffect
-  * @todo DM api 가 완성되면 easyFetch를 사용해서 수정해야함
   */
   useEffect(() => {
-    setDmList(testDMList);
+    getDmList();
   }, []);
 
   return (
     <ul className="dm-list">
       {
-        dmList?.map((dm, idx) => {
+        dmList.map((dm, idx) => {
           return (
             <li
               key={idx}

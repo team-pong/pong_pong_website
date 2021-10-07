@@ -1,12 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class ChatDto1{
-  @ApiProperty({
-		example: 'jinbkim',
-		description: 'owner 유저 아이디',
-	})
-	public owner_id: string;
-
 	@ApiProperty({
 		example: '아무나 와보던가',
 		description: '방 제목',
@@ -136,6 +130,50 @@ export class ChatDto5{
 		description: 'owner 유저 닉네임',
 	})
 	public owner_nick: string;
+}
+
+export class ChatDto6{
+	@ApiProperty({
+		example: '아무나 와보던가',
+		description: '방 제목',
+	})
+	public title: string;
+
+  @ApiProperty({
+		example: 'public',
+		description: '방 타입',
+	})
+	public type: string;
+
+  @ApiProperty({
+		example: '1234',
+		description: '방 비밀번호',
+	})
+	public passwd: string;
+
+  @ApiProperty({
+		example: 10,
+		description: '채널 최대인원',
+	})
+	public max_people: number;
+
+	@ApiProperty({
+		example: 3,
+		description: '채널 현재인원',
+	})
+	public current_people: number;
+
+	@ApiProperty({
+		example: 'jinbkim',
+		description: 'owner 유저 닉네임',
+	})
+	public owner_nick: string;
+
+	@ApiProperty({
+		example: 1,
+		description: '채널 아이디',
+	})
+	public channel_id: number;
 }
 
 // export class ChatDto6{

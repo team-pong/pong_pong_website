@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import EasyFetch from "../../../../utils/EasyFetch";
 import "/src/scss/content/profile/ManageFriendContent.scss";
 import { setAchievementStr, setAchievementImg } from "../../../../utils/setAchievement";
+import Loading from "../../../loading/Loading";
+import NoResult from "../../../noresult/NoResult";
 
 interface Friend {
 	user_id: string;
@@ -17,6 +19,17 @@ interface Friend {
 const FriendList: React.FC = () => {
 
 	const [friendList, setFriendList] = useState<Friend[]>();
+	const [noResult, setNoResult] = useState(false);
+
+	/*!
+   * @author donglee
+   * @brief 친구목록이 수정될 때 리스트가 없으면 결과없음을 보여주기 위해 검사함
+   */	
+	const checkListLength = (list: Friend[]) => {
+		if (list.length === 0) {
+			setNoResult(true);
+		}
+	};
 
   /*!
    * @author donglee
@@ -24,13 +37,14 @@ const FriendList: React.FC = () => {
    */	
 	const deleteFriend = async (nick: string) => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`, "DELETE");
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert(res.err_msg);
 		} else {
 			const updatedList = friendList.filter((friend) => friend.nick !== nick);
 			setFriendList(updatedList);
+			checkListLength(updatedList);
     }
 	};
 
@@ -50,13 +64,18 @@ const FriendList: React.FC = () => {
 		} else {
 			const updatedList = friendList.filter((friend) => friend.nick !== nick);
 			setFriendList(updatedList);
+			checkListLength(updatedList);
 		}
 	};
 
 	const getFriendList = async () => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
+		if (res.friendList.length === 0) {
+			setNoResult(true);
+			return ;
+		}
 		setFriendList(res.friendList);
 	}
 
@@ -64,6 +83,9 @@ const FriendList: React.FC = () => {
 		getFriendList();
 	},[]);
 
+	if (noResult) {
+		return ( <NoResult text="추가한 친구가 없습니다." style={{position: "absolute", left: "22%", top: "28%"}}/> );
+	}
 	if (friendList) {
 		return (
 			<ul>
@@ -98,30 +120,38 @@ const FriendList: React.FC = () => {
 			</ul>
 		);
 	} else {
-		return ( <h1>Loading...</h1> );
+		return ( <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "37%"}}/> );
 	}
 }
 
 const BlockedList: React.FC = () => {
 	
 	const [blockedList, setBlockedList] = useState<Friend[]>();
+	const [noResult, setNoResult] = useState(false);
 
 	const unblockFriend = async (nick: string) => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/block?block_nick=${nick}`, "DELETE");
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 		
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert("사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.");
 		} else {
 			const updatedList = blockedList.filter((friend) => friend.nick !== nick);
 			setBlockedList(updatedList);
+			if (updatedList.length === 0) {
+				setNoResult(true);
+			}
 		}
 	};
 
 	const getBlockedList = async () => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/block`);
-		const res =  await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 		
+		if (res.blockList.length === 0) {
+			setNoResult(true);
+			return ;
+		}
 		setBlockedList(res.blockList);
 	};
 
@@ -129,6 +159,9 @@ const BlockedList: React.FC = () => {
 		getBlockedList();
 	},[]);
 
+	if (noResult) {
+		return ( <NoResult text="차단한 친구가 없습니다." style={{position: "absolute", left: "22%", top: "28%"}}/> );
+	}
 	if (blockedList) {
 		return (
 			<ul>
@@ -152,7 +185,7 @@ const BlockedList: React.FC = () => {
 			</ul>
 		);
 	} else {
-		return ( <h1>Loading...</h1> );
+		return ( <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "37%"}}/> );
 	}
 }
 

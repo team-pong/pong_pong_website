@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { session } from 'src/entities/session';
 import { err25 } from 'src/err';
 import { SessionDto1 } from 'src/dto/session';
+import { Users } from 'src/entities/users';
 
 const db = {
 	user: process.env.PG_PONG_ADMIN,
@@ -27,7 +28,7 @@ export class SessionService {
   constructor(
     private usersService: UsersService,
     @InjectRepository(session) private sessionRepo: Repository<session>,
-
+    @InjectRepository(Users) private usersRepo: Repository<Users>,
     ){}
 
 	/*!
@@ -35,9 +36,9 @@ export class SessionService {
 	 * @detail 게임 매칭이 2인이라서 혼자 테스트하려면 2개 계정이 있어야해서 만듬
 	 * @todo production 환경에서 삭제되어야함
 	 */ 
-	public async tester_login(req: Request, user_id: string, nickname: string) {
+	public async tester_login(req: Request, user_id: string, nickname: string, avatar_url: string) {
 		try {
-			await this.usersService.createUsers(user_id, nickname, 'tester_avatar.url');
+			await this.usersService.createUsers(user_id, nickname, avatar_url);
 			await this.saveSession(req.session, user_id, 'tester_token');
 		} catch (err) {
 			console.log('tester user login error:', err);
@@ -101,9 +102,10 @@ export class SessionService {
     try {
       const result = await this.getToken(loginCodeDto)
       const { access_token } = result.data;
-      const { data } = await this.getInfo(access_token)
+      const {data} = await this.getInfo(access_token)
       await this.usersService.createUsers(data.login, data.login, data.image_url);
       await this.saveSession(req.session, data.login, access_token);
+      await this.usersRepo.update(data.login, {status: 'online'});
     } catch (err: any | AxiosError) {
       if (axios.isAxiosError(err)) {
         console.log("42api error:", err.response.statusText);

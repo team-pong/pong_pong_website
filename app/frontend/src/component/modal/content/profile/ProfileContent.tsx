@@ -6,6 +6,7 @@ import ManageFriendContent from "./ManageFriendContent";
 import RecordContent from "../record/RecordContent";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
+import Loading from "../../../loading/Loading";
 
 /*!
  * @author donglee
@@ -44,13 +45,12 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
   const [nickToEdit, setNickToEdit] = useState("");
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
   const [isBlockedFriend, setIsBlockedFriend] = useState(false);
+  const [isMyProfile, setIsMyProfile] = useState(false);
 
   const avatarImgRef = useRef(null);
 
   //url parameter로 넘어오는 nick 문자열 저장
   const { nick } = useParams<{nick: string}>();
-  //test 현재 내 nick은 donglee 이고 param으로 들어온 nick은 jinbkim이니까 false
-  const isMyProfile = ("donglee" === nick);
 
   /*!
    * @author donglee
@@ -112,18 +112,11 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
 
   /*!
    * @author donglee
-   * @brief API /user 에서 프로필 정보를 요청해서 state에 저장함
+   * @brief API /users 에서 프로필 정보를 요청해서 state에 저장함
    */
   const getUserInfo = async (): Promise<UserInfo> => {
-    let targetNick = "";
-    if (isMyProfile) {
-      targetNick = "donglee";
-    } else {
-      targetNick = nick;
-    }
-    /* TODO: session id로 유저의 정보를 받아오도록 해야 함 */
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/user?user_id=${targetNick}`);
-    const res = await (await easyfetch.fetch()).json();
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nick}`);
+    const res = await easyfetch.fetch()
 
     setUserInfo(res);
     return res;
@@ -187,7 +180,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    */
   const deleteFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`, "DELETE");
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert(res.err_msg);
@@ -229,7 +222,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    */
   const unblockFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/block?block_nick=${nick}`, "DELETE");
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert("사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.");
@@ -244,7 +237,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    */
   const getIsAlreadyFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`);
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
     if (res.bool) {
       setIsAlreadyFriend(true);
@@ -259,12 +252,25 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    */
   const getIsBlockedFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/block/isBlock?block_nick=${nick}`);
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
     if (res.bool) {
       setIsBlockedFriend(true);
     } else {
       setIsBlockedFriend(false);
+    }
+  };
+
+  /*!
+   * @author donglee
+   * @detail 프로필을 열 때 가장 먼저 나의 프로필인지 다른 사용자것인지를 판별
+   */
+  const setMineOrOthers = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
+    const res = await easyfetch.fetch()
+
+    if (res.nick === nick) {
+      setIsMyProfile(true);
     }
   };
 
@@ -288,7 +294,8 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    *         이미 친구인지, 차단한 친구인지 정보를 받아온다
    */
   useEffect(() => {
-    getUserInfo()
+    setMineOrOthers()
+      .then(getUserInfo)
       .then((res) => {setNickToEdit(res.nick); return res;});
     if (!isMyProfile) {
       getIsAlreadyFriend();
@@ -406,13 +413,15 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
               <span className="pr-explain">클릭하면 해당 유저를 차단합니다.</span>
               : <span className="pr-explain">클릭하면 해당 유저를 차단 해제합니다.</span>
             }
-          </div>          
+          </div>
         </div>
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={nick}/>} /></Route>
-      </div>      
+      </div>
     );
   } else {
-    return ( <h1>Loading..</h1> );
+    return (
+      <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "38%", top: "40%"}} />
+    );
   }
 };
 

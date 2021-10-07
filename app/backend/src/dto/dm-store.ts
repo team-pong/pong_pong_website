@@ -65,7 +65,7 @@ export class DmStoreDto2{
 		example: '2021-07-31T05:41:48.342Z',
 		description: 'dm 보낸 시간',
 	})
-	public createdAt: Date;
+	public created_at: Date;
 }
 
 export class DmStoreDto3{
@@ -75,19 +75,19 @@ export class DmStoreDto3{
       "sender_id": "jinbkim",
       "receiver_id": "donglee",
       "content": "ㅠㅠ",
-      "createdAt": "2021-09-03T01:40:59.575Z"
+      "created_at": "2021-09-03T01:40:59.575Z"
     },
     {
       "sender_id": "jinbkim",
       "receiver_id": "donglee",
       "content": "안녕",
-      "createdAt": "2021-09-03T01:02:08.420Z"
+      "created_at": "2021-09-03T01:02:08.420Z"
     },
     {
       "sender_id": "donglee",
       "receiver_id": "jinbkim",
       "content": "나도 안녕",
-      "createdAt": "2021-09-03T01:02:08.420Z"
+      "created_at": "2021-09-03T01:02:08.420Z"
     }
   ]`,
 		// description: 'DM 보낸 유저 아이디, 받은 유저 아이디, 내용, 보낸 시간 데이터들의 배열',

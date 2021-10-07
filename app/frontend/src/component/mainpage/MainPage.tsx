@@ -15,10 +15,24 @@ import { Link, Route, Switch } from "react-router-dom";
 const MainPage = ({match}): JSX.Element => {
 
   const [isDmOpen, setIsDmOpen] = useState(false);
+  const [updateFriendList, setUpdateFriendList] = useState({state: "", user_id: ""});
+  const [unReadMsg, setUnReadMsg] = useState(1);
+
+  useEffect(() => {
+    global.socket.on("online", ({user_id}) => {
+      setUpdateFriendList({state: "online", user_id: user_id});
+    });
+    global.socket.on("offline", ({user_id}) => {
+      setUpdateFriendList({state: "offline", user_id: user_id});
+    });
+    global.socket.on("ongame", ({user_id}) => {
+      setUpdateFriendList({state: "ongame", user_id: user_id});
+    });
+  }, []);
 
   return (
     <>
-      <NavBar />
+      <NavBar update={updateFriendList}/>
       <main>
         <div id="button-container">
           <Link
@@ -48,6 +62,7 @@ const MainPage = ({match}): JSX.Element => {
           <section id="dm-section">
             <Dm isDmOpen={isDmOpen}/>
             <button id="dm-controll-button" onClick={() => setIsDmOpen(!isDmOpen)}>
+              {unReadMsg && <div className="un-read-msg">{unReadMsg}</div>}
               {!isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
               {isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
             </button>

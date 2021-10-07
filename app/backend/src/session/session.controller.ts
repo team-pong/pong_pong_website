@@ -19,7 +19,7 @@ export class SessionController {
 	@ApiOperation({ summary: '개발용 테스트유저1 로 로그인' })
 	@Get("/test_user01")
 	async tester_login01(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
-		await this.sessionService.tester_login(request, 'tester01', 'test_user_01');
+		await this.sessionService.tester_login(request, 'tester01', 'tester01', 'https://gravatar.com/avatar/sdfdw332?s=400&d=robohash&r=x');
 		return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
 	}
 
@@ -30,7 +30,7 @@ export class SessionController {
 	@ApiOperation({ summary: '개발용 테스트유저2 로 로그인' })
 	@Get("/test_user02")
 	async tester_login02(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
-		await this.sessionService.tester_login(request, 'tester02', 'test_user_02');
+		await this.sessionService.tester_login(request, 'tester02', 'tester02', 'https://gravatar.com/avatar/ppgw8831?s=400&d=robohash&r=x');
 		return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
 	}
 

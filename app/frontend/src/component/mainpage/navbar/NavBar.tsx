@@ -1,5 +1,6 @@
 import { FC, useEffect, useState, useRef } from "react";
 import { Link, Route, RouteComponentProps, withRouter } from "react-router-dom";
+import { io } from "socket.io-client";
 import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
 import "/src/scss/navbar/NavBar.scss";
@@ -8,6 +9,7 @@ import "/src/scss/navbar/NavBar-mobile.scss";
 import Modal from "../../modal/Modal";
 import EasyFetch from "../../../utils/EasyFetch";
 import ProfileContent from "../../modal/content/profile/ProfileContent";
+import Loading from "../../loading/Loading";
 
 /*!
  * @author donglee
@@ -26,7 +28,7 @@ interface UserInfo {
   status: string;
 }
 
-const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
+const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProps> = (props): JSX.Element => {
 
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
@@ -42,9 +44,8 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
    * @brief API /user 에서 프로필 정보를 요청해서 state에 저장함
    */
   const getUserInfo = async () => {
-    //test session id로 받아와야 하는데 일단 donglee꺼 받아옴
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/user?user_id=donglee`);
-    const res = await (await easyfetch.fetch()).json();
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
+    const res = await easyfetch.fetch();
 
     setUserInfo(res);
     return res;
@@ -56,16 +57,33 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
    */
   const getFriendList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch();
 
     setFriendList(res.friendList);
   };
+
+  /*!
+   * @author donglee
+   * @brief Profile에서 닉네임 변경 시 NavBar에서도 userInfo를 업데이트 함
+   */
+  useEffect(() => {
+    if (userInfo) {
+      const updatedUserInfo = {...userInfo};
+
+      updatedUserInfo.nick = myNick;
+      setUserInfo(updatedUserInfo);
+    }
+  }, [myNick])
 
   useEffect(() => {
     getUserInfo()
       .then((res) => setMyNick(res.nick));
     getFriendList();
   },[]);
+
+  useEffect(() => {
+    getFriendList();
+  }, [props.update]);
 
   if (userInfo) {
     return (
@@ -120,7 +138,7 @@ const NavBar: FC<RouteComponentProps> = (props): JSX.Element => {
       </nav>
     );
   } else {
-    return ( <h1>Loading...</h1> );
+    return ( <Loading color="#fff" style={{width: "70px", height: "70px", marginLeft: "30px"}}/> );
   }
 };
 

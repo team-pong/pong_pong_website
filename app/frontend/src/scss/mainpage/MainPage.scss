@@ -87,6 +87,17 @@ main {
         background-color: #282438;
         border: 1px solid #fff;
         cursor: pointer;
+        div.un-read-msg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          background-color: red;
+          border-radius: 50%;
+          color: #fff;
+          line-height: 1.5em;
+          width: 1.5em;
+          height: 1.5em;
+        }
         img.dm-img {
           width: 30px;
           height: 30px;

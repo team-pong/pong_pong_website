@@ -11,5 +11,5 @@ export class DmStore{
   @Column()
   content: string;
 	@CreateDateColumn()
-	createdAt: Date;
+	created_at: Date;
 }

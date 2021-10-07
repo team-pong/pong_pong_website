@@ -4,7 +4,7 @@
  * @details
  *          1. const date = new Time("2021-07-31T05:41:48.342Z");
  *              -> 시간 형식은 Date 객체가 허용하는 한 사용 가능함
- *          2. console.log(date.month)
+ *          2. console.log(date.getMonth())
  *              -> 출력 예상: 7
  *          3. console.log(date.getRelativeTime())
  *              -> 출력 예상: 3 달 전 (사용 시점에 따라 달라짐)
@@ -17,54 +17,87 @@ export default class Time {
   private _localDate: string;
   private _localTime: string;
 
-  readonly year: string;
-  readonly month: string;
-  readonly date: string;
-  readonly hour: string;
-  readonly minuate: string;
-  readonly seconds: string;
+  private _year: string;
+  private _month: string;
+  private _date: string;
+  private _timeFormat: string;
+  private _hour: string;
+  private _minuate: string;
+  private _seconds: string;
 
-  constructor(time: string) {
+  private parseToLocal(time: string) {
     const date = new Date(time);
-    let parseDate: string[];
-    let parseTime: string[];
-
-    this._localDate = date.toLocaleDateString();
-    this._localTime = date.toLocaleTimeString();
-
-    /*!
-     * @author yochoi
-     * @brief parsing date
-     */
-  
-    parseDate = this._localDate.split(".");
-    this.year = parseDate[0].trim();
-    this.month = parseDate[1].trim();
-    this.date = parseDate[2].trim();
-
-    /*!
-     * @author yochoi
-     * @brief parsing time
-     */
-
-    parseTime = this._localTime.substr(3).split(":");
-    this.hour = parseTime[0];
-    this.minuate = parseTime[1];
-    this.seconds = parseTime[2];
+    this._localDate = date.toLocaleDateString('ko-KR');
+    this._localTime = date.toLocaleTimeString('ko-KR');
   }
 
-  getRelativeTime(): string {
+  private parseDate() {
+    const parse_date = this._localDate.split(".");
+    this._year = parse_date[0].trim();
+    this._month = parse_date[1].trim();
+    this._date = parse_date[2].trim();
+  }
+
+  private parseTime() {
+    const parseTime = this._localTime.substr(3).split(":");
+    this._timeFormat = this._localTime.substr(0, 2);
+    this._hour = parseTime[0];
+    this._minuate = parseTime[1];
+    this._seconds = parseTime[2];
+  }
+
+  public constructor(time: string) {
+    this.parseToLocal(time);
+    this.parseDate();
+    this.parseTime();
+  }
+
+  public setTime(time: string) {
+    this.parseToLocal(time);
+    this.parseDate();
+    this.parseTime();
+  }
+
+  public getRelativeTime(): string {
     const currentTime = new Time(new Date().toString());
 
-    if ((+currentTime.year - +this.year) >= 1) {
-      return (`${+currentTime.year - +this.year} 년 전`);
-    } else if ((+currentTime.month - +this.month) >= 1) {
-      return (`${+currentTime.month - +this.month} 달 전`);
-    } else if ((+currentTime.hour - +this.hour) >= 1) {
-      return (`${+currentTime.hour - +this.hour} 시간 전`);
-    } else if ((+currentTime.minuate - +this.minuate) >= 1) {
-      return (`${+currentTime.minuate - +this.minuate} 분 전`);
+    if ((+currentTime._year - +this._year) >= 1) {
+      return (`${+currentTime._year - +this._year}년 전`);
+    } else if ((+currentTime._month - +this._month) >= 1) {
+      return (`${+currentTime._month - +this._month}달 전`);
+    } else if ((+currentTime._hour - +this._hour) >= 1) {
+      return (`${+currentTime._hour - +this._hour}시간 전`);
+    } else if ((+currentTime._minuate - +this._minuate) >= 1) {
+      return (`${+currentTime._minuate - +this._minuate}분 전`);
     }
-    return ("지금");
+    return ("조금 전");
+  }
+
+  public getYear() {
+    return (this._year);
+  }
+
+  public getMonth() {
+    return (this._month);
+  }
+
+  public getDate() {
+    return (this._date);
+  }
+
+  public getTimeFormat() {
+    return (this._timeFormat);
+  }
+
+  public getHour() {
+    return (this._hour);
+  }
+
+  public getMinuate() {
+    return (this._minuate);
+  }
+
+  public getSeconds() {
+    return (this._seconds);
   }
 }

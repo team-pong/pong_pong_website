@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChatDto2 } from 'src/dto/chat';
+import { ChatDto2, ChatDto6 } from 'src/dto/chat';
 import { ErrMsgDto } from 'src/dto/utility';
 import { Admin } from 'src/entities/admin';
 import { Chat } from 'src/entities/chat';
@@ -24,7 +24,7 @@ export class ChatService {
     private chatGateway: ChatGateway,
     ){}
 
-  async createChat(owner_id: string, title: string, type: string, passwd: string, max_people: number){
+  async createChat(owner_id: string, title: string, type: string, passwd: string, max_people: number) {
     if (await this.usersRepo.count({user_id: owner_id}) === 0)  // 존재하지 않은 유저 라면
       return new ErrMsgDto(err2);
     if (type != 'public' && type != 'protected' && type != 'private')  // 존재하지 않은 방 타입이면
@@ -33,32 +33,60 @@ export class ChatService {
       return new ErrMsgDto(err10);
     if (20 < max_people)  // 채널 최대 인원의 최대값 보다 크면
       return new ErrMsgDto(err15);
-    if (await this.chatUsersRepo.count({user_id: owner_id}))  // 이미 다른방에 있는 유저 라면
-      return new ErrMsgDto(err9);
-    const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people});
+    // if (await this.chatUsersRepo.count({user_id: owner_id}))
+    //   return new ErrMsgDto(err9);
+    const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people, current_people: 1});
     await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 owner 추가
-    return {channel_id: newChat.channel_id};
-    // return new ErrMsgDto(err0);
+
+    let chatRoom = new ChatDto2();
+    chatRoom.channel_id = newChat.channel_id;
+    chatRoom.title = newChat.title;
+    chatRoom.type = newChat.type;
+    chatRoom.current_people = 1;
+    chatRoom.max_people = newChat.max_people;
+    return {chatRoom};
   }
 
   async readChat(){
     const chat = await this.chatRepo.find();  // 모든 채널
     let chatList = { chatList: Array<ChatDto2>() }
     let current_people;
+    let idx = -1;
     // 모든 채널의 제목, 타입, 현재인원 ,최대인원, 채널아이디만 담기
     for(var i in chat){
       if (chat[i].type === 'private')  // private 채널이면
         continue ;
       chatList.chatList.push(new ChatDto2());
-      chatList.chatList[i].title = chat[i].title;
-      chatList.chatList[i].type = chat[i].type;
+      chatList.chatList[++idx].title = chat[i].title;
+      chatList.chatList[idx].type = chat[i].type;
       current_people = await this.readPeople(chat[i].channel_id);
-      chatList.chatList[i].current_people = current_people;
-      chatList.chatList[i].max_people = chat[i].max_people;
-      chatList.chatList[i].channel_id = chat[i].channel_id;
+      chatList.chatList[idx].current_people = current_people;
+      chatList.chatList[idx].max_people = chat[i].max_people;
+      chatList.chatList[idx].channel_id = chat[i].channel_id;
     }
     return chatList;
   }
+
+  async readOneChat(channel_id: number){
+    if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널이면
+      return new ErrMsgDto(err4);
+    const chanel = await this.chatRepo.find({channel_id: channel_id});  // 채널 찾기
+
+    let chatRoom = new ChatDto6();
+    chatRoom.title = chanel[0].title;
+    chatRoom.type = chanel[0].type;
+    chatRoom.passwd = chanel[0].passwd;
+    chatRoom.max_people = chanel[0].max_people;
+    let current_people;
+    current_people = await this.readPeople(channel_id);
+    chatRoom.current_people = current_people;
+    let owner = await this.usersService.readUsers(chanel[0].owner_id, 'user_id');
+    chatRoom.owner_nick = owner["nick"];
+    chatRoom.channel_id = chanel[0].channel_id;
+    return chatRoom;
+  }
+
+
   async readTitle(title: string){
     const chat = await this.chatRepo.find();  // 모든 채널
     let chatList = { chatList: Array<ChatDto2>() }
@@ -91,6 +119,18 @@ export class ChatService {
       return new ErrMsgDto(err4);
     let people = await this.chatUsersRepo.count({channel_id: channel_id});
     return people;
+  }
+
+  async checkPasswd(channel_id: number, passwd: string){
+    if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널이면
+      return new ErrMsgDto(err4);
+    
+    const chanel = await this.chatRepo.findOne({channel_id: channel_id});  // 채널 찾기
+    if (chanel.type != 'protected')  // 방타입이 protected가 아니면
+      return new ErrMsgDto(err10);
+    if (chanel.passwd == passwd)
+      return true;
+    return false;
   }
 
   async updateChat(channel_id: number, title: string, type: string, passwd: string, max_people: number){

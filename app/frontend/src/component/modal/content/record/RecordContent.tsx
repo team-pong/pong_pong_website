@@ -43,7 +43,7 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
         break;
     };
     const easyfetch = new EasyFetch(apiAddress);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch()
     setMatchList(res.matchList);
   };
 
@@ -146,7 +146,7 @@ const RecordClose: FC = (): JSX.Element => {
 
   const getLadderRanking = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/match/ranking`);
-    setLadderRanking(await ((await easyfetch.fetch()).json()));
+    setLadderRanking(await easyfetch.fetch());
   }
 
   useEffect(() => {
@@ -211,7 +211,7 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
       } else {
         easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nickNameToFind}`);
       }
-      const res = await (await easyfetch.fetch()).json();
+      const res = await easyfetch.fetch()
       if (res.err_msg) {
         setIsRecordOpen(recordState.noResult);
         return ;
