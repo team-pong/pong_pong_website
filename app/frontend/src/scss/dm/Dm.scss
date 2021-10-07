@@ -11,46 +11,19 @@
   }
 }
 
-@keyframes dm-list-out {
-  0% {
-    opacity: 1;
-    height: 70vh;
-    bottom: calc(1em + 60px);
-  }
-  99% {
-    opacity: 0;
-    height: 70vh;
-    bottom: 1em;
-  }
-  100% {
-    opacity: 0;
-    height: 0px;
-    bottom: 1em;
-  }
-}
-
 div.dm-container {
   position: absolute;
   bottom: 1em;
   right: 1em;
   background-color: #fff;
+  opacity: 1;
   width: 350px;
-  height: 0px;
+  height: 70vh;
   max-height: 650px;
-  opacity: 0;
   border-radius: 10px;
   overflow: auto;
-  &.in {
-    opacity: 1;
-    height: 70vh;
-    bottom: calc(1em + 60px);
-    animation: dm-list-in .5s;
-  }
-  &.out {
-    opacity: 0;
-    height: 0px;
-    animation: dm-list-out .5s;
-  }
+  bottom: calc(1em + 60px);
+  animation: dm-list-in .5s;
   .top-bar {
     position: sticky;
     top: 0;

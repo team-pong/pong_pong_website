@@ -128,7 +128,7 @@ const MainPage = ({match}): JSX.Element => {
                   <span className="mp-explain-span">게임을 하려면 누르세요!</span>
                 </Link>
                 <section id="dm-section">
-                  <Dm isDmOpen={isDmOpen}/>
+                  {isDmOpen && <Dm />}
                   <button id="dm-controll-button" onClick={() => setIsDmOpen(!isDmOpen)}>
                     {unReadMsg && <div className="un-read-msg">{unReadMsg}</div>}
                     {!isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
