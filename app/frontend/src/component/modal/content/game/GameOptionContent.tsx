@@ -2,10 +2,6 @@ import { FC, useState } from "react";
 import { RouteComponentProps, useHistory, withRouter } from "react-router";
 import "/src/scss/content/game/GameOptionContent.scss";
 
-const IMG_BLACK: string = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
-const IMG_GRAY: string = "data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==";
-const IMG_RED: string = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==";
-
 enum MAP {
   map0,
   map1,
@@ -15,11 +11,11 @@ enum MAP {
 function getMapImg(mapType: MAP): string {
   switch(mapType) {
     default:
-      return (IMG_BLACK);
+      return ("/public/game-map/map1.png");
     case MAP.map1:
-      return (IMG_GRAY);
+      return ("/public/game-map/map2.png");
     case MAP.map2:
-      return (IMG_RED);
+      return ("/public/game-map/map3.png");
   }
 }
 
