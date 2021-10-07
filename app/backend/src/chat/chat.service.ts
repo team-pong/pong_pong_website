@@ -10,6 +10,7 @@ import { err0, err10, err13, err15, err2, err24, err4, err6, err8, err9 } from '
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { ChatGateway } from './chat.gateway';
+import crypto from 'crypto';
 
 @Injectable()
 export class ChatService {
@@ -35,6 +36,21 @@ export class ChatService {
       return new ErrMsgDto(err15);
     // if (await this.chatUsersRepo.count({user_id: owner_id}))
     //   return new ErrMsgDto(err9);
+
+    crypto.randomBytes(64, (err, buf) => {
+      /*
+       * argv[0]: 비밀번호 (db에 저장)
+       * argv[1]: salt값 (저장?)
+       * argv[2]: 반복 횟수 (저장?)
+       * argv[3]: 비밀번호 길이 (저장?)
+       * argv[4]: 알고리즘 
+       * argv[0]는 db에 저장하고, salt값도 따로 저장되어야한다. 모든 argv가 같아야 같은 해시값이 나온다.
+      */
+      crypto.pbkdf2(passwd, buf.toString('base64'), 185415, 64, 'sha512', (err, key) => {
+        console.log(key.toString('base64'));
+      });
+    });
+
     const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people, current_people: 1});
     await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 owner 추가
 
