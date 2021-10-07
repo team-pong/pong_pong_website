@@ -37,7 +37,7 @@ const FriendList: React.FC = () => {
    */	
 	const deleteFriend = async (nick: string) => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`, "DELETE");
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert(res.err_msg);
@@ -70,7 +70,7 @@ const FriendList: React.FC = () => {
 
 	const getFriendList = async () => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
 		if (res.friendList.length === 0) {
 			setNoResult(true);
@@ -131,7 +131,7 @@ const BlockedList: React.FC = () => {
 
 	const unblockFriend = async (nick: string) => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/block?block_nick=${nick}`, "DELETE");
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 		
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert("사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.");
@@ -146,7 +146,7 @@ const BlockedList: React.FC = () => {
 
 	const getBlockedList = async () => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/block`);
-		const res =  await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 		
 		if (res.blockList.length === 0) {
 			setNoResult(true);

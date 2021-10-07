@@ -116,7 +116,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    */
   const getUserInfo = async (): Promise<UserInfo> => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nick}`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch()
 
     setUserInfo(res);
     return res;
@@ -180,7 +180,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    */
   const deleteFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`, "DELETE");
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert(res.err_msg);
@@ -222,7 +222,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    */
   const unblockFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/block?block_nick=${nick}`, "DELETE");
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert("사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.");
@@ -237,7 +237,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    */
   const getIsAlreadyFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`);
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
     if (res.bool) {
       setIsAlreadyFriend(true);
@@ -252,7 +252,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    */
   const getIsBlockedFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/block/isBlock?block_nick=${nick}`);
-		const res = await (await easyfetch.fetch()).json();
+		const res = await easyfetch.fetch()
 
     if (res.bool) {
       setIsBlockedFriend(true);
@@ -267,7 +267,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    */
   const setMineOrOthers = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch()
 
     if (res.nick === nick) {
       setIsMyProfile(true);
