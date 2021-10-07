@@ -24,6 +24,7 @@ interface MatchInfo {
   rPlayerAvatarUrl: string,
   rPlayerScore: number,
   viewNumber: number,
+	myName: string,
 }
 
 interface socketInfo {
@@ -91,6 +92,7 @@ export class GameGateway {
 				rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
 				rPlayerScore: 0,
 				viewNumber: 0,
+				myName: '',
 			}
 			socket_infos[playerLeft.socket.id].match = userInfo;
 			socket_infos[playerRight.socket.id].match = userInfo;
@@ -99,8 +101,8 @@ export class GameGateway {
 			playerRight.socket.emit('init', gameLogic.getJson(), userInfo);
 			// this.server.to(roomName).emit("init", gameLogic.getJson());
 
-			playerLeft.socket.emit('setMatchInfo', userInfo);
-			playerRight.socket.emit('setMatchInfo', userInfo);
+			playerLeft.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.lPlayerNickname} );
+			playerRight.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.rPlayerNickname} );
 			// arrowDown : true -> 아래 방향키가 눌린 상태
 			// arrowDown : false -> 아래 방향키를 뗀 상태
 			// arrowUp : true -> 위 방향키가 눌린 상태
@@ -145,10 +147,38 @@ export class GameGateway {
 				}
 			});
 
+			/*
+			 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
+			*/
+			playerLeft.socket.on("giveUp", () => {
+				this.matchService.createMatch(playerRight.id, playerLeft.id, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
+				playerLeft.socket.emit('matchEnd', 'LOSE');
+				playerRight.socket.emit('matchEnd', 'WIN');
+				clearInterval(updateInterval);
+				clearInterval(gameLogic._leftBarMovement);
+				clearInterval(gameLogic._rightBarMovement);
+				playerRight.socket.removeAllListeners();
+				playerLeft.socket.removeAllListeners();
+			})
+
+			playerRight.socket.on("giveUp", () => {
+				this.matchService.createMatch(playerLeft.id, playerRight.id, gameLogic._score[0], gameLogic._score[1], 'normal', 0);
+				playerLeft.socket.emit('matchEnd', 'WIN');
+				playerRight.socket.emit('matchEnd', 'LOSE');
+				clearInterval(updateInterval);
+				clearInterval(gameLogic._leftBarMovement);
+				clearInterval(gameLogic._rightBarMovement);
+				playerRight.socket.removeAllListeners();
+				playerLeft.socket.removeAllListeners();
+			})
+
 			const updateInterval = setInterval(() => {
 				if (userInfo.lPlayerScore == 3
 					|| userInfo.rPlayerScore == 3
 					|| (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
+						playerLeft.socket.emit('matchEnd', userInfo.lPlayerScore == 3 ? 'WIN' : 'LOSE');
+						playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
+
 						clearInterval(updateInterval);
 						clearInterval(gameLogic._leftBarMovement);
 						clearInterval(gameLogic._rightBarMovement);
@@ -199,14 +229,13 @@ export class GameGateway {
 					loser = match.lPlayerNickname;
 					winner = match.rPlayerNickname;
 					this.matchService.createMatch(winner, loser, gameLogic._score[0], gameLogic._score[1], 'normal', 0);
+					playerRight.socket.emit('matchEnd', 'WIN');
 				} else {
 					loser = match.rPlayerNickname;
 					winner = match.lPlayerNickname;
 					this.matchService.createMatch(winner, loser, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
+					playerLeft.socket.emit('matchEnd', 'WIN');
 				}
-
-				console.log('broadcast disconnected message');
-				socket.broadcast.emit("disconnected", {id: socket_infos[socket.id]?.uid});
 				delete socket_infos[socket.id];
 			})
 		}

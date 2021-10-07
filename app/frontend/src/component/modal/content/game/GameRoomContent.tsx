@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { FC, useState, useEffect, useRef } from "react";
-import { RouteComponentProps, withRouter, useHistory } from "react-router-dom";
+import { RouteComponentProps, withRouter, useHistory, Redirect } from "react-router-dom";
 import "/src/scss/content/game/GameRoomContent.scss";
 import { io } from "socket.io-client";
 
@@ -12,6 +12,7 @@ interface MatchInfo {
   rPlayerAvatarUrl: string,
   rPlayerScore: number,
   viewNumber: number,
+  myName: string,
 }
 
 const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
@@ -20,12 +21,15 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const [canvasHeight, setCanvasHeight] = useState(450);
   const [leftBar, setLeftBar] = useState<fabric.Rect>();
   const [rightBar, setRightBar] = useState<fabric.Rect>(); 
+  const [resultWindow, setResultWindow] = useState<fabric.Text>();
   const [ball, setBall] = useState<fabric.Circle>();
   const [ballX, setBallX] = useState(350);
   const [ballY, setBallY] = useState(150);
   const [leftY, setLeftY] = useState(150);
   const [rightY, setRightY] = useState(150);
   const [init, setInit] = useState(0);
+  const [isExit, setIsExit] = useState(false);
+  const [showExitButton, setShowExitButton] = useState(false);
 
   const [matchInfo, setMatchInfo] = useState<MatchInfo>({
     lPlayerNickname: '',
@@ -35,8 +39,19 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     rPlayerAvatarUrl: '',
     rPlayerScore: 0,
     viewNumber: 0,
+    myName: '',
   });
 
+  const onClickGiveUp = () => {
+    socket.emit("giveUp");
+  }
+
+  const onClickExit = () => {
+    socket.disconnect();
+    removeEventListener("keydown", keyDownEvent);
+    removeEventListener("keyup", keyUpEvent);
+    setIsExit(true);
+  }
 
   const [downKey, _setDownKey] = useState(0);
   const downKeyRef = useRef(downKey)
@@ -59,6 +74,16 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const initCanvas = () => {
     return new fabric.StaticCanvas('ping-pong', {width: canvasWidth, height: canvasHeight, backgroundColor: "white"});
   };
+
+  const initResultWindow = (text) => {
+    return new fabric.Textbox(text, {
+      width: 300,
+      top: 5,
+      left: 5,
+      fontSize: 40,
+      textAlign: 'center',
+    });
+  }
   
   const initBar = (x, y, width, height) => {
     width = width - x;
@@ -134,8 +159,8 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       setMatchInfo(data);
     })
 
-    socket.on("disconnected", (data) => {
-      console.log(data, 'disconnected! you win');
+    socket.on("matchEnd", (data) => {
+      setResultWindow(initResultWindow(`YOU ${data}`));
     })
 
     addEventListener("keydown", keyDownEvent);
@@ -147,6 +172,18 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       removeEventListener("keyup", keyUpEvent);
     })
   }, []);
+
+  useEffect(() => {
+    if (canvas) {
+      resultWindow.set({
+        top: 125,
+        left: 200,
+      });
+      canvas.add(resultWindow);
+      canvas.renderAll();
+      setShowExitButton(true);
+    }
+  }, [resultWindow])
 
   useEffect(() => {
     if (init) {
@@ -204,10 +241,13 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     </div>
     <div className="ingame-side-bar">
       <div className="view-number">view {matchInfo.viewNumber}</div>
-      <button className="give-up">기권</button>
+      <button className="give-up" onClick={onClickGiveUp}>기권</button>
     </div>
-    <div className="ingame-footer"></div>
+    <div className="ingame-footer">
+      {showExitButton ? <button className="exit" onClick={onClickExit}>나가기</button> : null}
+    </div>
     <canvas id="ping-pong"></canvas>
+    {isExit && <Redirect to="/mainpage" />}
     </>
   );
 };
