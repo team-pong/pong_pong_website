@@ -45,17 +45,27 @@ function openContextMenu( e: React.MouseEvent,
   });
 };
 
-const Password: FC<{setIsProtected: Dispatch<SetStateAction<boolean>>, isMadeMyself: boolean}>
-  = ({setIsProtected, isMadeMyself}): JSX.Element => {
+const Password: FC<{
+  setIsProtected: Dispatch<SetStateAction<boolean>>,
+  isMadeMyself: boolean,
+  channelId: string}>
+  = ({setIsProtected, isMadeMyself, channelId}): JSX.Element => {
   const [password, setPassword] = useState("");
 
   /*!
    * @author donglee
    * @brief 비밀번호를 입력하면 백엔드 검증 요청 후 대화방을 보여주거나 입장을 거절함
    */
-  const submitPassword = (e: React.SyntheticEvent) => {
+  const submitPassword = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    /* TODO: 백엔드에 비밀번호 검증을 API요청하고 결과에 따라 대화방 내부 혹은 알림 메세지를 보여준다. */
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/checkPasswd?channel_id=${channelId}&passwd=${password}`);
+    const res = await easyfetch.fetch();
+ 
+    if (res) {
+      setIsProtected(false);
+    } else {
+      alert("비밀번호가 틀렸습니다.");
+    }
   };
 
   /*!
@@ -149,7 +159,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
    */
   const getChatRoomInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${channel_id}`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch();
 
     if (!res.err_msg) {
       setChatRoomInfo({
@@ -212,7 +222,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
 
   if (chatRoomInfo && isProtected) {
     return (
-      <Password setIsProtected={setIsProtected} isMadeMyself={isMadeMyself} />
+      <Password setIsProtected={setIsProtected} isMadeMyself={isMadeMyself} channelId={channel_id} />
     );
   } else if (chatRoomInfo && !isProtected) {
     return (
