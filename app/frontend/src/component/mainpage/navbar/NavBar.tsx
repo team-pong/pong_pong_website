@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, useRef } from "react";
+import { FC, useEffect, useState, useRef, useContext } from "react";
 import { Link, Route, RouteComponentProps, withRouter } from "react-router-dom";
 import { io } from "socket.io-client";
 import AddFriend from "./addFriend/AddFriend";
@@ -10,6 +10,7 @@ import Modal from "../../modal/Modal";
 import EasyFetch from "../../../utils/EasyFetch";
 import ProfileContent from "../../modal/content/profile/ProfileContent";
 import Loading from "../../loading/Loading";
+import { UserInfoContext } from "../MainPage";
 
 /*!
  * @author donglee
@@ -32,24 +33,25 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
 
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
-  const [userInfo, setUserInfo] = useState<UserInfo>();
+  // const [userInfo, setUserInfo] = useState<UserInfo>();
   const [myNick, setMyNick] = useState("");
   const [myAvatar, setMyAvatar] = useState("");
   const [friendList, setFriendList] = useState<UserInfo[]>(null);
 
   const avatarImgRef = useRef(null);
+  let userInfo = useContext(UserInfoContext);
 
   /*!
    * @author donglee
    * @brief API /user 에서 프로필 정보를 요청해서 state에 저장함
    */
-  const getUserInfo = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
-    const res = await easyfetch.fetch();
+  // const getUserInfo = async () => {
+  //   const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
+  //   const res = await easyfetch.fetch();
 
-    setUserInfo(res);
-    return res;
-  };
+  //   setUserInfo(res);
+  //   return res;
+  // };
 
   /*!
    * @author donglee
@@ -66,18 +68,18 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
    * @author donglee
    * @brief Profile에서 닉네임 변경 시 NavBar에서도 userInfo를 업데이트 함
    */
-  useEffect(() => {
-    if (userInfo) {
-      const updatedUserInfo = {...userInfo};
+  // useEffect(() => {
+  //   if (userInfo) {
+  //     const updatedUserInfo = {...userInfo};
 
-      updatedUserInfo.nick = myNick;
-      setUserInfo(updatedUserInfo);
-    }
-  }, [myNick])
+  //     updatedUserInfo.nick = myNick;
+  //     setUserInfo(updatedUserInfo);
+  //   }
+  // }, [myNick])
 
   useEffect(() => {
-    getUserInfo()
-      .then((res) => setMyNick(res.nick));
+    // getUserInfo()
+    //   .then((res) => setMyNick(res.nick));
     getFriendList();
   },[]);
 
@@ -99,7 +101,8 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
             }}
             alt="Avatar" />
           </Link>
-          <h2>{myNick}</h2>
+          {/* <h2>{myNick}</h2> */}
+          <h2>{userInfo.nick}</h2>
         </header>
         <ul className="nav-ul">
           <li className="nav-list-button" id="nav-friend" onClick={() => setIsFriendListOpen(!isFriendListOpen)}>

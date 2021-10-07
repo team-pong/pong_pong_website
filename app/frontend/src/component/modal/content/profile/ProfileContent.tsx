@@ -1,4 +1,4 @@
-import React, { Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
+import React, { Dispatch, FormEvent, SetStateAction, useContext, useEffect, useRef, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-router-dom";
 import "/src/scss/content/profile/ProfileContent.scss";
 import Modal from "../../Modal";
@@ -7,6 +7,9 @@ import RecordContent from "../record/RecordContent";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 import Loading from "../../../loading/Loading";
+import { UserInfoContext } from "../../../mainpage/MainPage";
+
+/* MainPage에서 계속 정보를 받아오는 것은 아니였다. 그래서 닉 바꾸는 거에 대해서 어떻게 해야 할 지 고민해야 된다. */
 
 /*!
  * @author donglee
@@ -39,6 +42,8 @@ interface ProfileContentProps {
 }
 
 const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (props) => {
+
+  const myInfo = useContext(UserInfoContext);
 
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
@@ -98,7 +103,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
       "nick": nickToEdit,
       "avatar_url": userInfo.avatar_url
     }
-    const res = await (await easyfetch.fetch(body)).json();
+    const res = await easyfetch.fetch(body);
     
     if (res.err_msg !== "에러가 없습니다.") {
       alert(`"${nickToEdit}" 은(는) 이미 존재하는 닉네임입니다.`);
@@ -165,7 +170,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
 		const body = {
 			"friend_nick": nick
 		};
-		const res = await (await easyfetch.fetch(body)).json();
+		const res = await easyfetch.fetch(body);
 
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert(res.err_msg);
@@ -206,7 +211,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
 		const body = {
 			"block_nick": nick,
 		};
-		const res = await (await easyfetch.fetch(body)).json();
+		const res = await easyfetch.fetch(body);
 
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert("사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.");
@@ -266,10 +271,13 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    * @detail 프로필을 열 때 가장 먼저 나의 프로필인지 다른 사용자것인지를 판별
    */
   const setMineOrOthers = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
-    const res = await easyfetch.fetch()
+    // const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
+    // const res = await easyfetch.fetch()
 
-    if (res.nick === nick) {
+    // if (res.nick === nick) {
+    //   setIsMyProfile(true);
+    // }
+    if (nick === myInfo.nick) {
       setIsMyProfile(true);
     }
   };
