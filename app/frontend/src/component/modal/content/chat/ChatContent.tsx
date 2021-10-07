@@ -76,9 +76,12 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
   }
 
   useEffect(() => {
-    getChatRoomList()
-    .then(sortChatRoomList)
-    .then(() => setIsLoading(false));
+    /* 백엔드에서 제거하기 전에 프론트에서 먼저 GET을 하는 문제가 있다. 어떻게 해결해야 할까? */
+    setTimeout(() => {
+      getChatRoomList()
+      .then(sortChatRoomList)
+      .then(() => setIsLoading(false));
+    }, 1000);
   }, [search]);
 
   if (isLoading) {

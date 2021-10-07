@@ -1,5 +1,5 @@
 import React, { FC, Dispatch, SetStateAction, useState, useEffect } from "react";
-import { Link, Route, RouteComponentProps, useParams, withRouter } from "react-router-dom";
+import { Link, Route, RouteComponentProps, useLocation, useParams, withRouter } from "react-router-dom";
 import Modal from "../../Modal";
 import ChatConfigContent from "./ChatConfigContent";
 import ChatInviteContent from "./ChatInviteContent";
@@ -160,7 +160,6 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
   const getChatRoomInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${channel_id}`);
     const res = await easyfetch.fetch();
-
     if (!res.err_msg) {
       setChatRoomInfo({
         title: res.title,
@@ -179,6 +178,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     const socket = io(`${global.BE_HOST}/chat`);
 
     socket.emit('join', {room_id: channel_id});
+    return socket;
   };
 
   /*!
@@ -188,7 +188,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
    */
   const getChatRoomUsers = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat-users?channel_id=${channel_id}`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch();
 
     if (res.chatUsersList) {
       const updatedUsers: ChatUser[] = [];
@@ -205,6 +205,18 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     }
   };
 
+  const exitChatRoom = async () => {
+    //test
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/chat-users?nick=donglee`, "DELETE");
+    const res = await easyfetch.fetch();
+
+    console.log("res: ", res);
+  };
+
+  const disconnectSocket = (socket) => {
+    socket.disconnect();
+  };
+
   /*!
    * @author donglee
    * @brief - 내가 직접 만든 비공개방일 경우에는 Password에 props을 줘서 첫 1회만 비번없이 입장 가능하도록 함
@@ -214,10 +226,15 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     if (props.location.state) {
       setIsMadeMyself(true);
     }
-    connectSocket();
+    const socket = connectSocket();
     getChatRoomInfo()
     .then((res) => {if (res.type === "protected") setIsProtected(true)});
     getChatRoomUsers();
+
+    return (() => {
+      disconnectSocket(socket);
+      exitChatRoom();
+    });
   }, []);
 
   if (chatRoomInfo && isProtected) {
