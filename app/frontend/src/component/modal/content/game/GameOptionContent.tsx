@@ -20,9 +20,7 @@ function getMapImg(mapType: MAP): string {
 }
 
 const GameOptionContent: FC<RouteComponentProps> = ({match: {url}}) => {
-
-  const [selectedMap, setSelectedMap] = useState<MAP>(MAP.map0);
-
+  const [mapSelector, setMapSelector] = useState(3);
   const history = useHistory();
 
   return (
@@ -33,20 +31,14 @@ const GameOptionContent: FC<RouteComponentProps> = ({match: {url}}) => {
         onClick={() => history.goBack()} />
       <img
         className="map-preview"
-        src={getMapImg(selectedMap)} />
+        src={getMapImg(mapSelector)} />
       <form className="map-select-form">
-        <label className="map-selectors">
-          <label onClick={() => setSelectedMap(MAP.map0)}>
-            <input type="radio" checked={selectedMap === MAP.map0} onChange={() => {}}/>맵 0
-          </label>
-          <label onClick={() => setSelectedMap(MAP.map1)}>
-            <input type="radio" checked={selectedMap === MAP.map1} onChange={() => {}}/>맵 1
-          </label>
-          <label onClick={() => setSelectedMap(MAP.map2)}>
-            <input type="radio" checked={selectedMap === MAP.map2} onChange={() => {}}/>맵 2
-          </label>
-        </label>
-        <button onClick={() => {history.push(`${url}/${selectedMap}`)}}>게임 찾기</button>
+        <div className="map-btn-group">
+          <button className="map-btn-00" onClick={() => {setMapSelector(0)}}>일반</button>
+          <button className="map-btn-01" onClick={() => {setMapSelector(1)}}>막대기</button>
+          <button className="map-btn-02" onClick={() => {setMapSelector(2)}}>거품</button>
+        </div>
+        <button className="start" onClick={() => {history.push(`${url}/${mapSelector}`)}}>게임 찾기</button>
       </form>
     </div>
   );
