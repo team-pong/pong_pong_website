@@ -144,7 +144,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
    */
   const getChatRoomInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${channel_id}`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch();
 
     if (!res.err_msg) {
       setChatRoomInfo({

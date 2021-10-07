@@ -35,7 +35,7 @@ const DmList: FC<DmListProps> = ({setDmTarget}): JSX.Element => {
 
   const getDmList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/list`);
-    const res: DM[] = await (await easyfetch.fetch()).json();
+    const res: DM[] = await easyfetch.fetch();
     const parsedRes: DM[] = res.map((val) => {
       val.lastMsgTime = new Time(val.lastMsgTime).getRelativeTime();
       return (val);

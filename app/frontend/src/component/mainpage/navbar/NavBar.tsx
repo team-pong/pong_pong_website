@@ -45,7 +45,7 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
    */
   const getUserInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch();
 
     setUserInfo(res);
     return res;
@@ -57,7 +57,7 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
    */
   const getFriendList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch();
 
     setFriendList(res.friendList);
   };

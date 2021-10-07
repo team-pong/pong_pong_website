@@ -16,7 +16,7 @@ class EasyFetch {
     this.method = method || 'GET';
   }
 
-  async fetch(body?: Object, header?: Object): Promise<Response> {
+  async fetch(body?: Object, header?: Object): Promise<any> {
     if (!header) {
       header = {
         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ class EasyFetch {
       alert("세션이 만료되었습니다.\n다시 로그인 해주세요.");
       window.location.href = `${global.BE_HOST}`
     };
-    return (fetch(this.targetURL, fetchOption));
+    return (res);
   }
 }
 

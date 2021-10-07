@@ -82,7 +82,7 @@ const FriendList: FC<FriendListProps> = ({friendList, setFriendList}): JSX.Eleme
    */
   const getFriendList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch();
 
     setFriendList(res.friendList);
   };
