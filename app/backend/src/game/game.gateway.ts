@@ -199,7 +199,7 @@ export class GameGateway {
 			 * 3. disconnected 메세지 브로드캐스팅
 			 * 4. 탈주자 소켓 정보 삭제
 			 */
-			socket.on("disconnect", () => {
+			playerLeft.socket.on("disconnect", () => {
 				clearInterval(updateInterval);
 				clearTimeout(games[socket_infos[socket.id].rid].timeout);
 				clearInterval(gameLogic._leftBarMovement);
@@ -210,20 +210,33 @@ export class GameGateway {
 				const match = socket_infos[socket.id].match;
 				let loser;
 				let winner;
-				if (match.lPlayerNickname == socket_infos[socket.id].uid) {
-					loser = match.lPlayerNickname;
-					winner = match.rPlayerNickname;
-					this.matchService.createMatch(winner, loser, gameLogic._score[0], gameLogic._score[1], 'normal', 0);
-					playerRight.socket.emit('matchEnd', 'WIN');
-				} else {
-					loser = match.rPlayerNickname;
-					winner = match.lPlayerNickname;
-					this.matchService.createMatch(winner, loser, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
-					playerLeft.socket.emit('matchEnd', 'WIN');
-				}
+				loser = match.lPlayerNickname;
+				winner = match.rPlayerNickname;
+				this.matchService.createMatch(winner, loser, gameLogic._score[0], gameLogic._score[1], 'normal', 0);
+				playerRight.socket.emit('matchEnd', 'WIN');
 				delete games[socket_infos[socket.id].rid];
 				delete socket_infos[socket.id];
 			})
+
+			playerRight.socket.on("disconnect", () => {
+				clearInterval(updateInterval);
+				clearTimeout(games[socket_infos[socket.id].rid].timeout);
+				clearInterval(gameLogic._leftBarMovement);
+				clearInterval(gameLogic._rightBarMovement);
+				playerRight.socket.removeAllListeners();
+				playerLeft.socket.removeAllListeners();
+
+				const match = socket_infos[socket.id].match;
+				let loser;
+				let winner;
+				loser = match.rPlayerNickname;
+				winner = match.lPlayerNickname;
+				this.matchService.createMatch(winner, loser, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
+				playerLeft.socket.emit('matchEnd', 'WIN');
+				delete games[socket_infos[socket.id].rid];
+				delete socket_infos[socket.id];
+			})
+
 		}
 		console.log('waiting:', normal_waiting);
   }
