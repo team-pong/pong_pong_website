@@ -20,7 +20,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const [canvasWidth, setCanvasWidth] = useState(700);
   const [canvasHeight, setCanvasHeight] = useState(450);
   const [leftBar, setLeftBar] = useState<fabric.Rect>();
-  const [rightBar, setRightBar] = useState<fabric.Rect>(); 
+  const [rightBar, setRightBar] = useState<fabric.Rect>();
   const [resultWindow, setResultWindow] = useState<fabric.Text>();
   const [ball, setBall] = useState<fabric.Circle>();
   const [ballX, setBallX] = useState(350);
@@ -30,6 +30,16 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const [init, setInit] = useState(0);
   const [isExit, setIsExit] = useState(false);
   const [showExitButton, setShowExitButton] = useState(false);
+
+  const [obsRect00, setObsRect00] = useState<fabric.Rect>();
+  const [obsRect01, setObsRect01] = useState<fabric.Rect>();
+  const [obsRect02, setObsRect02] = useState<fabric.Rect>();
+  const [obsRect03, setObsRect03] = useState<fabric.Rect>();
+  
+  const [obsCircle00, setObsCircle00] = useState<fabric.Circle>();
+  const [obsCircle01, setObsCircle01] = useState<fabric.Circle>();
+  const [obsCircle02, setObsCircle02] = useState<fabric.Circle>();
+  const [obsCircle03, setObsCircle03] = useState<fabric.Circle>();
 
   const [matchInfo, setMatchInfo] = useState<MatchInfo>({
     lPlayerNickname: '',
@@ -84,6 +94,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       textAlign: 'center',
     });
   }
+
   
   const initBar = (x, y, width, height) => {
     width = width - x;
@@ -103,6 +114,15 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       top: y - 10,
       fill: 'black',
       radius: 10,
+    })
+  }
+
+  const initCircle = (x, y, r) => {
+    return new fabric.Circle({
+      left: x - r,
+      top: y - r,
+      fill: 'black',
+      radius: r,
     })
   }
   
@@ -145,6 +165,18 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
       setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
       setBall(initBall(data.ball[0], data.ball[1]));
+      if (data?.type == 1) {
+        console.log('Map TYPE:', data.type);
+        setObsRect00(initBar(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2], data.obstacle.obs00[3]));
+        setObsRect01(initBar(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2], data.obstacle.obs01[3]));
+        setObsRect02(initBar(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2], data.obstacle.obs02[3]));
+        setObsRect03(initBar(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2], data.obstacle.obs03[3]));
+      } else if (data?.type == 2) {
+        setObsCircle00(initCircle(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2]));
+        setObsCircle01(initCircle(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2]));
+        setObsCircle02(initCircle(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2]));
+        setObsCircle03(initCircle(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2]));
+      }
       setInit(1);
     })
 
@@ -190,6 +222,18 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       canvas.add(ball);
       canvas.add(leftBar);
       canvas.add(rightBar);
+      if (obsCircle00) {
+        canvas.add(obsCircle00);
+        canvas.add(obsCircle01);
+        canvas.add(obsCircle02);
+        canvas.add(obsCircle03);
+      }
+      else if (obsRect00) {
+        canvas.add(obsRect00);
+        canvas.add(obsRect01);
+        canvas.add(obsRect02);
+        canvas.add(obsRect03);
+      }
     }
   }, [init])
   
