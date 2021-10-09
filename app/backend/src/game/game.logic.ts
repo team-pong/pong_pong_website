@@ -20,8 +20,7 @@ interface SquareObstacle extends Obstacle {
     obs00: [number, number, number, number],
     obs01: [number, number, number, number],
     obs02: [number, number, number, number],
-    obs03: [number, number, number, number],
-    obs04: [number, number, number, number]
+    obs03: [number, number, number, number]
 }
 
 interface CircleObstacle extends Obstacle {
@@ -29,7 +28,6 @@ interface CircleObstacle extends Obstacle {
     obs01: [number, number, number],
     obs02: [number, number, number],
     obs03: [number, number, number],
-    obs04: [number, number, number]
 }
 
 interface GameInfo {
@@ -46,9 +44,9 @@ export class GameLogic {
     _direction : [number, number] = [0, 0] // 공의 진행 방향, 추후 속도를 적용할 수도 있음
     _ball : [number, number] = [0, 0] // ball의 중심 좌표, 반지름은 front와 협의하는걸로 설정함
     _bar00 : [number, number, number, number] = [0, 0, 0, 0]// 왼쪽 Bar의 좌표, 왼쪽 상단과 우측 하단 값
-    _bar00_pre : [number, number, number, number] = [0, 0, 0, 0];
+    _bar00_pre : number = 0
     _bar01 : [number, number, number,number] = [0, 0, 0, 0]// 우측 Bar의 좌표
-    _bar01_pre : [number, number, number, number] = [0, 0, 0, 0];
+    _bar01_pre : number = 0
     _speed : number;
     _correction : number;
     _server : Server;
@@ -82,8 +80,10 @@ export class GameLogic {
 
         this._type = init;
 
-        this._direction[0] = (init / init)
-        this._direction[1] = (init / init)
+        this._direction[0] = (init / init) / Math.SQRT2;
+        this._direction[1] = (init / init) / Math.SQRT2;
+
+        console.log("direction abs = " + (this._direction[0] * this._direction[0] + this._direction[1] * this._direction[1]));
         this._speed = 3;
         this._correction = 0.1;
         this._server = server;
@@ -93,20 +93,18 @@ export class GameLogic {
         const center : [number, number] = [this._rightWall / 2, this._bottomWall / 2];
         if (init == 1) {
             const obstacle : SquareObstacle = {
-                obs00: [center[0] - 30, center[1] - 30, center[0] + 30, center[1] + 30],
-                obs01: [(0 + center[0]) / 2 - 30, (0 + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (0 + center[1]) / 2 + 30],
-                obs02: [(0 + center[0]) / 2 - 30, (this._bottomWall + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (this._bottomWall + center[1]) / 2 + 30],
-                obs03: [(center[0] + this._rightWall) / 2 - 30, (0 + center[1]) / 2 - 30, (center[0] + this._rightWall) / 2 + 30, (0 + center[1]) / 2 + 30],
-                obs04: [(center[0] + this._rightWall) / 2 - 30, (center[1] + this._bottomWall) / 2 - 30, (center[0] + this._rightWall) + 30, (center[1] + this._bottomWall) / 2 + 30]
+                obs00: [(0 + center[0]) / 2 - 30, (0 + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (0 + center[1]) / 2 + 30],
+                obs01: [(0 + center[0]) / 2 - 30, (this._bottomWall + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (this._bottomWall + center[1]) / 2 + 30],
+                obs02: [(center[0] + this._rightWall) / 2 - 30, (0 + center[1]) / 2 - 30, (center[0] + this._rightWall) / 2 + 30, (0 + center[1]) / 2 + 30],
+                obs03: [(center[0] + this._rightWall) / 2 - 30, (center[1] + this._bottomWall) / 2 - 30, (center[0] + this._rightWall) + 30, (center[1] + this._bottomWall) / 2 + 30]
             };
             obs = obstacle
         } else if (init == 2) {
             const obstacle : CircleObstacle = {
-                obs00: [center[0], center[1], 30],
-                obs01: [(0 + center[0]) / 2, (0 + center[1]) / 2, 30],
-                obs02: [(0 + center[0]) / 2, (center[1] + this._bottomWall) / 2, 30],
-                obs03: [(center[0] + this._rightWall) / 2, (0 + center[1]) / 2, 30],
-                obs04: [(center[0] + this._rightWall) / 2, (center[1] + this._bottomWall) / 2, 30]
+                obs00: [(0 + center[0]) / 2, (0 + center[1]) / 2, 30],
+                obs01: [(0 + center[0]) / 2, (center[1] + this._bottomWall) / 2, 30],
+                obs02: [(center[0] + this._rightWall) / 2, (0 + center[1]) / 2, 30],
+                obs03: [(center[0] + this._rightWall) / 2, (center[1] + this._bottomWall) / 2, 30]
             }
             obs = obstacle
         }
@@ -122,6 +120,12 @@ export class GameLogic {
     // dir이 true라면 위로, false면 아래로
     // pos가 true라면 왼쪽(00), false면 오른쪽(01)
     moveBar(dir : boolean, pos : boolean) {
+        if (pos) {
+            console.log("bar00 pre setting");
+            this._bar00_pre = this._bar00[1];
+        } else {
+            this._bar01_pre = this._bar01[1];
+        }
         const interval = setInterval(() => {
             let dirValue;
             if (dir) {
@@ -130,13 +134,11 @@ export class GameLogic {
                 dirValue = 5;
             }
             if (pos) {
-                this._bar00_pre = this._bar00;
                 if (this._bar00[1] + dirValue > 0 && this._bar00[3] + dirValue < this._bottomWall) {
                     this._bar00[1] += dirValue;
                     this._bar00[3] += dirValue;
                 }
             } else {
-                this._bar01_pre = this._bar01;
                 if (this._bar01[1] + dirValue > 0 && this._bar01[3] + dirValue < this._bottomWall) {
                     this._bar01[1] += dirValue;
                     this._bar01[3] += dirValue;
@@ -153,8 +155,13 @@ export class GameLogic {
     }
 
     rotate(angle : number) {
-        this._direction[0] = this._direction[0] * Math.cos(angle) - this._direction[1] * Math.sin(angle);
-        this._direction[1] = this._direction[0] * Math.sin(angle) + this._direction[1] * Math.cos(angle);
+        const rad = angle * Math.PI / 180;
+        this._direction[0] = this._direction[0] * Math.cos(rad) - this._direction[1] * Math.sin(rad);
+        this._direction[1] = this._direction[0] * Math.sin(rad) + this._direction[1] * Math.cos(rad);
+        const abs = Math.sqrt(this._direction[0] * this._direction[0] + this._direction[1] * this._direction[1]);
+        this._direction[0] = this._direction[0] / abs;
+        this._direction[1] = this._direction[1] / abs;
+        console.log("rotate abs: " + (this._direction[0] * this._direction[0] + this._direction[1] * this._direction[1]));
     }
 
     getJson() {
@@ -164,10 +171,10 @@ export class GameLogic {
     getObstacle() {
         if (this._type == 1) {
             const squares = this._gameInfo.obstacle as SquareObstacle
-            return { obs00:squares.obs00, obs01:squares.obs01, obs02:squares.obs02, obs03:squares.obs03, obs04:squares.obs04 };
+            return { obs00:squares.obs00, obs01:squares.obs01, obs02:squares.obs02, obs03:squares.obs03 };
         } else if (this._type == 2) {
             const circles = this._gameInfo.obstacle as CircleObstacle
-            return { obs00:circles.obs00, obs01:circles.obs01, obs02:circles.obs02, obs03:circles.obs03, obs04:circles.obs04 };
+            return { obs00:circles.obs00, obs01:circles.obs01, obs02:circles.obs02, obs03:circles.obs03 };
         } else {
             return {}
         }
@@ -207,6 +214,7 @@ export class GameLogic {
             this._score = score;
         } else {
             this.checkCollision(10)
+
             this._ball[0] += this._direction[0] * this._speed;
             this._ball[1] += this._direction[1] * this._speed;
         }
@@ -225,11 +233,11 @@ export class GameLogic {
      * @brief 원과 원의 충돌 체크
                 circle은 공의 좌표, col이 장애물의 좌표
      */
-    isCollisionCC(circle : [number, number], radius : number, col : [number, number], colRadius : number) : Boolean {
+    isCollisionCC(circle : [number, number], radius : number, col : [number, number, number]) : Boolean {
         const distX = circle[0] - col[0];
         const distY = circle[1] - col[1];
         const distance = Math.sqrt((distX * distX) + (distY * distY));
-        if (distance <= (radius + colRadius)) {
+        if (distance <= (radius + col[2])) {
             if (this._iscollision == false) {
                 this._direction[0] *= -1;
                 this._direction[1] *= -1;
@@ -299,44 +307,26 @@ export class GameLogic {
         const center : [number, number] = [this._rightWall / 2, this._bottomWall / 2];
         if (type == 1) {
             // Square
-            const squareCenter : [number, number, number, number] =
-                [center[0] - 30, center[1] - 30, center[0] + 30, center[1] + 30];
-            const squareLeftUp : [number, number, number, number] =
-                [(0 + center[0]) / 2 - 30, (0 + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (0 + center[1]) / 2 + 30];
-            const squareLeftDown : [number, number, number, number] =
-                [(0 + center[0]) / 2 - 30, (this._bottomWall + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (this._bottomWall + center[1]) / 2 + 30];
-            const squareRightUp : [number, number, number, number] =
-                [(center[0] + this._rightWall) / 2 - 30, (0 + center[1]) / 2 - 30, (center[0] + this._rightWall) / 2 + 30, (0 + center[1]) / 2 + 30];
-            const squareRightDown : [number, number, number, number] =
-                [(center[0] + this._rightWall) / 2 - 30, (center[1] + this._bottomWall) / 2 - 30, (center[0] + this._rightWall) + 30, (center[1] + this._bottomWall) / 2 + 30];
-            
-            if (this.isCollisionSC(this._ball, 10, squareCenter)) {
+            const squares = this._gameInfo.obstacle as SquareObstacle
+            if (this.isCollisionSC(this._ball, 10, squares.obs00)) {
                 return true;
-            } else if (this.isCollisionSC(this._ball, 10, squareLeftUp)) {
+            } else if (this.isCollisionSC(this._ball, 10, squares.obs01)) {
                 return true;
-            } else if (this.isCollisionSC(this._ball, 10, squareLeftDown)) {
+            } else if (this.isCollisionSC(this._ball, 10, squares.obs02)) {
                 return true;
-            } else if (this.isCollisionSC(this._ball, 10, squareRightUp)) {
-                return true;
-            } else if (this.isCollisionSC(this._ball, 10, squareRightDown)) {
+            } else if (this.isCollisionSC(this._ball, 10, squares.obs03)) {
                 return true;
             }
         } else if (type == 2) {
             // Circle
-            const ballCenter : [number, number] = [center[0], center[1]];
-            const ballLeftUp : [number, number] = [(0 + center[0]) / 2, (0 + center[1]) / 2];
-            const ballLeftDown : [number, number] = [(0 + center[0]) / 2, (center[1] + this._bottomWall) / 2];
-            const ballRightUp : [number, number] = [(center[0] + this._rightWall) / 2, (0 + center[1]) / 2];
-            const ballRightDown : [number, number] = [(center[0] + this._rightWall) / 2, (center[1] + this._bottomWall) / 2];
-            if (this.isCollisionCC(this._ball, 10, ballCenter, 30)) {
+            const circles = this._gameInfo.obstacle as CircleObstacle
+            if (this.isCollisionCC(this._ball, 10, circles.obs00)) {
                 return true;
-            } else if (this.isCollisionCC(this._ball, 10, ballLeftUp, 30)) {
+            } else if (this.isCollisionCC(this._ball, 10, circles.obs01)) {
                 return true;
-            } else if (this.isCollisionCC(this._ball, 10, ballLeftDown, 30)) {
+            } else if (this.isCollisionCC(this._ball, 10, circles.obs02)) {
                 return true;
-            } else if (this.isCollisionCC(this._ball, 10, ballRightUp, 30)) {
-                return true;
-            } else if (this.isCollisionCC(this._ball, 10, ballRightDown, 30)) {
+            } else if (this.isCollisionCC(this._ball, 10, circles.obs03)) {
                 return true;
             }
         }
@@ -359,8 +349,20 @@ export class GameLogic {
             this._direction[1] *= -1;
         } else if (this.isCollisionSC(this._ball, 10, this._bar00)) {
             // console.log("collision bar00");
+            // bar의 움직임에 따라 방향 값 회전
+            console.log("bar : " + this._bar00[1]);
+            console.log('bar pre: ' + this._bar00_pre);
+            const movingValue = this._bar00[1] - this._bar00_pre;
+            console.log("bar movement: " + movingValue);
+            console.log("rotate: " + (movingValue * this._correction));
+            this.rotate(movingValue * this._correction);
         } else if (this.isCollisionSC(this._ball, 10, this._bar01)) {
             // console.log("collision bar01");
+            // bar의 움직임에 따라 방향 값 회전
+            const movingValue = this._bar01[1] - this._bar01_pre;
+            console.log("bar movement: " + movingValue);
+            console.log("rotate: " + (movingValue * this._correction));
+            this.rotate(movingValue * this._correction);
         } else if (this.checkCollisionType(this._type)) {
             // console.log("collision brick");
         } else {
