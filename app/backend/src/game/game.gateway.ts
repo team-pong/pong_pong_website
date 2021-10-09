@@ -35,9 +35,13 @@ interface socketInfo {
 	match: MatchInfo,
 }
 
-var normal_waiting: WaitUser[] = [];
+interface Game {
+	timeout: NodeJS.Timeout,
+}
 
+var normal_waiting: WaitUser[] = [];
 var socket_infos: {[key: string]: socketInfo} = {};
+var games: {[key: string]: Game} = {};
 
 /*!
  * @brief 게임 연결용 웹소켓
@@ -52,8 +56,6 @@ export class GameGateway {
 		private usersService: UsersService,
 		private matchService: MatchService,
 	) {}
-
-	private timeout : NodeJS.Timeout
 
 	@WebSocketServer()public server: Server;
 
@@ -157,7 +159,7 @@ export class GameGateway {
 				playerLeft.socket.emit('matchEnd', 'LOSE');
 				playerRight.socket.emit('matchEnd', 'WIN');
 				clearInterval(updateInterval);
-				clearTimeout(this.timeout);
+				clearTimeout(games[socket_infos[socket.id].rid].timeout);
 				clearInterval(gameLogic._leftBarMovement);
 				clearInterval(gameLogic._rightBarMovement);
 				playerRight.socket.removeAllListeners();
@@ -169,7 +171,7 @@ export class GameGateway {
 				playerLeft.socket.emit('matchEnd', 'WIN');
 				playerRight.socket.emit('matchEnd', 'LOSE');
 				clearInterval(updateInterval);
-				clearTimeout(this.timeout);
+				clearTimeout(games[socket_infos[socket.id].rid].timeout);
 				clearInterval(gameLogic._leftBarMovement);
 				clearInterval(gameLogic._rightBarMovement);
 				playerRight.socket.removeAllListeners();
@@ -177,9 +179,11 @@ export class GameGateway {
 			})
 			let updateInterval : NodeJS.Timeout;
 			console.log("timeout start");
-			this.timeout = setTimeout(() => {
+			games[socket_infos[socket.id].rid] = {timeout: null};
+			this.server.to(roomName).emit("startCount");
+			games[socket_infos[socket.id].rid].timeout = setTimeout(() => {
 				updateInterval = setInterval(() => {
-					this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic);
+					this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic, socket);
 				}, 20)
 				console.log("timeout end");
 			}, 3000)
@@ -197,7 +201,7 @@ export class GameGateway {
 			 */
 			socket.on("disconnect", () => {
 				clearInterval(updateInterval);
-				clearTimeout(this.timeout);
+				clearTimeout(games[socket_infos[socket.id].rid].timeout);
 				clearInterval(gameLogic._leftBarMovement);
 				clearInterval(gameLogic._rightBarMovement);
 				playerRight.socket.removeAllListeners();
@@ -217,13 +221,14 @@ export class GameGateway {
 					this.matchService.createMatch(winner, loser, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
 					playerLeft.socket.emit('matchEnd', 'WIN');
 				}
+				delete games[socket_infos[socket.id].rid];
 				delete socket_infos[socket.id];
 			})
 		}
 		console.log('waiting:', normal_waiting);
   }
 
-	gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic) {
+	gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic, socket) {
 		if (gameLogic._score == Scored.PLAYER00) {
 			console.log("left win");
 			userInfo.lPlayerScore++;
@@ -238,7 +243,7 @@ export class GameGateway {
 					playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
 	
 					clearInterval(updateInterval);
-					clearTimeout(this.timeout);
+					clearTimeout(games[socket_infos[socket.id].rid].timeout);
 					clearInterval(gameLogic._leftBarMovement);
 					clearInterval(gameLogic._rightBarMovement);
 					playerRight.socket.removeAllListeners()
@@ -247,9 +252,10 @@ export class GameGateway {
 					// 
 				} else {
 					console.log("timeout start");
-					this.timeout = setTimeout(() => {
+					this.server.to(socket_infos[socket.id].rid).emit("startCount");
+					games[socket_infos[socket.id].rid].timeout = setTimeout(() => {
 						updateInterval = setInterval(() => {
-							this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic);
+							this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic, socket);
 						}, 20)
 						console.log("timeout end");
 					}, 3000)
@@ -268,7 +274,7 @@ export class GameGateway {
 					playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
 	
 					clearInterval(updateInterval);
-					clearTimeout(this.timeout);
+					clearTimeout(games[socket_infos[socket.id].rid].timeout);
 					clearInterval(gameLogic._leftBarMovement);
 					clearInterval(gameLogic._rightBarMovement);
 					playerRight.socket.removeAllListeners()
@@ -277,9 +283,10 @@ export class GameGateway {
 					// 
 				} else {
 					console.log("timeout start");
-					this.timeout = setTimeout(() => {
+					this.server.to(socket_infos[socket.id].rid).emit("startCount");
+					games[socket_infos[socket.id].rid].timeout = setTimeout(() => {
 						updateInterval = setInterval(() => {
-							this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic);
+							this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic, socket);
 						}, 20)
 						console.log("timeout end");
 					}, 3000)
