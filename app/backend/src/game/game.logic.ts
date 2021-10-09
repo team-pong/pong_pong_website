@@ -15,6 +15,31 @@ enum Edge {
     BOTTOM
 }
 
+interface Obstacle {}
+interface SquareObstacle extends Obstacle {
+    obs00: [number, number, number, number],
+    obs01: [number, number, number, number],
+    obs02: [number, number, number, number],
+    obs03: [number, number, number, number],
+    obs04: [number, number, number, number]
+}
+
+interface CircleObstacle extends Obstacle {
+    obs00: [number, number, number],
+    obs01: [number, number, number],
+    obs02: [number, number, number],
+    obs03: [number, number, number],
+    obs04: [number, number, number]
+}
+
+interface GameInfo {
+    type: number,
+    ball: [number, number],
+    bar00: [number, number, number, number],
+    bar01: [number, number, number, number],
+    obstacle: Obstacle
+}
+
 export class GameLogic {
     _rightWall : number;
     _bottomWall : number;
@@ -31,6 +56,8 @@ export class GameLogic {
     _score : Scored = Scored.NONE;
     _leftBarMovement : NodeJS.Timeout;
     _rightBarMovement : NodeJS.Timeout;
+    _type : number;
+    _gameInfo : GameInfo;
 
     constructor(
         width : number,
@@ -53,13 +80,43 @@ export class GameLogic {
         this._bar01[2] = width - 50
         this._bar01[3] = (height / 3) * 2
 
+        this._type = init;
+
         this._direction[0] = (init / init)
         this._direction[1] = (init / init)
-
         this._speed = 3;
         this._correction = 0.1;
         this._server = server;
         this._iscollision = false;
+
+        let obs : Obstacle = {}
+        const center : [number, number] = [this._rightWall / 2, this._bottomWall / 2];
+        if (init == 1) {
+            const obstacle : SquareObstacle = {
+                obs00: [center[0] - 30, center[1] - 30, center[0] + 30, center[1] + 30],
+                obs01: [(0 + center[0]) / 2 - 30, (0 + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (0 + center[1]) / 2 + 30],
+                obs02: [(0 + center[0]) / 2 - 30, (this._bottomWall + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (this._bottomWall + center[1]) / 2 + 30],
+                obs03: [(center[0] + this._rightWall) / 2 - 30, (0 + center[1]) / 2 - 30, (center[0] + this._rightWall) / 2 + 30, (0 + center[1]) / 2 + 30],
+                obs04: [(center[0] + this._rightWall) / 2 - 30, (center[1] + this._bottomWall) / 2 - 30, (center[0] + this._rightWall) + 30, (center[1] + this._bottomWall) / 2 + 30]
+            };
+            obs = obstacle
+        } else if (init == 2) {
+            const obstacle : CircleObstacle = {
+                obs00: [center[0], center[1], 30],
+                obs01: [(0 + center[0]) / 2, (0 + center[1]) / 2, 30],
+                obs02: [(0 + center[0]) / 2, (center[1] + this._bottomWall) / 2, 30],
+                obs03: [(center[0] + this._rightWall) / 2, (0 + center[1]) / 2, 30],
+                obs04: [(center[0] + this._rightWall) / 2, (center[1] + this._bottomWall) / 2, 30]
+            }
+            obs = obstacle
+        }
+        this._gameInfo = {
+            ball: [width / 2, height / 2],
+            bar00: [50, height / 3, 60, (height / 3) * 2],
+            bar01: [width - 60, height / 3, width - 50, (height / 3) * 2],
+            type: init,
+            obstacle: obs
+        }
     }
 
     // dir이 true라면 위로, false면 아래로
@@ -104,6 +161,22 @@ export class GameLogic {
         return { bar00:this._bar00, bar01:this._bar01, ball:this._ball}
     }
 
+    getObstacle() {
+        if (this._type == 1) {
+            const squares = this._gameInfo.obstacle as SquareObstacle
+            return { obs00:squares.obs00, obs01:squares.obs01, obs02:squares.obs02, obs03:squares.obs03, obs04:squares.obs04 };
+        } else if (this._type == 2) {
+            const circles = this._gameInfo.obstacle as CircleObstacle
+            return { obs00:circles.obs00, obs01:circles.obs01, obs02:circles.obs02, obs03:circles.obs03, obs04:circles.obs04 };
+        } else {
+            return {}
+        }
+    }
+
+    getInitJson() {
+        return { ball:this._ball, bar00:this._bar00, bar01:this._bar01, obstacle:this.getObstacle(), type:this._type }
+    }
+
     initGame() {
         console.log("init game");
         this._ball[0] = this._rightWall / 2 // ballX
@@ -119,6 +192,7 @@ export class GameLogic {
         this._bar01[2] = this._rightWall - 50
         this._bar01[3] = (this._bottomWall / 3) * 2
 
+        // 서브 넣는 방향 조절 필요, 진 사람쪽 x방향으로 공 날리던가 하면 됨
         this._direction[0] = (1 / 1)
         this._direction[1] = (1 / 1)
 
@@ -221,6 +295,54 @@ export class GameLogic {
         }
     }
 
+    checkCollisionType(type : number) : Boolean {
+        const center : [number, number] = [this._rightWall / 2, this._bottomWall / 2];
+        if (type == 1) {
+            // Square
+            const squareCenter : [number, number, number, number] =
+                [center[0] - 30, center[1] - 30, center[0] + 30, center[1] + 30];
+            const squareLeftUp : [number, number, number, number] =
+                [(0 + center[0]) / 2 - 30, (0 + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (0 + center[1]) / 2 + 30];
+            const squareLeftDown : [number, number, number, number] =
+                [(0 + center[0]) / 2 - 30, (this._bottomWall + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (this._bottomWall + center[1]) / 2 + 30];
+            const squareRightUp : [number, number, number, number] =
+                [(center[0] + this._rightWall) / 2 - 30, (0 + center[1]) / 2 - 30, (center[0] + this._rightWall) / 2 + 30, (0 + center[1]) / 2 + 30];
+            const squareRightDown : [number, number, number, number] =
+                [(center[0] + this._rightWall) / 2 - 30, (center[1] + this._bottomWall) / 2 - 30, (center[0] + this._rightWall) + 30, (center[1] + this._bottomWall) / 2 + 30];
+            
+            if (this.isCollisionSC(this._ball, 10, squareCenter)) {
+                return true;
+            } else if (this.isCollisionSC(this._ball, 10, squareLeftUp)) {
+                return true;
+            } else if (this.isCollisionSC(this._ball, 10, squareLeftDown)) {
+                return true;
+            } else if (this.isCollisionSC(this._ball, 10, squareRightUp)) {
+                return true;
+            } else if (this.isCollisionSC(this._ball, 10, squareRightDown)) {
+                return true;
+            }
+        } else if (type == 2) {
+            // Circle
+            const ballCenter : [number, number] = [center[0], center[1]];
+            const ballLeftUp : [number, number] = [(0 + center[0]) / 2, (0 + center[1]) / 2];
+            const ballLeftDown : [number, number] = [(0 + center[0]) / 2, (center[1] + this._bottomWall) / 2];
+            const ballRightUp : [number, number] = [(center[0] + this._rightWall) / 2, (0 + center[1]) / 2];
+            const ballRightDown : [number, number] = [(center[0] + this._rightWall) / 2, (center[1] + this._bottomWall) / 2];
+            if (this.isCollisionCC(this._ball, 10, ballCenter, 30)) {
+                return true;
+            } else if (this.isCollisionCC(this._ball, 10, ballLeftUp, 30)) {
+                return true;
+            } else if (this.isCollisionCC(this._ball, 10, ballLeftDown, 30)) {
+                return true;
+            } else if (this.isCollisionCC(this._ball, 10, ballRightUp, 30)) {
+                return true;
+            } else if (this.isCollisionCC(this._ball, 10, ballRightDown, 30)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     checkCollision(radius : number) {
         const ballX = this._ball[0] + this._direction[0] * this._speed;
         const ballY = this._ball[1] + this._direction[1] * this._speed;
@@ -239,50 +361,11 @@ export class GameLogic {
             // console.log("collision bar00");
         } else if (this.isCollisionSC(this._ball, 10, this._bar01)) {
             // console.log("collision bar01");
+        } else if (this.checkCollisionType(this._type)) {
+            // console.log("collision brick");
         } else {
             this._iscollision = false;
         }
-        // else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, up])) { // bar 0 = 좌측 상단의 x, 1 = y, 2 = 우측 하단의 x, 3 = y
-        //     if (this._iscollision == false) {
-        //         this._direction[1] *= -1
-        //         this._iscollision = true;
-        //     }
-        // } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [ballX, down])) {
-        //     if (this._iscollision == false) {
-        //         this._direction[1] *= -1
-        //         this._iscollision = true;
-        //     }
-        // } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [left, ballY])) {
-        //     if (this._iscollision == false) {
-        //         this._direction[0] *= -1;
-        //         this._iscollision = true;
-        //     }
-        // } else if (this.checkBarInside(this._bar00[1], this._bar00[3], this._bar00[0], this._bar00[2], [right, ballY])) {
-        //     if (this._iscollision == false) {
-        //         this._direction[0] *= -1;
-        //         this._iscollision = true;
-        //     }
-        // } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, up])) {
-        //     if (this._iscollision == false) {
-        //         this._direction[1] *= -1;
-        //         this._iscollision = true;
-        //     }
-        // } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [ballX, down])) {
-        //     if (this._iscollision == false) {
-        //         this._direction[1] *= -1;
-        //         this._iscollision = true;
-        //     }
-        // } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [left, ballY])) {
-        //     if (this._iscollision == false) {
-        //         this._direction[0] *= -1;
-        //         this._iscollision = true;
-        //     }
-        // } else if (this.checkBarInside(this._bar01[1], this._bar01[3], this._bar01[0], this._bar01[2], [right, ballY])) {
-        //     if (this._iscollision == false) {
-        //         this._direction[0] *= -1;
-        //         this._iscollision = true;
-        //     }
-        // }
     }
 
     isScored(radius : number) {

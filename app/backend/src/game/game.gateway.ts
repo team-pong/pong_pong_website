@@ -71,7 +71,7 @@ export class GameGateway {
 		if (normal_waiting.length >= 2) {
 			console.log('매칭 완료');
 			
-			const gameLogic = new GameLogic(700, 450, 1, this.server);
+			const gameLogic = new GameLogic(700, 450, 2, this.server);
 			const playerLeft = normal_waiting[0];
 			const playerRight = normal_waiting[1];
 
@@ -99,8 +99,8 @@ export class GameGateway {
 			socket_infos[playerLeft.socket.id].match = userInfo;
 			socket_infos[playerRight.socket.id].match = userInfo;
 
-			playerLeft.socket.emit('init', gameLogic.getJson(), userInfo);
-			playerRight.socket.emit('init', gameLogic.getJson(), userInfo);
+			playerLeft.socket.emit('init', gameLogic.getInitJson(), userInfo);
+			playerRight.socket.emit('init', gameLogic.getInitJson(), userInfo);
 			// this.server.to(roomName).emit("init", gameLogic.getJson());
 
 			playerLeft.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.lPlayerNickname} );
