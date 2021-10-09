@@ -180,6 +180,7 @@ export class GameGateway {
 			let updateInterval : NodeJS.Timeout;
 			console.log("timeout start");
 			games[socket_infos[socket.id].rid] = {timeout: null};
+			this.server.to(roomName).emit("startCount");
 			games[socket_infos[socket.id].rid].timeout = setTimeout(() => {
 				updateInterval = setInterval(() => {
 					this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic, socket);
@@ -220,6 +221,7 @@ export class GameGateway {
 					this.matchService.createMatch(winner, loser, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
 					playerLeft.socket.emit('matchEnd', 'WIN');
 				}
+				delete games[socket_infos[socket.id].rid];
 				delete socket_infos[socket.id];
 			})
 		}
@@ -250,6 +252,7 @@ export class GameGateway {
 					// 
 				} else {
 					console.log("timeout start");
+					this.server.to(socket_infos[socket.id].rid).emit("startCount");
 					games[socket_infos[socket.id].rid].timeout = setTimeout(() => {
 						updateInterval = setInterval(() => {
 							this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic, socket);
@@ -280,6 +283,7 @@ export class GameGateway {
 					// 
 				} else {
 					console.log("timeout start");
+					this.server.to(socket_infos[socket.id].rid).emit("startCount");
 					games[socket_infos[socket.id].rid].timeout = setTimeout(() => {
 						updateInterval = setInterval(() => {
 							this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic, socket);
