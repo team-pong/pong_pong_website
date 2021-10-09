@@ -172,39 +172,8 @@ export class GameGateway {
 				playerLeft.socket.removeAllListeners();
 			})
 
-			const updateInterval = setInterval(() => {
-				if (userInfo.lPlayerScore == 3
-					|| userInfo.rPlayerScore == 3
-					|| (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
-						playerLeft.socket.emit('matchEnd', userInfo.lPlayerScore == 3 ? 'WIN' : 'LOSE');
-						playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
-
-						clearInterval(updateInterval);
-						clearInterval(gameLogic._leftBarMovement);
-						clearInterval(gameLogic._rightBarMovement);
-						playerRight.socket.removeAllListeners()
-						playerLeft.socket.removeAllListeners()
-						// 게임 끝남, 전적 DB에 저장, 모달창 닫도록 프론트에 전달, 소켓 연결 끊고 리소스 정리
-						// 
-					}
-				if (gameLogic._score == Scored.PLAYER00) {
-					console.log("left win");
-					userInfo.lPlayerScore++;
-					gameLogic.initGame();
-					playerLeft.socket.emit('setMatchInfo', userInfo);
-					playerRight.socket.emit('setMatchInfo', userInfo);
-				} else if (gameLogic._score == Scored.PLAYER01) {
-					console.log("right win");
-					userInfo.rPlayerScore++;
-					gameLogic.initGame();
-					playerLeft.socket.emit('setMatchInfo', userInfo);
-					playerRight.socket.emit('setMatchInfo', userInfo);
-				} else {
-					// frontㅇㅔ서 준비 완료되면 시작(3, 2, 1, Start 메시지)
-					gameLogic.update();
-					playerLeft.socket.emit("update", gameLogic.getJson());
-					playerRight.socket.emit("update", gameLogic.getJson());	
-				}
+			let updateInterval = setInterval(() => {
+				this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic);
 			}, 20)
 			// gamsScore ㅇㅣㄹ정 값 되면 update interval 제거
 			
@@ -241,6 +210,54 @@ export class GameGateway {
 		}
 		console.log('waiting:', normal_waiting);
   }
+
+	gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic) {
+
+		if (userInfo.lPlayerScore == 3
+			|| userInfo.rPlayerScore == 3
+			|| (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
+				playerLeft.socket.emit('matchEnd', userInfo.lPlayerScore == 3 ? 'WIN' : 'LOSE');
+				playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
+
+				clearInterval(updateInterval);
+				clearInterval(gameLogic._leftBarMovement);
+				clearInterval(gameLogic._rightBarMovement);
+				playerRight.socket.removeAllListeners()
+				playerLeft.socket.removeAllListeners()
+				// 게임 끝남, 전적 DB에 저장, 모달창 닫도록 프론트에 전달, 소켓 연결 끊고 리소스 정리
+				// 
+			}
+		if (gameLogic._score == Scored.PLAYER00) {
+			console.log("left win");
+			userInfo.lPlayerScore++;
+			gameLogic.initGame();
+			playerLeft.socket.emit('setMatchInfo', userInfo);
+			playerRight.socket.emit('setMatchInfo', userInfo);
+			clearInterval(updateInterval);
+			setTimeout(() => {
+				updateInterval = setInterval(() => {
+					this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic);
+				}, 20)
+			}, 3000)
+		} else if (gameLogic._score == Scored.PLAYER01) {
+			console.log("right win");
+			userInfo.rPlayerScore++;
+			gameLogic.initGame();
+			playerLeft.socket.emit('setMatchInfo', userInfo);
+			playerRight.socket.emit('setMatchInfo', userInfo);
+			clearInterval(updateInterval);
+			setTimeout(() => {
+				updateInterval = setInterval(() => {
+					this.gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic);
+				}, 20)
+			}, 3000)
+		} else {
+			// frontㅇㅔ서 준비 완료되면 시작(3, 2, 1, Start 메시지)
+			gameLogic.update();
+			playerLeft.socket.emit("update", gameLogic.getJson());
+			playerRight.socket.emit("update", gameLogic.getJson());	
+		}
+	}
 
 	@SubscribeMessage('ladder')
 	async handdleMessage(@ConnectedSocket() socket: Socket) {
