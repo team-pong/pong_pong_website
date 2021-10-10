@@ -9,11 +9,9 @@ import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
 import { Scored, GameLogic } from './game.logic';
 
-class WaitUser {
-	constructor(
-		public id: string,
-		public socket: Socket,
-	) {}
+interface User {
+	id: string,
+	socket: Socket,
 }
 
 interface MatchInfo {
@@ -36,10 +34,10 @@ interface socketInfo {
 }
 
 interface Game {
-	timeout: NodeJS.Timeout,
+	timeout: NodeJS.Timeout
 }
 
-var normal_waiting: WaitUser[] = [];
+var normal_queue: User[] = [];
 var socket_infos: {[key: string]: socketInfo} = {};
 var games: {[key: string]: Game} = {};
 
@@ -68,23 +66,33 @@ export class GameGateway {
 
 		socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null};
 		// 큐에 넣기
-		normal_waiting.push(new WaitUser(userid, socket));
+		if (normal_queue.find((element) => {
+			if (element.id == userid) {
+				return true;
+			}
+			return false;
+		})) {
+			console.log('중복 대기열:', userid);
+		} else {
+			normal_queue.push({id: userid, socket: socket})
+		}
+		
 		// 2인 이상시 매칭
-		if (normal_waiting.length >= 2) {
+		if (normal_queue.length >= 2) {
 			console.log('매칭 완료');
 			
 			const gameLogic = new GameLogic(700, 450, 2, this.server);
-			const playerLeft = normal_waiting[0];
-			const playerRight = normal_waiting[1];
+			const playerLeft = normal_queue[0];
+			const playerRight = normal_queue[1];
 
 			const roomName: string = playerLeft.id + playerRight.id;
 			socket_infos[playerLeft.socket.id].rid = roomName;
 			socket_infos[playerRight.socket.id].rid = roomName;
 			playerLeft.socket.join(roomName);
 			playerRight.socket.join(roomName);
-			playerLeft.socket.emit('matched', {roomId: roomName, opponent: normal_waiting[1].id, position: 'left'});
-			playerRight.socket.emit('matched', {roomId: roomName, opponent: normal_waiting[0].id, position: 'right'});
-			normal_waiting.splice(0, 2);
+			playerLeft.socket.emit('matched', {roomId: roomName, opponent: normal_queue[1].id, position: 'left'});
+			playerRight.socket.emit('matched', {roomId: roomName, opponent: normal_queue[0].id, position: 'right'});
+			normal_queue.splice(0, 2);
 			console.log(socket.client.conn.server)
 
 			const ret = gameLogic.getJson();
@@ -238,7 +246,7 @@ export class GameGateway {
 			})
 
 		}
-		console.log('waiting:', normal_waiting);
+		console.log('waiting:', normal_queue);
   }
 
 	gameInterval(userInfo, playerLeft, playerRight, updateInterval, gameLogic, socket) {
@@ -327,17 +335,19 @@ export class GameGateway {
 
 	handleDisconnect(@ConnectedSocket() socket: Socket) {
 		console.log('Game 웹소켓 연결 해제', socket_infos[socket.id]?.uid);
-		if (!socket_infos[socket.id]?.rid) {
-			for (let i = 0; i < normal_waiting.length; i++) {
-				if (normal_waiting[i].socket.id === socket.id)  {
-					console.log('delete waiting queue', socket_infos[socket.id]?.uid);
-					normal_waiting.splice(i, 1);
-					i--;
-					delete socket_infos[socket.id];
 
-					return ;
-				}
+		const isSameSocketID = (element) => {
+			if (element.socket.id == socket.id) {
+				return true;
 			}
+			return false;
 		}
+
+		// 대기열에 있다면 대기열에서 제거
+		const idx = normal_queue.findIndex(isSameSocketID);
+		if (idx != -1) {
+			normal_queue.splice(idx, 1);
+		}
+		delete socket_infos[socket.id];
 	}
 }
