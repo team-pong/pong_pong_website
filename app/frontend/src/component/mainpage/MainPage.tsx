@@ -1,7 +1,7 @@
 import Modal, { ChatContent, RecordContent, GameContent } from '../modal/Modal';
 import NavBar from './navbar/NavBar';
 import Dm from './dm/Dm';
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useReducer, useState } from "react";
 import "/src/scss/mainpage/MainPage.scss";
 import "/src/scss/mainpage/MainPage-media.scss";
 import "/src/scss/mainpage/MainPage-mobile.scss";
@@ -25,26 +25,52 @@ interface UserInfo {
   status: string;
 }
 
+const userInfoinit = (userInfo: UserInfo) => {
+  if (userInfo) {
+    return {
+      user_id: userInfo.user_id,
+      nick: userInfo.nick,
+      avatar_url: userInfo.avatar_url,
+      total_games: userInfo.total_games,
+      win_games: userInfo.win_games,
+      loss_games: userInfo.loss_games,
+      ladder_level: userInfo.ladder_level,
+      status: userInfo.status,
+    }
+  }
+}
+
+const userInfoReducer = (state, action) => {
+  switch (action.type) {
+    case "CHANGE":
+      return action.info;
+    case "INIT":
+      return userInfoinit(action.info);
+  }
+}
+
 export const UserInfoContext = createContext(null);
+export const UserInfoDispatchContext = createContext(null);
 
 const MainPage = ({match}): JSX.Element => {
-
+  
   const [isDmOpen, setIsDmOpen] = useState(false);
   const [updateFriendList, setUpdateFriendList] = useState({state: "", user_id: ""});
   const [unReadMsg, setUnReadMsg] = useState(1);
-  const [userInfo, setUserInfo] = useState<UserInfo>(null);
-
+  
+  const [userInfoState, userInfoDispatch] = useReducer(userInfoReducer, null);
+  
   const getUserInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
     const res = await easyfetch.fetch();
-
-    if (res.err_msg) return null;
-    setUserInfo(res);
+    
     return res;
   }
 
   useEffect(() => {
-    getUserInfo();
+    getUserInfo()
+    .then((res) => userInfoDispatch({type: "INIT", info: res}));
+
     global.socket.on("online", ({user_id}) => {
       setUpdateFriendList({state: "online", user_id: user_id});
     });
@@ -56,58 +82,62 @@ const MainPage = ({match}): JSX.Element => {
     });
   }, []);
 
-  if (userInfo) {
+  if (userInfoState) {
     return (
       <>
-        {console.log("MyInfo: ", userInfo)}
-        <UserInfoContext.Provider value={userInfo}>
-        <NavBar update={updateFriendList}/>
-        <main>
-          <div id="button-container">
-            <Link
-              to={`${match.url}/record`}
-              style={{textDecoration: "none"}}
-              className="buttons"
-              id="record">
-              전적
-              <span className="mp-explain-span">게임 전적을 보려면 누르세요!</span>
-            </Link>
-            <Link
-              to={`${match.url}/chat`}
-              style={{textDecoration: "none"}}
-              className="buttons"
-              id="chat">
-              채팅
-              <span className="mp-explain-span">친구와 채팅을 하려면 누르세요!</span>
-            </Link>
-            <Link
-              to={`${match.path}/game`}
-              style={{textDecoration: "none"}}
-              className="buttons"
-              id="game">
-                게임
-              <span className="mp-explain-span">게임을 하려면 누르세요!</span>
-            </Link>
-            <section id="dm-section">
-              <Dm isDmOpen={isDmOpen}/>
-              <button id="dm-controll-button" onClick={() => setIsDmOpen(!isDmOpen)}>
-                {unReadMsg && <div className="un-read-msg">{unReadMsg}</div>}
-                {!isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
-                {isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
-              </button>
-            </section>
-          </div>
-          <Switch>
-            <Route path={`${match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
-            <Route path={`${match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
-            <Route path={`${match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route>
-          </Switch>
-        </main>
+        <UserInfoContext.Provider value={userInfoState}>
+          <UserInfoDispatchContext.Provider value={userInfoDispatch}>
+            <NavBar update={updateFriendList}/>
+            <main>
+              <div id="button-container">
+                <Link
+                  to={`${match.url}/record`}
+                  style={{textDecoration: "none"}}
+                  className="buttons"
+                  id="record">
+                  전적
+                  <span className="mp-explain-span">게임 전적을 보려면 누르세요!</span>
+                </Link>
+                <Link
+                  to={`${match.url}/chat`}
+                  style={{textDecoration: "none"}}
+                  className="buttons"
+                  id="chat">
+                  채팅
+                  <span className="mp-explain-span">친구와 채팅을 하려면 누르세요!</span>
+                </Link>
+                <Link
+                  to={`${match.path}/game`}
+                  style={{textDecoration: "none"}}
+                  className="buttons"
+                  id="game">
+                    게임
+                  <span className="mp-explain-span">게임을 하려면 누르세요!</span>
+                </Link>
+                <section id="dm-section">
+                  <Dm isDmOpen={isDmOpen}/>
+                  <button id="dm-controll-button" onClick={() => setIsDmOpen(!isDmOpen)}>
+                    {unReadMsg && <div className="un-read-msg">{unReadMsg}</div>}
+                    {!isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
+                    {isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
+                  </button>
+                </section>
+              </div>
+              <Switch>
+                <Route path={`${match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
+                <Route path={`${match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
+                <Route path={`${match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route>
+              </Switch>
+            </main>
+          </UserInfoDispatchContext.Provider>
         </UserInfoContext.Provider>
       </>
     );
+  } else {
+    return (
+      <Loading color="grey" style={{width: "100px", height: "100px"}} />
+    );
   }
-  return <></>;
 }
 
 export default MainPage;
