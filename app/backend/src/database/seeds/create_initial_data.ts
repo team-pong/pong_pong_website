@@ -96,6 +96,8 @@ export class createInitialData implements Seeder {
 				{user_id: 'unknown', nick: 'unknown', avatar_url: 'https://gravatar.com/avatar/d9344b9901723e7ec67159e63c4f999?s=400&d=robohash&r=x'},
 				{user_id: 'tester01', nick: 'tester01', avatar_url: 'https://gravatar.com/avatar/d9344b9901723e7ec67159e63c4f199?s=400&d=robohash&r=x'},
 				{user_id: 'tester02', nick: 'tester02', avatar_url: 'https://gravatar.com/avatar/d9344b9901723e7ec67159e63c4f299?s=400&d=robohash&r=x'},
+				{user_id: 'tester03', nick: 'tester03', avatar_url: 'https://gravatar.com/avatar/d9341b9901723e7ec67159e63c4f918?s=400&d=robohash&r=x'},
+				{user_id: 'tester04', nick: 'tester04', avatar_url: 'https://gravatar.com/avatar/d9341b9901723e7ec67159e63c4f928?s=400&d=robohash&r=x'},
 			])
 			.execute();
 	}
