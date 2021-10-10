@@ -72,20 +72,6 @@ const BarMovementEventListner = (e: any, game_logic: GameLogic, user_position: P
 	}
 }
 
-const ClearGameInterval = (game: Game) => {
-	clearInterval(game.interval);
-	clearTimeout(game.timeout);
-}
-
-const ClearGameLogicInterval = (gameLogic: GameLogic) => {
-	clearInterval(gameLogic._leftBarMovement);
-	clearInterval(gameLogic._rightBarMovement);
-}
-
-const ClearIntervals = (game: Game, gameLogic: GameLogic) => {
-	ClearGameInterval(game);
-	ClearGameLogicInterval(gameLogic);
-}
 /*!
  * @brief 게임 연결용 웹소켓
  * @notice 1. 프론트 서버에서 접근 허용을 위해 cors 옵션을 true로 해야함.
@@ -101,6 +87,21 @@ export class GameGateway {
 	) {}
 
 	@WebSocketServer()public server: Server;
+
+	ClearGameInterval(game: Game) {
+		clearInterval(game.interval);
+		clearTimeout(game.timeout);
+	}
+
+	ClearGameLogicInterval(gameLogic: GameLogic) {
+		clearInterval(gameLogic._leftBarMovement);
+		clearInterval(gameLogic._rightBarMovement);
+	}
+	
+	ClearIntervals(game: Game, gameLogic: GameLogic) {
+		this.ClearGameInterval(game);
+		this.ClearGameLogicInterval(gameLogic);
+	}
 
   @SubscribeMessage('normal')
   async handleMessage(@ConnectedSocket() socket: Socket) {
@@ -163,30 +164,26 @@ export class GameGateway {
 			/*
 			 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
 			*/
-			playerLeft.socket.on("giveUp", () => {
-				this.matchService.createMatch(playerRight.id, playerLeft.id, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
-				playerLeft.socket.emit('matchEnd', 'LOSE');
-				playerRight.socket.emit('matchEnd', 'WIN');
-				ClearIntervals(games[room_id], gameLogic);
-				playerRight.socket.removeAllListeners();
-				playerLeft.socket.removeAllListeners();
-			})
-
-			playerRight.socket.on("giveUp", () => {
-				this.matchService.createMatch(playerLeft.id, playerRight.id, gameLogic._score[0], gameLogic._score[1], 'normal', 0);
-				playerLeft.socket.emit('matchEnd', 'WIN');
-				playerRight.socket.emit('matchEnd', 'LOSE');
-				ClearIntervals(games[room_id], gameLogic);
-				playerRight.socket.removeAllListeners();
-				playerLeft.socket.removeAllListeners();
-			})
+			const GiveUpEventListener = (position: Position) => {
+				const winner = position == 'l' ? playerRight : playerLeft;
+				const loser = position == 'l' ? playerLeft : playerRight;
+				this.matchService.createMatch(winner.id, loser.id, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
+				loser.socket.emit('matchEnd', 'LOSE');
+				winner.socket.emit('matchEnd', 'WIN');
+				this.ClearIntervals(games[room_id], gameLogic);
+				winner.socket.removeAllListeners();
+				loser.socket.removeAllListeners();
+			}
+			
+			playerLeft.socket.on("giveUp", () => GiveUpEventListener('l'));
+			playerRight.socket.on("giveUp", () => GiveUpEventListener('r'));
 			console.log("timeout start");
 
 			games[room_id] = {timeout: null, interval: null};
 			this.server.to(room_id).emit("startCount");
 			games[room_id].timeout = setTimeout(() => {
 				games[room_id].interval = setInterval(() => {
-					gameInterval(userInfo, playerLeft, playerRight, room_id, gameLogic, socket);
+					gameInterval(userInfo, playerLeft, playerRight, room_id, gameLogic);
 				}, 20)
 				console.log("timeout end");
 			}, 3000)
@@ -211,7 +208,7 @@ export class GameGateway {
 				playerRight.socket.emit('matchEnd', 'WIN');
 
 				// playerRight.socket.disconnect();
-				ClearIntervals(games[room_id], gameLogic);
+				this.ClearIntervals(games[room_id], gameLogic);
 				playerRight.socket.removeAllListeners();
 				playerLeft.socket.removeAllListeners();
 				delete games[socket_infos[playerLeft.socket.id].rid];
@@ -222,7 +219,7 @@ export class GameGateway {
 			playerRight.socket.on("disconnect", () => {
 				console.log('Game 웹소켓 연결 해제됨', socket_infos[playerRight.socket.id]?.uid);
 
-				ClearIntervals(games[room_id], gameLogic);
+				this.ClearIntervals(games[room_id], gameLogic);
 				playerRight.socket.removeAllListeners();
 				playerLeft.socket.removeAllListeners();
 
@@ -241,7 +238,7 @@ export class GameGateway {
 		}
 		console.log('대기열 인원 수:', normal_queue.length);
 
-		const gameInterval = (userInfo, playerLeft, playerRight, room_id, gameLogic, socket) => {
+		const gameInterval = (userInfo, playerLeft, playerRight, room_id, gameLogic) => {
 			if (gameLogic._score == Scored.PLAYER00) {
 				console.log("left win");
 				userInfo.lPlayerScore++;
@@ -254,7 +251,7 @@ export class GameGateway {
 					|| (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
 						playerLeft.socket.emit('matchEnd', userInfo.lPlayerScore == 3 ? 'WIN' : 'LOSE');
 						playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
-						ClearIntervals(games[room_id], gameLogic);
+						this.ClearIntervals(games[room_id], gameLogic);
 						playerRight.socket.removeAllListeners()
 						playerLeft.socket.removeAllListeners()
 						// 게임 끝남, 전적 DB에 저장, 모달창 닫도록 프론트에 전달, 소켓 연결 끊고 리소스 정리
@@ -264,7 +261,7 @@ export class GameGateway {
 						this.server.to(room_id).emit("startCount");
 						games[room_id].timeout = setTimeout(() => {
 							games[room_id].interval = setInterval(() => {
-								gameInterval(userInfo, playerLeft, playerRight, room_id, gameLogic, socket);
+								gameInterval(userInfo, playerLeft, playerRight, room_id, gameLogic);
 							}, 20)
 							console.log("timeout end");
 						}, 3000)
@@ -281,17 +278,17 @@ export class GameGateway {
 					|| (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
 						playerLeft.socket.emit('matchEnd', userInfo.lPlayerScore == 3 ? 'WIN' : 'LOSE');
 						playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
-						ClearIntervals(games[room_id], gameLogic);
+						this.ClearIntervals(games[room_id], gameLogic);
 						playerRight.socket.removeAllListeners()
 						playerLeft.socket.removeAllListeners()
 						// 게임 끝남, 전적 DB에 저장, 모달창 닫도록 프론트에 전달, 소켓 연결 끊고 리소스 정리
 						// 
 					} else {
 						console.log("timeout start");
-						this.server.to(socket_infos[socket.id].rid).emit("startCount");
-						games[socket_infos[socket.id].rid].timeout = setTimeout(() => {
+						this.server.to(room_id).emit("startCount");
+						games[room_id].timeout = setTimeout(() => {
 							games[room_id].interval = setInterval(() => {
-								gameInterval(userInfo, playerLeft, playerRight, room_id, gameLogic, socket);
+								gameInterval(userInfo, playerLeft, playerRight, room_id, gameLogic);
 							}, 20)
 							console.log("timeout end");
 						}, 3000)
