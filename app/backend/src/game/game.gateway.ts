@@ -38,6 +38,14 @@ interface Game {
 	interval: NodeJS.Timeout,
 }
 
+interface GameInfo {
+	game: Game,
+	gameLogic: GameLogic,
+	lPlayer: User,
+	rPlayer: User,
+	room_id: string,
+}
+
 type Position = 'l' | 'r';
 
 var normal_queue: User[] = [];
@@ -122,14 +130,13 @@ export class GameGateway {
 			const playerLeft = normal_queue[0];
 			const playerRight = normal_queue[1];
 
-			const roomName: string = playerLeft.id + playerRight.id;
-			const room_id = roomName;
-			socket_infos[playerLeft.socket.id].rid = roomName;
-			socket_infos[playerRight.socket.id].rid = roomName;
-			playerLeft.socket.join(roomName);
-			playerRight.socket.join(roomName);
-			playerLeft.socket.emit('matched', {roomId: roomName, opponent: normal_queue[1].id, position: 'left'});
-			playerRight.socket.emit('matched', {roomId: roomName, opponent: normal_queue[0].id, position: 'right'});
+			const room_id: string = playerLeft.id + playerRight.id;
+			socket_infos[playerLeft.socket.id].rid = room_id;
+			socket_infos[playerRight.socket.id].rid = room_id;
+			playerLeft.socket.join(room_id);
+			playerRight.socket.join(room_id);
+			playerLeft.socket.emit('matched', {roomId: room_id, opponent: normal_queue[1].id, position: 'left'});
+			playerRight.socket.emit('matched', {roomId: room_id, opponent: normal_queue[0].id, position: 'right'});
 			normal_queue.splice(0, 2); // 대기열에서 제거
 
 			const ret = gameLogic.getJson();
@@ -146,7 +153,7 @@ export class GameGateway {
 			socket_infos[playerLeft.socket.id].match = userInfo;
 			socket_infos[playerRight.socket.id].match = userInfo;
 
-			this.server.to(roomName).emit("init", gameLogic.getInitJson(), userInfo);
+			this.server.to(room_id).emit("init", gameLogic.getInitJson(), userInfo);
 
 			playerLeft.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.lPlayerNickname} );
 			playerRight.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.rPlayerNickname} );
@@ -176,7 +183,7 @@ export class GameGateway {
 			console.log("timeout start");
 
 			games[room_id] = {timeout: null, interval: null};
-			this.server.to(roomName).emit("startCount");
+			this.server.to(room_id).emit("startCount");
 			games[room_id].timeout = setTimeout(() => {
 				games[room_id].interval = setInterval(() => {
 					gameInterval(userInfo, playerLeft, playerRight, room_id, gameLogic, socket);
@@ -192,39 +199,47 @@ export class GameGateway {
 			 * 4. 탈주자 소켓 정보 삭제
 			 */
 			playerLeft.socket.on("disconnect", () => {
-				ClearIntervals(games[room_id], gameLogic);
-				playerRight.socket.removeAllListeners();
-				playerLeft.socket.removeAllListeners();
+				
+				console.log('Game 웹소켓 연결 해제됨', playerLeft.socket.id, socket_infos[playerLeft.socket.id]?.uid);
 
-				const match = socket_infos[socket.id].match;
+				const match = socket_infos[playerLeft.socket.id].match;
 				let loser;
 				let winner;
 				loser = match.lPlayerNickname;
 				winner = match.rPlayerNickname;
 				this.matchService.createMatch(winner, loser, gameLogic._score[0], gameLogic._score[1], 'normal', 0);
 				playerRight.socket.emit('matchEnd', 'WIN');
-				delete games[socket_infos[socket.id].rid];
-				delete socket_infos[socket.id];
+
+				// playerRight.socket.disconnect();
+				ClearIntervals(games[room_id], gameLogic);
+				playerRight.socket.removeAllListeners();
+				playerLeft.socket.removeAllListeners();
+				delete games[socket_infos[playerLeft.socket.id].rid];
+				delete socket_infos[playerLeft.socket.id];
+				console.log('Game 연결중인 소켓 정보', socket_infos);
 			})
 
 			playerRight.socket.on("disconnect", () => {
+				console.log('Game 웹소켓 연결 해제됨', socket_infos[playerRight.socket.id]?.uid);
+
 				ClearIntervals(games[room_id], gameLogic);
 				playerRight.socket.removeAllListeners();
 				playerLeft.socket.removeAllListeners();
 
-				const match = socket_infos[socket.id].match;
+				const match = socket_infos[playerRight.socket.id].match;
 				let loser;
 				let winner;
 				loser = match.rPlayerNickname;
 				winner = match.lPlayerNickname;
 				this.matchService.createMatch(winner, loser, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
 				playerLeft.socket.emit('matchEnd', 'WIN');
-				delete games[socket_infos[socket.id].rid];
-				delete socket_infos[socket.id];
+				delete games[socket_infos[playerRight.socket.id].rid];
+				delete socket_infos[playerRight.socket.id];
+				console.log('Game 연결중인 소켓 정보', socket_infos);
 			})
 
 		}
-		console.log('waiting:', normal_queue);
+		console.log('대기열 인원 수:', normal_queue.length);
 
 		const gameInterval = (userInfo, playerLeft, playerRight, room_id, gameLogic, socket) => {
 			if (gameLogic._score == Scored.PLAYER00) {
@@ -302,12 +317,10 @@ export class GameGateway {
 	}
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
-		console.log('Game 웹소켓 연결됨', socket.nsp.name);
+		console.log('Game 웹소켓 연결됨', socket.id);
 	}
 
 	handleDisconnect(@ConnectedSocket() socket: Socket) {
-		console.log('Game 웹소켓 연결 해제', socket_infos[socket.id]?.uid);
-
 		const isSameSocketID = (element) => {
 			if (element.socket.id == socket.id) {
 				return true;
