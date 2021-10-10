@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GlobalModule } from 'src/global/global.module';
 import { MatchModule } from 'src/match/match.module';
 import { SessionModule } from 'src/session/session.module';
 import { UsersModule } from 'src/users/users.module';
@@ -13,7 +14,7 @@ import { GameService } from './game.service';
 * 2. 대전 소켓 통신
 */
 @Module({
-	imports: [ SessionModule, UsersModule, MatchModule],
+	imports: [ SessionModule, UsersModule, MatchModule, GlobalModule],
   controllers: [GameController],
   providers: [GameService, GameGateway,]
 })

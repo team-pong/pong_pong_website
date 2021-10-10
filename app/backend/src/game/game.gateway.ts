@@ -4,6 +4,7 @@ import { ConnectedSocket, OnGatewayDisconnect } from '@nestjs/websockets';
 import { WebSocketServer, OnGatewayConnection, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
+import { GlobalService } from 'src/global/global.service';
 import { MatchService } from 'src/match/match.service';
 import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
@@ -66,6 +67,7 @@ export class GameGateway {
 		private sessionService: SessionService, // readUserId 함수 쓰려고 가져옴
 		private usersService: UsersService,
 		private matchService: MatchService,
+		private globalService: GlobalService,
 	) {}
 
 	@WebSocketServer()public server: Server;
@@ -178,7 +180,7 @@ export class GameGateway {
   @SubscribeMessage('normal')
   async handleMessage(@ConnectedSocket() socket: Socket) {
 		// 쿠키에서 sid 파싱
-		const sid: string = socket.request.headers.cookie.split('.')[1].substring(8);
+		const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
 		// sid로 유저 아이디 찾기
 		const userid = await this.sessionService.readUserId(sid);
 
@@ -273,10 +275,17 @@ export class GameGateway {
 	}
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
-		console.log('Game 웹소켓 연결됨', socket.id);
+		const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+		const user_id = await this.sessionService.readUserId(sid);
+		
+		console.log('Game 웹소켓 연결됨', user_id);
 	}
 
-	handleDisconnect(@ConnectedSocket() socket: Socket) {
+	async handleDisconnect(@ConnectedSocket() socket: Socket) {
+		const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+		const user_id = await this.sessionService.readUserId(sid);
+
+		console.log('Game 웹소켓 연결해제', user_id);
 		const isSameSocketID = (element) => {
 			if (element.socket.id == socket.id) {
 				return true;
