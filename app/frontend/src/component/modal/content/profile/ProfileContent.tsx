@@ -43,8 +43,6 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
   //url parameter로 넘어오는 nick 문자열 저장
   const { nick } = useParams<{nick: string}>();
 
-  console.log("how many?", isMyProfile, myInfo);
-
   /*!
    * @author donglee
    * @brief 닉네임 변경 버튼을 눌렀을 때 현재 닉네임 텍스트가 자동으로 하이라이트되는 함수
@@ -269,12 +267,13 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
 
   /*!
    * @author donglee
-   * @detail 다른 사용자의 경우 프로필 정보를 API로 받아온다
+   * @detail 내 프로필인지 다른 사용자의 프로필인지 검사한다
+   *         다른 사용자의 경우 프로필 정보를 API로 받아온다
    *         이미 친구인지, 차단한 친구인지 정보를 받아온다
    */
   useEffect(() => {
     setIsMyProfile(nick === myInfo.nick);
-    if (!isMyProfile) {
+    if (nick !== myInfo.nick) {
       getOtherUserInfo();
       getIsAlreadyFriend();
       getIsBlockedFriend();
@@ -282,6 +281,7 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
   }, []);
 
   if (isMyProfile) {
+    console.log("mine render");
     return (
       <div id="pr-profile">
         <div className="upper-part">
@@ -316,7 +316,7 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
                   onChange={(e) => setNickToEdit(e.target.value)}
                   onKeyDown={(e) => cancelEditNickKey(e)} />
               </form>
-              <span className={"mf-nick" + (isEditNickClicked ? " mf-nick-clicked" : "")}>{`${myInfo.nick}`}</span>
+              <span className={"mf-nick" + (isEditNickClicked ? " mf-nick-clicked" : "")}>{myInfo.nick}</span>
               <img
                 id="mf-edit-img"
                 src={isEditNickClicked ? "/public/check.png" : "/public/pencil.png"}
@@ -351,6 +351,7 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
   }
 
   if (otherUserInfo) {
+    console.log("other render");
     return (
       <div id="pr-profile">
         <div className="upper-part user-profile">
@@ -399,7 +400,8 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
       </div>
     );
   }
-
+  
+  console.log("loading render");
   return (
     <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "38%", top: "40%"}} />
   );
