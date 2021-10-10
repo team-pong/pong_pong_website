@@ -1,4 +1,4 @@
-import React, { Dispatch, FormEvent, MouseEvent, SetStateAction, useContext, useEffect, useRef, useState } from "react";
+import React, { FormEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-router-dom";
 import "/src/scss/content/profile/ProfileContent.scss";
 import Modal from "../../Modal";

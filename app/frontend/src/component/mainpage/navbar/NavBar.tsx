@@ -1,6 +1,5 @@
 import { FC, useEffect, useState, useRef, useContext } from "react";
 import { Link, Route, RouteComponentProps, withRouter } from "react-router-dom";
-import { io } from "socket.io-client";
 import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
 import "/src/scss/navbar/NavBar.scss";
@@ -9,7 +8,6 @@ import "/src/scss/navbar/NavBar-mobile.scss";
 import Modal from "../../modal/Modal";
 import EasyFetch from "../../../utils/EasyFetch";
 import ProfileContent from "../../modal/content/profile/ProfileContent";
-import Loading from "../../loading/Loading";
 import { UserInfoContext } from "../MainPage";
 
 /*!
@@ -35,8 +33,6 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
 
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
-  const [myNick, setMyNick] = useState(userInfo.nick);
-  const [myAvatar, setMyAvatar] = useState("");
   const [friendList, setFriendList] = useState<UserInfo[]>(null);
 
   const avatarImgRef = useRef(null);
