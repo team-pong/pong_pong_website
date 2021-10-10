@@ -38,10 +38,46 @@ interface Game {
 	interval: NodeJS.Timeout,
 }
 
+type Position = 'l' | 'r';
+
 var normal_queue: User[] = [];
 var socket_infos: {[key: string]: socketInfo} = {};
 var games: {[key: string]: Game} = {};
 
+const BarMovementEventListner = (e: any, game_logic: GameLogic, user_position: Position) => {
+	const position = user_position == 'l' ? true : false;
+	if (e.arrowDown === true) { // 아랫키가 눌리면 아래로 이동하는 인터벌을 생성한다.
+		game_logic.moveBar(false, position);
+	} else if (e.arrowDown === false) { // 아래키가 떼어지면 아래로 이동하던 인터벌을 제거한다.
+		clearInterval(game_logic._leftBarMovement);
+		if (e.arrowUp === 1) { // Down키가 떼어졌는데 Up키가 이미 눌려진 상태라면, 위로 이동하는 인터벌을 생성.
+			game_logic.moveBar(true, position);
+		}
+	}
+	if (e.arrowUp === true) {
+		game_logic.moveBar(true, position);
+	} else if (e.arrowUp === false) {
+		clearInterval(game_logic._leftBarMovement);
+		if (e.arrowDown === 1) {
+			game_logic.moveBar(false, position);
+		}
+	}
+}
+
+const ClearGameInterval = (game: Game) => {
+	clearInterval(game.interval);
+	clearTimeout(game.timeout);
+}
+
+const ClearGameLogicInterval = (gameLogic: GameLogic) => {
+	clearInterval(gameLogic._leftBarMovement);
+	clearInterval(gameLogic._rightBarMovement);
+}
+
+const ClearIntervals = (game: Game, gameLogic: GameLogic) => {
+	ClearGameInterval(game);
+	ClearGameLogicInterval(gameLogic);
+}
 /*!
  * @brief 게임 연결용 웹소켓
  * @notice 1. 프론트 서버에서 접근 허용을 위해 cors 옵션을 true로 해야함.
@@ -94,8 +130,7 @@ export class GameGateway {
 			playerRight.socket.join(roomName);
 			playerLeft.socket.emit('matched', {roomId: roomName, opponent: normal_queue[1].id, position: 'left'});
 			playerRight.socket.emit('matched', {roomId: roomName, opponent: normal_queue[0].id, position: 'right'});
-			normal_queue.splice(0, 2);
-			console.log(socket.client.conn.server)
+			normal_queue.splice(0, 2); // 대기열에서 제거
 
 			const ret = gameLogic.getJson();
 			const userInfo: MatchInfo = {
@@ -111,55 +146,12 @@ export class GameGateway {
 			socket_infos[playerLeft.socket.id].match = userInfo;
 			socket_infos[playerRight.socket.id].match = userInfo;
 
-			playerLeft.socket.emit('init', gameLogic.getInitJson(), userInfo);
-			playerRight.socket.emit('init', gameLogic.getInitJson(), userInfo);
-			// this.server.to(roomName).emit("init", gameLogic.getJson());
+			this.server.to(roomName).emit("init", gameLogic.getInitJson(), userInfo);
 
 			playerLeft.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.lPlayerNickname} );
 			playerRight.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.rPlayerNickname} );
-			// arrowDown : true -> 아래 방향키가 눌린 상태
-			// arrowDown : false -> 아래 방향키를 뗀 상태
-			// arrowUp : true -> 위 방향키가 눌린 상태
-			// arrowUp : false -> 위 방향키를 뗀 상태
-			playerLeft.socket.on('keyEvent', (e) => {
-				console.log('left player key event:', e);
-				if (e.arrowDown === true) { // 아랫키 눌림
-					gameLogic.moveBar(false, true);
-				} else if (e.arrowDown === false) {
-					clearInterval(gameLogic._leftBarMovement);
-					if (e.arrowUp === 1) {
-						gameLogic.moveBar(true, true);
-					}
-				}
-				if (e.arrowUp === true) {
-					gameLogic.moveBar(true, true);
-				} else if (e.arrowUp === false) {
-					clearInterval(gameLogic._leftBarMovement);
-					if (e.arrowDown === 1) {
-						gameLogic.moveBar(false, true);
-					}
-				}
-			})
-
-			playerRight.socket.on('keyEvent', (e) => {
-				console.log('right player key event:', e);
-				if (e.arrowDown === true) { // 아랫키 눌림
-					gameLogic.moveBar(false, false);
-				} else if (e.arrowDown === false) {
-					clearInterval(gameLogic._rightBarMovement);
-					if (e.arrowUp === 1) {
-						gameLogic.moveBar(true, false);
-					}
-				}
-				if (e.arrowUp ===  true) {
-					gameLogic.moveBar(true, false);
-				} else if (e.arrowUp === false) {
-					clearInterval(gameLogic._rightBarMovement);
-					if (e.arrowDown === 1) {
-						gameLogic.moveBar(false, false);
-					}
-				}
-			});
+			playerLeft.socket.on('keyEvent', (e) => BarMovementEventListner(e, gameLogic, 'l'));
+			playerRight.socket.on('keyEvent', (e) => BarMovementEventListner(e, gameLogic, 'r'));
 
 			/*
 			 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
@@ -168,10 +160,7 @@ export class GameGateway {
 				this.matchService.createMatch(playerRight.id, playerLeft.id, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
 				playerLeft.socket.emit('matchEnd', 'LOSE');
 				playerRight.socket.emit('matchEnd', 'WIN');
-				clearInterval(games[room_id].interval);
-				clearTimeout(games[room_id].timeout);
-				clearInterval(gameLogic._leftBarMovement);
-				clearInterval(gameLogic._rightBarMovement);
+				ClearIntervals(games[room_id], gameLogic);
 				playerRight.socket.removeAllListeners();
 				playerLeft.socket.removeAllListeners();
 			})
@@ -180,10 +169,7 @@ export class GameGateway {
 				this.matchService.createMatch(playerLeft.id, playerRight.id, gameLogic._score[0], gameLogic._score[1], 'normal', 0);
 				playerLeft.socket.emit('matchEnd', 'WIN');
 				playerRight.socket.emit('matchEnd', 'LOSE');
-				clearInterval(games[room_id].interval);
-				clearTimeout(games[room_id].timeout);
-				clearInterval(gameLogic._leftBarMovement);
-				clearInterval(gameLogic._rightBarMovement);
+				ClearIntervals(games[room_id], gameLogic);
 				playerRight.socket.removeAllListeners();
 				playerLeft.socket.removeAllListeners();
 			})
@@ -206,10 +192,7 @@ export class GameGateway {
 			 * 4. 탈주자 소켓 정보 삭제
 			 */
 			playerLeft.socket.on("disconnect", () => {
-				clearInterval(games[room_id].interval);
-				clearTimeout(games[room_id].timeout);
-				clearInterval(gameLogic._leftBarMovement);
-				clearInterval(gameLogic._rightBarMovement);
+				ClearIntervals(games[room_id], gameLogic);
 				playerRight.socket.removeAllListeners();
 				playerLeft.socket.removeAllListeners();
 
@@ -225,10 +208,7 @@ export class GameGateway {
 			})
 
 			playerRight.socket.on("disconnect", () => {
-				clearInterval(games[room_id].interval);
-				clearTimeout(games[room_id].timeout);
-				clearInterval(gameLogic._leftBarMovement);
-				clearInterval(gameLogic._rightBarMovement);
+				ClearIntervals(games[room_id], gameLogic);
 				playerRight.socket.removeAllListeners();
 				playerLeft.socket.removeAllListeners();
 
@@ -259,19 +239,15 @@ export class GameGateway {
 					|| (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
 						playerLeft.socket.emit('matchEnd', userInfo.lPlayerScore == 3 ? 'WIN' : 'LOSE');
 						playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
-		
-						clearInterval(games[room_id].interval);
-						clearTimeout(games[socket_infos[socket.id].rid].timeout);
-						clearInterval(gameLogic._leftBarMovement);
-						clearInterval(gameLogic._rightBarMovement);
+						ClearIntervals(games[room_id], gameLogic);
 						playerRight.socket.removeAllListeners()
 						playerLeft.socket.removeAllListeners()
 						// 게임 끝남, 전적 DB에 저장, 모달창 닫도록 프론트에 전달, 소켓 연결 끊고 리소스 정리
 						// 
 					} else {
 						console.log("timeout start");
-						this.server.to(socket_infos[socket.id].rid).emit("startCount");
-						games[socket_infos[socket.id].rid].timeout = setTimeout(() => {
+						this.server.to(room_id).emit("startCount");
+						games[room_id].timeout = setTimeout(() => {
 							games[room_id].interval = setInterval(() => {
 								gameInterval(userInfo, playerLeft, playerRight, room_id, gameLogic, socket);
 							}, 20)
@@ -290,11 +266,7 @@ export class GameGateway {
 					|| (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
 						playerLeft.socket.emit('matchEnd', userInfo.lPlayerScore == 3 ? 'WIN' : 'LOSE');
 						playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
-		
-						clearInterval(games[room_id].interval);
-						clearTimeout(games[socket_infos[socket.id].rid].timeout);
-						clearInterval(gameLogic._leftBarMovement);
-						clearInterval(gameLogic._rightBarMovement);
+						ClearIntervals(games[room_id], gameLogic);
 						playerRight.socket.removeAllListeners()
 						playerLeft.socket.removeAllListeners()
 						// 게임 끝남, 전적 DB에 저장, 모달창 닫도록 프론트에 전달, 소켓 연결 끊고 리소스 정리
