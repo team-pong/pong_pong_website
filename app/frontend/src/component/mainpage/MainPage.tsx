@@ -25,6 +25,10 @@ interface UserInfo {
   status: string;
 }
 
+/*!
+ * @author donglee
+ * @brief 최초 로그인시에 API에서 받아온 사용자 정보로 userInfoState를 초기화함
+ */
 const userInfoinit = (userInfo: UserInfo) => {
   if (userInfo) {
     return {
@@ -40,6 +44,10 @@ const userInfoinit = (userInfo: UserInfo) => {
   }
 }
 
+/*!
+ * @author donglee
+ * @brief 전역으로 사용될 userInfo객체를 초기화, 업데이트 하는 reducer함수
+ */
 const userInfoReducer = (state, action) => {
   switch (action.type) {
     case "CHANGE":
@@ -67,6 +75,11 @@ const MainPage = ({match}): JSX.Element => {
     return res;
   }
 
+  /*!
+   * @author donglee, yochoi
+   * @brief - 로그인한 사용자 정보를 가져온 후 전역으로 사용될 userInfoState를 업데이트함
+   *        - 전역으로 사용될 소켓 연결
+   */
   useEffect(() => {
     getUserInfo()
     .then((res) => userInfoDispatch({type: "INIT", info: res}));
