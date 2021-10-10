@@ -14,6 +14,10 @@ interface User {
 	socket: Socket,
 }
 
+type MatchType = 'normal' | 'ladder';
+
+type MapType = 0 | 1 | 2;
+
 interface MatchInfo {
   lPlayerNickname: string,
   lPlayerAvatarUrl: string,
@@ -22,7 +26,8 @@ interface MatchInfo {
   rPlayerAvatarUrl: string,
   rPlayerScore: number,
   viewNumber: number,
-	myName: string,
+	type: MatchType,
+	map: MapType,
 }
 
 interface socketInfo {
@@ -41,8 +46,9 @@ interface Game {
 interface GameInfo {
 	game: Game,
 	gameLogic: GameLogic,
-	lPlayer: User,
-	rPlayer: User,
+	match_info: MatchInfo,
+	left_player: User,
+	right_player: User,
 	room_id: string,
 }
 
@@ -103,57 +109,70 @@ export class GameGateway {
 		}
 	}
 
+ GiveUpEventListener (playerLeft: User, playerRight: User, room_id: string, gameLogic: GameLogic, game_type: string, map: number, position: Position) {
+		const winner = position == 'l' ? playerRight : playerLeft;
+		const loser = position == 'l' ? playerLeft : playerRight;
+		this.matchService.createMatch(winner.id, loser.id, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
+		loser.socket.emit('matchEnd', 'LOSE');
+		winner.socket.emit('matchEnd', 'WIN');
+		this.clearGame(playerLeft, playerRight, room_id, gameLogic);
+	}
+
+	prepareNextRound(userInfo: MatchInfo, playerLeft: User, playerRight: User, room_id: string, gameLogic: GameLogic) {
+		gameLogic.initGame();
+		this.server.to(room_id).emit('setMatchInfo', userInfo);
+		clearInterval(this.games[room_id].interval);
+		if (userInfo.lPlayerScore == 3 || userInfo.rPlayerScore == 3 || (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
+				playerLeft.socket.emit('matchEnd', userInfo.lPlayerScore == 3 ? 'WIN' : 'LOSE');
+				playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
+				this.clearGame(playerLeft, playerRight, room_id, gameLogic);
+			} else {
+				console.log("timeout start");
+				this.server.to(room_id).emit("startCount");
+				this.games[room_id].timeout = setTimeout(() => {
+					this.games[room_id].interval = setInterval(() => {
+						this.gameInterval(userInfo, playerLeft, playerRight, room_id, gameLogic);
+					}, 20)
+					console.log("timeout end");
+				}, 3000)
+			}
+	}
+
 	gameInterval = (userInfo: MatchInfo, playerLeft: User, playerRight: User, room_id: string, gameLogic: GameLogic) => {
 		if (gameLogic._score == Scored.PLAYER00) {
 			console.log("left win");
 			userInfo.lPlayerScore++;
-			gameLogic.initGame();
-			this.server.to(room_id).emit('setMatchInfo', userInfo);
-			clearInterval(this.games[room_id].interval);
-			if (userInfo.lPlayerScore == 3 || (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
-					playerLeft.socket.emit('matchEnd', userInfo.lPlayerScore == 3 ? 'WIN' : 'LOSE');
-					playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
-					this.clearIntervals(this.games[room_id], gameLogic);
-					playerRight.socket.removeAllListeners()
-					playerLeft.socket.removeAllListeners()
-				} else {
-					console.log("timeout start");
-					this.server.to(room_id).emit("startCount");
-					this.games[room_id].timeout = setTimeout(() => {
-						this.games[room_id].interval = setInterval(() => {
-							this.gameInterval(userInfo, playerLeft, playerRight, room_id, gameLogic);
-						}, 20)
-						console.log("timeout end");
-					}, 3000)
-				}
+			this.prepareNextRound(userInfo, playerLeft, playerRight, room_id, gameLogic);
 		} else if (gameLogic._score == Scored.PLAYER01) {
 			console.log("right win");
 			userInfo.rPlayerScore++;
-			gameLogic.initGame();
-			this.server.to(room_id).emit('setMatchInfo', userInfo);
-			clearInterval(this.games[room_id].interval);
-			if (userInfo.rPlayerScore == 3 || (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
-					playerLeft.socket.emit('matchEnd', userInfo.lPlayerScore == 3 ? 'WIN' : 'LOSE');
-					playerRight.socket.emit('matchEnd', userInfo.rPlayerScore == 3 ? 'WIN' : 'LOSE');
-					this.clearIntervals(this.games[room_id], gameLogic);
-					playerRight.socket.removeAllListeners()
-					playerLeft.socket.removeAllListeners()
-				} else {
-					console.log("timeout start");
-					this.server.to(room_id).emit("startCount");
-					this.games[room_id].timeout = setTimeout(() => {
-						this.games[room_id].interval = setInterval(() => {
-							this.gameInterval(userInfo, playerLeft, playerRight, room_id, gameLogic);
-						}, 20)
-						console.log("timeout end");
-					}, 3000)
-				}
+			this.prepareNextRound(userInfo, playerLeft, playerRight, room_id, gameLogic);
 		} else {
 			// frontㅇㅔ서 준비 완료되면 시작(3, 2, 1, Start 메시지)
 			gameLogic.update();
 			playerLeft.socket.emit("update", gameLogic.getJson());
 			playerRight.socket.emit("update", gameLogic.getJson());	
 		}
+	}
+
+	clearGame(left_player: User, right_player: User, room_id: string, gameLogic: GameLogic) {
+		this.clearIntervals(this.games[room_id], gameLogic);
+		left_player.socket.removeAllListeners();
+		right_player.socket.removeAllListeners();
+		delete this.games[room_id];
+		delete this.socket_infos[left_player.socket.id];
+		left_player.socket.disconnect();
+		right_player.socket.disconnect();
+	}
+
+	disconnectEvent(position: Position, left_player: User, right_player: User, gameLogic: GameLogic) {
+		const room_id = this.socket_infos[left_player.socket.id].rid;
+		const winner = position == 'l' ? right_player : left_player;
+		const loser = position == 'l' ? left_player : right_player;
+
+		this.matchService.createMatch(winner.id, loser.id, gameLogic._score[0], gameLogic._score[1], 'normal', 0);
+		winner.socket.emit('matchEnd', 'WIN');
+		this.clearGame(left_player, right_player, room_id, gameLogic);
 	}
 
   @SubscribeMessage('normal')
@@ -202,7 +221,8 @@ export class GameGateway {
 				rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
 				rPlayerScore: 0,
 				viewNumber: 0,
-				myName: '',
+				type: 'normal',
+				map: 0,
 			}
 			this.socket_infos[playerLeft.socket.id].match = userInfo;
 			this.socket_infos[playerRight.socket.id].match = userInfo;
@@ -217,19 +237,9 @@ export class GameGateway {
 			/*
 			 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
 			*/
-			const GiveUpEventListener = (position: Position) => {
-				const winner = position == 'l' ? playerRight : playerLeft;
-				const loser = position == 'l' ? playerLeft : playerRight;
-				this.matchService.createMatch(winner.id, loser.id, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
-				loser.socket.emit('matchEnd', 'LOSE');
-				winner.socket.emit('matchEnd', 'WIN');
-				this.clearIntervals(this.games[room_id], gameLogic);
-				winner.socket.removeAllListeners();
-				loser.socket.removeAllListeners();
-			}
 			
-			playerLeft.socket.on("giveUp", () => GiveUpEventListener('l'));
-			playerRight.socket.on("giveUp", () => GiveUpEventListener('r'));
+			playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, room_id, gameLogic, 'normal', 0, 'l'));
+			playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, room_id, gameLogic, 'normal', 0, 'r'));
 			console.log("timeout start");
 
 			this.games[room_id] = {timeout: null, interval: null};
@@ -243,50 +253,9 @@ export class GameGateway {
 			
 			/*
 			 * 게임 중 연결 끊은 경우
-			 * 1. 인터벌, 리스너 등 자원 해제
-			 * 2. 탈주 패배 기록
-			 * 3. disconnected 메세지 브로드캐스팅
-			 * 4. 탈주자 소켓 정보 삭제
 			 */
-			playerLeft.socket.on("disconnect", () => {
-				
-				console.log('Game 웹소켓 연결 해제됨', playerLeft.socket.id, this.socket_infos[playerLeft.socket.id]?.uid);
-
-				const match = this.socket_infos[playerLeft.socket.id].match;
-				let loser;
-				let winner;
-				loser = match.lPlayerNickname;
-				winner = match.rPlayerNickname;
-				this.matchService.createMatch(winner, loser, gameLogic._score[0], gameLogic._score[1], 'normal', 0);
-				playerRight.socket.emit('matchEnd', 'WIN');
-
-				// playerRight.socket.disconnect();
-				this.clearIntervals(this.games[room_id], gameLogic);
-				playerRight.socket.removeAllListeners();
-				playerLeft.socket.removeAllListeners();
-				delete this.games[this.socket_infos[playerLeft.socket.id].rid];
-				delete this.socket_infos[playerLeft.socket.id];
-				console.log('Game 연결중인 소켓 정보', this.socket_infos);
-			})
-
-			playerRight.socket.on("disconnect", () => {
-				console.log('Game 웹소켓 연결 해제됨', this.socket_infos[playerRight.socket.id]?.uid);
-
-				this.clearIntervals(this.games[room_id], gameLogic);
-				playerRight.socket.removeAllListeners();
-				playerLeft.socket.removeAllListeners();
-
-				const match = this.socket_infos[playerRight.socket.id].match;
-				let loser;
-				let winner;
-				loser = match.rPlayerNickname;
-				winner = match.lPlayerNickname;
-				this.matchService.createMatch(winner, loser, gameLogic._score[1], gameLogic._score[0], 'normal', 0);
-				playerLeft.socket.emit('matchEnd', 'WIN');
-				delete this.games[this.socket_infos[playerRight.socket.id].rid];
-				delete this.socket_infos[playerRight.socket.id];
-				console.log('Game 연결중인 소켓 정보', this.socket_infos);
-			})
+			playerLeft.socket.on("disconnect", () => this.disconnectEvent('l', playerLeft, playerRight, gameLogic));
+			playerRight.socket.on("disconnect", () => this.disconnectEvent('r', playerLeft, playerRight, gameLogic));
 
 		}
 		console.log('대기열 인원 수:', this.normal_queue.length);
