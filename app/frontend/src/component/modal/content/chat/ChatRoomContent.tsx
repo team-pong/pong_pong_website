@@ -134,7 +134,11 @@ interface ChatUser {
   position: string,
 };
 
-const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
+interface TestProps {
+  setRoomToBeRemoved: Dispatch<SetStateAction<number>>,
+};
+
+const ChatRoomContent: FC<TestProps & RouteComponentProps> = (props): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
   const [chatLog, setChatLog] = useState<ChatLog[]>([]);
@@ -207,14 +211,14 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
 
   const exitChatRoom = async () => {
     //test
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/chat-users?nick=donglee`, "DELETE");
-    const res = await easyfetch.fetch();
+    // const easyfetch = new EasyFetch(`${global.BE_HOST}/chat-users?nick=donglee`, "DELETE");
+    // const res = await easyfetch.fetch();
 
-    console.log("res: ", res);
+    // console.log("res: ", res);
   };
 
-  const disconnectSocket = (socket) => {
-    socket.disconnect();
+  const disconnectSocket = async (socket) => {
+    await socket.disconnect();
   };
 
   /*!
@@ -233,7 +237,8 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
 
     return (() => {
       disconnectSocket(socket);
-      exitChatRoom();
+      // exitChatRoom();
+      props.setRoomToBeRemoved(+channel_id);
     });
   }, []);
 

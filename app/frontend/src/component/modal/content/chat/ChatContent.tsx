@@ -19,9 +19,10 @@ interface chatRoom {
 interface chatRoomListProps {
   search: string,
   type: string,
+  roomToBeRemoved: number,
 };
 
-const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
+const ChatRoomList: FC<chatRoomListProps> = ({ search, type, roomToBeRemoved }): JSX.Element => {
 
   const [publicChatRoom, setPublicChatRoom] = useState<chatRoom[]>([]);
   const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
@@ -75,13 +76,21 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
     return (res.chatList);
   }
 
+  const checkRoomEmpty = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${roomToBeRemoved}`);
+    const res = await easyfetch.fetch();
+
+    console.log("res: ", res);
+  };
+
+  /* TroubleShooting: roomToBeRemoved가 하위 컴포넌트에서 바뀌면 다시 렌더링을 하고
+  그렇게 다시 렌더링이 ChatContent까지는 잘 되는거 같은데 왜 ChatList까지는 렌더링을 다시
+  하지 않는거지? 이 부분을 해결해보자 */
+
   useEffect(() => {
-    /* 백엔드에서 제거하기 전에 프론트에서 먼저 GET을 하는 문제가 있다. 어떻게 해결해야 할까? */
-    setTimeout(() => {
-      getChatRoomList()
-      .then(sortChatRoomList)
-      .then(() => setIsLoading(false));
-    }, 1000);
+    getChatRoomList()
+    .then(sortChatRoomList)
+    .then(() => setIsLoading(false));
   }, [search]);
 
   if (isLoading) {
@@ -123,11 +132,13 @@ const ChatContent: FC = (): JSX.Element => {
   const [searchInputValue, setSearchInputValue] = useState("");
   const [chatRoomToFind, setChatRoomToFind] = useState("");
   const [chatRoomSelector, setChatRoomSelector] = useState("all");
+  const [roomToBeRemoved, setRoomToBeRemoved] = useState(0);
 
   if (window.location.pathname === "/mainpage/chat"
       || window.location.pathname === "/mainpage/chat/makechat") {
     return (
       <div id="chat-main">
+        {console.log("test: ", roomToBeRemoved)}
         <div id="search">
           <input
             className="chat-search-input"
@@ -155,7 +166,7 @@ const ChatContent: FC = (): JSX.Element => {
             <label className="chat-room-label">비공개방</label>
           </li>
         </ul>
-        <ChatRoomList search={chatRoomToFind} type={chatRoomSelector} />
+        <ChatRoomList search={chatRoomToFind} type={chatRoomSelector} roomToBeRemoved={roomToBeRemoved}/>
         <Link to={`/mainpage/chat/makechat`}>
           <button className="chat-room-btn">채팅방 만들기</button>
         </Link>
@@ -166,7 +177,7 @@ const ChatContent: FC = (): JSX.Element => {
     );
   } else {
     return (
-      <Route path="/mainpage/chat/:channel_id"><ChatRoomContent /></Route>
+      <Route path="/mainpage/chat/:channel_id"><ChatRoomContent setRoomToBeRemoved={setRoomToBeRemoved}/></Route>
     );
   }
 }
