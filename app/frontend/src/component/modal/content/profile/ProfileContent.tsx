@@ -7,7 +7,7 @@ import RecordContent from "../record/RecordContent";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 import Loading from "../../../loading/Loading";
-import { UserInfoContext, UserInfoDispatchContext } from "../../../mainpage/MainPage";
+import { UserInfoContext, SetUserInfoContext } from "../../../../Context";
 
 /*!
  * @author donglee
@@ -29,7 +29,7 @@ interface UserInfo {
 const ProfileContent: React.FC<RouteComponentProps> = (props) => {
 
   const myInfo = useContext(UserInfoContext);
-  const myInfoDispatch = useContext(UserInfoDispatchContext);
+  const setMyInfo = useContext(SetUserInfoContext);
 
   const [otherUserInfo, setOtherUserInfo] = useState<UserInfo>();
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
@@ -73,7 +73,7 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
     const newUserInfo = {...myInfo};
 
     newUserInfo.nick = nickToEdit;
-    myInfoDispatch({type: "CHANGE", info: newUserInfo});
+    setMyInfo({...newUserInfo});
   };
 
   /*!
