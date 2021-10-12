@@ -1,5 +1,6 @@
-import { Dispatch, FC, SetStateAction } from 'react'
+import { Dispatch, FC, SetStateAction, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { SetDmInfoContext } from '../../../../Context';
 import EasyFetch from '../../../../utils/EasyFetch';
 
 /*!
@@ -34,6 +35,8 @@ interface contextMenuProps {
 
 const ContextMenu: FC<contextMenuProps> =
   ({target, x, y, friendList, setFriendList, setContextMenuInfo}): JSX.Element => {
+
+  const setDmInfo = useContext(SetDmInfoContext);
   
   /*!
   * @author donglee
@@ -92,7 +95,7 @@ const ContextMenu: FC<contextMenuProps> =
         style={{textDecoration: "none"}}>
         <li className="cm-list">프로필 보기</li>
       </Link>
-      <li className="cm-list" onClick={() => console.log(`message to ${target}`)}>메세지 보내기</li>
+      <li className="cm-list" onClick={() => setDmInfo({isDmOpen: true, target: target})}>메세지 보내기</li>
       <li className="cm-list" onClick={deleteFriend}>친구 삭제</li>
       <li className="cm-list" onClick={blockFriend}>친구 차단</li>
     </ul>

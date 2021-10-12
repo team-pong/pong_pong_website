@@ -1,29 +1,32 @@
-import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from "react";
+import { FC, useContext, useRef, useState } from "react";
 import DmList from "./DmList";
 import DmRoom from "./DmRoom";
+import { DmInfoContext, SetDmInfoContext } from "../../../Context";
 import "/src/scss/dm/Dm.scss";
 
-const Dm: FC<{setIsDmOpen: Dispatch<SetStateAction<boolean>>}> = ({setIsDmOpen}): JSX.Element => {
+const Dm: FC = (): JSX.Element => {
+
+  const dmInfo = useContext(DmInfoContext);
+  const setDmInfo = useContext(SetDmInfoContext);
 
   const dmRef = useRef<HTMLDivElement>(null);
-  const [dmTarget, setDmTarget] = useState("");
 
   return (
-    <div id="dm-outside" onClick={(e) => {if(e.target === e.currentTarget) setIsDmOpen(false)}}>
+    <div id="dm-outside" onClick={(e) => {if(e.target === e.currentTarget) setDmInfo({isDmOpen: false, target: ""})}}>
       <div className="dm-container" ref={dmRef}>
         <div className="top-bar">
           <span>
             {
-              dmTarget === ""
+              dmInfo.target === ""
               ? <>개인 메세지</>
               : <><img
                     src="/public/arrow.svg"
                     alt="뒤로가기"
-                    onClick={() => setDmTarget("")} />{dmTarget}</>
+                    onClick={() => setDmInfo({isDmOpen: true, target: ""})} />{dmInfo.target}</>
             }
           </span>
         </div>
-        {dmTarget === "" ? <DmList setDmTarget={setDmTarget}/> : <DmRoom dmTarget={dmTarget}/>}
+        {dmInfo.target === "" ? <DmList /> : <DmRoom dmTarget={dmInfo.target}/>}
       </div>
     </div>
   )
