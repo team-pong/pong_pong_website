@@ -19,16 +19,25 @@ interface chatRoom {
 interface chatRoomListProps {
   search: string,
   type: string,
-  roomToBeRemoved: number,
 };
 
-const ChatRoomList: FC<chatRoomListProps> = ({ search, type, roomToBeRemoved }): JSX.Element => {
+const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
 
   const [publicChatRoom, setPublicChatRoom] = useState<chatRoom[]>([]);
   const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  /*!
+   * @author donglee, yochoi
+   * @brief map 함수 안에서 대화방 목록 정보를 li에 담아서 return 하는 함수
+   * @detail 대화방에 들어갔다가 나올 때 웹소켓 연결을 끊으면서 백엔드에서 대화방에서 사용자가 나간
+   *         경우를 API 요청하는데 이 요청보다 현재 FC가 get하는 요청이 더 빠른 경우에
+   *         chatRoom의 정보가 정확하지 않아서 에러가 나는 경우가 있는데 이를 if 문으로 예외처리함.
+   */  
   const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
+    if (chatRoom.current_people === 0 || chatRoom.current_people.constructor == Object) {
+      return ;
+    }
     return (
       <Link to={`/mainpage/chat/${chatRoom.channel_id}`} key={idx} style={{color: "inherit", textDecoration: "none"}}>
         <li className="chat-generator-li">
@@ -76,17 +85,6 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type, roomToBeRemoved }):
     return (res.chatList);
   }
 
-  const checkRoomEmpty = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${roomToBeRemoved}`);
-    const res = await easyfetch.fetch();
-
-    console.log("res: ", res);
-  };
-
-  /* TroubleShooting: roomToBeRemoved가 하위 컴포넌트에서 바뀌면 다시 렌더링을 하고
-  그렇게 다시 렌더링이 ChatContent까지는 잘 되는거 같은데 왜 ChatList까지는 렌더링을 다시
-  하지 않는거지? 이 부분을 해결해보자 */
-
   useEffect(() => {
     getChatRoomList()
     .then(sortChatRoomList)
@@ -132,13 +130,11 @@ const ChatContent: FC = (): JSX.Element => {
   const [searchInputValue, setSearchInputValue] = useState("");
   const [chatRoomToFind, setChatRoomToFind] = useState("");
   const [chatRoomSelector, setChatRoomSelector] = useState("all");
-  const [roomToBeRemoved, setRoomToBeRemoved] = useState(0);
 
   if (window.location.pathname === "/mainpage/chat"
       || window.location.pathname === "/mainpage/chat/makechat") {
     return (
       <div id="chat-main">
-        {console.log("test: ", roomToBeRemoved)}
         <div id="search">
           <input
             className="chat-search-input"
@@ -166,7 +162,7 @@ const ChatContent: FC = (): JSX.Element => {
             <label className="chat-room-label">비공개방</label>
           </li>
         </ul>
-        <ChatRoomList search={chatRoomToFind} type={chatRoomSelector} roomToBeRemoved={roomToBeRemoved}/>
+        <ChatRoomList search={chatRoomToFind} type={chatRoomSelector} />
         <Link to={`/mainpage/chat/makechat`}>
           <button className="chat-room-btn">채팅방 만들기</button>
         </Link>
@@ -177,7 +173,7 @@ const ChatContent: FC = (): JSX.Element => {
     );
   } else {
     return (
-      <Route path="/mainpage/chat/:channel_id"><ChatRoomContent setRoomToBeRemoved={setRoomToBeRemoved}/></Route>
+      <Route path="/mainpage/chat/:channel_id"><ChatRoomContent /></Route>
     );
   }
 }

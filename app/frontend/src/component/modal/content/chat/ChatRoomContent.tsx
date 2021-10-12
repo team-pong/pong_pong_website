@@ -1,5 +1,5 @@
 import React, { FC, Dispatch, SetStateAction, useState, useEffect } from "react";
-import { Link, Route, RouteComponentProps, useLocation, useParams, withRouter } from "react-router-dom";
+import { Link, Route, RouteComponentProps, useParams, withRouter } from "react-router-dom";
 import Modal from "../../Modal";
 import ChatConfigContent from "./ChatConfigContent";
 import ChatInviteContent from "./ChatInviteContent";
@@ -134,11 +134,7 @@ interface ChatUser {
   position: string,
 };
 
-interface TestProps {
-  setRoomToBeRemoved: Dispatch<SetStateAction<number>>,
-};
-
-const ChatRoomContent: FC<TestProps & RouteComponentProps> = (props): JSX.Element => {
+const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
   const [chatLog, setChatLog] = useState<ChatLog[]>([]);
@@ -209,18 +205,6 @@ const ChatRoomContent: FC<TestProps & RouteComponentProps> = (props): JSX.Elemen
     }
   };
 
-  const exitChatRoom = async () => {
-    //test
-    // const easyfetch = new EasyFetch(`${global.BE_HOST}/chat-users?nick=donglee`, "DELETE");
-    // const res = await easyfetch.fetch();
-
-    // console.log("res: ", res);
-  };
-
-  const disconnectSocket = async (socket) => {
-    await socket.disconnect();
-  };
-
   /*!
    * @author donglee
    * @brief - 내가 직접 만든 비공개방일 경우에는 Password에 props을 줘서 첫 1회만 비번없이 입장 가능하도록 함
@@ -236,9 +220,7 @@ const ChatRoomContent: FC<TestProps & RouteComponentProps> = (props): JSX.Elemen
     getChatRoomUsers();
 
     return (() => {
-      disconnectSocket(socket);
-      // exitChatRoom();
-      props.setRoomToBeRemoved(+channel_id);
+      socket.disconnect();
     });
   }, []);
 
