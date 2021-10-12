@@ -96,7 +96,7 @@ export class GameLogic {
                 obs00: [(0 + center[0]) / 2 - 30, (0 + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (0 + center[1]) / 2 + 30],
                 obs01: [(0 + center[0]) / 2 - 30, (this._bottomWall + center[1]) / 2 - 30, (0 + center[0]) / 2 + 30, (this._bottomWall + center[1]) / 2 + 30],
                 obs02: [(center[0] + this._rightWall) / 2 - 30, (0 + center[1]) / 2 - 30, (center[0] + this._rightWall) / 2 + 30, (0 + center[1]) / 2 + 30],
-                obs03: [(center[0] + this._rightWall) / 2 - 30, (center[1] + this._bottomWall) / 2 - 30, (center[0] + this._rightWall) + 30, (center[1] + this._bottomWall) / 2 + 30]
+                obs03: [(center[0] + this._rightWall) / 2 - 30, (center[1] + this._bottomWall) / 2 - 30, (center[0] + this._rightWall) / 2 + 30, (center[1] + this._bottomWall) / 2 + 30]
             };
             obs = obstacle
         } else if (init == 2) {
