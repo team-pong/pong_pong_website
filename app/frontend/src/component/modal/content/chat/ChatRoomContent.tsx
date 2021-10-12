@@ -286,7 +286,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
             rows={4}
             cols={50}
             value={message}
-            onKeyDown={(e) => controlTextAreaKeyDown(e, message, setMessage, chatLog, setChatLog)}
+            onKeyPress={(e) => controlTextAreaKeyDown(e, message, setMessage, chatLog, setChatLog)}
             onChange={({target: {value}}) => setMessage(value)}/>
           <button className="chat-msg-btn" onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
         </form>
