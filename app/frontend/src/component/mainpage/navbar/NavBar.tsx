@@ -1,6 +1,5 @@
-import { FC, useEffect, useState, useRef } from "react";
+import { FC, useEffect, useState, useRef, useContext } from "react";
 import { Link, Route, RouteComponentProps, withRouter } from "react-router-dom";
-import { io } from "socket.io-client";
 import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
 import "/src/scss/navbar/NavBar.scss";
@@ -9,7 +8,7 @@ import "/src/scss/navbar/NavBar-mobile.scss";
 import Modal from "../../modal/Modal";
 import EasyFetch from "../../../utils/EasyFetch";
 import ProfileContent from "../../modal/content/profile/ProfileContent";
-import Loading from "../../loading/Loading";
+import { UserInfoContext } from "../MainPage";
 
 /*!
  * @author donglee
@@ -29,27 +28,15 @@ interface UserInfo {
 }
 
 const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProps> = (props): JSX.Element => {
+  
+  const userInfo = useContext(UserInfoContext);
 
   const [isFriendListOpen, setIsFriendListOpen] = useState(false);
   const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
-  const [userInfo, setUserInfo] = useState<UserInfo>();
-  const [myNick, setMyNick] = useState("");
-  const [myAvatar, setMyAvatar] = useState("");
   const [friendList, setFriendList] = useState<UserInfo[]>(null);
 
   const avatarImgRef = useRef(null);
 
-  /*!
-   * @author donglee
-   * @brief API /user 에서 프로필 정보를 요청해서 state에 저장함
-   */
-  const getUserInfo = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
-    const res = await easyfetch.fetch();
-
-    setUserInfo(res);
-    return res;
-  };
 
   /*!
    * @author donglee
@@ -62,84 +49,61 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
     setFriendList(res.friendList);
   };
 
-  /*!
-   * @author donglee
-   * @brief Profile에서 닉네임 변경 시 NavBar에서도 userInfo를 업데이트 함
-   */
-  useEffect(() => {
-    if (userInfo) {
-      const updatedUserInfo = {...userInfo};
-
-      updatedUserInfo.nick = myNick;
-      setUserInfo(updatedUserInfo);
-    }
-  }, [myNick])
-
-  useEffect(() => {
-    getUserInfo()
-      .then((res) => setMyNick(res.nick));
-    getFriendList();
-  },[]);
-
   useEffect(() => {
     getFriendList();
   }, [props.update]);
 
-  if (userInfo) {
-    return (
-      <nav className="menu">
-        <header className="avatar">
-          <Link to={`${props.match.url}/profile/${userInfo.nick}`}>
-          <img
-            id="avatarImg"
-            ref={avatarImgRef}
-            src={userInfo.avatar_url}
-            onError={() => {
-              avatarImgRef.current.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+  return (
+    <nav className="menu">
+      <header className="avatar">
+        <Link to={`${props.match.url}/profile/${userInfo.nick}`}>
+        <img
+          id="avatarImg"
+          ref={avatarImgRef}
+          src={userInfo.avatar_url}
+          onError={() => {
+            avatarImgRef.current.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+          }}
+          alt="Avatar" />
+        </Link>
+        <h2>{userInfo.nick}</h2>
+      </header>
+      <ul className="nav-ul">
+        <li className="nav-list-button" id="nav-friend" onClick={() => setIsFriendListOpen(!isFriendListOpen)}>
+          <img className="nav-list-img" src="/public/users.svg"/>
+          <span className="nav-list-span">친구</span>
+          <img 
+            id="icon-plus"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsAddFriendOpen(!isAddFriendOpen);
             }}
-            alt="Avatar" />
-          </Link>
-          <h2>{myNick}</h2>
-        </header>
-        <ul className="nav-ul">
-          <li className="nav-list-button" id="nav-friend" onClick={() => setIsFriendListOpen(!isFriendListOpen)}>
-            <img className="nav-list-img" src="/public/users.svg"/>
-            <span className="nav-list-span">친구</span>
-            <img 
-              id="icon-plus"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsAddFriendOpen(!isAddFriendOpen);
-              }}
-              src="/public/plus.svg"/>
-            {isAddFriendOpen ? <AddFriend setState={setIsAddFriendOpen} friendList={friendList} setFriendList={setFriendList} /> : <></>}
+            src="/public/plus.svg"/>
+          {isAddFriendOpen ? <AddFriend setState={setIsAddFriendOpen} friendList={friendList} setFriendList={setFriendList} /> : <></>}
+        </li>
+        {isFriendListOpen ? <FriendList friendList={friendList} setFriendList={setFriendList} /> : <></>}
+        <Link to={`${props.match.url}/record`} style={{color: "inherit", textDecoration: "none"}}>
+          <li className="nav-list-button">
+            <img className="nav-list-img" src="/public/line-graph.svg"/>
+            <span className="nav-list-span">전적</span>
           </li>
-          {isFriendListOpen ? <FriendList friendList={friendList} setFriendList={setFriendList} /> : <></>}
-          <Link to={`${props.match.url}/record`} style={{color: "inherit", textDecoration: "none"}}>
-            <li className="nav-list-button">
-              <img className="nav-list-img" src="/public/line-graph.svg"/>
-              <span className="nav-list-span">전적</span>
-            </li>
-          </Link>
-          <Link to={`${props.match.url}/chat`} style={{color: "inherit", textDecoration: "none"}}>
-            <li className="nav-list-button">
-              <img className="nav-list-img" src="/public/chat.svg"/>
-              <span className="nav-list-span">채팅</span>
-            </li>
-          </Link>
-          <Link to={`${props.match.url}/game`} style={{color: "inherit", textDecoration: "none"}}>
-            <li className="nav-list-button">
-              <img className="nav-list-img" src="/public/controller-play.svg"/>
-              <span className="nav-list-span">게임하기</span>
-            </li>
-          </Link>
-        </ul>
-        <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent myNickSetter={setMyNick} myAvatarSetter={setMyAvatar}/>} smallModal/></Route>
-      </nav>
-    );
-  } else {
-    return ( <Loading color="#fff" style={{width: "70px", height: "70px", marginLeft: "30px"}}/> );
-  }
+        </Link>
+        <Link to={`${props.match.url}/chat`} style={{color: "inherit", textDecoration: "none"}}>
+          <li className="nav-list-button">
+            <img className="nav-list-img" src="/public/chat.svg"/>
+            <span className="nav-list-span">채팅</span>
+          </li>
+        </Link>
+        <Link to={`${props.match.url}/game`} style={{color: "inherit", textDecoration: "none"}}>
+          <li className="nav-list-button">
+            <img className="nav-list-img" src="/public/controller-play.svg"/>
+            <span className="nav-list-span">게임하기</span>
+          </li>
+        </Link>
+      </ul>
+      <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent />} smallModal/></Route>
+    </nav>
+  );
 };
 
 export default withRouter(NavBar);

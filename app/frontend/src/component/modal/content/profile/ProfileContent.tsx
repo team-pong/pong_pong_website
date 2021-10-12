@@ -1,4 +1,4 @@
-import React, { Dispatch, FormEvent, SetStateAction, useEffect, useRef, useState } from "react";
+import React, { FormEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-router-dom";
 import "/src/scss/content/profile/ProfileContent.scss";
 import Modal from "../../Modal";
@@ -7,6 +7,7 @@ import RecordContent from "../record/RecordContent";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 import Loading from "../../../loading/Loading";
+import { UserInfoContext, UserInfoDispatchContext } from "../../../mainpage/MainPage";
 
 /*!
  * @author donglee
@@ -25,22 +26,12 @@ interface UserInfo {
   status: string;
 }
 
-/*!
- * @author donglee
- * @param[in] myNickSetter: 프로필 컴포넌트에서 닉네임 수정 시 NavBar에서
- *                         props로 넘어온 setMyNick stateSetter를 바꿔서
- *                         NavBar에서도 업데이트된 nick이 렌더링되도록 함
- * @param[in] myAvatarSetter: 아바타 state setter
- */
+const ProfileContent: React.FC<RouteComponentProps> = (props) => {
 
-interface ProfileContentProps {
-  myNickSetter?: Dispatch<SetStateAction<string>>;
-  myAvatarSetter?: Dispatch<SetStateAction<string>>;
-}
+  const myInfo = useContext(UserInfoContext);
+  const myInfoDispatch = useContext(UserInfoDispatchContext);
 
-const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (props) => {
-
-  const [userInfo, setUserInfo] = useState<UserInfo>();
+  const [otherUserInfo, setOtherUserInfo] = useState<UserInfo>();
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
   const [nickToEdit, setNickToEdit] = useState("");
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
@@ -76,13 +67,13 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
 
   /*!
    * @author donglee
-   * @brief POST요청 이후 정상 수정 후에 userInfo를 업데이트함
+   * @brief POST요청 이후 정상 수정 후에 전역으로 쓰이는 myInfo를 업데이트함
    */
-  const updateUserInfo = () => {
-    const newUserInfo = {...userInfo};
+  const updateUserInfoState = () => {
+    const newUserInfo = {...myInfo};
 
     newUserInfo.nick = nickToEdit;
-    setUserInfo(newUserInfo);
+    myInfoDispatch({type: "CHANGE", info: newUserInfo});
   };
 
   /*!
@@ -94,42 +85,41 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
     e.preventDefault();
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users/info`, "POST");
     const body = {
-      "user_id": userInfo.user_id,
+      "user_id": myInfo.user_id,
       "nick": nickToEdit,
-      "avatar_url": userInfo.avatar_url
+      "avatar_url": myInfo.avatar_url
     }
-    const res = await (await easyfetch.fetch(body)).json();
+    const res = await easyfetch.fetch(body);
     
     if (res.err_msg !== "에러가 없습니다.") {
       alert(`"${nickToEdit}" 은(는) 이미 존재하는 닉네임입니다.`);
-      setNickToEdit(userInfo.nick);
+      setNickToEdit(myInfo.nick);
       return ;
     }
-    updateUserInfo();
-    props.myNickSetter(nickToEdit);
+    updateUserInfoState();
     setIsEditNickClicked(false);
   };
 
   /*!
    * @author donglee
-   * @brief API /users 에서 프로필 정보를 요청해서 state에 저장함
+   * @brief 내가 아닌 다른 사용자 프로필 정보를 요청해서 state에 저장함
    */
-  const getUserInfo = async (): Promise<UserInfo> => {
+  const getOtherUserInfo = async (): Promise<UserInfo> => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nick}`);
     const res = await easyfetch.fetch()
 
-    setUserInfo(res);
+    setOtherUserInfo(res);
     return res;
   };
 
   /*!
    * @author donglee
-   * @brief Enter 누르면 저장, ESC 누르면 취소
+   * @brief - Enter 누르면 저장, ESC 누르면 취소
    */
-  const cancelEditNick = (e: React.KeyboardEvent) => {
+  const cancelEditNickKey = (e: React.KeyboardEvent) => {
     if (e.key === "Esc" || e.key === "Escape") {
       setIsEditNickClicked(false);
-      setNickToEdit(userInfo.nick);
+      setNickToEdit(myInfo.nick);
     }
   };
 
@@ -138,11 +128,11 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
    * @detail 닉네임 수정 버튼을 누른 상태에서 input화면과 수정 버튼을 제외한
    *         다른 부분을 눌렀을 때는 수정을 취소하고 원래 닉네임을 보여줌
    */
-  const cancelEdit = (e: MouseEvent, nick: string) => {
+  const cancelEditNickMouse = (e: MouseEvent, nick: string) => {
     if (e.target !== document.getElementById("mf-edit-img") &&
         e.target !== document.getElementsByClassName("mf-edit-nick")[0]) {
       setIsEditNickClicked(false);
-      setNickToEdit(nick);
+      setNickToEdit(myInfo.nick);
     }
   };
 
@@ -165,7 +155,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
 		const body = {
 			"friend_nick": nick
 		};
-		const res = await (await easyfetch.fetch(body)).json();
+		const res = await easyfetch.fetch(body);
 
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert(res.err_msg);
@@ -206,7 +196,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
 		const body = {
 			"block_nick": nick,
 		};
-		const res = await (await easyfetch.fetch(body)).json();
+		const res = await easyfetch.fetch(body);
 
 		if (res.err_msg !== "에러가 없습니다.") {
 			alert("사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.");
@@ -261,19 +251,6 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
     }
   };
 
-  /*!
-   * @author donglee
-   * @detail 프로필을 열 때 가장 먼저 나의 프로필인지 다른 사용자것인지를 판별
-   */
-  const setMineOrOthers = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
-    const res = await easyfetch.fetch()
-
-    if (res.nick === nick) {
-      setIsMyProfile(true);
-    }
-  };
-
  /*!
   * @author donglee
   * @detail 닉네임 수정을 눌렀을 때만 click이벤트리스너를 등록하고
@@ -283,27 +260,28 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
  
   useEffect(() => {
     if (isEditNickClicked) {
-      window.addEventListener("click", handlerToBeRemoved = function(e) {cancelEdit(e, nickToEdit)});
+      window.addEventListener("click", handlerToBeRemoved = function(e) {cancelEditNickMouse(e, nickToEdit)});
     }
     return (() => window.removeEventListener("click", handlerToBeRemoved));
   }, [isEditNickClicked]);
 
   /*!
    * @author donglee
-   * @detail DB에서 정보를 얻어온 이후에 nickToEdit state를 업데이트한다
+   * @detail 내 프로필인지 다른 사용자의 프로필인지 검사한다
+   *         다른 사용자의 경우 프로필 정보를 API로 받아온다
    *         이미 친구인지, 차단한 친구인지 정보를 받아온다
    */
   useEffect(() => {
-    setMineOrOthers()
-      .then(getUserInfo)
-      .then((res) => {setNickToEdit(res.nick); return res;});
-    if (!isMyProfile) {
+    setIsMyProfile(nick === myInfo.nick);
+    if (nick !== myInfo.nick) {
+      getOtherUserInfo();
       getIsAlreadyFriend();
       getIsBlockedFriend();
     }
   }, []);
 
-  if (userInfo && isMyProfile) {
+  if (isMyProfile) {
+    console.log("mine render");
     return (
       <div id="pr-profile">
         <div className="upper-part">
@@ -321,7 +299,7 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
           <div id="avatar-container">
             <img className="pr-avatar"
               ref={avatarImgRef}
-              src={userInfo.avatar_url}
+              src={myInfo.avatar_url}
               onError={() => {avatarImgRef.current.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="}}
               alt="프로필사진" />
           </div>
@@ -336,9 +314,9 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
                   maxLength={10}
                   required
                   onChange={(e) => setNickToEdit(e.target.value)}
-                  onKeyDown={(e) => cancelEditNick(e)} />
+                  onKeyDown={(e) => cancelEditNickKey(e)} />
               </form>
-              <span className={"mf-nick" + (isEditNickClicked ? " mf-nick-clicked" : "")}>{`${userInfo.nick}`}</span>
+              <span className={"mf-nick" + (isEditNickClicked ? " mf-nick-clicked" : "")}>{myInfo.nick}</span>
               <img
                 id="mf-edit-img"
                 src={isEditNickClicked ? "/public/check.png" : "/public/pencil.png"}
@@ -346,14 +324,14 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
                 onClick={!isEditNickClicked ? activateEdit : submitForm}/>
             </div>
             <div id="user-stat">
-              <span id="win">{userInfo.win_games} 승</span>
+              <span id="win">{myInfo.win_games} 승</span>
               <span className="delimiter">|</span>
-              <span id="lose">{userInfo.loss_games} 패</span>
+              <span id="lose">{myInfo.loss_games} 패</span>
               <span className="delimiter">|</span>
-              <span id="score">{userInfo.ladder_level} 점</span>
+              <span id="score">{myInfo.ladder_level} 점</span>
             </div>
-            <div id="user-title">{setAchievementStr(userInfo.ladder_level)}
-              <img id="user-achievement-img" src={setAchievementImg(userInfo.ladder_level)} alt="타이틀로고" />
+            <div id="user-title">{setAchievementStr(myInfo.ladder_level)}
+              <img id="user-achievement-img" src={setAchievementImg(myInfo.ladder_level)} alt="타이틀로고" />
             </div>
           </div>
         </div>
@@ -366,11 +344,14 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
             <span className="pr-explain">클릭하면 회원님의 모든 데이터가 서버에서 삭제됩니다</span>
           </div>
         </div>
-        <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={nick}/>} /></Route>
-        <Route path={`${props.match.path}/manageFriend`}><Modal id={Date.now()} smallModal content={<ManageFriendContent nick={userInfo.nick}/>} /></Route>
+        <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={myInfo.nick}/>} /></Route>
+        <Route path={`${props.match.path}/manageFriend`}><Modal id={Date.now()} smallModal content={<ManageFriendContent nick={myInfo.nick}/>} /></Route>
       </div>
     );
-  } else if (userInfo && !isMyProfile) {
+  }
+
+  if (otherUserInfo) {
+    console.log("other render");
     return (
       <div id="pr-profile">
         <div className="upper-part user-profile">
@@ -382,24 +363,24 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
             <button className="pr-btn" onClick={requestMatch}>대전 신청</button>
           </div>
           <div id="avatar-container">
-            <img className="pr-avatar" src={userInfo.avatar_url} alt="프로필사진" />
+            <img className="pr-avatar" src={otherUserInfo.avatar_url} alt="프로필사진" />
           </div>
           <div id="user-info">
             <div id="user-id">
               <span className="mf-nick">{`${nick}`}</span>
             </div>
             <div id="user-stat">
-              <span>{userInfo.win_games} 승</span>
+              <span>{otherUserInfo.win_games} 승</span>
               <span className="delimiter">|</span>
-              <span>{userInfo.loss_games} 패</span>
+              <span>{otherUserInfo.loss_games} 패</span>
               <span className="delimiter">|</span>
-              <span>{userInfo.ladder_level} 점</span>
+              <span>{otherUserInfo.ladder_level} 점</span>
               <Link to={`${props.match.url}/record`}>
                 <img className="profile-stat-detail" src="/public/search.svg" alt="상세전적보기" title="상세전적보기"/>
               </Link>
             </div>
-            <div id="user-title">{setAchievementStr(userInfo.ladder_level)}
-              <img id="user-achievement-img" src={setAchievementImg(userInfo.ladder_level)} alt="타이틀로고" />
+            <div id="user-title">{setAchievementStr(otherUserInfo.ladder_level)}
+              <img id="user-achievement-img" src={setAchievementImg(otherUserInfo.ladder_level)} alt="타이틀로고" />
             </div>
           </div>
         </div>
@@ -418,11 +399,12 @@ const ProfileContent: React.FC<ProfileContentProps & RouteComponentProps> = (pro
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={nick}/>} /></Route>
       </div>
     );
-  } else {
-    return (
-      <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "38%", top: "40%"}} />
-    );
   }
+  
+  console.log("loading render");
+  return (
+    <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "38%", top: "40%"}} />
+  );
 };
 
 export default withRouter(ProfileContent);
