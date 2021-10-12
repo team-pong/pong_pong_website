@@ -22,6 +22,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const [canvasHeight, setCanvasHeight] = useState(450);
   const [leftBar, setLeftBar] = useState<fabric.Rect>();
   const [rightBar, setRightBar] = useState<fabric.Rect>();
+  const [countdownWindow, setCountdownWindow] = useState<fabric.Text>();
   const [resultWindow, setResultWindow] = useState<fabric.Text>();
   const [ball, setBall] = useState<fabric.Circle>();
   const [ballX, setBallX] = useState(350);
@@ -85,6 +86,16 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const initCanvas = () => {
     return new fabric.StaticCanvas('ping-pong', {width: canvasWidth, height: canvasHeight, backgroundColor: "white"});
   };
+
+  const initCountdownWindow = (text) => {
+    return new fabric.Textbox(text, {
+      width: 300,
+      top: 5,
+      left: 5,
+      fontSize: 40,
+      textAlign: 'center',
+    });
+  }
 
   const initResultWindow = (text) => {
     return new fabric.Textbox(text, {
@@ -194,6 +205,10 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       setMatchInfo(data);
     })
 
+    socket.on("startCount", () => {
+      setCountdownWindow(initCountdownWindow('3'));
+    })
+
     socket.on("matchEnd", (data) => {
       setResultWindow(initResultWindow(`YOU ${data}`));
     })
@@ -210,6 +225,35 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
 
   useEffect(() => {
     if (canvas) {
+      setTimeout(() => {
+        countdownWindow.set({
+          text: '2'
+        });
+        canvas.renderAll();
+      }, 1000);
+      setTimeout(() => {
+        countdownWindow.set({
+          text: '1'
+        });
+        canvas.renderAll();
+      }, 2000);
+      setTimeout(() => {
+        countdownWindow.set({
+          text: ''
+        });
+        canvas.renderAll();
+      }, 3000)
+      countdownWindow.set({
+        top: 125,
+        left: 200,
+      });
+      canvas.add(countdownWindow);
+    }
+  }, [countdownWindow])
+
+  useEffect(() => {
+    if (canvas) {
+      canvas.remove(countdownWindow);
       resultWindow.set({
         top: 125,
         left: 200,
