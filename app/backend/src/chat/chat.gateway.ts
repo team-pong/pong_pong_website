@@ -1,22 +1,64 @@
-import { ConnectedSocket, OnGatewayDisconnect } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayDisconnect } from '@nestjs/websockets';
 import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import axios from 'axios';
+import { Inject, forwardRef } from '@nestjs/common';
+import { GlobalService } from 'src/global/global.service';
+import { SessionService } from 'src/session/session.service';
+import { ChatUsersService } from 'src/chat-users/chat-users.service';
 
-export const onlineMap = {};
+const socketMap = {};
+
+interface JoinMsg{
+  room_id: string,
+}
 
 @WebSocketGateway({ namespace: 'chat' })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway {
+  constructor(
+    @Inject(forwardRef(() => GlobalService))
+    private globalService: GlobalService,
+    @Inject(forwardRef(() => SessionService))
+    private sessionService: SessionService,
+    @Inject(forwardRef(() => ChatUsersService))
+    private chatUsersService: ChatUsersService,
+  ) {}
+
   @WebSocketServer() public server: Server;
 
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
-    console.log('direct message');
-    return 'use POST /chat/:channel_id Body: {user: string, chat: string}';
+  afterInit(server: any): any {
+    console.log('Chat Server Init');
   }
 
-  afterInit(server: any): any {
-    console.log('WebSocket Server Init');
+  // 채널 접속시
+  // 1. 해당 room에 join
+  // 2. db 채팅방 유저 리스트에 추가요청
+  // 3. 해당 유저 입장 시스템 메세지 전송
+  @SubscribeMessage('join')
+  async joinMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: JoinMsg) {
+    const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+    const user_id = await this.sessionService.readUserId(session_id);
+    const room_id = body.room_id;
+
+    socketMap[socket.id] = {};
+    socketMap[socket.id].uid = user_id;
+    socketMap[socket.id].rid = room_id;
+
+    socket.join(room_id);
+    this.chatUsersService.createChatUsers(user_id, Number(room_id));
+    console.log(`Join Message user: ${user_id}, channel: ${room_id}`);
+    this.server.to(room_id).emit('message', {
+      user: 'system',
+      chat: `${user_id}님이 입장하셨습니다.`
+    });
+  }
+
+  @SubscribeMessage('message')
+  sendMessage(@ConnectedSocket() socket: Socket, msg: string) {
+    socket.to(socketMap[socket.id].rid).emit('message', {
+      user: socketMap[socket.id].uid,
+      chat: msg,
+    })
+    console.log(`Message Arrive user: ${socketMap[socket.id].uid}, chat: ${msg}`);
   }
 
   /*
@@ -25,38 +67,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   */
   async handleConnection(@ConnectedSocket() socket: Socket) {
     console.log('Chat 웹소켓 연결됨:', socket.nsp.name);
-    const req = socket.request;
-    const { headers: {referer} } = req;
-    const channel_id = referer.split('/')[referer.split('/').length - 1];
-    const user_id = socket.data.userid;
-    axios.post(`${process.env.BACKEND_SERVER_URL}/chat-users`, {user_id: user_id, channel_id: channel_id});
-    console.log(`user: ${user_id}, channel: ${channel_id}`);
-    socket.join(channel_id);
-    socket.to(channel_id).emit('message', {
-      user: 'system',
-      chat: `${user_id}님이 입장하셨습니다.`
-    });
-
-    const userList = await axios.get(`${process.env.BACKEND_SERVER_URL}/chat-users?channel_id=${channel_id}`);
-    socket.to(channel_id).emit('userList', userList.data.chatUsersList);
-
-    socket.on('disconnect', () => {
-      console.log('Chat 웹소켓 연결 해제')
-      socket.leave(channel_id);
-      const userCount = 0;
-      if (userCount == 0) {
-        axios.delete(`${process.env.BACKEND_SERVER_URL}/chat?channel_id=${channel_id}`);
-      } else {
-        axios.delete(`${process.env.BACKEND_SERVER_URL}/chat-users?channel_id=${channel_id}&user_id=${user_id}`)
-        socket.to(channel_id).emit('message', {
-          user: 'system',
-          chat: `${user_id} 님이 퇴장하셨습니다.`,
-        })
-      }
-    })
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket): any {
-    console.log('disconnected', socket.nsp.name);
+    const uid = socketMap[socket.id].uid;
+    const rid = socketMap[socket.id].rid;
+
+    console.log('Chat Socket Disconnected', uid);
+    this.chatUsersService.deleteChatUsers(uid, Number(rid)); // 남은 유저가 없는 경우까지 이 메서드에서 처리
+    socket.to(rid).emit('message', {
+      user: 'system',
+      chat: `${uid} 님이 퇴장하셨습니다.`,
+    })
+    socket.leave(rid);
+    delete socketMap[socket.id];
   }
 }

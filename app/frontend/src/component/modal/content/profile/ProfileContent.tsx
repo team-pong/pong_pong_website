@@ -281,7 +281,6 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
   }, []);
 
   if (isMyProfile) {
-    console.log("mine render");
     return (
       <div id="pr-profile">
         <div className="upper-part">
@@ -351,7 +350,6 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
   }
 
   if (otherUserInfo) {
-    console.log("other render");
     return (
       <div id="pr-profile">
         <div className="upper-part user-profile">
@@ -401,7 +399,6 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
     );
   }
   
-  console.log("loading render");
   return (
     <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "38%", top: "40%"}} />
   );

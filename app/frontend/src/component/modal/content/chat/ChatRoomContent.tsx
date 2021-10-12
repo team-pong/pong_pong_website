@@ -7,14 +7,7 @@ import ChatContextMenu from "./ChatContextMenu";
 import EasyFetch from "../../../../utils/EasyFetch";
 import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
-
-interface ChatRoom {
-  title: string,
-  type: string,
-  current_people: number,
-  max_people: number,
-  passwd: string,
-};
+import { io } from "socket.io-client";
 
 function submitMessage(message: string, setMessage: Dispatch<SetStateAction<string>>,
                         chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
@@ -119,10 +112,32 @@ const Password: FC<{
   );
 }
 
+interface ChatRoom {
+  title: string,
+  type: string,
+  current_people: number,
+  max_people: number,
+  passwd: string,
+};
+
+interface ChatLog {
+  nick: string,
+  position: string,
+  avatar_url: string,
+  time: number,
+  message: string,
+};
+
+interface ChatUser {
+  nick: string,
+  avatar_url: string,
+  position: string,
+};
+
 const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
 
-  const [chatUsers, setChatUsers] = useState<{nick: string, avatar_url: string, position: string}[]>(require("../../../../dummydata/testChatRoomLog").chatUsers);
-  const [chatLog, setChatLog] = useState(require("../../../../dummydata/testChatRoomLog").chatLog);
+  const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
+  const [chatLog, setChatLog] = useState<ChatLog[]>([]);
   const [message, setMessage] = useState("");
   const [contextMenu, setContextMenu] = useState<{
     isOpen: boolean,
@@ -145,7 +160,6 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
   const getChatRoomInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${channel_id}`);
     const res = await easyfetch.fetch();
-
     if (!res.err_msg) {
       setChatRoomInfo({
         title: res.title,
@@ -160,6 +174,37 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     return res;
   }
 
+  const connectSocket = () => {
+    const socket = io(`${global.BE_HOST}/chat`);
+
+    socket.emit('join', {room_id: channel_id});
+    return socket;
+  };
+
+  /*!
+   * @author donglee
+   * @brief 대화방 참여 중인 사용자 목록을 불러옴
+   * @TODO: position에 대해서 API에서 어떻게 처리해야 할 지를 알아야 함.
+   */
+  const getChatRoomUsers = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/chat-users?channel_id=${channel_id}`);
+    const res = await easyfetch.fetch();
+
+    if (res.chatUsersList) {
+      const updatedUsers: ChatUser[] = [];
+
+      res.chatUsersList.map((user) => {
+        const elem = {
+          nick: user.nick,
+          avatar_url: user.avatar_url,
+          position: "mute", //test
+        };
+        updatedUsers.push(elem);
+      })
+      setChatUsers(updatedUsers);
+    }
+  };
+
   /*!
    * @author donglee
    * @brief - 내가 직접 만든 비공개방일 경우에는 Password에 props을 줘서 첫 1회만 비번없이 입장 가능하도록 함
@@ -169,8 +214,14 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     if (props.location.state) {
       setIsMadeMyself(true);
     }
+    const socket = connectSocket();
     getChatRoomInfo()
     .then((res) => {if (res.type === "protected") setIsProtected(true)});
+    getChatRoomUsers();
+
+    return (() => {
+      socket.disconnect();
+    });
   }, []);
 
   if (chatRoomInfo && isProtected) {

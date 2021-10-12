@@ -27,7 +27,17 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
   const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  /*!
+   * @author donglee, yochoi
+   * @brief map 함수 안에서 대화방 목록 정보를 li에 담아서 return 하는 함수
+   * @detail 대화방에 들어갔다가 나올 때 웹소켓 연결을 끊으면서 백엔드에서 대화방에서 사용자가 나간
+   *         경우를 API 요청하는데 이 요청보다 현재 FC가 get하는 요청이 더 빠른 경우에
+   *         chatRoom의 정보가 정확하지 않아서 에러가 나는 경우가 있는데 이를 if 문으로 예외처리함.
+   */  
   const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
+    if (chatRoom.current_people === 0 || chatRoom.current_people.constructor == Object) {
+      return ;
+    }
     return (
       <Link to={`/mainpage/chat/${chatRoom.channel_id}`} key={idx} style={{color: "inherit", textDecoration: "none"}}>
         <li className="chat-generator-li">
