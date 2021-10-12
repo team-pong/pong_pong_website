@@ -1,5 +1,5 @@
 import Modal, { ChatContent, RecordContent, GameContent } from '../modal/Modal';
-import { UserInfoContext, SetUserInfoContext, DmContext, SetDmContext } from '../../Context';
+import { UserInfoContext, SetUserInfoContext, DmInfoContext, SetDmInfoContext } from '../../Context';
 import NavBar from './navbar/NavBar';
 import Dm from './dm/Dm';
 import { useContext, useEffect, useState } from "react";
@@ -22,8 +22,8 @@ const MainPage = ({match}): JSX.Element => {
 
   const userInfo = useContext(UserInfoContext);
   const setUserInfo = useContext(SetUserInfoContext);
-  const isDmOpen = useContext(DmContext);
-  const setIsDmOpen = useContext(SetDmContext);
+  const dmInfo = useContext(DmInfoContext);
+  const setDmInfo = useContext(SetDmInfoContext);
 
   const getUserInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
@@ -88,11 +88,11 @@ const MainPage = ({match}): JSX.Element => {
               <span className="mp-explain-span">게임을 하려면 누르세요!</span>
             </Link>
             <section id="dm-section">
-              {isDmOpen && <Dm setIsDmOpen={setIsDmOpen}/>}
-              <button id="dm-controll-button" onClick={() => setIsDmOpen(!isDmOpen)}>
+              {dmInfo.isDmOpen && <Dm />}
+              <button id="dm-controll-button" onClick={() => setDmInfo({isDmOpen: !dmInfo.isDmOpen, target: ""})}>
                 {unReadMsg && <div className="un-read-msg">{unReadMsg}</div>}
-                {!isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
-                {isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
+                {!dmInfo.isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
+                {dmInfo.isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
               </button>
             </section>
           </div>
