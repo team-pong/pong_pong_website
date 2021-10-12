@@ -1,6 +1,6 @@
 import { Req } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import { ConnectedSocket, OnGatewayDisconnect } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayDisconnect } from '@nestjs/websockets';
 import { WebSocketServer, OnGatewayConnection, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
@@ -157,6 +157,13 @@ export class GameGateway {
 		}
 	}
 
+	/*
+	 * @brief 게임에 할당된 자원 제거
+	 * 1. 해당 게임에서 생성됐던 Interval, Timeout 제거
+	 * 2. 해당 소켓에 등록된 이벤트 리스너 제거
+	 * 3. 소켓 정보와 게임 정보 제거
+	 * 4. 소켓 연결 해제
+	*/
 	clearGame(left_player: User, right_player: User, room_id: string, gameLogic: GameLogic) {
 		this.clearIntervals(this.games[room_id], gameLogic);
 		left_player.socket.removeAllListeners();
@@ -178,7 +185,7 @@ export class GameGateway {
 	}
 
   @SubscribeMessage('normal')
-  async handleMessage(@ConnectedSocket() socket: Socket) {
+  async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: string) {
 		// 쿠키에서 sid 파싱
 		const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
 		// sid로 유저 아이디 찾기
@@ -201,7 +208,7 @@ export class GameGateway {
 		if (this.normal_queue.length >= 2) {
 			console.log('매칭 완료');
 			
-			const gameLogic = new GameLogic(700, 450, 2, this.server);
+			const gameLogic = new GameLogic(700, 450, Number(map), this.server);
 			const playerLeft = this.normal_queue[0];
 			const playerRight = this.normal_queue[1];
 
