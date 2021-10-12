@@ -30,7 +30,6 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setI
     });
     return (() => {
       if (isMatched === false) {
-        console.log('isMatched false');
         socket.disconnect();
       }
     })

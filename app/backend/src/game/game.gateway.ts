@@ -144,24 +144,20 @@ export class GameGateway {
 				this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
 				this.clearGame(playerLeft, playerRight, room_id, gameLogic);
 			} else {
-				console.log("timeout start");
 				this.server.to(room_id).emit("startCount");
 				this.games[room_id].timeout = setTimeout(() => {
 					this.games[room_id].interval = setInterval(() => {
 						this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
 					}, 20)
-					console.log("timeout end");
 				}, 3000)
 			}
 	}
 
 	gameInterval = (userInfo: MatchInfo, playerLeft: User, playerRight: User, gameLogic: GameLogic) => {
 		if (gameLogic._score == Scored.PLAYER00) {
-			console.log("left win");
 			userInfo.lPlayerScore++;
 			this.prepareNextRound(userInfo, playerLeft, playerRight, gameLogic);
 		} else if (gameLogic._score == Scored.PLAYER01) {
-			console.log("right win");
 			userInfo.rPlayerScore++;
 			this.prepareNextRound(userInfo, playerLeft, playerRight, gameLogic);
 		} else {
@@ -240,14 +236,12 @@ export class GameGateway {
 			}
 			return false;
 		})) {
-			console.log('중복 대기열:', userid);
 		} else {
 			this.normal_queue.push({id: userid, socket: socket, map: map_type})
 		}
 		// 같은 맵을 선택하고 기다리는중인 사람들 리스트
 		const waiters = this.normal_queue.filter((element) => element.map == map_type);
 		if (waiters.length >= 2) {
-			console.log('매칭 완료');
 			
 			const gameLogic = new GameLogic(700, 450, Number(map), this.server);
 			const playerLeft = waiters[0];
@@ -291,7 +285,6 @@ export class GameGateway {
 			
 			playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l'));
 			playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r'));
-			console.log("timeout start");
 
 			this.games[room_id] = {timeout: null, interval: null, type: game_type, map: map_type};
 			this.server.to(room_id).emit("startCount");
@@ -299,7 +292,6 @@ export class GameGateway {
 				this.games[room_id].interval = setInterval(() => {
 					this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
 				}, 20)
-				console.log("timeout end");
 			}, 3000)
 			
 			/*
@@ -307,9 +299,7 @@ export class GameGateway {
 			 */
 			playerLeft.socket.on("disconnect", () => this.disconnectEvent('l', playerLeft, playerRight, gameLogic));
 			playerRight.socket.on("disconnect", () => this.disconnectEvent('r', playerLeft, playerRight, gameLogic));
-
 		}
-		console.log('대기열 인원 수:', this.normal_queue.length);
   }
 
 	
@@ -331,15 +321,12 @@ export class GameGateway {
 			}
 			return false;
 		})) {
-			console.log('중복 대기열:', userid);
 		} else {
 			this.ladder_queue.push({id: userid, socket: socket, map: map_type})
 		}
 		// 같은 맵을 선택하고 기다리는중인 사람들 리스트
 		const waiters = this.ladder_queue.filter((element) => element.map == map_type);
 		if (waiters.length >= 2) {
-			console.log('매칭 완료');
-			
 			const gameLogic = new GameLogic(700, 450, Number(map), this.server);
 			const playerLeft = waiters[0];
 			const playerRight = waiters[1];
@@ -382,7 +369,6 @@ export class GameGateway {
 			
 			playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l'));
 			playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r'));
-			console.log("timeout start");
 
 			this.games[room_id] = {timeout: null, interval: null, type: game_type, map: map_type};
 			this.server.to(room_id).emit("startCount");
@@ -390,7 +376,6 @@ export class GameGateway {
 				this.games[room_id].interval = setInterval(() => {
 					this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
 				}, 20)
-				console.log("timeout end");
 			}, 3000)
 			
 			/*
@@ -400,7 +385,6 @@ export class GameGateway {
 			playerRight.socket.on("disconnect", () => this.disconnectEvent('r', playerLeft, playerRight, gameLogic));
 
 		}
-		console.log('대기열 인원 수:', this.ladder_queue.length);
 	}
 
 	afterInit(server: Server): any {

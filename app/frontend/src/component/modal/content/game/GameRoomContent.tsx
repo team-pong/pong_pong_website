@@ -173,14 +173,12 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    */
   useEffect(() => {
     socket.on("init", (data) => {
-      console.log("init position", data);
       setMap(data.type);
       setCanvas(initCanvas());
       setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
       setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
       setBall(initBall(data.ball[0], data.ball[1]));
       if (data?.type == 1) {
-        console.log('Map TYPE:', data.type);
         setObsRect00(initBar(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2], data.obstacle.obs00[3]));
         setObsRect01(initBar(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2], data.obstacle.obs01[3]));
         setObsRect02(initBar(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2], data.obstacle.obs02[3]));
