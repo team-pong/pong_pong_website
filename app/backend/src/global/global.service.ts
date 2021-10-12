@@ -5,6 +5,11 @@ export class GlobalService {
   constructor() {}
 
   getSessionIDFromCookie(cookie): string {
-    return cookie.split('.')[1].substring(8);
+    if (cookie) {
+      return cookie.split('.')[1].substring(8);
+    } else {
+      console.log('no cookie');
+      return ;
+    }
   }
 }

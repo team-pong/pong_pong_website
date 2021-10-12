@@ -34,6 +34,28 @@ export class SessionController {
 		return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
 	}
 
+	/*!
+	 * @brief 소켓 통신용 테스트 유저로 로그인하는 api
+	 * @todo production 환경에서 삭제되어야함
+	 */
+	@ApiOperation({ summary: '개발용 테스트유저2 로 로그인' })
+	@Get("/test_user03")
+	async tester_login03(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
+		await this.sessionService.tester_login(request, 'tester03', 'tester03', 'https://gravatar.com/avatar/ppgw8831?s=400&d=robohash&r=x');
+		return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
+	}
+
+	/*!
+	 * @brief 소켓 통신용 테스트 유저로 로그인하는 api
+	 * @todo production 환경에서 삭제되어야함
+	 */
+	@ApiOperation({ summary: '개발용 테스트유저2 로 로그인' })
+	@Get("/test_user04")
+	async tester_login04(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
+		await this.sessionService.tester_login(request, 'tester04', 'tester04', 'https://gravatar.com/avatar/ppgw8831?s=400&d=robohash&r=x');
+		return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
+	}
+
   @ApiOperation({ summary: '42로그인 페이지에서 이 주소로 코드를 전송'})
   @Get("/oauth")
   async login(@Query() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {

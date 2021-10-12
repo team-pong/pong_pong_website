@@ -1,19 +1,22 @@
 import { Req } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import { ConnectedSocket, OnGatewayDisconnect } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayDisconnect } from '@nestjs/websockets';
 import { WebSocketServer, OnGatewayConnection, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
+import { GlobalService } from 'src/global/global.service';
+import { MatchService } from 'src/match/match.service';
 import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
-import { GameLogic } from './game.logic';
+import { Scored, GameLogic } from './game.logic';
 
-class WaitUser {
-	constructor(
-		public id: string,
-		public socket: Socket,
-	) {}
+interface User {
+	id: string,
+	socket: Socket,
+	map: Number,
 }
+
+type MatchType = 'normal' | 'ladder';
 
 interface MatchInfo {
   lPlayerNickname: string,
@@ -23,9 +26,35 @@ interface MatchInfo {
   rPlayerAvatarUrl: string,
   rPlayerScore: number,
   viewNumber: number,
+	type: MatchType,
+	map: number,
 }
 
-var normal_waiting: WaitUser[] = [];
+interface socketInfo {
+	socket: Socket,
+	sid: string, // session id
+	uid: string, // user id
+	rid: string, // room id
+	match: MatchInfo,
+}
+
+interface Game {
+	timeout: NodeJS.Timeout,
+	interval: NodeJS.Timeout,
+	type: MatchType;
+	map: number;
+}
+
+interface GameInfo {
+	game: Game,
+	gameLogic: GameLogic,
+	match_info: MatchInfo,
+	left_player: User,
+	right_player: User,
+	room_id: string,
+}
+
+type Position = 'l' | 'r';
 
 /*!
  * @brief 게임 연결용 웹소켓
@@ -38,32 +67,201 @@ export class GameGateway {
 	constructor(
 		private sessionService: SessionService, // readUserId 함수 쓰려고 가져옴
 		private usersService: UsersService,
+		private matchService: MatchService,
+		private globalService: GlobalService,
 	) {}
 
 	@WebSocketServer()public server: Server;
 
+	private normal_queue: User[] = [];
+	private ladder_queue: User[] = [];
+	private socket_infos: {[key: string]: socketInfo} = {};
+	private games: {[key: string]: Game} = {};
+
+	clearGameInterval(game: Game) {
+		clearInterval(game.interval);
+		clearTimeout(game.timeout);
+	}
+
+	clearGameLogicInterval(gameLogic: GameLogic) {
+		clearInterval(gameLogic._leftBarMovement);
+		clearInterval(gameLogic._rightBarMovement);
+	}
+	
+	clearIntervals(game: Game, gameLogic: GameLogic) {
+		this.clearGameInterval(game);
+		this.clearGameLogicInterval(gameLogic);
+	}
+
+	BarMovementEventListner(e: any, game_logic: GameLogic, user_position: Position) {
+		const position = user_position == 'l' ? true : false;
+		if (e.arrowDown === true) { // 아랫키가 눌리면 아래로 이동하는 인터벌을 생성한다.
+			game_logic.moveBar(false, position);
+		} else if (e.arrowDown === false) { // 아래키가 떼어지면 아래로 이동하던 인터벌을 제거한다.
+			clearInterval(position ? game_logic._leftBarMovement : game_logic._rightBarMovement);
+			if (e.arrowUp === 1) { // Down키가 떼어졌는데 Up키가 이미 눌려진 상태라면, 위로 이동하는 인터벌을 생성.
+				game_logic.moveBar(true, position);
+			}
+		}
+		if (e.arrowUp === true) {
+			game_logic.moveBar(true, position);
+		} else if (e.arrowUp === false) {
+			clearInterval(position ? game_logic._leftBarMovement : game_logic._rightBarMovement);
+			if (e.arrowDown === 1) {
+				game_logic.moveBar(false, position);
+			}
+		}
+	}
+
+ GiveUpEventListener (playerLeft: User, playerRight: User, gameLogic: GameLogic, position: Position) {
+		const room_id = this.socket_infos[playerLeft.socket.id].rid;
+		const winner = position == 'l' ? playerRight : playerLeft;
+		const loser = position == 'l' ? playerLeft : playerRight;
+		this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
+		loser.socket.emit('matchEnd', 'LOSE');
+		winner.socket.emit('matchEnd', 'WIN');
+		this.clearGame(playerLeft, playerRight, room_id, gameLogic);
+	}
+
+	saveResult(winner: User, loser: User, winner_score: number, loser_score: number, room_id: string) {
+		this.matchService.createMatch(winner.id, loser.id, winner_score, loser_score, this.games[room_id].type, this.games[room_id].map);
+		if (this.games[room_id].type == 'ladder') {
+			this.matchService.updateLadderScore(winner.id, 100);
+			this.matchService.updateLadderScore(loser.id, -100);
+		}
+	}
+
+	prepareNextRound(userInfo: MatchInfo, playerLeft: User, playerRight: User, gameLogic: GameLogic) {
+		gameLogic.initGame();
+		const room_id = this.socket_infos[playerLeft.socket.id].rid;
+		this.server.to(room_id).emit('setMatchInfo', userInfo);
+		clearInterval(this.games[room_id].interval);
+		if (userInfo.lPlayerScore == 3 || userInfo.rPlayerScore == 3 || (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
+				const winner = userInfo.lPlayerScore == 3 ? playerLeft : playerRight;
+				const loser = userInfo.lPlayerScore == 3 ? playerRight : playerLeft;
+				winner.socket.emit('matchEnd', 'WIN');
+				loser.socket.emit('matchEnd', 'LOSE');
+				this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
+				this.clearGame(playerLeft, playerRight, room_id, gameLogic);
+			} else {
+				console.log("timeout start");
+				this.server.to(room_id).emit("startCount");
+				this.games[room_id].timeout = setTimeout(() => {
+					this.games[room_id].interval = setInterval(() => {
+						this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
+					}, 20)
+					console.log("timeout end");
+				}, 3000)
+			}
+	}
+
+	gameInterval = (userInfo: MatchInfo, playerLeft: User, playerRight: User, gameLogic: GameLogic) => {
+		if (gameLogic._score == Scored.PLAYER00) {
+			console.log("left win");
+			userInfo.lPlayerScore++;
+			this.prepareNextRound(userInfo, playerLeft, playerRight, gameLogic);
+		} else if (gameLogic._score == Scored.PLAYER01) {
+			console.log("right win");
+			userInfo.rPlayerScore++;
+			this.prepareNextRound(userInfo, playerLeft, playerRight, gameLogic);
+		} else {
+			// frontㅇㅔ서 준비 완료되면 시작(3, 2, 1, Start 메시지)
+			gameLogic.update();
+			playerLeft.socket.emit("update", gameLogic.getJson());
+			playerRight.socket.emit("update", gameLogic.getJson());	
+		}
+	}
+
+	/*
+	 * @brief 게임에 할당된 자원 제거
+	 * 1. 해당 게임에서 생성됐던 Interval, Timeout 제거
+	 * 2. 해당 소켓에 등록된 이벤트 리스너 제거
+	 * 3. 소켓 정보와 게임 정보 제거
+	 * 4. 소켓 연결 해제
+	*/
+	clearGame(left_player: User, right_player: User, room_id: string, gameLogic: GameLogic) {
+		this.clearIntervals(this.games[room_id], gameLogic);
+		left_player.socket.removeAllListeners();
+		right_player.socket.removeAllListeners();
+		delete this.games[room_id];
+		delete this.socket_infos[left_player.socket.id];
+		left_player.socket.disconnect();
+		right_player.socket.disconnect();
+	}
+
+	disconnectEvent(position: Position, left_player: User, right_player: User, gameLogic: GameLogic) {
+		const room_id = this.socket_infos[left_player.socket.id].rid;
+		const winner = position == 'l' ? right_player : left_player;
+		const loser = position == 'l' ? left_player : right_player;
+
+		this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
+		winner.socket.emit('matchEnd', 'WIN');
+		this.clearGame(left_player, right_player, room_id, gameLogic);
+	}
+
+	deleteFromNormalQueue(user_id: string) {
+		const idx = this.normal_queue.findIndex((element) => {
+			if (element.id = user_id) {
+				return true;
+			}
+			return false;
+		})
+		if (idx != -1) {
+			this.normal_queue.splice(idx, 1);
+		}
+	}
+
+	deleteFromLadderQueue(user_id: string) {
+		const idx = this.ladder_queue.findIndex((element) => {
+			if (element.id = user_id) {
+				return true;
+			}
+			return false;
+		})
+		if (idx != -1) {
+			this.ladder_queue.splice(idx, 1);
+		}
+	}
+
   @SubscribeMessage('normal')
-  async handleMessage(@ConnectedSocket() socket: Socket) {
+  async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: string) {
+		const map_type = Number(map);
+		const game_type = 'normal';
 		// 쿠키에서 sid 파싱
-		const sid: string = socket.request.headers.cookie.split('.')[1].substring(8);
+		const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
 		// sid로 유저 아이디 찾기
 		const userid = await this.sessionService.readUserId(sid);
+
+		this.socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null};
 		// 큐에 넣기
-		normal_waiting.push(new WaitUser(userid, socket));
-		// 2인 이상시 매칭
-		if (normal_waiting.length >= 2) {
+		if (this.normal_queue.find((element) => {
+			if (element.id == userid) {
+				return true;
+			}
+			return false;
+		})) {
+			console.log('중복 대기열:', userid);
+		} else {
+			this.normal_queue.push({id: userid, socket: socket, map: map_type})
+		}
+		// 같은 맵을 선택하고 기다리는중인 사람들 리스트
+		const waiters = this.normal_queue.filter((element) => element.map == map_type);
+		if (waiters.length >= 2) {
 			console.log('매칭 완료');
 			
-			const gameLogic = new GameLogic(700, 450, 1, this.server);
-			const playerLeft = normal_waiting[0];
-			const playerRight = normal_waiting[1];
+			const gameLogic = new GameLogic(700, 450, Number(map), this.server);
+			const playerLeft = waiters[0];
+			const playerRight = waiters[1];
 
-			const roomName: string = playerLeft.id + playerRight.id;
-			playerLeft.socket.join(roomName);
-			playerRight.socket.join(roomName);
-			playerLeft.socket.emit('matched', {roomId: roomName, opponent: normal_waiting[1].id, position: 'left'});
-			playerRight.socket.emit('matched', {roomId: roomName, opponent: normal_waiting[0].id, position: 'right'});
-			normal_waiting.splice(0, 2);
+			const room_id: string = playerLeft.id + playerRight.id;
+			this.socket_infos[playerLeft.socket.id].rid = room_id;
+			this.socket_infos[playerRight.socket.id].rid = room_id;
+			playerLeft.socket.join(room_id);
+			playerRight.socket.join(room_id);
+			playerLeft.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[1].id, position: 'left'});
+			playerRight.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[0].id, position: 'right'});
+			this.deleteFromNormalQueue(waiters[0].id);
+			this.deleteFromNormalQueue(waiters[1].id);
 
 			const ret = gameLogic.getJson();
 			const userInfo: MatchInfo = {
@@ -73,52 +271,136 @@ export class GameGateway {
 				rPlayerNickname: playerRight.id,
 				rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
 				rPlayerScore: 0,
-				viewNumber: socket.client.conn.server.clientsCount - 2,
+				viewNumber: 0,
+				type: game_type,
+				map: 0,
 			}
+			this.socket_infos[playerLeft.socket.id].match = userInfo;
+			this.socket_infos[playerRight.socket.id].match = userInfo;
 
-			playerLeft.socket.emit('init', gameLogic.getJson(), userInfo);
-			playerRight.socket.emit('init', gameLogic.getJson(), userInfo);
-			// this.server.to(roomName).emit("init", gameLogic.getJson());
+			this.server.to(room_id).emit("init", gameLogic.getInitJson(), userInfo);
 
-			playerLeft.socket.emit('setMatchInfo', userInfo);
-			playerRight.socket.emit('setMatchInfo', userInfo);
-			// arrowDown : true -> 아래 방향키가 눌린 상태
-			// arrowDown : false -> 아래 방향키를 뗀 상태
-			// arrowUp : true -> 위 방향키가 눌린 상태
-			// arrowUp : false -> 위 방향키를 뗀 상태
-			playerLeft.socket.on('keyEvent', (e) => {
-				console.log('left player key event:', e);
-				if (e.arrowDown) { // 아랫키 눌림
-					gameLogic.moveBar(false, true);
-				}
-				if (e.arrowUp) {
-					gameLogic.moveBar(true, true);
-				}
-			})
+			playerLeft.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.lPlayerNickname} );
+			playerRight.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.rPlayerNickname} );
+			playerLeft.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'l'));
+			playerRight.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'r'));
 
-			playerRight.socket.on('keyEvent', (e) => {
-				console.log('right player key event:', e);
-				if (e.arrowDown) { // 아랫키 눌림
-					gameLogic.moveBar(false, false);
-				}
-				if (e.arrowUp) {
-					gameLogic.moveBar(true, false);
-				}
-			})
+			/*
+			 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
+			*/
+			
+			playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l'));
+			playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r'));
+			console.log("timeout start");
 
-			// 점수처리 추가, 득점시 초기화, 게임 종료메세지
-			const interval = setInterval(() => {
-				gameLogic.update();
-				playerLeft.socket.emit("update", gameLogic.getJson());
-				playerRight.socket.emit("update", gameLogic.getJson());
-			}, 20)
+			this.games[room_id] = {timeout: null, interval: null, type: game_type, map: map_type};
+			this.server.to(room_id).emit("startCount");
+			this.games[room_id].timeout = setTimeout(() => {
+				this.games[room_id].interval = setInterval(() => {
+					this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
+				}, 20)
+				console.log("timeout end");
+			}, 3000)
+			
+			/*
+			 * 게임 중 연결 끊은 경우
+			 */
+			playerLeft.socket.on("disconnect", () => this.disconnectEvent('l', playerLeft, playerRight, gameLogic));
+			playerRight.socket.on("disconnect", () => this.disconnectEvent('r', playerLeft, playerRight, gameLogic));
+
 		}
-		console.log('waiting:', normal_waiting);
+		console.log('대기열 인원 수:', this.normal_queue.length);
   }
 
+	
+
 	@SubscribeMessage('ladder')
-	async handdleMessage(@ConnectedSocket() socket: Socket) {
-		
+	async handdleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: string) {
+		const map_type = Number(map);
+		const game_type = 'ladder';
+		// 쿠키에서 sid 파싱
+		const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+		// sid로 유저 아이디 찾기
+		const userid = await this.sessionService.readUserId(sid);
+
+		this.socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null};
+		// 큐에 넣기
+		if (this.ladder_queue.find((element) => {
+			if (element.id == userid) {
+				return true;
+			}
+			return false;
+		})) {
+			console.log('중복 대기열:', userid);
+		} else {
+			this.ladder_queue.push({id: userid, socket: socket, map: map_type})
+		}
+		// 같은 맵을 선택하고 기다리는중인 사람들 리스트
+		const waiters = this.ladder_queue.filter((element) => element.map == map_type);
+		if (waiters.length >= 2) {
+			console.log('매칭 완료');
+			
+			const gameLogic = new GameLogic(700, 450, Number(map), this.server);
+			const playerLeft = waiters[0];
+			const playerRight = waiters[1];
+
+			const room_id: string = playerLeft.id + playerRight.id;
+			this.socket_infos[playerLeft.socket.id].rid = room_id;
+			this.socket_infos[playerRight.socket.id].rid = room_id;
+			playerLeft.socket.join(room_id);
+			playerRight.socket.join(room_id);
+			playerLeft.socket.emit('matched', {roomId: room_id, opponent: this.ladder_queue[1].id, position: 'left'});
+			playerRight.socket.emit('matched', {roomId: room_id, opponent: this.ladder_queue[0].id, position: 'right'});
+			this.deleteFromLadderQueue(waiters[0].id);
+			this.deleteFromLadderQueue(waiters[1].id);
+
+			const ret = gameLogic.getJson();
+			const userInfo: MatchInfo = {
+				lPlayerNickname: playerLeft.id,
+				lPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerLeft.id),
+				lPlayerScore: 0,
+				rPlayerNickname: playerRight.id,
+				rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
+				rPlayerScore: 0,
+				viewNumber: 0,
+				type: 'ladder',
+				map: 0,
+			}
+			this.socket_infos[playerLeft.socket.id].match = userInfo;
+			this.socket_infos[playerRight.socket.id].match = userInfo;
+
+			this.server.to(room_id).emit("init", gameLogic.getInitJson(), userInfo);
+
+			playerLeft.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.lPlayerNickname} );
+			playerRight.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.rPlayerNickname} );
+			playerLeft.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'l'));
+			playerRight.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'r'));
+
+			/*
+			 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
+			*/
+			
+			playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l'));
+			playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r'));
+			console.log("timeout start");
+
+			this.games[room_id] = {timeout: null, interval: null, type: game_type, map: map_type};
+			this.server.to(room_id).emit("startCount");
+			this.games[room_id].timeout = setTimeout(() => {
+				this.games[room_id].interval = setInterval(() => {
+					this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
+				}, 20)
+				console.log("timeout end");
+			}, 3000)
+			
+			/*
+			 * 게임 중 연결 끊은 경우
+			 */
+			playerLeft.socket.on("disconnect", () => this.disconnectEvent('l', playerLeft, playerRight, gameLogic));
+			playerRight.socket.on("disconnect", () => this.disconnectEvent('r', playerLeft, playerRight, gameLogic));
+
+		}
+		console.log('대기열 인원 수:', this.ladder_queue.length);
 	}
 
 	afterInit(server: Server): any {
@@ -126,16 +408,19 @@ export class GameGateway {
 	}
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
-		console.log('Game 웹소켓 연결됨', socket.nsp.name);
+		const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+		const user_id = await this.sessionService.readUserId(sid);
 		
-		socket.on('disconnect', () => {
-			for (let i = 0; i < normal_waiting.length; i++) {
-				if (normal_waiting[i].socket.id === socket.id)  {
-					normal_waiting.splice(i, 1);
-					i--;
-				}
-			}
-			console.log('Game 웹소켓 연결 해제', socket.id);
-		})
+		console.log('Game 웹소켓 연결됨', user_id);
+	}
+
+	async handleDisconnect(@ConnectedSocket() socket: Socket) {
+		const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+		const user_id = await this.sessionService.readUserId(sid);
+
+		console.log('Game 웹소켓 연결해제', user_id);
+		// 대기열에 있다면 대기열에서 제거
+		this.deleteFromNormalQueue(user_id);
+		this.deleteFromLadderQueue(user_id);
 	}
 }
