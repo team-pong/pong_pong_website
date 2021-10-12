@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import Login from './component/login/Login';
 import MainPage from './component/mainpage/MainPage';
+import Global from './Context';
 import '/src/App.scss'
 
 function NotFound() {
@@ -11,6 +12,7 @@ function NotFound() {
 
 const App = (): JSX.Element => {
   return (
+      <Global>
         <BrowserRouter>
           <Switch>
             <Route exact path="/" component={Login} />
@@ -18,6 +20,7 @@ const App = (): JSX.Element => {
             <Route component={NotFound} />
           </Switch>
         </BrowserRouter>
+      </Global>
   );
 }
 

@@ -8,7 +8,7 @@ import "/src/scss/navbar/NavBar-mobile.scss";
 import Modal from "../../modal/Modal";
 import EasyFetch from "../../../utils/EasyFetch";
 import ProfileContent from "../../modal/content/profile/ProfileContent";
-import { UserInfoContext } from "../MainPage";
+import { UserInfoContext } from "../../../Context";
 
 /*!
  * @author donglee
