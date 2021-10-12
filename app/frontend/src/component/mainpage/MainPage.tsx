@@ -1,8 +1,8 @@
 import Modal, { ChatContent, RecordContent, GameContent } from '../modal/Modal';
-import { UserInfoContext, SetUserInfoContext } from '../../Context';
+import { UserInfoContext, SetUserInfoContext, DmContext, SetDmContext } from '../../Context';
 import NavBar from './navbar/NavBar';
 import Dm from './dm/Dm';
-import { createContext, useContext, useEffect, useReducer, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "/src/scss/mainpage/MainPage.scss";
 import "/src/scss/mainpage/MainPage-media.scss";
 import "/src/scss/mainpage/MainPage-mobile.scss";
@@ -17,12 +17,13 @@ import Loading from '../loading/Loading';
 
 const MainPage = ({match}): JSX.Element => {
   
-  const [isDmOpen, setIsDmOpen] = useState(false);
   const [updateFriendList, setUpdateFriendList] = useState({state: "", user_id: ""});
   const [unReadMsg, setUnReadMsg] = useState(1);
 
   const userInfo = useContext(UserInfoContext);
   const setUserInfo = useContext(SetUserInfoContext);
+  const isDmOpen = useContext(DmContext);
+  const setIsDmOpen = useContext(SetDmContext);
 
   const getUserInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
