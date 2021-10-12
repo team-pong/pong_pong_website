@@ -16,6 +16,7 @@ interface MatchInfo {
 }
 
 const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
+  const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
   const [canvasWidth, setCanvasWidth] = useState(700);
   const [canvasHeight, setCanvasHeight] = useState(450);
@@ -161,6 +162,8 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    */
   useEffect(() => {
     socket.on("init", (data) => {
+      console.log("init position", data);
+      setMap(data.type);
       setCanvas(initCanvas());
       setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
       setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
@@ -222,13 +225,13 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       canvas.add(ball);
       canvas.add(leftBar);
       canvas.add(rightBar);
-      if (obsCircle00) {
+      if (map == 2) {
         canvas.add(obsCircle00);
         canvas.add(obsCircle01);
         canvas.add(obsCircle02);
         canvas.add(obsCircle03);
       }
-      else if (obsRect00) {
+      else if (map == 1) {
         canvas.add(obsRect00);
         canvas.add(obsRect01);
         canvas.add(obsRect02);

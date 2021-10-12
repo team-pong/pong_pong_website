@@ -13,6 +13,7 @@ import { Scored, GameLogic } from './game.logic';
 interface User {
 	id: string,
 	socket: Socket,
+	map: Number,
 }
 
 type MatchType = 'normal' | 'ladder';
@@ -184,8 +185,19 @@ export class GameGateway {
 		this.clearGame(left_player, right_player, room_id, gameLogic);
 	}
 
+	deleteFromList(user_id: string) {
+		const idx = this.normal_queue.findIndex((element) => {
+			if (element.id = user_id) {
+				return true;
+			}
+			return false;
+		})
+		this.normal_queue.splice(idx, 1);
+	}
+
   @SubscribeMessage('normal')
   async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: string) {
+		const map_type = Number(map);
 		// 쿠키에서 sid 파싱
 		const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
 		// sid로 유저 아이디 찾기
@@ -201,16 +213,16 @@ export class GameGateway {
 		})) {
 			console.log('중복 대기열:', userid);
 		} else {
-			this.normal_queue.push({id: userid, socket: socket})
+			this.normal_queue.push({id: userid, socket: socket, map: map_type})
 		}
-		
-		// 2인 이상시 매칭
-		if (this.normal_queue.length >= 2) {
+		// 같은 맵을 선택하고 기다리는중인 사람들 리스트
+		const waiters = this.normal_queue.filter((element) => element.map == map_type);
+		if (waiters.length >= 2) {
 			console.log('매칭 완료');
 			
 			const gameLogic = new GameLogic(700, 450, Number(map), this.server);
-			const playerLeft = this.normal_queue[0];
-			const playerRight = this.normal_queue[1];
+			const playerLeft = waiters[0];
+			const playerRight = waiters[1];
 
 			const room_id: string = playerLeft.id + playerRight.id;
 			this.socket_infos[playerLeft.socket.id].rid = room_id;
@@ -219,7 +231,8 @@ export class GameGateway {
 			playerRight.socket.join(room_id);
 			playerLeft.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[1].id, position: 'left'});
 			playerRight.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[0].id, position: 'right'});
-			this.normal_queue.splice(0, 2); // 대기열에서 제거
+			this.deleteFromList(waiters[0].id);
+			this.deleteFromList(waiters[1].id);
 
 			const ret = gameLogic.getJson();
 			const userInfo: MatchInfo = {
