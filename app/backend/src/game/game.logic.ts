@@ -80,8 +80,8 @@ export class GameLogic {
 
         this._type = init;
 
-        this._direction[0] = (init / init) / Math.SQRT2;
-        this._direction[1] = (init / init) / Math.SQRT2;
+        this._direction[0] = 1 / Math.SQRT2;
+        this._direction[1] = 1 / Math.SQRT2;
 
         console.log("direction abs = " + (this._direction[0] * this._direction[0] + this._direction[1] * this._direction[1]));
         this._speed = 3;
