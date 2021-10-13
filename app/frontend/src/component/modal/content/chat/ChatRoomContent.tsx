@@ -160,6 +160,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
    * @brief param으로 넘어온 channel_id로 채팅방 정보 API요청, 결과없으면 NoResult 렌더링
    */
   const getChatRoomInfo = async () => {
+    console.log("getChatRoomInfo!");
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${channel_id}`);
     const res = await easyfetch.fetch();
     if (!res.err_msg) {
@@ -188,24 +189,24 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
    * @brief 대화방 참여 중인 사용자 목록을 불러옴
    * @TODO: position에 대해서 API에서 어떻게 처리해야 할 지를 알아야 함.
    */
-  const getChatRoomUsers = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/chat-users?channel_id=${channel_id}`);
-    const res = await easyfetch.fetch();
+  // const getChatRoomUsers = async () => {
+  //   const easyfetch = new EasyFetch(`${global.BE_HOST}/chat-users?channel_id=${channel_id}`);
+  //   const res = await easyfetch.fetch();
 
-    if (res.chatUsersList) {
-      const updatedUsers: ChatUser[] = [];
+  //   if (res.chatUsersList) {
+  //     const updatedUsers: ChatUser[] = [];
 
-      res.chatUsersList.map((user) => {
-        const elem = {
-          nick: user.nick,
-          avatar_url: user.avatar_url,
-          position: "mute", //test
-        };
-        updatedUsers.push(elem);
-      })
-      setChatUsers(updatedUsers);
-    }
-  };
+  //     res.chatUsersList.map((user) => {
+  //       const elem = {
+  //         nick: user.nick,
+  //         avatar_url: user.avatar_url,
+  //         position: "mute", //test
+  //       };
+  //       updatedUsers.push(elem);
+  //     })
+  //     setChatUsers(updatedUsers);
+  //   }
+  // };
 
   /*!
    * @author donglee
@@ -220,18 +221,18 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     setSocket(socket);
     getChatRoomInfo()
     .then((res) => {if (res.type === "protected") setIsProtected(true)});
-    getChatRoomUsers();
 
     socket.on("message", (data) => {
-      console.log("message: ", data);
+      
     })
 
     socket.on("setRoomInfo", (data) => {
       console.log("setRoomInfo: ", data);
     })
 
-    socket.on("setRoomUsers", (data) => {
-      console.log("setRoomUsers: ", data);
+    socket.on("setRoomUsers", (data: ChatUser[]) => {
+      const users = [...data];
+      setChatUsers(users);
     })
 
     return (() => {
