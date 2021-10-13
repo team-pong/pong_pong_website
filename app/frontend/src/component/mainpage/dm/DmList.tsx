@@ -52,6 +52,8 @@ const DmList: FC = (): JSX.Element => {
   */
   useEffect(() => {
     getDmList();
+    global.socket.on("dm", () => getDmList());
+    return (() => global.socket.off("dm", () => getDmList()))
   }, []);
 
   return (
