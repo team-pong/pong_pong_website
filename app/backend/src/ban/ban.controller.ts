@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Delete, Query, forwardRef, Inject, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, Delete, Query, forwardRef, Inject, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BanService } from './ban.service';
 import { BanDto1 } from 'src/dto/ban';
@@ -9,9 +9,11 @@ import { ChatService } from 'src/chat/chat.service';
 import { err27 } from 'src/err';
 import { Request } from 'express';
 import { AdminService } from 'src/admin/admin.service';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
 
 @ApiTags('Ban')
 @Controller('ban')
+@UseGuards(new LoggedInGuard())
 export class BanController {
   constructor(
     private banService: BanService,

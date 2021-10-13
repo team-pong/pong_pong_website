@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { SessionService } from 'src/session/session.service';
 
 @Injectable()
 export class GlobalService {
-  constructor() {}
+  constructor(
+  ) {}
+
+  @Inject(forwardRef(() => SessionService))
+  private sessionService: SessionService
 
   getSessionIDFromCookie(cookie): string {
     if (cookie) {
@@ -11,5 +16,9 @@ export class GlobalService {
       console.log('no cookie');
       return ;
     }
+  }
+  
+  getUserIdFromSessionId(session_id: string) {
+    return this.sessionService.readUserId(session_id);
   }
 }

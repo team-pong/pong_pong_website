@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ChatUsersDto1, ChatUsersDto2 } from 'src/dto/chat-users';
 import { UsersDto5 } from 'src/dto/users';
@@ -7,9 +7,11 @@ import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatUsersService } from './chat-users.service';
 import { Request } from 'express';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
 
 @ApiTags('Chat-users')
 @Controller('chat-users')
+@UseGuards(new LoggedInGuard())
 export class ChatUsersController {
   constructor(
     @Inject(forwardRef(() => UsersService))

@@ -1,10 +1,11 @@
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect } from '@nestjs/websockets';
 import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Inject, forwardRef } from '@nestjs/common';
+import { Inject, forwardRef, UseGuards } from '@nestjs/common';
 import { GlobalService } from 'src/global/global.service';
 import { SessionService } from 'src/session/session.service';
 import { ChatUsersService } from 'src/chat-users/chat-users.service';
+import { LoggedInWsGuard } from 'src/auth/logged-in.guard';
 
 const socketMap = {};
 
@@ -12,6 +13,7 @@ interface JoinMsg{
   room_id: string,
 }
 
+@UseGuards(new LoggedInWsGuard())
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway {
   constructor(

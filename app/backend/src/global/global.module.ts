@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { GlobalController } from './global.controller';
 import { GlobalService } from './global.service';
 import { GlobalGateway } from './global.gateway';
@@ -16,8 +16,8 @@ import { DmStoreModule } from 'src/dm-store/dm-store.module';
       Users,
       Friend,
     ]),
-    FriendModule, 
-    SessionModule, 
+    forwardRef(() => SessionModule),
+    FriendModule,
     UsersModule,
     DmStoreModule,
   ],

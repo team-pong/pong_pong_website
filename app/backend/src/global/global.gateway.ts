@@ -13,6 +13,8 @@ import { GlobalService } from './global.service';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { DmStoreService } from 'src/dm-store/dm-store.service';
 import { string } from 'joi';
+import { UseGuards } from '@nestjs/common';
+import { LoggedInWsGuard } from 'src/auth/logged-in.guard';
 
 // key: user id / value: socket id
 const socketMap = {};
@@ -36,6 +38,7 @@ function findUIDwithSID(sid: string) {
   }
 }
 
+@UseGuards(new LoggedInWsGuard())
 @WebSocketGateway({ namespace: 'global'})
 export class GlobalGateway {
   constructor(

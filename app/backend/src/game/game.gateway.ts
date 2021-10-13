@@ -1,9 +1,10 @@
-import { Req } from '@nestjs/common';
+import { Req, UseGuards } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect } from '@nestjs/websockets';
 import { WebSocketServer, OnGatewayConnection, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
+import { LoggedInWsGuard } from 'src/auth/logged-in.guard';
 import { GlobalService } from 'src/global/global.service';
 import { MatchService } from 'src/match/match.service';
 import { SessionService } from 'src/session/session.service';
@@ -62,6 +63,7 @@ type Position = 'l' | 'r';
  * @			 2. 프론트에서 소켓 서버 연결시 withCredentials: true 옵션을 추가해줘야 connect.sid 쿠키가 전달되고,
  * @					그래야 백엔드에서 연결된 소켓의 유저가 누구인지 알 수 있다. (더 나은 방법이 있는지 확인해야 함)
  */
+@UseGuards(new LoggedInWsGuard())
 @WebSocketGateway({ namespace: 'game', cors: true })
 export class GameGateway {
 	constructor(

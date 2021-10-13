@@ -69,13 +69,13 @@ export class SessionController {
   }
 
   @ApiOperation({ summary: '로그인' })
-  @UseGuards(new NotLoggedInGuard())
   @Post("/oauth")
   public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
     return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
   }
 
   @ApiOperation({ summary: '입력받은 세션 ID와 토큰이 유효한지 체크해서 Body에 결과를 담는다' })
+	@UseGuards(new LoggedInGuard())
   @Get("/valid")
   isValidSession(@Req() request: Request, @Res() response: Response) {
     return this.sessionService.sessionValidCheck(request.sessionID, response);
