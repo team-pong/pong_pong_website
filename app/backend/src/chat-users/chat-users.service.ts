@@ -118,4 +118,21 @@ export class ChatUsersService {
       return 'normal';
     }
   }
+
+  async getUserListInRoom(room_id: string) {
+    const rid = Number(room_id)
+    if (await this.chatRepo.count({channel_id: rid}) === 0)  // 존재하지 않은 채널 이라면
+      throw new ErrMsgDto(err4);
+    const ret = []
+    const users = await this.chatUsersRepo.find({channel_id: rid});  // 해당 채널의 유저들 검색
+    for (let user of users) {
+      const user_info = await this.usersRepo.findOne({user_id: user.user_id});
+      ret.push({
+        nick: user_info.nick,
+        avatar_url: user_info.avatar_url,
+        position: await this.getUserPosition(user.user_id, room_id),
+      })
+    }
+    return ret;
+  }
 }

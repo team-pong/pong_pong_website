@@ -97,8 +97,8 @@ export class ChatGateway {
       this.server.to(room_id).emit('setRoomInfo', room_info);
     
       // 유저 정보 리스트 전송
-      const users = await this.chatUsersService.readChatUsers(Number(room_id));
-      this.server.to(room_id).emit('setRoomUsers', users.chatUsersList);
+      const user_list = await this.chatUsersService.getUserListInRoom(room_id)
+      this.server.to(room_id).emit('setRoomUsers', user_list);
   
       this.server.to(room_id).emit('message', {
         user: 'system',
@@ -145,9 +145,9 @@ export class ChatGateway {
       const room_info = await this.chatService.getChannelInfo(Number(rid));
       this.server.to(rid).emit('setRoomInfo', room_info);
     
-      // 유저 정보 리스트 전송
-      const users = await this.chatUsersService.readChatUsers(Number(rid));
-      this.server.to(rid).emit('setRoomUsers', users.chatUsersList);
+      // 유저 정보 리스트 전송 닉 ,아바타, 포지션
+      const user_list = await this.chatUsersService.getUserListInRoom(rid)
+      this.server.to(rid).emit('setRoomUsers', user_list);
 
       socket.to(rid).emit('message', {
         user: 'system',
