@@ -141,7 +141,7 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
           cols={50}
           value={textAreaMsg}
           onChange={({target: {value}}) => setTextAreaMsg(value)}
-          onKeyDown={controllTextAreaKeyDown}/>
+          onKeyPress={controllTextAreaKeyDown}/>
         <button
           className="dm-msg-button"
           disabled={textAreaMsg === ""}
