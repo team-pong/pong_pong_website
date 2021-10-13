@@ -36,7 +36,6 @@ const Modal: FC<modalProps & RouteComponentProps> = ({ history, content, smallMo
   }
   
   const detectOutsideOfModal = (e: React.MouseEvent) => {
-    e.preventDefault();
     if (e.target === e.currentTarget) {
       closer(e);
     }
