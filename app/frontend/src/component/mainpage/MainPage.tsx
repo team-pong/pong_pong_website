@@ -18,7 +18,7 @@ import Loading from '../loading/Loading';
 const MainPage = ({match}): JSX.Element => {
   
   const [updateFriendList, setUpdateFriendList] = useState({state: "", user_id: ""});
-  const [unReadMsg, setUnReadMsg] = useState(1);
+  const [unReadMsg, setUnReadMsg] = useState(false);
 
   const userInfo = useContext(UserInfoContext);
   const setUserInfo = useContext(SetUserInfoContext);
@@ -51,6 +51,15 @@ const MainPage = ({match}): JSX.Element => {
       setUpdateFriendList({state: "ongame", user_id: user_id});
     });
   }, []);
+
+  useEffect(() => {
+    if (!dmInfo.isDmOpen) {
+      global.socket.on("dm", () => setUnReadMsg(true));
+    } else if (dmInfo.isDmOpen) {
+      setUnReadMsg(false);
+      global.socket.off("dm", () => setUnReadMsg(true));
+    }
+  }, [dmInfo]);
 
   if (userInfo) {
     return (
@@ -90,7 +99,7 @@ const MainPage = ({match}): JSX.Element => {
             <section id="dm-section">
               {dmInfo.isDmOpen && <Dm />}
               <button id="dm-controll-button" onClick={() => setDmInfo({isDmOpen: !dmInfo.isDmOpen, target: ""})}>
-                {unReadMsg && <div className="un-read-msg">{unReadMsg}</div>}
+                {unReadMsg && <div className="un-read-msg">!</div>}
                 {!dmInfo.isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
                 {dmInfo.isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
               </button>
