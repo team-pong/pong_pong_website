@@ -6,6 +6,7 @@ import { GlobalService } from 'src/global/global.service';
 import { SessionService } from 'src/session/session.service';
 import { ChatUsersService } from 'src/chat-users/chat-users.service';
 import { UsersService } from 'src/users/users.service';
+import { ChatService } from './chat.service';
 
 interface JoinMsg{
   room_id: string,
@@ -27,6 +28,22 @@ interface ChatLog {
   message: string, // msg
 };
 
+
+interface ChatRoomInfo {
+  title: string,
+  type: string,
+  current_people: number,
+  max_people: number,
+  passwd: string,
+  users: ChatUserInfo[],
+};
+
+interface ChatUserInfo {
+  nick: string,
+  avatar_url: string,
+  position: string,
+};
+
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway {
   constructor(
@@ -38,6 +55,8 @@ export class ChatGateway {
     private chatUsersService: ChatUsersService,
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    @Inject(forwardRef(() => ChatService))
+    private chatService: ChatService,
   ) {}
 
   @WebSocketServer() public server: Server;
@@ -54,27 +73,41 @@ export class ChatGateway {
   // 3. 해당 유저 입장 시스템 메세지 전송
   @SubscribeMessage('join')
   async joinMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: JoinMsg) {
-    const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
-    const user_id = await this.sessionService.readUserId(session_id);
-    const user_info = await this.usersService.getUserInfo(user_id);
-    const room_id = body.room_id;
-    const position = await this.chatUsersService.getUserPosition(user_id, room_id);
-
-    this.socket_map[socket.id] = {
-      room_id: room_id,
-      user_id: user_id,
-      nickname: user_info.nick,
-      avatar_url: user_info.avatar_url,
-      position: position,
-    };
-
-    socket.join(room_id);
-    this.chatUsersService.createChatUsers(user_id, Number(room_id));
-    console.log(`Join Message user: ${user_id}, channel: ${room_id}`);
-    this.server.to(room_id).emit('message', {
-      user: 'system',
-      chat: `${user_id}님이 입장하셨습니다.`
-    });
+    try {
+      const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+      const user_id = await this.sessionService.readUserId(session_id);
+      const user_info = await this.usersService.getUserInfo(user_id);
+      const room_id = body.room_id;
+      const position = await this.chatUsersService.getUserPosition(user_id, room_id);
+  
+      this.socket_map[socket.id] = {
+        room_id: room_id,
+        user_id: user_id,
+        nickname: user_info.nick,
+        avatar_url: user_info.avatar_url,
+        position: position,
+      };
+  
+      socket.join(room_id);
+      await this.chatUsersService.addUser(room_id, user_id);
+      console.log(`Join Message user: ${user_id}, channel: ${room_id}`);
+  
+      // 방 정보 전송
+      const room_info = await this.chatService.getChannelInfo(Number(room_id));
+      this.server.to(room_id).emit('setRoomInfo', room_info);
+    
+      // 유저 정보 리스트 전송
+      const users = await this.chatUsersService.readChatUsers(Number(room_id));
+      this.server.to(room_id).emit('setRoomUsers', users.chatUsersList);
+  
+      this.server.to(room_id).emit('message', {
+        user: 'system',
+        chat: `${user_id}님이 입장하셨습니다.`
+      });
+    } catch (err) {
+      console.log(err);
+      return (err);
+    }
   }
 
   @SubscribeMessage('message')
@@ -100,17 +133,30 @@ export class ChatGateway {
     console.log('Chat 웹소켓 연결됨:', user_id);
   }
 
-  handleDisconnect(@ConnectedSocket() socket: Socket): any {
-    const uid = this.socket_map[socket.id].user_id;
-    const rid = this.socket_map[socket.id].room_id;
+  async handleDisconnect(@ConnectedSocket() socket: Socket) {
+    try {
+      const uid = this.socket_map[socket.id].user_id;
+      const rid = this.socket_map[socket.id].room_id;
 
-    console.log('Chat Socket Disconnected', uid);
-    this.chatUsersService.deleteChatUsers(uid, Number(rid)); // 남은 유저가 없는 경우까지 이 메서드에서 처리
-    socket.to(rid).emit('message', {
-      user: 'system',
-      chat: `${uid} 님이 퇴장하셨습니다.`,
-    })
-    socket.leave(rid);
-    delete this.socket_map[socket.id];
+      console.log('Chat Socket Disconnected', uid);
+      this.chatUsersService.deleteUser(uid, rid); // 남은 유저가 없는 경우까지 이 메서드에서 처리
+
+      // 방 정보 전송
+      const room_info = await this.chatService.getChannelInfo(Number(rid));
+      this.server.to(rid).emit('setRoomInfo', room_info);
+    
+      // 유저 정보 리스트 전송
+      const users = await this.chatUsersService.readChatUsers(Number(rid));
+      this.server.to(rid).emit('setRoomUsers', users.chatUsersList);
+
+      socket.to(rid).emit('message', {
+        user: 'system',
+        chat: `${uid} 님이 퇴장하셨습니다.`,
+      })
+      socket.leave(rid);
+      delete this.socket_map[socket.id];
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
