@@ -74,5 +74,17 @@ export class ChatUsersService {
       }
     }
     return new ErrMsgDto(err0);
-  }  
+  }
+
+  async getUserPosition(user_id: string, room_id: string) {
+    const admin = await this.adminRepo.count({user_id: user_id, channel_id: Number(room_id)});
+    const owner = await this.chatRepo.count({owner_id: user_id, channel_id: Number(room_id)});
+    if (owner) {
+      return 'owner';
+    } else if (admin) {
+      return 'admin';
+    } else {
+      return 'normal';
+    }
+  }
 }

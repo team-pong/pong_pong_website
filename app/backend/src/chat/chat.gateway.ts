@@ -5,12 +5,27 @@ import { Inject, forwardRef } from '@nestjs/common';
 import { GlobalService } from 'src/global/global.service';
 import { SessionService } from 'src/session/session.service';
 import { ChatUsersService } from 'src/chat-users/chat-users.service';
-
-const socketMap = {};
+import { UsersService } from 'src/users/users.service';
 
 interface JoinMsg{
   room_id: string,
 }
+
+interface SocketInfo {
+  room_id: string,
+  user_id: string,
+  nickname: string,
+  avatar_url: string,
+  position: string,
+}
+
+interface ChatLog {
+  nick: string, // socket_map[socket.id].nickname
+  position: string, // socket_map[socket.id].position
+  avatar_url: string, // socket_map[socket.id].avatar_url
+  time: number, // Date.now()
+  message: string, // msg
+};
 
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway {
@@ -21,9 +36,13 @@ export class ChatGateway {
     private sessionService: SessionService,
     @Inject(forwardRef(() => ChatUsersService))
     private chatUsersService: ChatUsersService,
+    @Inject(forwardRef(() => UsersService))
+    private usersService: UsersService,
   ) {}
 
   @WebSocketServer() public server: Server;
+
+  private socket_map: {[key: string]: SocketInfo} = {};
 
   afterInit(server: any): any {
     console.log('Chat Server Init');
@@ -37,11 +56,17 @@ export class ChatGateway {
   async joinMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: JoinMsg) {
     const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
     const user_id = await this.sessionService.readUserId(session_id);
+    const user_info = await this.usersService.getUserInfo(user_id);
     const room_id = body.room_id;
+    const position = await this.chatUsersService.getUserPosition(user_id, room_id);
 
-    socketMap[socket.id] = {};
-    socketMap[socket.id].uid = user_id;
-    socketMap[socket.id].rid = room_id;
+    this.socket_map[socket.id] = {
+      room_id: room_id,
+      user_id: user_id,
+      nickname: user_info.nick,
+      avatar_url: user_info.avatar_url,
+      position: position,
+    };
 
     socket.join(room_id);
     this.chatUsersService.createChatUsers(user_id, Number(room_id));
@@ -54,11 +79,14 @@ export class ChatGateway {
 
   @SubscribeMessage('message')
   sendMessage(@ConnectedSocket() socket: Socket, @MessageBody() msg: string) {
-    socket.to(socketMap[socket.id].rid).emit('message', {
-      user: socketMap[socket.id].uid,
-      chat: msg,
+    socket.to(this.socket_map[socket.id].room_id).emit('message', {
+      nick: this.socket_map[socket.id].nickname,
+      position: this.socket_map[socket.id].position,
+      avatar_url: this.socket_map[socket.id].avatar_url,
+      time: Date.now(),
+      message: msg,
     })
-    console.log(`Message Arrive user: ${socketMap[socket.id].uid}, chat: ${msg}`);
+    console.log(`Message Arrive user: ${this.socket_map[socket.id].user_id}, chat: ${msg}`);
   }
 
   /*
@@ -66,12 +94,15 @@ export class ChatGateway {
   @todo userList에 각 유저가 owner인지 admin인지 normal인지를 정해주는 type 추가
   */
   async handleConnection(@ConnectedSocket() socket: Socket) {
-    console.log('Chat 웹소켓 연결됨:', socket.nsp.name);
+    const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+    const user_id = await this.sessionService.readUserId(session_id);
+
+    console.log('Chat 웹소켓 연결됨:', user_id);
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket): any {
-    const uid = socketMap[socket.id].uid;
-    const rid = socketMap[socket.id].rid;
+    const uid = this.socket_map[socket.id].user_id;
+    const rid = this.socket_map[socket.id].room_id;
 
     console.log('Chat Socket Disconnected', uid);
     this.chatUsersService.deleteChatUsers(uid, Number(rid)); // 남은 유저가 없는 경우까지 이 메서드에서 처리
@@ -80,6 +111,6 @@ export class ChatGateway {
       chat: `${uid} 님이 퇴장하셨습니다.`,
     })
     socket.leave(rid);
-    delete socketMap[socket.id];
+    delete this.socket_map[socket.id];
   }
 }
