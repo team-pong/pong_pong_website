@@ -223,7 +223,15 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     getChatRoomUsers();
 
     socket.on("message", (data) => {
-      console.log("sockeT: ", data);
+      console.log("message: ", data);
+    })
+
+    socket.on("setRoomInfo", (data) => {
+      console.log("setRoomInfo: ", data);
+    })
+
+    socket.on("setRoomUsers", (data) => {
+      console.log("setRoomUsers: ", data);
     })
 
     return (() => {
