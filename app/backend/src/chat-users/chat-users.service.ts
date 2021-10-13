@@ -92,11 +92,11 @@ export class ChatUsersService {
       throw new ErrMsgDto(err4);
     if (await this.chatUsersRepo.count({ user_id: user_id, channel_id: rid }) === 0)  // 유저가 해당 채널에 없다면
       throw new ErrMsgDto(err13);
-    await this.chatUsersRepo.delete({ user_id: user_id, channel_id: rid });
+    await this.chatUsersRepo.delete({ user_id: user_id, channel_id: rid }); // 목록에서 제거
     if (await this.adminRepo.count({user_id: user_id, channel_id: rid}))  // 나간 유저가 admin 이면
-      await this.adminRepo.delete({user_id: user_id, channel_id: rid});
+      await this.adminRepo.delete({user_id: user_id, channel_id: rid}); // 어드민 테이블에서 제거
     if (await this.chatUsersRepo.count({channel_id: rid}) === 0)  // 해당 채널에 아무도 없다면
-      await this.chatRepo.delete({channel_id: rid});
+      await this.chatRepo.delete({channel_id: rid}); // 채널 삭제
     else{  // 채널에 누군가가 남아있다면
       const channel = await this.chatRepo.findOne({channel_id: rid});
       if (channel.owner_id == user_id){  // 나간 사람이 owner이라면

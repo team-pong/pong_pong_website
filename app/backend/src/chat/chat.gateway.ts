@@ -139,7 +139,7 @@ export class ChatGateway {
       const rid = this.socket_map[socket.id].room_id;
 
       console.log('Chat Socket Disconnected', uid);
-      this.chatUsersService.deleteUser(uid, rid); // 남은 유저가 없는 경우까지 이 메서드에서 처리
+      await this.chatUsersService.deleteUser(rid, uid); // 남은 유저가 없는 경우까지 이 메서드에서 처리
 
       // 방 정보 전송
       const room_info = await this.chatService.getChannelInfo(Number(rid));
