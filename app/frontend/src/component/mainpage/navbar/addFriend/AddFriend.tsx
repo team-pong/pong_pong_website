@@ -41,7 +41,7 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
   */
   const updateState = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nicknameToFind}`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch();
 
     if (!res.err_msg) {
       const updatedList = JSON.parse(JSON.stringify(props.friendList));
@@ -63,7 +63,7 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
     const body = {
       "friend_nick": nicknameToFind
     };
-    const res = await (await easyfetch.fetch(body)).json();
+    const res = await easyfetch.fetch(body);
 
     if (res.err_msg !== "에러가 없습니다.") {
       setFailureNotice(true);

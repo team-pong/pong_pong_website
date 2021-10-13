@@ -6,6 +6,58 @@
   }
 }
 
+button.start {
+  width: 240px;
+  height: 60px;
+  background-color: ghostwhite;
+  font-family: 'NanumSquareRound';
+  font-size: 30px;
+  border-radius: 5px;
+}
+
+button.start:hover {
+  background-color: #828282;
+}
+
+button.map-btn-00 {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  margin-right: 0px;
+}
+
+button.map-btn-01 {
+  margin-left: -1px;
+  margin-right: -1px;
+}
+
+button.map-btn-02 {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  margin-left: 0px;
+}
+
+div.map-btn-group button{
+  width: 120px;
+  height: 40px;
+  border: 1px solid gray; 
+  background-color: #323232; 
+  color: ghostwhite;
+  font-family: 'NanumSquareRound';
+  font-size: 20px;
+  padding: 5px;
+}
+
+div.map-btn-group button:hover{
+  border: 1px solid #646464;
+  background-color: #646464; 
+}
+
+div.map-btn-group button:focus{
+  border: none;
+  outline:none;
+  background-color: #828282; 
+}
+
 div#game-option-content {
   height: calc(100% - 40px);
   margin: 40px 40px 0 40px;

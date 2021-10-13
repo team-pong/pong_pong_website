@@ -4,8 +4,7 @@ import Loading from "../../../loading/Loading";
 import { io } from "socket.io-client";
 import "/src/scss/content/game/GameMatchContent.scss";
 
-interface gameMatchContentProps
-  extends RouteComponentProps<{matchType: string}> {
+interface gameMatchContentProps extends RouteComponentProps<{matchType: string}> {
   setIsMatched: Dispatch<SetStateAction<{
     isMatched: boolean;
     roomId: string;
@@ -15,14 +14,25 @@ interface gameMatchContentProps
   }>>;
 }
 
-const GameMatchContent: FC<gameMatchContentProps> = ({match: {params}, setIsMatched}): JSX.Element => {
+const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setIsMatched}): JSX.Element => {
 
   useEffect(() => {
+    const url_params = url.split('/');
+    const map = url_params.pop();
+    let isMatched = false;
+    
+    setIsMatched({isMatched: false, roomId: '', opponent: '', position: '', socket: null});
     const socket = io(`${global.BE_HOST}/game`);
-    socket.emit(params.matchType);
+    socket.emit(params.matchType, map);
     socket.on("matched", ({roomId, opponent, position}) => {
+      isMatched = true;
       setIsMatched({isMatched: true, roomId, opponent, position, socket});
     });
+    return (() => {
+      if (isMatched === false) {
+        socket.disconnect();
+      }
+    })
   }, []);
 
   return (

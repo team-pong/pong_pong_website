@@ -45,7 +45,7 @@ const MakeChatRoom: FC = (): JSX.Element => {
         "passwd": password,
         "max_people": max,
       };
-      const res = await (await easyfetch.fetch(body)).json();
+      const res = await easyfetch.fetch(body);
 
       if (!res.err_msg) {
         setChannelId(res.chatRoom.channel_id);

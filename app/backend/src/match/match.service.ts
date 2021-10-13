@@ -106,4 +106,22 @@ export class MatchService {
     const user = await this.usersRepo.findOne({nick: nick});
     return user.user_id;
   }
+
+  /*!
+   * @brief 해당 유저의 점수를 score_dist만큼 더해서 db에 저장한다.
+   *        음수인 경우 래더점수 감소, 양수인 경우 래더점수 증가
+   *        0보다 낮아지면 래더점수가 0이 된다.
+   */
+  async updateLadderScore(user_id: string, score_dist: number) {
+    const user = await this.usersRepo.findOne({user_id: user_id});
+    if (user) {
+      if (user.ladder_level + score_dist < 0) { // 래더점수가 0보다 낮아지는 경우
+        await this.usersRepo.update({user_id: user_id}, {ladder_level: 0});
+      } else {
+        await this.usersRepo.update({user_id: user_id}, {ladder_level: user.ladder_level + score_dist});
+      }
+    } else { // 해당 유저가 없는 경우 
+      console.log('해당 유저가 DB, users 테이블에 존재하지 않습니다', user_id);
+    }
+  }
 }

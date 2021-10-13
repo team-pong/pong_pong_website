@@ -116,7 +116,7 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
 
   const getDmLog = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?receiver_nick=${dmTarget}`);
-    const res = await (await easyfetch.fetch()).json();
+    const res = await easyfetch.fetch();
     setDmLog(res);
   }
 

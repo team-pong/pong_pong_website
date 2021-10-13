@@ -8,11 +8,17 @@ import { ChatService } from './chat.service';
 import { ChatGateway } from './chat.gateway';
 import { UsersModule } from 'src/users/users.module';
 import { Admin } from 'src/entities/admin';
+import { GlobalModule } from 'src/global/global.module';
+import { SessionModule } from 'src/session/session.module';
+import { ChatUsersModule } from 'src/chat-users/chat-users.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Users, Chat, ChatUsers, Admin]),
-    forwardRef(() => UsersModule)
+    forwardRef(() => UsersModule),
+    forwardRef(() => GlobalModule),
+    forwardRef(() => SessionModule),
+    forwardRef(() => ChatUsersModule),
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],

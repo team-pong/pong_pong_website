@@ -142,7 +142,7 @@ export class ChatService {
       return new ErrMsgDto(err4);
     
     const chanel = await this.chatRepo.findOne({channel_id: channel_id});  // 채널 찾기
-    if (chanel.title != 'protected')  // 방타입이 protected가 아니면
+    if (chanel.type != 'protected')  // 방타입이 protected가 아니면
       return new ErrMsgDto(err10);
     if (chanel.passwd == passwd)
       return true;

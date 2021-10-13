@@ -38,7 +38,7 @@ export class SessionService {
 	 */ 
 	public async tester_login(req: Request, user_id: string, nickname: string, avatar_url: string) {
 		try {
-			await this.usersService.createUsers(user_id, nickname, avatar_url);
+			// await this.usersService.createUsers(user_id, nickname, avatar_url);
 			await this.saveSession(req.session, user_id, 'tester_token');
 		} catch (err) {
 			console.log('tester user login error:', err);

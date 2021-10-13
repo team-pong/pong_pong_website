@@ -1,6 +1,6 @@
 div.ingame-match-info {
 	display: flex;
-	width: 720px;
+	width: 730px;
 	height: 70px;
 	line-height: 70px;
 	justify-content: space-around;
@@ -20,15 +20,15 @@ div.right-player {
 div.ingame-side-bar {
 	position: absolute;
 	right: 0;
-	width: 60px;
-	height: 500px;
+	width: 70px;
+	height: 550px;
 }
 
 div.ingame-footer {
 	position: absolute;
 	bottom: 0;
-	width: 700px;
-	height: 30px;
+	width: 730px;
+	height: 80px;
 }
 
 div.left-player-nickname {
@@ -72,16 +72,47 @@ div.right-player-profile {
 }
 
 div.view-number {
+	margin-left: 10px;
 	margin-top: 30px;
 	text-decoration: underline;
 	text-decoration-thickness: 3px;
 }
 
 button.give-up {
+	margin-left: 10px;
+	margin-top: 50px;
 	width: 50px;
 	height: 30px;
-	margin-top: 50px;
 	background-color: ghostwhite;
+	border: 1px solid gray;
+	border-radius: 5px;
+	font-family: 'NanumSquareRound';
+	letter-spacing: 1px;
+}
+
+button.give-up:hover {
+	color: ghostwhite;
+	background-color: gray;
+}
+
+
+button.exit {
+	width: 250px;
+	height: 50px;
+	margin-left: 240px;
+	margin-top: 15px;
+	background-color: ghostwhite;
+	border: 1px solid gray;
+	padding: 5px;
+	border-radius: 10px;
+	font-size: 24px;
+	letter-spacing: 3px;
+	font-family: 'NanumSquareRound';
+}
+
+button.exit:hover {
+	color: ghostwhite;
+	background-color: gray;
 }
 
 canvas#ping-pong {

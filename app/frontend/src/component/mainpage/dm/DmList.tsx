@@ -1,5 +1,6 @@
-import { FC, useState, useEffect, Dispatch, SetStateAction } from "react";
+import { FC, useState, useEffect, Dispatch, SetStateAction, useContext } from "react";
 import "../../../scss/dm/DmList.scss";
+import { SetDmInfoContext } from "../../../Context";
 import EasyFetch from "../../../utils/EasyFetch";
 import Time from "../../../utils/Time";
 
@@ -25,17 +26,14 @@ function msgFormatter(msg: string): string {
   return (msg);
 }
 
-interface DmListProps {
-  setDmTarget: Dispatch<SetStateAction<string>>;
-}
-
-const DmList: FC<DmListProps> = ({setDmTarget}): JSX.Element => {
+const DmList: FC = (): JSX.Element => {
 
   const [dmList, setDmList] = useState<DM[]>([]);
+  const setDmInfo = useContext(SetDmInfoContext);
 
   const getDmList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/list`);
-    const res: DM[] = await (await easyfetch.fetch()).json();
+    const res: DM[] = await easyfetch.fetch();
     const parsedRes: DM[] = res.map((val) => {
       val.lastMsgTime = new Time(val.lastMsgTime).getRelativeTime();
       return (val);
@@ -59,7 +57,7 @@ const DmList: FC<DmListProps> = ({setDmTarget}): JSX.Element => {
             <li
               key={idx}
               className="dm-list-li"
-              onClick={() => setDmTarget(dm.target.nick)}>
+              onClick={() => setDmInfo({isDmOpen: true, target: dm.target.nick})}>
               <img
                 className="dm-list-li-avatar"
                 src={dm.target.avatar_url}
