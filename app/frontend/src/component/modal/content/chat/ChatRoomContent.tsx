@@ -1,4 +1,4 @@
-import React, { FC, Dispatch, SetStateAction, useState, useEffect } from "react";
+import React, { FC, Dispatch, SetStateAction, useState, useEffect, useContext, useRef } from "react";
 import { Link, Route, RouteComponentProps, useParams, withRouter } from "react-router-dom";
 import Modal from "../../Modal";
 import ChatConfigContent from "./ChatConfigContent";
@@ -7,26 +7,27 @@ import ChatContextMenu from "./ChatContextMenu";
 import EasyFetch from "../../../../utils/EasyFetch";
 import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
+import { UserInfoContext } from "../../../../Context";
 
-function submitMessage(message: string, setMessage: Dispatch<SetStateAction<string>>,
-                        chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
+function submitMessage(myInfo, message: string, chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
   if (message === "") return ;
   setChatLog([{
-    nick: "yochoi",
-    position: "admin",
-    avatar_url: `https://cdn.intra.42.fr/users/medium_yochoi.png`,
+    nick: myInfo.nick,
+    position: "normal",
+    avatar_url: myInfo.avatar_url,
     time: new Date().getTime(),
     message: message
   }, ...chatLog]);
 };
 
-function controlTextAreaKeyDown(e: React.KeyboardEvent,
+function controlTextAreaKeyDown(e: React.KeyboardEvent, myInfo,
                           message: string, setMessage: Dispatch<SetStateAction<string>>,
                           chatLog, setChatLog: Dispatch<SetStateAction<any>>, socket) {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
-    submitMessage(message, setMessage, chatLog, setChatLog);
+    if (message === "") return ;
+    submitMessage(myInfo, message, chatLog, setChatLog);
     socket.emit("message", message);
     setMessage("");
   }
@@ -138,7 +139,7 @@ interface ChatUser {
 const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
-  const [chatLog, setChatLog] = useState<ChatLog[]>([]);
+  const [chatLog, _setChatLog] = useState<ChatLog[]>([]);
   const [message, setMessage] = useState("");
   const [contextMenu, setContextMenu] = useState<{
     isOpen: boolean,
@@ -154,13 +155,20 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
   const [isProtected, setIsProtected] = useState(false);
   const [isMadeMyself, setIsMadeMyself] = useState(false);
   const [socket, setSocket] = useState(null);
+  const chatLogRef = useRef(chatLog);
+
+  const myInfo = useContext(UserInfoContext);
+
+  const setChatLog = (data) => {
+    chatLogRef.current = data;
+    _setChatLog(data);
+  };
 
   /*!
    * @author donglee
    * @brief param으로 넘어온 channel_id로 채팅방 정보 API요청, 결과없으면 NoResult 렌더링
    */
   const getChatRoomInfo = async () => {
-    console.log("getChatRoomInfo!");
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${channel_id}`);
     const res = await easyfetch.fetch();
     if (!res.err_msg) {
@@ -184,29 +192,10 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     return socket;
   };
 
-  /*!
-   * @author donglee
-   * @brief 대화방 참여 중인 사용자 목록을 불러옴
-   * @TODO: position에 대해서 API에서 어떻게 처리해야 할 지를 알아야 함.
-   */
-  // const getChatRoomUsers = async () => {
-  //   const easyfetch = new EasyFetch(`${global.BE_HOST}/chat-users?channel_id=${channel_id}`);
-  //   const res = await easyfetch.fetch();
-
-  //   if (res.chatUsersList) {
-  //     const updatedUsers: ChatUser[] = [];
-
-  //     res.chatUsersList.map((user) => {
-  //       const elem = {
-  //         nick: user.nick,
-  //         avatar_url: user.avatar_url,
-  //         position: "mute", //test
-  //       };
-  //       updatedUsers.push(elem);
-  //     })
-  //     setChatUsers(updatedUsers);
-  //   }
-  // };
+  interface Test {
+    user: string,
+    chat: string,
+  }
 
   /*!
    * @author donglee
@@ -222,20 +211,32 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     getChatRoomInfo()
     .then((res) => {if (res.type === "protected") setIsProtected(true)});
 
-    socket.on("message", (data) => {
-      
+    socket.on("message", (data: ChatLog & Test) => {
+      if (data.user) {
+        return ;
+      }
+      setChatLog([{
+        nick: data.nick,
+        position: "admin",
+        avatar_url: data.avatar_url,
+        time: data.time,
+        message: data.message
+      }, ...chatLogRef.current]);
     })
 
-    socket.on("setRoomInfo", (data) => {
-      console.log("setRoomInfo: ", data);
+    socket.on("setRoomInfo", (data: ChatRoom) => {
+      const roomInfo = {
+        title: data.title,
+        type: data.type,
+        current_people: data.current_people,
+        max_people: data.max_people,
+        passwd: data.passwd,
+      };
+      setChatRoomInfo(roomInfo);
     })
 
     socket.on("setRoomUsers", (data: ChatUser[]) => {
-      let users: ChatUser[] = [];
-      
-      data.map((value) => {
-        users.push({nick: value.nick, avatar_url: value.avatar_url, position: "normal"});
-      })
+      const users = [...data];
       setChatUsers(users);
     })
 
@@ -306,9 +307,9 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
             rows={4}
             cols={50}
             value={message}
-            onKeyPress={(e) => controlTextAreaKeyDown(e, message, setMessage, chatLog, setChatLog, socket)}
+            onKeyPress={(e) => controlTextAreaKeyDown(e, myInfo, message, setMessage, chatLog, setChatLog, socket)}
             onChange={({target: {value}}) => setMessage(value)}/>
-          <button className="chat-msg-btn" onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
+          <button className="chat-msg-btn" onClick={() => submitMessage(myInfo, message, chatLog, setChatLog)}>전송</button>
         </form>
         {contextMenu.isOpen && <ChatContextMenu
                                   x={contextMenu.x}
