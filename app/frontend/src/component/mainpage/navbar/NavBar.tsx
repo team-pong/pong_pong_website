@@ -9,23 +9,13 @@ import Modal from "../../modal/Modal";
 import EasyFetch from "../../../utils/EasyFetch";
 import ProfileContent from "../../modal/content/profile/ProfileContent";
 import { UserInfoContext } from "../../../Context";
+import { UserInfo } from "../MainPage";
 
 /*!
  * @author donglee
  * @brief 좌측에 NavBar가 상시 나타나있음
  *        NavBar 버튼들을 누르면 router로 url을 변경해주면서 모달이 뜨게 함
  */
-
-interface UserInfo {
-  user_id: string;
-  nick: string;
-  avatar_url: string;
-  total_games: number;
-  win_games: number;
-  loss_games: number;
-  ladder_level: number;
-  status: string;
-}
 
 const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProps> = (props): JSX.Element => {
   

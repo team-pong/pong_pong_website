@@ -2,11 +2,12 @@ import { FC, useEffect, useState } from "react";
 import "/src/scss/content/chat/ChatContent.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import ChatRoomContent from "./ChatRoomContent";
-import { Link, Route } from "react-router-dom";
+import { Link, Route, Switch } from "react-router-dom";
 import Modal from "../../Modal";
 import MakeChatRoom from "./MakeChatRoom";
 import Loading from "../../../loading/Loading";
 import NoResult from "../../../noresult/NoResult";
+import ChatPassword from "./ChatPassword";
 
 interface chatRoom {
   channel_id: number,
@@ -35,11 +36,17 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
    *         chatRoom의 정보가 정확하지 않아서 에러가 나는 경우가 있는데 이를 if 문으로 예외처리함.
    */  
   const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
-    if (chatRoom.current_people === 0 || chatRoom.current_people.constructor == Object) {
-      return ;
-    }
+    // if (chatRoom.current_people === 0 || chatRoom.current_people.constructor == Object) {
+    //   return ;
+    // }
     return (
-      <Link to={`/mainpage/chat/${chatRoom.channel_id}`} key={idx} style={{color: "inherit", textDecoration: "none"}}>
+      <Link
+        to={{
+          pathname: `/mainpage/chat/${chatRoom.channel_id}`,
+          state: { type: chatRoom.type }
+        }}
+        key={idx}
+        style={{color: "inherit", textDecoration: "none"}}>
         <li className="chat-generator-li">
           <span className="chat-generator-span">{chatRoom.title}{chatRoom.type === "protected" ? <img className="chat-generator-lock-img" src="/public/lock.svg" alt="비밀방" /> : <></>}</span>
           <span className="chat-generator-span">{chatRoom.current_people}/{chatRoom.max_people}</span>
@@ -173,7 +180,10 @@ const ChatContent: FC = (): JSX.Element => {
     );
   } else {
     return (
-      <Route path="/mainpage/chat/:channel_id"><ChatRoomContent /></Route>
+      <Switch>
+        <Route path="/mainpage/chat/password/:channel_id"><ChatPassword /></Route>
+        <Route path="/mainpage/chat/:channel_id"><ChatRoomContent /></Route>
+      </Switch>
     );
   }
 }
