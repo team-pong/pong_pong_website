@@ -231,7 +231,11 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
     })
 
     socket.on("setRoomUsers", (data: ChatUser[]) => {
-      const users = [...data];
+      let users: ChatUser[] = [];
+      
+      data.map((value) => {
+        users.push({nick: value.nick, avatar_url: value.avatar_url, position: "normal"});
+      })
       setChatUsers(users);
     })
 
