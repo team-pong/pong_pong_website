@@ -53,7 +53,7 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('message')
-  sendMessage(@ConnectedSocket() socket: Socket, msg: string) {
+  sendMessage(@ConnectedSocket() socket: Socket, @MessageBody() msg: string) {
     socket.to(socketMap[socket.id].rid).emit('message', {
       user: socketMap[socket.id].uid,
       chat: msg,

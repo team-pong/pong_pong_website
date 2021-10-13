@@ -7,7 +7,7 @@ import ChatContextMenu from "./ChatContextMenu";
 import EasyFetch from "../../../../utils/EasyFetch";
 import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 function submitMessage(message: string, setMessage: Dispatch<SetStateAction<string>>,
                         chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
@@ -19,15 +19,16 @@ function submitMessage(message: string, setMessage: Dispatch<SetStateAction<stri
     time: new Date().getTime(),
     message: message
   }, ...chatLog]);
-  setMessage("");
 };
 
 function controlTextAreaKeyDown(e: React.KeyboardEvent,
                           message: string, setMessage: Dispatch<SetStateAction<string>>,
-                          chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
+                          chatLog, setChatLog: Dispatch<SetStateAction<any>>, socket) {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     submitMessage(message, setMessage, chatLog, setChatLog);
+    socket.emit("message", message);
+    setMessage("");
   }
 };
 
@@ -152,6 +153,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
   const { channel_id } = useParams<{channel_id: string}>();
   const [isProtected, setIsProtected] = useState(false);
   const [isMadeMyself, setIsMadeMyself] = useState(false);
+  const [socket, setSocket] = useState(null);
 
   /*!
    * @author donglee
@@ -215,9 +217,14 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
       setIsMadeMyself(true);
     }
     const socket = connectSocket();
+    setSocket(socket);
     getChatRoomInfo()
     .then((res) => {if (res.type === "protected") setIsProtected(true)});
     getChatRoomUsers();
+
+    socket.on("message", (data) => {
+      console.log("sockeT: ", data);
+    })
 
     return (() => {
       socket.disconnect();
@@ -286,7 +293,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
             rows={4}
             cols={50}
             value={message}
-            onKeyPress={(e) => controlTextAreaKeyDown(e, message, setMessage, chatLog, setChatLog)}
+            onKeyPress={(e) => controlTextAreaKeyDown(e, message, setMessage, chatLog, setChatLog, socket)}
             onChange={({target: {value}}) => setMessage(value)}/>
           <button className="chat-msg-btn" onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
         </form>
