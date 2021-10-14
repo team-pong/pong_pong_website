@@ -1,14 +1,18 @@
-import { FC, useState } from "react";
+import { Dispatch, FC, SetStateAction, useState } from "react";
 import "/src/scss/content/chat/MakeChatRoom.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { Redirect } from "react-router-dom";
+
+interface MakeChatRoomProps {
+  setIsMadeMyself: Dispatch<SetStateAction<boolean>>;
+};
 
 /*!
  * @author donglee
  * @brief 채팅방을 설정하여 만드는 컴포넌트
  */
 
-const MakeChatRoom: FC = (): JSX.Element => {
+const MakeChatRoom: FC<MakeChatRoomProps> = ({setIsMadeMyself}): JSX.Element => {
 
   const [title, setTitle] = useState("");
   const [type, setType] = useState("public");
@@ -34,7 +38,8 @@ const MakeChatRoom: FC = (): JSX.Element => {
 
   /*!
    * @author donglee
-   * @brief 채팅방 만들기 요청 후 해당 채팅방으로 redirect함
+   * @brief - 채팅방 만들기 요청 후 해당 채팅방으로 redirect함
+   *        - 성공적으로 만들어졌으면 내가 직접 만든 방이라는 isMadeMyself 를 true로 바꿔줌(password없이 입장하기 위함)
    */
   const makeChatRoom = async () => {
     if (checkFormat()) {
@@ -49,6 +54,7 @@ const MakeChatRoom: FC = (): JSX.Element => {
 
       if (!res.err_msg) {
         setChannelId(res.chatRoom.channel_id);
+        setIsMadeMyself(true);
       } else {
         alert(res.err_msg);
       }
@@ -56,7 +62,7 @@ const MakeChatRoom: FC = (): JSX.Element => {
   };
 
   if (channelId) {
-    return <Redirect to={{pathname: `/mainpage/chat/${channelId}`, state: {myself: true}}}></Redirect>
+    return <Redirect to={{pathname: `/mainpage/chat/${channelId}`, state: {type: type}}}></Redirect>
   } else {
     return (
       <div className="mc-container">

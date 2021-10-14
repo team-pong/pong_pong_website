@@ -2,12 +2,11 @@ import { FC, useEffect, useState } from "react";
 import "/src/scss/content/chat/ChatContent.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import ChatRoomContent from "./ChatRoomContent";
-import { Link, Route, Switch } from "react-router-dom";
+import { Link, Route } from "react-router-dom";
 import Modal from "../../Modal";
 import MakeChatRoom from "./MakeChatRoom";
 import Loading from "../../../loading/Loading";
 import NoResult from "../../../noresult/NoResult";
-import ChatPassword from "./ChatPassword";
 
 interface chatRoom {
   channel_id: number,
@@ -36,15 +35,12 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
    *         chatRoom의 정보가 정확하지 않아서 에러가 나는 경우가 있는데 이를 if 문으로 예외처리함.
    */  
   const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
-    // if (chatRoom.current_people === 0 || chatRoom.current_people.constructor == Object) {
-    //   return ;
-    // }
+    if (chatRoom.current_people === 0 || chatRoom.current_people.constructor == Object) {
+      return ;
+    }
     return (
       <Link
-        to={{
-          pathname: `/mainpage/chat/${chatRoom.channel_id}`,
-          state: { type: chatRoom.type }
-        }}
+        to={`/mainpage/chat/${chatRoom.channel_id}`}
         key={idx}
         style={{color: "inherit", textDecoration: "none"}}>
         <li className="chat-generator-li">
@@ -137,6 +133,7 @@ const ChatContent: FC = (): JSX.Element => {
   const [searchInputValue, setSearchInputValue] = useState("");
   const [chatRoomToFind, setChatRoomToFind] = useState("");
   const [chatRoomSelector, setChatRoomSelector] = useState("all");
+  const [isMadeMyself, setIsMadeMyself] = useState(false);
 
   if (window.location.pathname === "/mainpage/chat"
       || window.location.pathname === "/mainpage/chat/makechat") {
@@ -174,17 +171,12 @@ const ChatContent: FC = (): JSX.Element => {
           <button className="chat-room-btn">채팅방 만들기</button>
         </Link>
         <Route path={`/mainpage/chat/makechat`}>
-          <Modal id={Date.now()} content={<MakeChatRoom />} smallModal/>
+          <Modal id={Date.now()} content={<MakeChatRoom setIsMadeMyself={setIsMadeMyself}/>} smallModal/>
         </Route>
       </div>
     );
   } else {
-    return (
-      <Switch>
-        <Route path="/mainpage/chat/password/:channel_id"><ChatPassword /></Route>
-        <Route path="/mainpage/chat/:channel_id"><ChatRoomContent /></Route>
-      </Switch>
-    );
+    return <Route path="/mainpage/chat/:channel_id"><ChatRoomContent isMadeMyself={isMadeMyself} setIsMadeMyself={setIsMadeMyself}/></Route>;
   }
 }
 

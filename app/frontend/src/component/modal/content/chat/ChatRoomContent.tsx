@@ -49,72 +49,75 @@ function openContextMenu( e: React.MouseEvent,
   });
 };
 
-// const Password: FC<{
-//   setIsProtected: Dispatch<SetStateAction<boolean>>,
-//   isMadeMyself: boolean,
-//   channelId: string}>
-//   = ({setIsProtected, isMadeMyself, channelId}): JSX.Element => {
-//   const [password, setPassword] = useState("");
+const Password: FC<{
+  setIsProtected: Dispatch<SetStateAction<boolean>>,
+  isMadeMyself: boolean,
+  channelId: string,
+  setPasswordPassed: Dispatch<SetStateAction<boolean>>,}>
+  = ({setIsProtected, isMadeMyself, channelId, setPasswordPassed}): JSX.Element => {
 
-//   /*!
-//    * @author donglee
-//    * @brief 비밀번호를 입력하면 백엔드 검증 요청 후 대화방을 보여주거나 입장을 거절함
-//    */
-//   const submitPassword = async (e: React.SyntheticEvent) => {
-//     e.preventDefault();
-//     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/checkPasswd?channel_id=${channelId}&passwd=${password}`);
-//     const res = await easyfetch.fetch();
- 
-//     if (res) {
-//       setIsProtected(false);
-//     } else {
-//       alert("비밀번호가 틀렸습니다.");
-//     }
-//   };
+  const [password, setPassword] = useState("");
 
-//   /*!
-//    * @author donglee
-//    * @brief 자동으로 비밀번호 input에 focus함
-//    */
-//   const inputFocus = () => {
-//     const input = document.getElementsByClassName("pw-input")[0] as HTMLInputElement;
+  /*!
+   * @author donglee
+   * @brief 비밀번호를 입력하면 백엔드 검증 요청 후 대화방을 보여주거나 입장을 거절함
+   */
+  const submitPassword = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/checkPasswd?channel_id=${channelId}&passwd=${password}`);
+    const res = await easyfetch.fetch();
 
-//     input.focus();
-//   }
+    if (res) {
+      setIsProtected(false);
+      setPasswordPassed(true);
+    } else {
+      alert("비밀번호가 틀렸습니다.");
+    }
+  };
 
-//   /*!
-//    * @author donglee
-//    * @brief - 내가 직접 만든 비공개방 첫 입장 시에는 Password 컴포넌트를 보여주지 않음
-//    *        - 자동으로 input에 focus함.
-//    */
-//   useEffect(() => {
-//     if (isMadeMyself) {
-//       setIsProtected(false);
-//     }
-//     inputFocus();
-//   }, []);
+  /*!
+   * @author donglee
+   * @brief 자동으로 비밀번호 input에 focus함
+   */
+  const inputFocus = () => {
+    const input = document.getElementsByClassName("pw-input")[0] as HTMLInputElement;
 
-//   return (
-//     <div className="pw-container">
-//       <div className="password-lock-container">
-//         <img className="password-lock-img" src="/public/protected.png" alt="자물쇠" />
-//       </div>
-//       <span className="pw-explain">이 대화방은 비공개방입니다</span>
-//       <span className="pw-explain">비밀번호를 입력하세요</span>
-//       <form>
-//         <input
-//           className="pw-input"
-//           type="password"
-//           minLength={4}
-//           maxLength={10}
-//           size={10}
-//           value={password}
-//           onChange={(e) => setPassword(e.target.value)}
-//           onKeyDown={(e) => {if (e.key === "Enter") submitPassword(e)}} />
-//       </form>
-//     </div>
-//   );
-// }
+    input.focus();
+  }
+
+  /*!
+   * @author donglee
+   * @brief - 내가 직접 만든 비공개방 첫 입장 시에는 Password 컴포넌트를 보여주지 않음
+   *        - 자동으로 input에 focus함.
+   */
+  useEffect(() => {
+    if (isMadeMyself) {
+      setIsProtected(false);
+    }
+    inputFocus();
+  }, []);
+
+  return (
+    <div className="pw-container">
+      <div className="password-lock-container">
+        <img className="password-lock-img" src="/public/protected.png" alt="자물쇠" />
+      </div>
+      <span className="pw-explain">이 대화방은 비공개방입니다</span>
+      <span className="pw-explain">비밀번호를 입력하세요</span>
+      <form>
+        <input
+          className="pw-input"
+          type="password"
+          minLength={4}
+          maxLength={10}
+          size={10}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onKeyDown={(e) => {if (e.key === "Enter") submitPassword(e)}} />
+      </form>
+    </div>
+  );
+}
 
 interface ChatRoom {
   title: string,
@@ -142,7 +145,12 @@ interface RouteState {
   type: string;
 };
 
-const ChatRoomContent: FC<RouteComponentProps> = (props: RouteComponentProps<RouteState>): JSX.Element => {
+interface ChatRoomContentProps {
+  isMadeMyself: boolean;
+  setIsMadeMyself: Dispatch<SetStateAction<boolean>>;
+};
+
+const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMadeMyself, setIsMadeMyself}): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
   const [chatLog, _setChatLog] = useState<ChatLog[]>([]);
@@ -158,11 +166,12 @@ const ChatRoomContent: FC<RouteComponentProps> = (props: RouteComponentProps<Rou
 
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
   const { channel_id } = useParams<{channel_id: string}>();
-  // const [isProtected, setIsProtected] = useState(false);
-  const [isMadeMyself, setIsMadeMyself] = useState(false);
+  const [isProtected, setIsProtected] = useState(false);
+  // const [isMadeMyself, setIsMadeMyself] = useState(false);
   const [socket, setSocket] = useState<Socket>(null);
   const chatLogRef = useRef(chatLog);
   const {state} = useLocation<RouteState>();
+  const [passwordPassed, setPasswordPassed] = useState(false);
 
   const myInfo = useContext(UserInfoContext);
 
@@ -205,76 +214,112 @@ const ChatRoomContent: FC<RouteComponentProps> = (props: RouteComponentProps<Rou
 
   /*!
    * @author donglee
-   * @brief - 내가 직접 만든 비공개방일 경우에는 Password에 props을 줘서 첫 1회만 비번없이 입장 가능하도록 함
-   *        - 채팅방 정보를 받아온 후 비공개방일 경우에는 state를 바꿔서 Password 컴포넌트 렌더링 하도록 함
+   * @brief socket state가 처음에 연결되면 리스너들을 등록함
    */
   useEffect(() => {
-    console.log("ChatRoom hi");
-    if (props.location.state) {
-      console.log("test: ", state.type);
-      /* TODO: 문제: 비밀번호 렌더링할 때 useEffect 들어와서 소켓을 연결해버림. 그래서 패스워드 안 쳤는데도 입장이 됨
-              해결: ChatPassword 컴포넌트 따로 만들고 여기에 들어왔는데 state.type 이 protected면 리다이렉트 해버리자
-                  근데 방을 만들 때도 똑같이 type을 넘겨줘야 한다. 현재는 undefined가 나오는 상황임.
-                  리다이렉트해서 비밀번호 검증 후에 다시 여기로 돌아온다.
-                  그러면 뒤로가기를 하고 앞으로가기를 다시 해도 useEffect가 실행되면서 비밀번호를 쓰도록 할 것이다.
-              */
+    if (socket) {
+      /*!
+       * @author donglee
+       * @brief 메세지를 받았을 때 chatLog를 최신화해서 렌더링함
+       */
+      socket.on("message", (data: ChatLog & {user: string, chat: string}) => {
+        if (data.user) {
+          return ;
+        }
+        setChatLog([{
+          nick: data.nick,
+          position: "admin",
+          avatar_url: data.avatar_url,
+          time: data.time,
+          message: data.message
+        }, ...chatLogRef.current]);
+      });
+  
+      /*!
+       * @author donglee
+       * @brief 대화방 정보가 변경될 경우 방 정보를 최신화함
+       */
+      socket.on("setRoomInfo", (data: ChatRoom) => {
+        const roomInfo = {
+          title: data.title,
+          type: data.type,
+          current_people: data.current_people,
+          max_people: data.max_people,
+          passwd: data.passwd,
+        };
+        setChatRoomInfo(roomInfo);
+      });
+  
+      /*!
+       * @author donglee
+       * @brief 대화방에 참여중인 사용자들이 변경될 때 최신화해서 렌더링함
+       */
+      socket.on("setRoomUsers", (data: ChatUser[]) => {
+        const users = [...data];
+        setChatUsers(users);
+      });
     }
-    // if (props.location.state) {
-    //   setIsMadeMyself(true);
-    // }
-    getChatRoomInfo();
-    // .then((res) => {if (res.type === "protected") setIsProtected(true)});
-    
-    const socket: Socket = connectSocket();
-    setSocket(socket);
-
-    /*!
-     * @author donglee
-     * @brief 메세지를 받았을 때 chatLog를 최신화해서 렌더링함
-     */
-    socket.on("message", (data: ChatLog & {user: string, chat: string}) => {
-      if (data.user) {
-        return ;
-      }
-      setChatLog([{
-        nick: data.nick,
-        position: "admin",
-        avatar_url: data.avatar_url,
-        time: data.time,
-        message: data.message
-      }, ...chatLogRef.current]);
-    });
-
-    /*!
-     * @author donglee
-     * @brief 대화방 정보가 변경될 경우 방 정보를 최신화함
-     */
-    socket.on("setRoomInfo", (data: ChatRoom) => {
-      const roomInfo = {
-        title: data.title,
-        type: data.type,
-        current_people: data.current_people,
-        max_people: data.max_people,
-        passwd: data.passwd,
-      };
-      setChatRoomInfo(roomInfo);
-    });
-
-    /*!
-     * @author donglee
-     * @brief 대화방에 참여중인 사용자들이 변경될 때 최신화해서 렌더링함
-     */
-    socket.on("setRoomUsers", (data: ChatUser[]) => {
-      const users = [...data];
-      setChatUsers(users);
-    });
 
     return (() => {
-      socket.disconnect();
+      if (socket) socket.disconnect();
+    })
+  }, [socket]);
+
+  /*!
+   * @author donglee
+   * @brief password를 입력하면 passwordPassed가 true가 되면서 소켓을 연결함
+   */
+  useEffect(() => {
+    if (passwordPassed) {
+      const socket = connectSocket();
+      setSocket(socket);
+    }
+  }, [passwordPassed]);
+
+  /*!
+   * @author donglee
+   * @brief 내가 만든 방일 경우에 처음 한 번만 비밀번호 없이 입장할 수 있도록 소켓을 연결함
+   */
+  useEffect(() => {
+    if (isMadeMyself) {
+      const socket = connectSocket();
+      setSocket(socket);
+    }
+  }, [isMadeMyself]);
+
+  /*!
+   * @author donglee
+   * @brief - 내가 직접 만든 비공개방일 경우에는 Password에 props을 줘서 첫 1회만 비번없이 입장 가능하도록 함
+   *        - 채팅방 정보를 받아온 후 비공개방일 경우에는 state를 바꿔서 Password 컴포넌트 렌더링 하도록 함
+   *        - protected 가 아닌 대화방의 경우는 바로 소켓 연결함
+   *        - clean-up : 내가 만든 방을 최초 1회만 적용하기 위해서 false로 값을 바꿔줌
+   */
+  useEffect(() => {
+    getChatRoomInfo()
+    .then((res) => {
+        if (res.type === "protected") {
+          setIsProtected(true);
+        } else {
+          const socket = connectSocket();
+          setSocket(socket);
+        }
+      }
+    );
+
+    return (() => {
+      setIsMadeMyself(false);
     });
   }, []);
 
-  if (chatRoomInfo) {
+  if (chatRoomInfo && isProtected) {
+    return (
+      <Password
+        setIsProtected={setIsProtected}
+        isMadeMyself={isMadeMyself}
+        channelId={channel_id}
+        setPasswordPassed={setPasswordPassed}/>
+    );
+  } else if (chatRoomInfo && !isProtected) {
     return (
       <div id="chat-room">
         <div id="chat-room-header">
@@ -346,7 +391,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props: RouteComponentProps<Rou
         <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
       </div>
     );
-  }
+  } 
   if (noResult) {
     return ( <NoResult
       text="대화방이 존재하지 않습니다."
@@ -357,94 +402,6 @@ const ChatRoomContent: FC<RouteComponentProps> = (props: RouteComponentProps<Rou
     );
   }
   return ( <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "43%", top: "10%"}} /> );
-
-  // if (chatRoomInfo && isProtected) {
-  //   return (
-  //     <Password setIsProtected={setIsProtected} isMadeMyself={isMadeMyself} channelId={channel_id} />
-  //   );
-  // } else if (chatRoomInfo && !isProtected) {
-  //   return (
-  //     <div id="chat-room">
-  //       <div id="chat-room-header">
-  //         <img
-  //           src="/public/arrow.svg"
-  //           id="arrow-button"
-  //           alt="뒤로가기"
-  //           onClick={() => history.back()} />
-  //         {chatRoomInfo.title}{chatRoomInfo.type === "protected" ? <img id="lock" src="/public/lock-black.svg" alt="비밀방" /> : <></>}
-  //       </div>
-  //       <div id="chat-room-body">
-  //         {
-  //           chatLog.map((value, idx) => {
-  //             const date = new Date(value.time);
-  //             const hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
-  //             const minute = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-  //             return (
-  //               <div key={idx} className="chat-room-message">
-  //                 <img id="message-avatar" src={value.avatar_url}/>
-  //                 <div id="message-content">
-  //                   <span id="message-nick"><b>{value.nick}</b></span>
-  //                   <span id="message-time">{hour}:{minute}</span>
-  //                   <span id="message-body">{value.message}</span>
-  //                 </div>
-  //               </div>
-  //             );
-  //           })
-  //         }
-  //       </div>
-  //       <div id="chat-room-users">
-  //         {
-  //           chatUsers.map((value, idx) => {
-  //             return (
-  //               <div  key={idx}
-  //                     className="chat-user"
-  //                     onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position)}>
-  //                 <img className="chat-room-user-img" src={value.avatar_url} alt={value.nick} />
-  //                 <span className="chat-room-user-nick" >{value.nick}</span>
-  //                 {value.position === "owner" && <img className="position" src={"/public/crown.png"} alt="owner"/>}
-  //                 {value.position === "admin" && <img className="position" src={"/public/knight.png"} alt="admin"/>}
-  //                 {value.position === "mute" && <img className="position" src={"/public/mute.png"} alt="mute"/>}
-  //               </div>
-  //             );
-  //           })
-  //         }
-  //         <div id="chat-room-menu">
-  //           <Link to="/mainpage/chat/invite"><img className="chat-menu-img" src="/public/plus.svg" alt="invite" /></Link>
-  //           <Link to="/mainpage/chat/config"><img className="chat-menu-img" src="/public/tools.svg" alt="config" /></Link>
-  //         </div>
-  //       </div>
-  //       <form className="chat-msg-form">
-  //         <textarea
-  //           className="chat-msg-textarea"
-  //           placeholder="대화내용 입력"
-  //           rows={4}
-  //           cols={50}
-  //           value={message}
-  //           onKeyPress={(e) => controlTextAreaKeyDown(e, myInfo, message, setMessage, chatLog, setChatLog, socket)}
-  //           onChange={({target: {value}}) => setMessage(value)}/>
-  //         <button className="chat-msg-btn" onClick={() => submitMessage(myInfo, message, chatLog, setChatLog)}>전송</button>
-  //       </form>
-  //       {contextMenu.isOpen && <ChatContextMenu
-  //                                 x={contextMenu.x}
-  //                                 y={contextMenu.y}
-  //                                 myPosition="owner"
-  //                                 targetPosition={contextMenu.targetPosition}
-  //                                 closer={setContextMenu}/>}
-  //       <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<ChatConfigContent/>}/></Route>
-  //       <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
-  //     </div>
-  //   );
-  // } 
-  // if (noResult) {
-  //   return ( <NoResult
-  //     text="대화방이 존재하지 않습니다."
-  //     style={{display: "block",
-  //             marginLeft: "190px",
-  //             marginTop: "100px",
-  //             fontSize: "20pt"}} />
-  //   );
-  // }
-  // return ( <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "43%", top: "10%"}} /> );
 };
 
 export default withRouter(ChatRoomContent);
