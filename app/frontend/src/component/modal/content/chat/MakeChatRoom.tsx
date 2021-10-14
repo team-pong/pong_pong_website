@@ -2,19 +2,27 @@ import { FC, useState } from "react";
 import "/src/scss/content/chat/MakeChatRoom.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { Redirect } from "react-router-dom";
+import { ChatRoom } from "./ChatRoomContent";
+
+interface MakeChatRoomProps {
+  chatRoomInfo?: ChatRoom;
+  channelIdToBeSet?: string;
+};
 
 /*!
  * @author donglee
  * @brief 채팅방을 설정하여 만드는 컴포넌트
  */
 
-const MakeChatRoom: FC = (): JSX.Element => {
+const MakeChatRoom: FC<MakeChatRoomProps> = ({chatRoomInfo, channelIdToBeSet}): JSX.Element => {
 
-  const [title, setTitle] = useState("");
-  const [type, setType] = useState("public");
+  const [title, setTitle] = useState(chatRoomInfo ? chatRoomInfo.title : "");
+  const [type, setType] = useState(chatRoomInfo ? chatRoomInfo.type : "public");
   const [password, setPassword] = useState("");
-  const [max, setMax] = useState(2);
+  const [max, setMax] = useState(chatRoomInfo ? chatRoomInfo.max_people : 2);
   const [channelId, setChannelId] = useState("");
+
+  console.log("Config: ", channelIdToBeSet);
 
   /*!
    * @author donglee
@@ -55,12 +63,36 @@ const MakeChatRoom: FC = (): JSX.Element => {
     }
   };
 
+  /*!
+   * @author donglee
+   * @brief 채팅방 설정 변경 요청 후 해당 채팅방으로 redirect함
+   */
+  const changeChatRoom = async () => {
+    if (checkFormat()) {
+      const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/channel`, "POST");
+      const body = {
+        "channel_id": channelIdToBeSet,
+        "title": title,
+        "type": type,
+        "passwd": password,
+        "max_people": max,
+      };
+      const res = await easyfetch.fetch(body);
+
+      if (!res.err_msg) {
+        setChannelId(channelIdToBeSet);
+      } else {
+        alert(res.err_msg);
+      }
+    }
+  };
+
   if (channelId) {
     return <Redirect to={{pathname: `/mainpage/chat/${channelId}`, state: {myself: true}}}></Redirect>
   } else {
     return (
       <div className="mc-container">
-        <h2>채팅방 만들기</h2>
+        <h2>{chatRoomInfo ? "대화방 설정 변경" : "채팅방 만들기"}</h2>
         <div className="mc-content-container">
           <label htmlFor="mc-title">채팅방 이름:</label>
           <form onSubmit={(e) => e.preventDefault()}>
@@ -139,7 +171,7 @@ const MakeChatRoom: FC = (): JSX.Element => {
         </div>
         <div className="mc-content-container">
           <label htmlFor="mc-max">최대 인원:</label>
-          <select name="mc-max" id="mc-max" required onChange={(e) => setMax(+e.target.value)}>
+          <select name="mc-max" id="mc-max" required value={max} onChange={(e) => setMax(+e.target.value)}>
             <option className="mc-option" value={2}>2명</option>
             <option className="mc-option" value={4}>4명</option>
             <option className="mc-option" value={6}>6명</option>
@@ -147,7 +179,9 @@ const MakeChatRoom: FC = (): JSX.Element => {
             <option className="mc-option" value={10}>10명</option>
           </select>
         </div>
-        <button className="mc-make" onClick={makeChatRoom}>만들기</button>
+        <button className="mc-make" onClick={chatRoomInfo ? changeChatRoom : makeChatRoom}>
+          {chatRoomInfo ? "변경하기" : "만들기"}
+        </button>
       </div>
     );
   }

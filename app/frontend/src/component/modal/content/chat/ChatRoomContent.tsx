@@ -1,13 +1,13 @@
 import React, { FC, Dispatch, SetStateAction, useState, useEffect } from "react";
 import { Link, Route, RouteComponentProps, useParams, withRouter } from "react-router-dom";
 import Modal from "../../Modal";
-import ChatConfigContent from "./ChatConfigContent";
 import ChatInviteContent from "./ChatInviteContent";
 import ChatContextMenu from "./ChatContextMenu";
 import EasyFetch from "../../../../utils/EasyFetch";
 import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
 import { io } from "socket.io-client";
+import MakeChatRoom from "./MakeChatRoom";
 
 function submitMessage(message: string, setMessage: Dispatch<SetStateAction<string>>,
                         chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
@@ -112,7 +112,7 @@ const Password: FC<{
   );
 }
 
-interface ChatRoom {
+export interface ChatRoom {
   title: string,
   type: string,
   current_people: number,
@@ -152,6 +152,10 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
   const { channel_id } = useParams<{channel_id: string}>();
   const [isProtected, setIsProtected] = useState(false);
   const [isMadeMyself, setIsMadeMyself] = useState(false);
+  
+  /* TODO : 라우트 주소를 channel_id 를 포함해서 그 다음으로 하니까 이상하게 리다이렉트 한 이후에
+            뭐가 없다; url로 받아오는 channel_id가 바뀌어버리는데 그 부분을 어떻게 해결할지 생각해보자.
+  */
 
   /*!
    * @author donglee
@@ -296,7 +300,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
                                   myPosition="owner"
                                   targetPosition={contextMenu.targetPosition}
                                   closer={setContextMenu}/>}
-        <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<ChatConfigContent/>}/></Route>
+        <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<MakeChatRoom chatRoomInfo={chatRoomInfo} channelIdToBeSet={channel_id}/>}/></Route>
         <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
       </div>
     );

@@ -8,7 +8,7 @@ import MakeChatRoom from "./MakeChatRoom";
 import Loading from "../../../loading/Loading";
 import NoResult from "../../../noresult/NoResult";
 
-interface chatRoom {
+interface ChatRoom {
   channel_id: number,
   title: string,
   type: string,
@@ -16,15 +16,15 @@ interface chatRoom {
   max_people: number
 };
 
-interface chatRoomListProps {
+interface ChatRoomListProps {
   search: string,
   type: string,
 };
 
-const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
+const ChatRoomList: FC<ChatRoomListProps> = ({ search, type }): JSX.Element => {
 
-  const [publicChatRoom, setPublicChatRoom] = useState<chatRoom[]>([]);
-  const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
+  const [publicChatRoom, setPublicChatRoom] = useState<ChatRoom[]>([]);
+  const [protectedChatRoom, setProtectedChatRoom] = useState<ChatRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   /*!
@@ -34,7 +34,7 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
    *         경우를 API 요청하는데 이 요청보다 현재 FC가 get하는 요청이 더 빠른 경우에
    *         chatRoom의 정보가 정확하지 않아서 에러가 나는 경우가 있는데 이를 if 문으로 예외처리함.
    */  
-  const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
+  const chatRoomListGenerator = (chatRoom: ChatRoom, idx: number) => {
     if (chatRoom.current_people === 0 || chatRoom.current_people.constructor == Object) {
       return ;
     }
@@ -52,7 +52,7 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
    * @author donglee
    * @brief public과 protected로 각각 state에 저장함
    */
-  const sortChatRoomList = (list: chatRoom[]) => {
+  const sortChatRoomList = (list: ChatRoom[]) => {
     let sortedPublicList = [];
     let sortedProtectedList = [];
 
@@ -72,8 +72,8 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
     setProtectedChatRoom(sortedProtectedList);
   }
 
-  const getChatRoomList = async (): Promise<chatRoom[]> => {
-    let res: {chatList: chatRoom[]};
+  const getChatRoomList = async (): Promise<ChatRoom[]> => {
+    let res: {chatList: ChatRoom[]};
 
     if (search === "") {
       const easyfetch = new EasyFetch(`${global.BE_HOST}/chat`);
