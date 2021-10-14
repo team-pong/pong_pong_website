@@ -102,6 +102,7 @@ export class SessionController {
 	@Post('/twoFactor')
 	updateFactorAuth(@Req() req: Request, @Body() body: MultiFactorAuthState) {
 		this.sessionService.updateMultiFactorAuthInfo(req.session.userid, body.email);
+		return ({});
 	}
 
 	@Post('/emailCode')
