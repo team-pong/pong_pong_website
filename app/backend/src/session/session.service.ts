@@ -126,7 +126,7 @@ export class SessionService {
           subject: '2차 인증 코드 안내',
           html: `<b>${random_code}</b>`,
         });
-        await this.authCodeRepo.create({user_id: req.session.userid, email_code: random_code});
+        await this.authCodeRepo.save({user_id: req.session.userid, email_code: random_code});
         return res.redirect(`${process.env.BACKEND_SERVER_URL}?twoFactor=email`);
       }
       await this.saveSession(req.session, data.login, access_token);
