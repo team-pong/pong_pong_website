@@ -185,7 +185,7 @@ export class SessionService {
     }
   }
 
-  async updateMultiFactorAuthInfo(user_id: string) {
-    await this.usersRepo.update({user_id: user_id}, {two_factor_login: true});
+  async updateMultiFactorAuthInfo(user_id: string, two_factor_login: boolean) {
+    await this.usersRepo.update({user_id: user_id}, {two_factor_login: two_factor_login});
   }
 }
