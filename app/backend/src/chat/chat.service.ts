@@ -10,6 +10,7 @@ import { err0, err10, err13, err15, err2, err24, err4, err6, err8, err9 } from '
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { ChatGateway } from './chat.gateway';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class ChatService {
@@ -35,7 +36,8 @@ export class ChatService {
       return new ErrMsgDto(err15);
     // if (await this.chatUsersRepo.count({user_id: owner_id}))
     //   return new ErrMsgDto(err9);
-    const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: passwd, max_people: max_people, current_people: 1});
+    const hashed_password = crypto.createHash('sha256').update(passwd).digest('base64');
+    const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: hashed_password, max_people: max_people, current_people: 1});
     await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 owner 추가
 
     let chatRoom = new ChatDto2();
@@ -128,7 +130,8 @@ export class ChatService {
     const chanel = await this.chatRepo.findOne({channel_id: channel_id});  // 채널 찾기
     if (chanel.type != 'protected')  // 방타입이 protected가 아니면
       return new ErrMsgDto(err10);
-    if (chanel.passwd == passwd)
+    const hashed_password = crypto.createHash('sha256').update(passwd).digest('base64');
+    if (chanel.passwd == hashed_password)
       return true;
     return false;
   }
@@ -145,7 +148,8 @@ export class ChatService {
     let current_people = await this.readPeople(channel_id);
     if (max_people < current_people)
       return new ErrMsgDto(err24);
-    await this.chatRepo.save({channel_id: channel_id, title: title, type: type, passwd: passwd, max_people: max_people});
+    const hashed_password = crypto.createHash('sha256').update(passwd).digest('base64');
+    await this.chatRepo.save({channel_id: channel_id, title: title, type: type, passwd: hashed_password, max_people: max_people});
     return new ErrMsgDto(err0);
   }
 
