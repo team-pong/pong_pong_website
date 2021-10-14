@@ -11,6 +11,7 @@ import { session } from 'src/entities/session';
 import { err25 } from 'src/err';
 import { SessionDto1 } from 'src/dto/session';
 import { Users } from 'src/entities/users';
+import * as nodemailer from 'nodemailer';
 
 const db = {
 	user: process.env.PG_PONG_ADMIN,
@@ -35,7 +36,7 @@ export class SessionService {
 	 * @brief 테스트 유저용 로그인 함수 (42api를 거치지 않음)
 	 * @detail 게임 매칭이 2인이라서 혼자 테스트하려면 2개 계정이 있어야해서 만듬
 	 * @todo production 환경에서 삭제되어야함
-	 */ 
+	 */
 	public async tester_login(req: Request, user_id: string, nickname: string, avatar_url: string) {
 		try {
 			// await this.usersService.createUsers(user_id, nickname, avatar_url);
@@ -91,7 +92,7 @@ export class SessionService {
    * @param[in] req Request 객체
    * @param[in] res Response 객체
    * @brief 유저 로그인시 세션 생성
-   * @detail 1. LoginCode를 받아 42api에서 토큰발급 
+   * @detail 1. LoginCode를 받아 42api에서 토큰발급
    * @       2. 토큰으로 유저 정보 조회
    * @       3. 유저 id와 avatar_url을 DB에 저장
    * @       4. 세션을 저장하고 응답 쿠키에 세션 아이디를 기록
@@ -106,7 +107,24 @@ export class SessionService {
       if (!user) { // 회원가입이 필요한 경우
         await this.usersService.createUsers(data.login, data.login, data.image_url, data.email);
       } else if (user.two_factor_login) { // 2차인증이 켜져 있는 경우
-        return res.redirect(`${process.env.BACKEND_SERVER_URL}/twoFactor`);
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: true,
+          auth: {
+            user: process.env.EMAIL_ID,
+            pass: process.env.EMAIL_PW,
+          },
+        });
+        const info = await transporter.sendMail({
+          from: `"ft_trancendence team" <${process.env.EMAIL_ID}>`,
+          to: user.email,
+          subject: '2차 인증 코드 안내',
+          html: `<b>랜덤 문자열</b>`,
+        });
+        
+        return res.redirect(`${process.env.BACKEND_SERVER_URL}?twoFactor=email`);
       }
       await this.saveSession(req.session, data.login, access_token);
       await this.usersRepo.update(data.login, {status: 'online'});
