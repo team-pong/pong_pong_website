@@ -1,13 +1,15 @@
-import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersDto1, UsersDto2, UsersDto3, UsersDto4 } from 'src/dto/users';
 import { ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from './users.service';
 import { Request } from 'express';
 import { SessionService } from 'src/session/session.service';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
 
 @ApiTags('Users')
 @Controller('users')
+@UseGuards(new LoggedInGuard())
 export class UsersController {
   constructor(
     private usersService: UsersService,

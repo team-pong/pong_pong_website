@@ -1,10 +1,11 @@
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect } from '@nestjs/websockets';
 import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Inject, forwardRef } from '@nestjs/common';
+import { Inject, forwardRef, UseGuards } from '@nestjs/common';
 import { GlobalService } from 'src/global/global.service';
 import { SessionService } from 'src/session/session.service';
 import { ChatUsersService } from 'src/chat-users/chat-users.service';
+import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
 
 const socketMap = {};
 
@@ -35,21 +36,25 @@ export class ChatGateway {
   // 3. 해당 유저 입장 시스템 메세지 전송
   @SubscribeMessage('join')
   async joinMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: JoinMsg) {
-    const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
-    const user_id = await this.sessionService.readUserId(session_id);
-    const room_id = body.room_id;
-
-    socketMap[socket.id] = {};
-    socketMap[socket.id].uid = user_id;
-    socketMap[socket.id].rid = room_id;
-
-    socket.join(room_id);
-    this.chatUsersService.createChatUsers(user_id, Number(room_id));
-    console.log(`Join Message user: ${user_id}, channel: ${room_id}`);
-    this.server.to(room_id).emit('message', {
-      user: 'system',
-      chat: `${user_id}님이 입장하셨습니다.`
-    });
+    try {
+      const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+      const user_id = await this.sessionService.readUserId(session_id);
+      const room_id = body.room_id;
+  
+      socketMap[socket.id] = {};
+      socketMap[socket.id].uid = user_id;
+      socketMap[socket.id].rid = room_id;
+  
+      socket.join(room_id);
+      this.chatUsersService.createChatUsers(user_id, Number(room_id));
+      console.log(`Join Message user: ${user_id}, channel: ${room_id}`);
+      this.server.to(room_id).emit('message', {
+        user: 'system',
+        chat: `${user_id}님이 입장하셨습니다.`
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   @SubscribeMessage('message')

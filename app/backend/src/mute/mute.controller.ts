@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AdminService } from 'src/admin/admin.service';
 import { ChatService } from 'src/chat/chat.service';
@@ -9,9 +9,11 @@ import { UsersService } from 'src/users/users.service';
 import { MuteService } from './mute.service';
 import { Request } from 'express';
 import { err27 } from 'src/err';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
 
 @ApiTags('Mute')
 @Controller('mute')
+@UseGuards(new LoggedInGuard())
 export class MuteController {
   constructor(
     private muteService: MuteService,
