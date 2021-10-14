@@ -103,4 +103,13 @@ export class SessionController {
 	updateFactorAuth(@Req() req: Request, @Body() body: MultiFactorAuthState) {
 		this.sessionService.updateMultiFactorAuthInfo(req.session.userid, body.email);
 	}
+
+	@Post('/emailCode')
+	loginWithEmailCode(@Req() req: Request, @Body() body: any, @Res() res: Response) {
+		if (this.sessionService.isValidCode(req.session.userid, body.code)) {
+			return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`);
+		} else {
+			res.json("잘못된 코드 입니다.");
+		}
+	}
 }

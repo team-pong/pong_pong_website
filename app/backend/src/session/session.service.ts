@@ -217,4 +217,13 @@ export class SessionService {
   async updateMultiFactorAuthInfo(user_id: string, two_factor_login: boolean) {
     await this.usersRepo.update({user_id: user_id}, {two_factor_login: two_factor_login});
   }
+
+  async isValidCode(user_id: string, code: string) {
+    const ret = await this.authCodeRepo.count({user_id: user_id, email_code: code});
+    if (ret) {
+      this.authCodeRepo.delete({user_id: user_id});
+      return true;
+    }
+    return false;
+  }
 }
