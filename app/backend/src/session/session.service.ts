@@ -65,7 +65,7 @@ export class SessionService {
     return axios.post(getTokenUrl, qs.stringify(requestBody), config);
   }
 
-  async getInfo(access_token: string) {
+  async getUserInfoFrom42Api(access_token: string) {
     const getUserUrl = "https://api.intra.42.fr/v2/me";
     return axios.get(getUserUrl, {
       headers: {
@@ -102,8 +102,8 @@ export class SessionService {
     try {
       const result = await this.getToken(loginCodeDto)
       const { access_token } = result.data;
-      const {data} = await this.getInfo(access_token)
-      await this.usersService.createUsers(data.login, data.login, data.image_url);
+      const {data} = await this.getUserInfoFrom42Api(access_token)
+      await this.usersService.createUsers(data.login, data.login, data.image_url, data.email);
       await this.saveSession(req.session, data.login, access_token);
       await this.usersRepo.update(data.login, {status: 'online'});
     } catch (err: any | AxiosError) {
