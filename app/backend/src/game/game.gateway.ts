@@ -4,8 +4,8 @@ import { ConnectedSocket, MessageBody, OnGatewayDisconnect } from '@nestjs/webso
 import { WebSocketServer, OnGatewayConnection, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
-import { LoggedInWsGuard } from 'src/auth/logged-in.guard';
-import { GlobalService } from 'src/global/global.service';
+import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
+import * as globalService_1 from 'src/global/global.service';
 import { MatchService } from 'src/match/match.service';
 import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
@@ -63,14 +63,13 @@ type Position = 'l' | 'r';
  * @			 2. 프론트에서 소켓 서버 연결시 withCredentials: true 옵션을 추가해줘야 connect.sid 쿠키가 전달되고,
  * @					그래야 백엔드에서 연결된 소켓의 유저가 누구인지 알 수 있다. (더 나은 방법이 있는지 확인해야 함)
  */
-@UseGuards(new LoggedInWsGuard())
 @WebSocketGateway({ namespace: 'game', cors: true })
 export class GameGateway {
 	constructor(
 		private sessionService: SessionService, // readUserId 함수 쓰려고 가져옴
 		private usersService: UsersService,
 		private matchService: MatchService,
-		private globalService: GlobalService,
+		private globalService: globalService_1.GlobalService,
 	) {}
 
 	@WebSocketServer()public server: Server;
@@ -223,84 +222,88 @@ export class GameGateway {
 
   @SubscribeMessage('normal')
   async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: string) {
-		const map_type = Number(map);
-		const game_type = 'normal';
-		// 쿠키에서 sid 파싱
-		const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
-		// sid로 유저 아이디 찾기
-		const userid = await this.sessionService.readUserId(sid);
-
-		this.socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null};
-		// 큐에 넣기
-		if (this.normal_queue.find((element) => {
-			if (element.id == userid) {
-				return true;
+		try {
+			const map_type = Number(map);
+			const game_type = 'normal';
+			// 쿠키에서 sid 파싱
+			const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			// sid로 유저 아이디 찾기
+			const userid = await this.sessionService.readUserId(sid);
+	
+			this.socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null};
+			// 큐에 넣기
+			if (this.normal_queue.find((element) => {
+				if (element.id == userid) {
+					return true;
+				}
+				return false;
+			})) {
+			} else {
+				this.normal_queue.push({id: userid, socket: socket, map: map_type})
 			}
-			return false;
-		})) {
-		} else {
-			this.normal_queue.push({id: userid, socket: socket, map: map_type})
-		}
-		// 같은 맵을 선택하고 기다리는중인 사람들 리스트
-		const waiters = this.normal_queue.filter((element) => element.map == map_type);
-		if (waiters.length >= 2) {
-			
-			const gameLogic = new GameLogic(700, 450, Number(map), this.server);
-			const playerLeft = waiters[0];
-			const playerRight = waiters[1];
-
-			const room_id: string = playerLeft.id + playerRight.id;
-			this.socket_infos[playerLeft.socket.id].rid = room_id;
-			this.socket_infos[playerRight.socket.id].rid = room_id;
-			playerLeft.socket.join(room_id);
-			playerRight.socket.join(room_id);
-			playerLeft.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[1].id, position: 'left'});
-			playerRight.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[0].id, position: 'right'});
-			this.deleteFromNormalQueue(waiters[0].id);
-			this.deleteFromNormalQueue(waiters[1].id);
-
-			const ret = gameLogic.getJson();
-			const userInfo: MatchInfo = {
-				lPlayerNickname: playerLeft.id,
-				lPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerLeft.id),
-				lPlayerScore: 0,
-				rPlayerNickname: playerRight.id,
-				rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
-				rPlayerScore: 0,
-				viewNumber: 0,
-				type: game_type,
-				map: 0,
+			// 같은 맵을 선택하고 기다리는중인 사람들 리스트
+			const waiters = this.normal_queue.filter((element) => element.map == map_type);
+			if (waiters.length >= 2) {
+				
+				const gameLogic = new GameLogic(700, 450, Number(map), this.server);
+				const playerLeft = waiters[0];
+				const playerRight = waiters[1];
+	
+				const room_id: string = playerLeft.id + playerRight.id;
+				this.socket_infos[playerLeft.socket.id].rid = room_id;
+				this.socket_infos[playerRight.socket.id].rid = room_id;
+				playerLeft.socket.join(room_id);
+				playerRight.socket.join(room_id);
+				playerLeft.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[1].id, position: 'left'});
+				playerRight.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[0].id, position: 'right'});
+				this.deleteFromNormalQueue(waiters[0].id);
+				this.deleteFromNormalQueue(waiters[1].id);
+	
+				const ret = gameLogic.getJson();
+				const userInfo: MatchInfo = {
+					lPlayerNickname: playerLeft.id,
+					lPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerLeft.id),
+					lPlayerScore: 0,
+					rPlayerNickname: playerRight.id,
+					rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
+					rPlayerScore: 0,
+					viewNumber: 0,
+					type: game_type,
+					map: 0,
+				}
+				this.socket_infos[playerLeft.socket.id].match = userInfo;
+				this.socket_infos[playerRight.socket.id].match = userInfo;
+	
+				this.server.to(room_id).emit("init", gameLogic.getInitJson(), userInfo);
+	
+				playerLeft.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.lPlayerNickname} );
+				playerRight.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.rPlayerNickname} );
+				playerLeft.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'l'));
+				playerRight.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'r'));
+	
+				/*
+				 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
+				*/
+				
+				playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l'));
+				playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r'));
+	
+				this.games[room_id] = {timeout: null, interval: null, type: game_type, map: map_type};
+				this.server.to(room_id).emit("startCount");
+				this.games[room_id].timeout = setTimeout(() => {
+					this.games[room_id].interval = setInterval(() => {
+						this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
+					}, 20)
+				}, 3000)
+				
+				/*
+				 * 게임 중 연결 끊은 경우
+				 */
+				playerLeft.socket.on("disconnect", () => this.disconnectEvent('l', playerLeft, playerRight, gameLogic));
+				playerRight.socket.on("disconnect", () => this.disconnectEvent('r', playerLeft, playerRight, gameLogic));
 			}
-			this.socket_infos[playerLeft.socket.id].match = userInfo;
-			this.socket_infos[playerRight.socket.id].match = userInfo;
-
-			this.server.to(room_id).emit("init", gameLogic.getInitJson(), userInfo);
-
-			playerLeft.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.lPlayerNickname} );
-			playerRight.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.rPlayerNickname} );
-			playerLeft.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'l'));
-			playerRight.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'r'));
-
-			/*
-			 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
-			*/
-			
-			playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l'));
-			playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r'));
-
-			this.games[room_id] = {timeout: null, interval: null, type: game_type, map: map_type};
-			this.server.to(room_id).emit("startCount");
-			this.games[room_id].timeout = setTimeout(() => {
-				this.games[room_id].interval = setInterval(() => {
-					this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
-				}, 20)
-			}, 3000)
-			
-			/*
-			 * 게임 중 연결 끊은 경우
-			 */
-			playerLeft.socket.on("disconnect", () => this.disconnectEvent('l', playerLeft, playerRight, gameLogic));
-			playerRight.socket.on("disconnect", () => this.disconnectEvent('r', playerLeft, playerRight, gameLogic));
+		} catch (err) {
+			console.error(err);
 		}
   }
 
@@ -308,84 +311,87 @@ export class GameGateway {
 
 	@SubscribeMessage('ladder')
 	async handdleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: string) {
-		const map_type = Number(map);
-		const game_type = 'ladder';
-		// 쿠키에서 sid 파싱
-		const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
-		// sid로 유저 아이디 찾기
-		const userid = await this.sessionService.readUserId(sid);
-
-		this.socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null};
-		// 큐에 넣기
-		if (this.ladder_queue.find((element) => {
-			if (element.id == userid) {
-				return true;
+		try {
+			const map_type = Number(map);
+			const game_type = 'ladder';
+			// 쿠키에서 sid 파싱
+			const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			// sid로 유저 아이디 찾기
+			const userid = await this.sessionService.readUserId(sid);
+	
+			this.socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null};
+			// 큐에 넣기
+			if (this.ladder_queue.find((element) => {
+				if (element.id == userid) {
+					return true;
+				}
+				return false;
+			})) {
+			} else {
+				this.ladder_queue.push({id: userid, socket: socket, map: map_type})
 			}
-			return false;
-		})) {
-		} else {
-			this.ladder_queue.push({id: userid, socket: socket, map: map_type})
-		}
-		// 같은 맵을 선택하고 기다리는중인 사람들 리스트
-		const waiters = this.ladder_queue.filter((element) => element.map == map_type);
-		if (waiters.length >= 2) {
-			const gameLogic = new GameLogic(700, 450, Number(map), this.server);
-			const playerLeft = waiters[0];
-			const playerRight = waiters[1];
-
-			const room_id: string = playerLeft.id + playerRight.id;
-			this.socket_infos[playerLeft.socket.id].rid = room_id;
-			this.socket_infos[playerRight.socket.id].rid = room_id;
-			playerLeft.socket.join(room_id);
-			playerRight.socket.join(room_id);
-			playerLeft.socket.emit('matched', {roomId: room_id, opponent: this.ladder_queue[1].id, position: 'left'});
-			playerRight.socket.emit('matched', {roomId: room_id, opponent: this.ladder_queue[0].id, position: 'right'});
-			this.deleteFromLadderQueue(waiters[0].id);
-			this.deleteFromLadderQueue(waiters[1].id);
-
-			const ret = gameLogic.getJson();
-			const userInfo: MatchInfo = {
-				lPlayerNickname: playerLeft.id,
-				lPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerLeft.id),
-				lPlayerScore: 0,
-				rPlayerNickname: playerRight.id,
-				rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
-				rPlayerScore: 0,
-				viewNumber: 0,
-				type: 'ladder',
-				map: 0,
+			// 같은 맵을 선택하고 기다리는중인 사람들 리스트
+			const waiters = this.ladder_queue.filter((element) => element.map == map_type);
+			if (waiters.length >= 2) {
+				const gameLogic = new GameLogic(700, 450, Number(map), this.server);
+				const playerLeft = waiters[0];
+				const playerRight = waiters[1];
+	
+				const room_id: string = playerLeft.id + playerRight.id;
+				this.socket_infos[playerLeft.socket.id].rid = room_id;
+				this.socket_infos[playerRight.socket.id].rid = room_id;
+				playerLeft.socket.join(room_id);
+				playerRight.socket.join(room_id);
+				playerLeft.socket.emit('matched', {roomId: room_id, opponent: this.ladder_queue[1].id, position: 'left'});
+				playerRight.socket.emit('matched', {roomId: room_id, opponent: this.ladder_queue[0].id, position: 'right'});
+				this.deleteFromLadderQueue(waiters[0].id);
+				this.deleteFromLadderQueue(waiters[1].id);
+	
+				const ret = gameLogic.getJson();
+				const userInfo: MatchInfo = {
+					lPlayerNickname: playerLeft.id,
+					lPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerLeft.id),
+					lPlayerScore: 0,
+					rPlayerNickname: playerRight.id,
+					rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
+					rPlayerScore: 0,
+					viewNumber: 0,
+					type: 'ladder',
+					map: 0,
+				}
+				this.socket_infos[playerLeft.socket.id].match = userInfo;
+				this.socket_infos[playerRight.socket.id].match = userInfo;
+	
+				this.server.to(room_id).emit("init", gameLogic.getInitJson(), userInfo);
+	
+				playerLeft.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.lPlayerNickname} );
+				playerRight.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.rPlayerNickname} );
+				playerLeft.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'l'));
+				playerRight.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'r'));
+	
+				/*
+				 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
+				*/
+				
+				playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l'));
+				playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r'));
+	
+				this.games[room_id] = {timeout: null, interval: null, type: game_type, map: map_type};
+				this.server.to(room_id).emit("startCount");
+				this.games[room_id].timeout = setTimeout(() => {
+					this.games[room_id].interval = setInterval(() => {
+						this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
+					}, 20)
+				}, 3000)
+				
+				/*
+				 * 게임 중 연결 끊은 경우
+				 */
+				playerLeft.socket.on("disconnect", () => this.disconnectEvent('l', playerLeft, playerRight, gameLogic));
+				playerRight.socket.on("disconnect", () => this.disconnectEvent('r', playerLeft, playerRight, gameLogic));
 			}
-			this.socket_infos[playerLeft.socket.id].match = userInfo;
-			this.socket_infos[playerRight.socket.id].match = userInfo;
-
-			this.server.to(room_id).emit("init", gameLogic.getInitJson(), userInfo);
-
-			playerLeft.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.lPlayerNickname} );
-			playerRight.socket.emit('setMatchInfo', {...userInfo, myName: userInfo.rPlayerNickname} );
-			playerLeft.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'l'));
-			playerRight.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'r'));
-
-			/*
-			 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
-			*/
-			
-			playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l'));
-			playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r'));
-
-			this.games[room_id] = {timeout: null, interval: null, type: game_type, map: map_type};
-			this.server.to(room_id).emit("startCount");
-			this.games[room_id].timeout = setTimeout(() => {
-				this.games[room_id].interval = setInterval(() => {
-					this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
-				}, 20)
-			}, 3000)
-			
-			/*
-			 * 게임 중 연결 끊은 경우
-			 */
-			playerLeft.socket.on("disconnect", () => this.disconnectEvent('l', playerLeft, playerRight, gameLogic));
-			playerRight.socket.on("disconnect", () => this.disconnectEvent('r', playerLeft, playerRight, gameLogic));
-
+		} catch (err) {
+			console.error(err);
 		}
 	}
 
@@ -394,19 +400,26 @@ export class GameGateway {
 	}
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
-		const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
-		const user_id = await this.sessionService.readUserId(sid);
-		
-		console.log('Game 웹소켓 연결됨', user_id);
+		try {
+			const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			const user_id = await this.sessionService.readUserId(sid);
+			console.log('Game 웹소켓 연결됨', user_id);
+		} catch (err) {
+			console.error(err);
+		}
 	}
 
 	async handleDisconnect(@ConnectedSocket() socket: Socket) {
-		const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
-		const user_id = await this.sessionService.readUserId(sid);
-
-		console.log('Game 웹소켓 연결해제', user_id);
-		// 대기열에 있다면 대기열에서 제거
-		this.deleteFromNormalQueue(user_id);
-		this.deleteFromLadderQueue(user_id);
+		try {
+			const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			const user_id = await this.sessionService.readUserId(sid);
+	
+			console.log('Game 웹소켓 연결해제', user_id);
+			// 대기열에 있다면 대기열에서 제거
+			this.deleteFromNormalQueue(user_id);
+			this.deleteFromLadderQueue(user_id);
+		} catch (err) {
+			console.error(err);
+		}
 	}
 }

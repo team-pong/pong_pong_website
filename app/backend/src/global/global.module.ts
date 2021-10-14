@@ -16,7 +16,7 @@ import { DmStoreModule } from 'src/dm-store/dm-store.module';
       Users,
       Friend,
     ]),
-    forwardRef(() => SessionModule),
+    SessionModule,
     FriendModule,
     UsersModule,
     DmStoreModule,

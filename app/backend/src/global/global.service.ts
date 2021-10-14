@@ -4,17 +4,14 @@ import { SessionService } from 'src/session/session.service';
 @Injectable()
 export class GlobalService {
   constructor(
+    private sessionService: SessionService,
   ) {}
-
-  @Inject(forwardRef(() => SessionService))
-  private sessionService: SessionService
 
   getSessionIDFromCookie(cookie): string {
     if (cookie) {
       return cookie.split('.')[1].substring(8);
     } else {
-      console.log('no cookie');
-      return ;
+      throw 'empty cookie';
     }
   }
   
