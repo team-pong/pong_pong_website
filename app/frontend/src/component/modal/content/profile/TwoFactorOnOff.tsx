@@ -13,7 +13,7 @@ const TwoFactorOnOff: FC = (): JSX.Element => {
   const getOnOff = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/session/twoFactor`, "GET");
     const res = await easyfetch.fetch();
-    if (res.email === "true") {
+    if (res.email === true) {
       setOnOff(true);
       sliderInsideRef.current.style.transform = "translateX(26px)"
       sliderRef.current.style.backgroundColor = "#2196F3";
