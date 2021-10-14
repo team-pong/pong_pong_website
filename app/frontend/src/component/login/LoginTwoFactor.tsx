@@ -1,6 +1,8 @@
-import { FC, FormEvent } from "react";
+import { FC, useState, FormEvent } from "react";
 
 const LoginTwoFactor: FC = (): JSX.Element => {
+
+  const [code, setCode] = useState("");
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -10,7 +12,9 @@ const LoginTwoFactor: FC = (): JSX.Element => {
     <>
       이메일 확인하세
       <form onSubmit={onSubmit}>
-        <input type="text"/>
+        <input type="text"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}/>
         <input type="submit" value="확인"/>
       </form>
     </>
