@@ -18,4 +18,8 @@ export class Users{
   ladder_level: number;
 	@Column({default: 'offline'})
 	status: string;
+	@Column({default: 0})
+	two_factor_login: boolean;
+	@Column({default: ''})
+	email: string;
 }
