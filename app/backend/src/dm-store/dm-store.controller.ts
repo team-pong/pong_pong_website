@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { string } from 'joi';
 import { DmStoreDto1, DmStoreDto3 } from 'src/dto/dm-store';
@@ -6,9 +6,11 @@ import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
 import { DmStoreService } from './dm-store.service';
 import { Request } from 'express';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
 
 @ApiTags('DM-Store')
 @Controller('dm-store')
+@UseGuards(new LoggedInGuard())
 export class DmStoreController {
   constructor(
     private dmStoreService: DmStoreService,

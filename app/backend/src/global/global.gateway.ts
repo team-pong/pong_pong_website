@@ -13,6 +13,8 @@ import { GlobalService } from './global.service';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { DmStoreService } from 'src/dm-store/dm-store.service';
 import { string } from 'joi';
+import { UseGuards } from '@nestjs/common';
+import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
 
 // key: user id / value: socket id
 const socketMap = {};
@@ -57,20 +59,23 @@ export class GlobalGateway {
   // 문제: 그 사람의 소켓을 어떻게 가져올것인가?
   // 해결: 소켓 연결시 소켓 맵에 저장
   async handleConnection(@ConnectedSocket() socket: Socket, data: string) {
-    const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
-    const userid = await this.sessionService.readUserId(sid);
+    try {
+      const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+      const userid = await this.sessionService.readUserId(sid);
 
-    await this.usersRepo.update(userid, {status: 'online'});
-    socketMap[userid] = socket.id;
-    console.log('socket connected', sid, userid);
-    const friend_list = await this.friendRepo.find({friend_id: userid});
-    let friend_id: string = '';
-    for (let i in friend_list) {
-      console.log(i, friend_list[i]);
-      friend_id = friend_list[i].user_id;
-      this.server.to(socketMap[friend_id]).emit('online', {user_id: friend_id})
-    }
-    
+      await this.usersRepo.update(userid, {status: 'online'});
+      socketMap[userid] = socket.id;
+      console.log('socket connected', sid, userid);
+      const friend_list = await this.friendRepo.find({friend_id: userid});
+      let friend_id: string = '';
+      for (let i in friend_list) {
+        console.log(i, friend_list[i]);
+        friend_id = friend_list[i].user_id;
+        this.server.to(socketMap[friend_id]).emit('online', {user_id: friend_id})
+      }
+    } catch (err) {
+      console.log(err);
+    }  
   }
 
   /*!
@@ -107,8 +112,6 @@ export class GlobalGateway {
     const friend_list = await this.friendRepo.query(
       `select (friend.user_id) from friend JOIN users ON friend."user_id"=users."user_id" WHERE (friend_id='${user_id}' and status='online')`
     );
-
-    console.log('online friend list: ', friend_list);
 
     // 4. 소켓 메세지 전송
     for (let idx in friend_list) {

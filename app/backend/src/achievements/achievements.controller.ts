@@ -1,11 +1,13 @@
-import { Controller, Get, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Delete, Query, UseGuards } from '@nestjs/common';
 import { achievementsService } from './achievements.service'
 import { AcievementDto2 } from '../dto/achievements'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ErrMsgDto } from 'src/dto/utility';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
 
 @ApiTags('achievements')
 @Controller('achievements')
+@UseGuards(new LoggedInGuard()) 
 export class achievementsController {
   constructor(private achievementsService: achievementsService){}
 

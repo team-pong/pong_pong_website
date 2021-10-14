@@ -11,6 +11,7 @@ import { ChatService } from './chat.service';
 
 @ApiTags('Chat')
 @Controller('chat')
+@UseGuards(new LoggedInGuard())
 export class ChatController {
   constructor(
     @Inject(forwardRef(() => UsersService))

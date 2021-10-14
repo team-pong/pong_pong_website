@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, forwardRef, Get, Inject, Param, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AdminDto1 } from 'src/dto/admin';
 import { UsersDto5 } from 'src/dto/users';
@@ -9,9 +9,11 @@ import { AdminService } from './admin.service';
 import { Request } from 'express';
 import { ChatService } from 'src/chat/chat.service';
 import { err26 } from 'src/err';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
 
 @ApiTags('Admin')
 @Controller('admin')
+@UseGuards(new LoggedInGuard())
 export class AdminController {
   constructor(
     private adminService: AdminService,

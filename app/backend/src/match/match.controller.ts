@@ -1,5 +1,6 @@
- import { Body, Controller, Get, Post, Delete, Query, forwardRef, Inject } from '@nestjs/common';
+ import { Body, Controller, Get, Post, Delete, Query, forwardRef, Inject, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
 import { MatchDto1, MatchDto3 } from 'src/dto/match';
 import { ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from 'src/users/users.service';
@@ -7,6 +8,7 @@ import { MatchService } from './match.service';
 
 @ApiTags('Match')
 @Controller('match')
+@UseGuards(new LoggedInGuard())
 export class MatchController {
   constructor(
     @Inject(forwardRef(() => UsersService))

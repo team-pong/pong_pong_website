@@ -69,13 +69,13 @@ export class SessionController {
   }
 
   @ApiOperation({ summary: '로그인' })
-  @UseGuards(new NotLoggedInGuard())
   @Post("/oauth")
   public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
     return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
   }
 
   @ApiOperation({ summary: '입력받은 세션 ID와 토큰이 유효한지 체크해서 Body에 결과를 담는다' })
+	@UseGuards(new LoggedInGuard())
   @Get("/valid")
   isValidSession(@Req() request: Request, @Res() response: Response) {
     return this.sessionService.sessionValidCheck(request.sessionID, response);
@@ -84,7 +84,6 @@ export class SessionController {
   @ApiOperation({ summary: '세션 아이디로 유저아이디 검색'})
   @ApiResponse({ type: SessionDto1, description: '유저 아이디' })
   @ApiQuery({ name: 'sid', example: '0TBeNj59PUBZ_XjbXGKq9sHHPHCkZky4', description: '세션아이디' })
-  @UseGuards(new LoggedInGuard()) 
   @Get("/user_id")
   readUser(@Query() q){
     return this.sessionService.readUser(q.sid);
