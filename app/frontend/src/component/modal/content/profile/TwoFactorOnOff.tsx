@@ -6,6 +6,7 @@ const TwoFactorOnOff: FC = (): JSX.Element => {
 
   const [onOff, setOnOff] = useState(false);
 
+  const isInitialMount = useRef(true);
   const sliderRef = useRef<HTMLSpanElement>(null);
   const sliderInsideRef = useRef<HTMLDivElement>(null);
 
@@ -24,6 +25,10 @@ const TwoFactorOnOff: FC = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return ;
+    }
     const easyfetch = new EasyFetch(`${global.BE_HOST}/session/twoFactor`, "POST");
     if (onOff === true) {
       sliderInsideRef.current.style.transform = "translateX(26px)"
