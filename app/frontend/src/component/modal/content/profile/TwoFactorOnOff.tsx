@@ -15,8 +15,12 @@ const TwoFactorOnOff: FC = (): JSX.Element => {
     const res = await easyfetch.fetch();
     if (res.email === "true") {
       setOnOff(true);
+      sliderInsideRef.current.style.transform = "translateX(26px)"
+      sliderRef.current.style.backgroundColor = "#2196F3";
     } else {
       setOnOff(false);
+      sliderInsideRef.current.style.transform = "";
+      sliderRef.current.style.backgroundColor = "#ccc";
     }
   }
 
