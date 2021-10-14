@@ -303,11 +303,14 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
             </> : <></>}
           </div>
           <div id="avatar-container">
-            <img className="pr-avatar"
-              ref={avatarImgRef}
-              src={myInfo.avatar_url}
-              onError={() => {avatarImgRef.current.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="}}
-              alt="프로필사진" />
+            <label htmlFor="input-file">
+              <img className="pr-avatar"
+                ref={avatarImgRef}
+                src={myInfo.avatar_url}
+                onError={() => {avatarImgRef.current.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="}}
+                alt="프로필사진" />
+            </label>
+            <input id="input-file" type="file" />
           </div>
           <div id="user-info">
             <div id="user-id">

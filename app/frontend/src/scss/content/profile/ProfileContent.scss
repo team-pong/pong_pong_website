@@ -54,27 +54,31 @@
     #avatar-container {
       text-align: center;
       margin-left: 50px;
-
-      .pr-avatar {
-        border-style: solid;
-        border-width: 7px;
-        border-color: white;
-        opacity: 0.8;
-        margin-top: 10%;
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        box-shadow: 0 0 7px #fff;
-        transform: scale(1);
-        transition: 0.1s all ease-in-out;
+      label {
+        cursor: pointer;
+        .pr-avatar {
+          border-style: solid;
+          border-width: 7px;
+          border-color: white;
+          opacity: 0.8;
+          margin-top: 10%;
+          width: 150px;
+          height: 150px;
+          border-radius: 50%;
+          box-shadow: 0 0 7px #fff;
+          transform: scale(1);
+          transition: 0.1s all ease-in-out;
+        }
       }
-    }
-
-    #avatar-container > :hover {
-      transform: scale(1.1);
-      transition: 0.2s all ease-in-out;
-      opacity: 1;
-      cursor: pointer;
+      input#input-file {
+        display: none;
+      }
+      &:hover {
+        transform: scale(1.1);
+        transition: 0.2s all ease-in-out;
+        opacity: 1;
+        cursor: pointer;
+      }
     }
 
     #user-info {
