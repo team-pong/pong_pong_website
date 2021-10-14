@@ -12,6 +12,7 @@ import { err25 } from 'src/err';
 import { SessionDto1 } from 'src/dto/session';
 import { Users } from 'src/entities/users';
 import * as nodemailer from 'nodemailer';
+import { AuthCode } from 'src/entities/auth-code';
 
 const db = {
 	user: process.env.PG_PONG_ADMIN,
@@ -30,6 +31,7 @@ export class SessionService {
     private usersService: UsersService,
     @InjectRepository(session) private sessionRepo: Repository<session>,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
+    @InjectRepository(AuthCode) private authCodeRepo: Repository<AuthCode>,
     ){}
 
 	/*!
@@ -107,6 +109,7 @@ export class SessionService {
       if (!user) { // 회원가입이 필요한 경우
         await this.usersService.createUsers(data.login, data.login, data.image_url, data.email);
       } else if (user.two_factor_login) { // 2차인증이 켜져 있는 경우
+        const random_code = this.getRandomAuthCode(4);
         const transporter = nodemailer.createTransport({
           service: 'gmail',
           host: 'smtp.gmail.com',
@@ -121,9 +124,9 @@ export class SessionService {
           from: `"ft_trancendence team" <${process.env.EMAIL_ID}>`,
           to: user.email,
           subject: '2차 인증 코드 안내',
-          html: `<b>랜덤 문자열</b>`,
+          html: `<b>${random_code}</b>`,
         });
-        
+        await this.authCodeRepo.create({user_id: req.session.userid, email_code: random_code});
         return res.redirect(`${process.env.BACKEND_SERVER_URL}?twoFactor=email`);
       }
       await this.saveSession(req.session, data.login, access_token);
@@ -140,6 +143,14 @@ export class SessionService {
         console.log("login error:", err);
       }
     }
+  }
+
+  getRandomAuthCode(n: number) {
+    let ret = '';
+    for (let i = 0; i < n; i++) {
+      ret += String.fromCharCode(Math.floor(Math.random() * 25) + 97);
+    }
+    return ret;
   }
 
  /*!

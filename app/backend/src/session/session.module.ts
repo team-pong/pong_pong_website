@@ -15,6 +15,7 @@ import { session } from 'src/entities/session';
 import { SessionController } from './session.controller';
 import { SessionService } from './session.service';
 import { UsersModule } from 'src/users/users.module';
+import { AuthCode } from 'src/entities/auth-code';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { UsersModule } from 'src/users/users.module';
       Friend, 
       Match, 
       Mute,
-      session
+      session,
+      AuthCode
     ]),
     forwardRef(() => UsersModule)
   ],

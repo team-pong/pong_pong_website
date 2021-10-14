@@ -6,7 +6,6 @@ import { Request, Response } from 'express';
 import { SessionDto1 } from 'src/dto/session';
 import { NotLoggedInGuard } from 'src/auth/not-logged-in.guard';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
-import * as nodemailer from 'nodemailer';
 
 interface MultiFactorAuthState {
 	email: boolean,

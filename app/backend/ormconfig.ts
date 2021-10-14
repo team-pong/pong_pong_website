@@ -12,6 +12,7 @@ import { Mute } from './src/entities/mute'
 import { session } from './src/entities/session'
 import { Users } from './src/entities/users'
 import { Block } from './src/entities/block';
+import { AuthCode } from './src/entities/auth-code';
 
 dotenv.config();
 const config: TypeOrmModuleOptions = {
@@ -33,7 +34,8 @@ const config: TypeOrmModuleOptions = {
     Mute,
     session,
     Users,
-    Block
+    Block,
+    AuthCode
   ],
   migrations: [__dirname + '/src/migrations/*.ts'],
   cli: { migrationsDir: 'src/migrations' },
