@@ -85,7 +85,6 @@ export class SessionService {
     session.save();
   }
 
-
   /*!
    * @author hna
    * @param[in] loginCodeDto Body로 들어온 code
@@ -102,18 +101,24 @@ export class SessionService {
     try {
       const result = await this.getToken(loginCodeDto)
       const { access_token } = result.data;
-      const {data} = await this.getUserInfoFrom42Api(access_token)
-      await this.usersService.createUsers(data.login, data.login, data.image_url, data.email);
+      const { data } = await this.getUserInfoFrom42Api(access_token)
+      const user = await this.usersRepo.findOne({user_id: data.login});
+      if (!user) { // 회원가입이 필요한 경우
+        await this.usersService.createUsers(data.login, data.login, data.image_url, data.email);
+      } else if (user.two_factor_login) { // 2차인증이 켜져 있는 경우
+        return res.redirect(`${process.env.BACKEND_SERVER_URL}/twoFactor`);
+      }
       await this.saveSession(req.session, data.login, access_token);
       await this.usersRepo.update(data.login, {status: 'online'});
+      return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`);
     } catch (err: any | AxiosError) {
-      if (axios.isAxiosError(err)) {
+      if (axios.isAxiosError(err)) { // 42 응답에러
         console.log("42api error:", err.response.statusText);
         res.statusCode = err.response.status;
         res.statusMessage = err.response.statusText;
         res.json(err.response.data);
       }
-      else {
+      else { // 내부 에러
         console.log("login error:", err);
       }
     }
@@ -171,5 +176,16 @@ export class SessionService {
     let user = new SessionDto1;
     user.user_id = user_id;
     return user;
+  }
+
+  async getMultiFactorAuthInfo(user_id: string) {
+    const user_info = await this.usersRepo.findOne({user_id: user_id});
+    if (user_info) {
+      return {email: user_info.two_factor_login};
+    }
+  }
+
+  async updateMultiFactorAuthInfo(user_id: string) {
+    await this.usersRepo.update({user_id: user_id}, {two_factor_login: true});
   }
 }

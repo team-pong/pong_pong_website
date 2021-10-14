@@ -6,6 +6,11 @@ import { Request, Response } from 'express';
 import { SessionDto1 } from 'src/dto/session';
 import { NotLoggedInGuard } from 'src/auth/not-logged-in.guard';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
+import * as nodemailer from 'nodemailer';
+
+interface MultiFactorAuthState {
+	email: boolean,
+}
 
 @ApiTags('Session')
 @Controller('session')
@@ -60,9 +65,9 @@ export class SessionController {
   @Get("/oauth")
   async login(@Query() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
     try {
-      if (LoginCodeDto)
-        await this.sessionService.login(loginCodeDto, request, response);
-      return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
+      if (LoginCodeDto) {
+				return await this.sessionService.login(loginCodeDto, request, response);
+			}
     } catch (err){
       console.log("get42UserInfo Err: ", err);
     }
@@ -71,6 +76,7 @@ export class SessionController {
   @ApiOperation({ summary: '로그인' })
   @Post("/oauth")
   public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
+		console.log("POST /oauth 사용됨");
     return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
   }
 
@@ -87,5 +93,15 @@ export class SessionController {
   @Get("/user_id")
   readUser(@Query() q){
     return this.sessionService.readUser(q.sid);
-  }  
+  }
+
+	@Get('/twoFactor')
+	getMultiFactorAuthInfo(@Req() req: Request) {
+		return this.sessionService.getMultiFactorAuthInfo(req.session.userid);
+	}
+
+	@Post('/twoFactor')
+	updateFactorAuth(@Req() req: Request, @Body() body: MultiFactorAuthState) {
+		this.sessionService.updateMultiFactorAuthInfo(req.session.userid);
+	}
 }
