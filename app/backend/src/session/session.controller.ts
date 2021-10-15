@@ -106,12 +106,11 @@ export class SessionController {
 	}
 
 	@Get('/emailCode')
-	loginWithEmailCode(@Req() req: Request, @Body() body: any, @Res() res: Response) {
-		console.log('email code arrived');
-		if (this.sessionService.isValidCode(req.session.userid, body.code)) {
+	async loginWithEmailCode(@Req() req: Request, @Query() query: any, @Res() res: Response) {
+		if (await this.sessionService.isValidCode(req.session.userid, query.code)) {
 			return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`);
 		} else {
-			res.json("잘못된 코드 입니다.");
+			return res.redirect(`${process.env.BACKEND_SERVER_URL}/?twoFactor=email`)
 		}
 	}
 }

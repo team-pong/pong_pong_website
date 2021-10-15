@@ -219,7 +219,7 @@ export class SessionService {
   }
 
   async isValidCode(user_id: string, code: string) {
-    const ret = await this.authCodeRepo.count({user_id: user_id, email_code: code});
+    const ret = await this.authCodeRepo.findOne({user_id: user_id, email_code: code});
     if (ret) {
       this.authCodeRepo.delete({user_id: user_id});
       return true;
