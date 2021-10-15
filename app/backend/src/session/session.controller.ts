@@ -105,8 +105,9 @@ export class SessionController {
 		return ({});
 	}
 
-	@Post('/emailCode')
+	@Get('/emailCode')
 	loginWithEmailCode(@Req() req: Request, @Body() body: any, @Res() res: Response) {
+		console.log('email code arrived');
 		if (this.sessionService.isValidCode(req.session.userid, body.code)) {
 			return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`);
 		} else {
