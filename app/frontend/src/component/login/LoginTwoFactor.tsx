@@ -4,13 +4,15 @@ const LoginTwoFactor: FC = (): JSX.Element => {
 
   const [code, setCode] = useState("");
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log("submit")
+    const res = 
+    await fetch(`${global.BE_HOST}/session/emailCode`, {method: "POST", body: {code: code} as any});
+    if (res) alert(JSON.stringify(res));
   }
   return (
     <>
-      이메일 확인하세
+      이메일을 확인하세요
       <form onSubmit={onSubmit}>
         <input type="text"
           value={code}
