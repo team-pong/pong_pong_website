@@ -6,9 +6,7 @@ const LoginTwoFactor: FC = (): JSX.Element => {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const res = 
-    await fetch(`${global.BE_HOST}/session/emailCode`, {method: "POST", body: {code: code} as any});
-    if (res) alert(JSON.stringify(res));
+    window.location.href = `${global.BE_HOST}/session/emailCode?code=${code}`;
   }
   return (
     <>
