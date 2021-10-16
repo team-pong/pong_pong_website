@@ -39,7 +39,10 @@ const ChatRoomList: FC<ChatRoomListProps> = ({ search, type }): JSX.Element => {
       return ;
     }
     return (
-      <Link to={`/mainpage/chat/${chatRoom.channel_id}`} key={idx} style={{color: "inherit", textDecoration: "none"}}>
+      <Link
+        to={`/mainpage/chat/${chatRoom.channel_id}`}
+        key={idx}
+        style={{color: "inherit", textDecoration: "none"}}>
         <li className="chat-generator-li">
           <span className="chat-generator-span">{chatRoom.title}{chatRoom.type === "protected" ? <img className="chat-generator-lock-img" src="/public/lock.svg" alt="비밀방" /> : <></>}</span>
           <span className="chat-generator-span">{chatRoom.current_people}/{chatRoom.max_people}</span>
@@ -130,6 +133,7 @@ const ChatContent: FC = (): JSX.Element => {
   const [searchInputValue, setSearchInputValue] = useState("");
   const [chatRoomToFind, setChatRoomToFind] = useState("");
   const [chatRoomSelector, setChatRoomSelector] = useState("all");
+  const [isMadeMyself, setIsMadeMyself] = useState(false);
 
   if (window.location.pathname === "/mainpage/chat"
       || window.location.pathname === "/mainpage/chat/makechat") {
@@ -167,14 +171,12 @@ const ChatContent: FC = (): JSX.Element => {
           <button className="chat-room-btn">채팅방 만들기</button>
         </Link>
         <Route path={`/mainpage/chat/makechat`}>
-          <Modal id={Date.now()} content={<MakeChatRoom />} smallModal/>
+          <Modal id={Date.now()} content={<MakeChatRoom setIsMadeMyself={setIsMadeMyself}/>} smallModal/>
         </Route>
       </div>
     );
   } else {
-    return (
-      <Route path="/mainpage/chat/:channel_id"><ChatRoomContent /></Route>
-    );
+    return <Route path="/mainpage/chat/:channel_id"><ChatRoomContent isMadeMyself={isMadeMyself} setIsMadeMyself={setIsMadeMyself}/></Route>;
   }
 }
 

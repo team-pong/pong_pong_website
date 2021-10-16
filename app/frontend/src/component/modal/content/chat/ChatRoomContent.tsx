@@ -1,4 +1,4 @@
-import React, { FC, Dispatch, SetStateAction, useState, useEffect } from "react";
+import React, { FC, Dispatch, SetStateAction, useState, useEffect, useContext, useRef } from "react";
 import { Link, Route, RouteComponentProps, useParams, withRouter } from "react-router-dom";
 import Modal from "../../Modal";
 import ChatInviteContent from "./ChatInviteContent";
@@ -6,28 +6,32 @@ import ChatContextMenu from "./ChatContextMenu";
 import EasyFetch from "../../../../utils/EasyFetch";
 import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
-import { io } from "socket.io-client";
 import MakeChatRoom from "./MakeChatRoom";
+import { io, Socket } from "socket.io-client";
+import { UserInfoContext } from "../../../../Context";
+import { UserInfo } from "../../../mainpage/MainPage";
 
-function submitMessage(message: string, setMessage: Dispatch<SetStateAction<string>>,
-                        chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
+
+function submitMessage(myInfo: UserInfo, message: string, chatLog: ChatLog[], setChatLog: Dispatch<SetStateAction<any>>) {
   if (message === "") return ;
   setChatLog([{
-    nick: "yochoi",
-    position: "admin",
-    avatar_url: `https://cdn.intra.42.fr/users/medium_yochoi.png`,
+    nick: myInfo.nick,
+    position: "normal",
+    avatar_url: myInfo.avatar_url,
     time: new Date().getTime(),
     message: message
   }, ...chatLog]);
-  setMessage("");
 };
 
-function controlTextAreaKeyDown(e: React.KeyboardEvent,
+function controlTextAreaKeyDown(e: React.KeyboardEvent, myInfo: UserInfo,
                           message: string, setMessage: Dispatch<SetStateAction<string>>,
-                          chatLog, setChatLog: Dispatch<SetStateAction<any>>) {
+                          chatLog: ChatLog[], setChatLog: Dispatch<SetStateAction<any>>, socket: Socket) {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
-    submitMessage(message, setMessage, chatLog, setChatLog);
+    if (message === "") return ;
+    submitMessage(myInfo, message, chatLog, setChatLog);
+    socket.emit("message", message);
+    setMessage("");
   }
 };
 
@@ -48,8 +52,10 @@ function openContextMenu( e: React.MouseEvent,
 const Password: FC<{
   setIsProtected: Dispatch<SetStateAction<boolean>>,
   isMadeMyself: boolean,
-  channelId: string}>
-  = ({setIsProtected, isMadeMyself, channelId}): JSX.Element => {
+  channelId: string,
+  setPasswordPassed: Dispatch<SetStateAction<boolean>>,}>
+  = ({setIsProtected, isMadeMyself, channelId, setPasswordPassed}): JSX.Element => {
+
   const [password, setPassword] = useState("");
 
   /*!
@@ -60,9 +66,10 @@ const Password: FC<{
     e.preventDefault();
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/checkPasswd?channel_id=${channelId}&passwd=${password}`);
     const res = await easyfetch.fetch();
- 
+
     if (res) {
       setIsProtected(false);
+      setPasswordPassed(true);
     } else {
       alert("비밀번호가 틀렸습니다.");
     }
@@ -134,10 +141,15 @@ interface ChatUser {
   position: string,
 };
 
-const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
+interface ChatRoomContentProps {
+  isMadeMyself: boolean;
+  setIsMadeMyself: Dispatch<SetStateAction<boolean>>;
+};
+
+const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMadeMyself, setIsMadeMyself}): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
-  const [chatLog, setChatLog] = useState<ChatLog[]>([]);
+  const [chatLog, _setChatLog] = useState<ChatLog[]>([]);
   const [message, setMessage] = useState("");
   const [contextMenu, setContextMenu] = useState<{
     isOpen: boolean,
@@ -150,12 +162,24 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
 
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
   const { channel_id } = useParams<{channel_id: string}>();
-  const [isProtected, setIsProtected] = useState(false);
-  const [isMadeMyself, setIsMadeMyself] = useState(false);
-  
+  const [isProtected, setIsProtected] = useState(false);  
   /* TODO : 라우트 주소를 channel_id 를 포함해서 그 다음으로 하니까 이상하게 리다이렉트 한 이후에
             뭐가 없다; url로 받아오는 channel_id가 바뀌어버리는데 그 부분을 어떻게 해결할지 생각해보자.
   */
+  const [socket, setSocket] = useState<Socket>(null);
+  const chatLogRef = useRef(chatLog);
+  const [passwordPassed, setPasswordPassed] = useState(false);
+
+  const myInfo = useContext(UserInfoContext);
+
+  /*!
+   * @author donglee
+   * @brief 웹소켓에서 이벤트리스너에 최신화된 chatLog state에 접근하기 위해서 ref훅을 사용함
+   */
+  const setChatLog = (data) => {
+    chatLogRef.current = data;
+    _setChatLog(data);
+  };
 
   /*!
    * @author donglee
@@ -176,7 +200,7 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
       setNoReult(true);
     }
     return res;
-  }
+  };
 
   const connectSocket = () => {
     const socket = io(`${global.BE_HOST}/chat`);
@@ -187,50 +211,110 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
 
   /*!
    * @author donglee
-   * @brief 대화방 참여 중인 사용자 목록을 불러옴
-   * @TODO: position에 대해서 API에서 어떻게 처리해야 할 지를 알아야 함.
+   * @brief socket state가 처음에 연결되면 리스너들을 등록함
    */
-  const getChatRoomUsers = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/chat-users?channel_id=${channel_id}`);
-    const res = await easyfetch.fetch();
-
-    if (res.chatUsersList) {
-      const updatedUsers: ChatUser[] = [];
-
-      res.chatUsersList.map((user) => {
-        const elem = {
-          nick: user.nick,
-          avatar_url: user.avatar_url,
-          position: "mute", //test
+  useEffect(() => {
+    if (socket) {
+      /*!
+       * @author donglee
+       * @brief 메세지를 받았을 때 chatLog를 최신화해서 렌더링함
+       */
+      socket.on("message", (data: ChatLog & {user: string, chat: string}) => {
+        if (data.user) {
+          return ;
+        }
+        setChatLog([{
+          nick: data.nick,
+          position: "admin",
+          avatar_url: data.avatar_url,
+          time: data.time,
+          message: data.message
+        }, ...chatLogRef.current]);
+      });
+  
+      /*!
+       * @author donglee
+       * @brief 대화방 정보가 변경될 경우 방 정보를 최신화함
+       */
+      socket.on("setRoomInfo", (data: ChatRoom) => {
+        const roomInfo = {
+          title: data.title,
+          type: data.type,
+          current_people: data.current_people,
+          max_people: data.max_people,
+          passwd: data.passwd,
         };
-        updatedUsers.push(elem);
-      })
-      setChatUsers(updatedUsers);
+        setChatRoomInfo(roomInfo);
+      });
+  
+      /*!
+       * @author donglee
+       * @brief 대화방에 참여중인 사용자들이 변경될 때 최신화해서 렌더링함
+       */
+      socket.on("setRoomUsers", (data: ChatUser[]) => {
+        const users = [...data];
+        setChatUsers(users);
+      });
     }
-  };
+
+    return (() => {
+      if (socket) socket.disconnect();
+    })
+  }, [socket]);
+
+  /*!
+   * @author donglee
+   * @brief password를 입력하면 passwordPassed가 true가 되면서 소켓을 연결함
+   */
+  useEffect(() => {
+    if (passwordPassed) {
+      const socket = connectSocket();
+      setSocket(socket);
+    }
+  }, [passwordPassed]);
+
+  /*!
+   * @author donglee
+   * @brief 내가 만든 방일 경우에 처음 한 번만 비밀번호 없이 입장할 수 있도록 소켓을 연결함
+   */
+  useEffect(() => {
+    if (isMadeMyself) {
+      const socket = connectSocket();
+      setSocket(socket);
+    }
+  }, [isMadeMyself]);
 
   /*!
    * @author donglee
    * @brief - 내가 직접 만든 비공개방일 경우에는 Password에 props을 줘서 첫 1회만 비번없이 입장 가능하도록 함
    *        - 채팅방 정보를 받아온 후 비공개방일 경우에는 state를 바꿔서 Password 컴포넌트 렌더링 하도록 함
+   *        - protected 가 아닌 대화방의 경우는 바로 소켓 연결함
+   *        - clean-up : 내가 만든 방을 최초 1회만 적용하기 위해서 false로 값을 바꿔줌
    */
   useEffect(() => {
-    if (props.location.state) {
-      setIsMadeMyself(true);
-    }
-    const socket = connectSocket();
     getChatRoomInfo()
-    .then((res) => {if (res.type === "protected") setIsProtected(true)});
-    getChatRoomUsers();
+    .then((res) => {
+        if (res.type === "protected") {
+          setIsProtected(true);
+        } else {
+          const socket = connectSocket();
+          setSocket(socket);
+        }
+      }
+    );
 
     return (() => {
-      socket.disconnect();
+      setIsMadeMyself(false);
     });
   }, []);
 
   if (chatRoomInfo && isProtected) {
     return (
-      <Password setIsProtected={setIsProtected} isMadeMyself={isMadeMyself} channelId={channel_id} />
+      <Password
+        setIsProtected={setIsProtected}
+        isMadeMyself={isMadeMyself}
+        channelId={channel_id}
+        setPasswordPassed={setPasswordPassed}/>
     );
   } else if (chatRoomInfo && !isProtected) {
     return (
@@ -290,9 +374,9 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
             rows={4}
             cols={50}
             value={message}
-            onKeyPress={(e) => controlTextAreaKeyDown(e, message, setMessage, chatLog, setChatLog)}
+            onKeyPress={(e) => controlTextAreaKeyDown(e, myInfo, message, setMessage, chatLog, setChatLog, socket)}
             onChange={({target: {value}}) => setMessage(value)}/>
-          <button className="chat-msg-btn" onClick={() => submitMessage(message, setMessage, chatLog, setChatLog)}>전송</button>
+          <button className="chat-msg-btn" onClick={() => submitMessage(myInfo, message, chatLog, setChatLog)}>전송</button>
         </form>
         {contextMenu.isOpen && <ChatContextMenu
                                   x={contextMenu.x}
@@ -300,13 +384,19 @@ const ChatRoomContent: FC<RouteComponentProps> = (props): JSX.Element => {
                                   myPosition="owner"
                                   targetPosition={contextMenu.targetPosition}
                                   closer={setContextMenu}/>}
-        <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<MakeChatRoom chatRoomInfo={chatRoomInfo} channelIdToBeSet={channel_id}/>}/></Route>
+        <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<MakeChatRoom chatRoomInfo={chatRoomInfo} channelIdToBeSet={channel_id} setIsMadeMyself={setIsMadeMyself}/>}/></Route>
         <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
       </div>
     );
   } 
   if (noResult) {
-    return ( <NoResult text="대화방이 존재하지 않습니다."></NoResult> );
+    return ( <NoResult
+      text="대화방이 존재하지 않습니다."
+      style={{display: "block",
+              marginLeft: "190px",
+              marginTop: "100px",
+              fontSize: "20pt"}} />
+    );
   }
   return ( <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "43%", top: "10%"}} /> );
 };
