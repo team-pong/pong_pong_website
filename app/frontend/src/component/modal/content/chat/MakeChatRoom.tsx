@@ -22,8 +22,6 @@ const MakeChatRoom: FC<MakeChatRoomProps> = ({chatRoomInfo, channelIdToBeSet, se
   const [max, setMax] = useState(chatRoomInfo ? chatRoomInfo.max_people : 2);
   const [channelId, setChannelId] = useState("");
 
-  console.log("Config: ", channelIdToBeSet);
-
   /*!
    * @author donglee
    * @brief 대화방 이름과 비밀번호의 글자수가 유효한지 검사
@@ -72,6 +70,8 @@ const MakeChatRoom: FC<MakeChatRoomProps> = ({chatRoomInfo, channelIdToBeSet, se
   const changeChatRoom = async () => {
     if (checkFormat()) {
       const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/channel`, "POST");
+
+      console.log("post : ", channelIdToBeSet, title, type, password, max);
       const body = {
         "channel_id": channelIdToBeSet,
         "title": title,
@@ -80,6 +80,8 @@ const MakeChatRoom: FC<MakeChatRoomProps> = ({chatRoomInfo, channelIdToBeSet, se
         "max_people": max,
       };
       const res = await easyfetch.fetch(body);
+
+      console.log("res: ", res);
 
       if (!res.err_msg) {
         setChannelId(channelIdToBeSet);

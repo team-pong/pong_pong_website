@@ -125,6 +125,7 @@ export interface ChatRoom {
   current_people: number,
   max_people: number,
   passwd: string,
+  channel_id: number,
 };
 
 interface ChatLog {
@@ -162,7 +163,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
 
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
   const { channel_id } = useParams<{channel_id: string}>();
-  const [isProtected, setIsProtected] = useState(false);  
+  const [isProtected, setIsProtected] = useState(false);
+
+
   /* TODO : 라우트 주소를 channel_id 를 포함해서 그 다음으로 하니까 이상하게 리다이렉트 한 이후에
             뭐가 없다; url로 받아오는 channel_id가 바뀌어버리는데 그 부분을 어떻게 해결할지 생각해보자.
   */
@@ -188,6 +191,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   const getChatRoomInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${channel_id}`);
     const res = await easyfetch.fetch();
+    
     if (!res.err_msg) {
       setChatRoomInfo({
         title: res.title,
@@ -195,6 +199,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         current_people: res.current_people,
         max_people: res.max_people,
         passwd: res.passwd,
+        channel_id: res.channel_id,
       });
     } else {
       setNoReult(true);
@@ -243,6 +248,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
           current_people: data.current_people,
           max_people: data.max_people,
           passwd: data.passwd,
+          channel_id: data.channel_id,
         };
         setChatRoomInfo(roomInfo);
       });
@@ -384,7 +390,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
                                   myPosition="owner"
                                   targetPosition={contextMenu.targetPosition}
                                   closer={setContextMenu}/>}
-        <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<MakeChatRoom chatRoomInfo={chatRoomInfo} channelIdToBeSet={channel_id} setIsMadeMyself={setIsMadeMyself}/>}/></Route>
+        <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<MakeChatRoom chatRoomInfo={chatRoomInfo} channelIdToBeSet={`${chatRoomInfo.channel_id}`} setIsMadeMyself={setIsMadeMyself}/>}/></Route>
         <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
       </div>
     );
