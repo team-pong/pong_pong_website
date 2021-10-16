@@ -10,6 +10,17 @@ import { Link, Route, Switch } from "react-router-dom";
 import EasyFetch from '../../utils/EasyFetch';
 import Loading from '../loading/Loading';
 
+export interface UserInfo {
+  avatar_url: string;
+  ladder_level: number;
+  loss_games: number;
+  nick: string;
+  status: string;
+  total_games: number;
+  user_id: string;
+  win_games: number;
+}
+
 /*!
  * @author yochoi, donglee
  * @brief NavBar를 상시 보이게 하고 Record, Match-game, Chat 모달 버튼이 있는 메인페이지
@@ -20,7 +31,7 @@ const MainPage = ({match}): JSX.Element => {
   const [updateFriendList, setUpdateFriendList] = useState({state: "", user_id: ""});
   const [unReadMsg, setUnReadMsg] = useState(false);
 
-  const userInfo = useContext(UserInfoContext);
+  const userInfo = useContext<UserInfo>(UserInfoContext);
   const setUserInfo = useContext(SetUserInfoContext);
   const dmInfo = useContext(DmInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
