@@ -4,7 +4,7 @@ import "/src/scss/content/chat/ChatContextMenu.scss";
 interface chatContextMenuProps {
   x: number,
   y: number,
-  myPosition: string, /* "owner" || "admin" || "user" */
+  myPosition: string, /* "owner" || "admin" || "normal" */
   targetPosition: string,
   closer: Dispatch<SetStateAction<{
     isOpen: boolean,
@@ -20,17 +20,17 @@ const ConditionalContextMenu: FC<{myPosition: string, targetPosition: string}> =
     case "owner":
       return (
         <>
-          {targetPosition === "admin" ? <li className="chat-context-li">관리자 해임</li> : <li className="chat-context-li">관리자 임명</li>}
-          <li className="chat-context-li">유저 밴</li>
-          {targetPosition === "mute" ? <li className="chat-context-li">뮤트 해제</li> :<li className="chat-context-li">유저 뮤트</li>}
+          <li className="chat-context-li">{targetPosition === "admin" ? "관리자 해임" : "관리자로 임명"}</li>
+          <li className="chat-context-li">강퇴하기</li>
+          <li className="chat-context-li">{targetPosition === "mute" ? "대화 차단 해제" : "대화 차단하기"}</li>
         </>
       );
     case "admin":
       if ((targetPosition !== "owner") && (targetPosition !== "admin")) {
         return (
           <>
-            <li className="chat-context-li">유저 밴</li>
-            {targetPosition === "mute" ? <li className="chat-context-li">뮤트 해제</li> :<li className="chat-context-li">유저 뮤트</li>}
+            <li className="chat-context-li">강퇴하기</li>
+            <li className="chat-context-li">{targetPosition === "mute" ? "대화 차단 해제" : "대화 차단하기"}</li>
           </>
         );
       }
