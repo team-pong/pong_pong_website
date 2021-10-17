@@ -6,6 +6,7 @@ import { ChatRoom } from "./ChatRoomContent";
 
 interface MakeChatRoomProps {
   chatRoomInfo?: ChatRoom;
+  setChatRoomInfo?: Dispatch<SetStateAction<ChatRoom>>;
   channelIdToBeSet?: string;
   setIsMadeMyself: Dispatch<SetStateAction<boolean>>;
 };
@@ -13,8 +14,14 @@ interface MakeChatRoomProps {
 /*!
  * @author donglee
  * @brief 채팅방을 설정하여 만드는 컴포넌트
+ * @param[in] chatRoomInfo?: 대화방 만들기가 아닌 대화방 설정 변경 시에만 방 정보가 넘어옴
+ * @param[in] setChatRoomInfo?: 설정을 변경한 후에 ChatRoomContent에 보여질 state를 업데이트하기 위함
+ * @param[in] channelIdToBeSet?: 설정변경할 채널의 아이디를 ChatRoomContent에서 받아옴
+ * @param[in] setIsMadeMyself: 방을 직접 만드는 경우에만 true값으로 이 FC에서 바꿔줌
  */
-const MakeChatRoom: FC<MakeChatRoomProps> = ({chatRoomInfo, channelIdToBeSet, setIsMadeMyself}): JSX.Element => {
+const MakeChatRoom: FC<MakeChatRoomProps> = (
+    {chatRoomInfo, channelIdToBeSet, setIsMadeMyself, setChatRoomInfo}
+  ): JSX.Element => {
 
   const [title, setTitle] = useState(chatRoomInfo ? chatRoomInfo.title : "");
   const [type, setType] = useState(chatRoomInfo ? chatRoomInfo.type : "public");
@@ -65,13 +72,15 @@ const MakeChatRoom: FC<MakeChatRoomProps> = ({chatRoomInfo, channelIdToBeSet, se
 
   /*!
    * @author donglee
-   * @brief 채팅방 설정 변경 요청 후 해당 채팅방으로 redirect함
+   * @brief 채팅방 설정 변경 요청 후 해당 채팅방으로 다시 뒤로가기함
+   * @TODO: 백엔드에서 뭔가 subscribe할 수 있는게 있어야 할 것 같다.
+   *      여기서 socket을 prop으로 받아와서 emit을 해야 방 정보 변경이
+   *      다른 사용자한테 웹소켓으로 정보가 갈 것 같다.
    */
   const changeChatRoom = async () => {
     if (checkFormat()) {
       const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/channel`, "POST");
 
-      console.log("post : ", channelIdToBeSet, title, type, password, max);
       const body = {
         "channel_id": channelIdToBeSet,
         "title": title,
@@ -81,10 +90,16 @@ const MakeChatRoom: FC<MakeChatRoomProps> = ({chatRoomInfo, channelIdToBeSet, se
       };
       const res = await easyfetch.fetch(body);
 
-      console.log("res: ", res);
-
-      if (!res.err_msg) {
-        setChannelId(channelIdToBeSet);
+      if (res.err_msg === "에러가 없습니다.") {
+        setChatRoomInfo({
+          title: title,
+          type: type,
+          current_people: chatRoomInfo.current_people,
+          max_people: max,
+          passwd: password,
+          channel_id: +channelIdToBeSet,
+        });
+        history.back();
       } else {
         alert(res.err_msg);
       }
@@ -92,7 +107,7 @@ const MakeChatRoom: FC<MakeChatRoomProps> = ({chatRoomInfo, channelIdToBeSet, se
   };
 
   if (channelId) {
-    return <Redirect to={{pathname: `/mainpage/chat/${channelId}`, state: {type: type}}}></Redirect>
+    return <Redirect to={`/mainpage/chat/${channelId}`}></Redirect>
   } else {
     return (
       <div className="mc-container">

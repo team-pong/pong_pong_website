@@ -164,11 +164,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
   const { channel_id } = useParams<{channel_id: string}>();
   const [isProtected, setIsProtected] = useState(false);
-
-
-  /* TODO : 라우트 주소를 channel_id 를 포함해서 그 다음으로 하니까 이상하게 리다이렉트 한 이후에
-            뭐가 없다; url로 받아오는 channel_id가 바뀌어버리는데 그 부분을 어떻게 해결할지 생각해보자.
-  */
   const [socket, setSocket] = useState<Socket>(null);
   const chatLogRef = useRef(chatLog);
   const [passwordPassed, setPasswordPassed] = useState(false);
@@ -390,7 +385,15 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
                                   myPosition="owner"
                                   targetPosition={contextMenu.targetPosition}
                                   closer={setContextMenu}/>}
-        <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<MakeChatRoom chatRoomInfo={chatRoomInfo} channelIdToBeSet={`${chatRoomInfo.channel_id}`} setIsMadeMyself={setIsMadeMyself}/>}/></Route>
+        <Route path="/mainpage/chat/config">
+          <Modal id={Date.now()} smallModal content={
+            <MakeChatRoom 
+              chatRoomInfo={chatRoomInfo}
+              channelIdToBeSet={`${chatRoomInfo.channel_id}`}
+              setIsMadeMyself={setIsMadeMyself}
+              setChatRoomInfo={setChatRoomInfo}/>
+            } />
+        </Route>
         <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
       </div>
     );
