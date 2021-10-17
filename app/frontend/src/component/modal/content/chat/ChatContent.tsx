@@ -4,7 +4,7 @@ import EasyFetch from "../../../../utils/EasyFetch";
 import ChatRoomContent from "./ChatRoomContent";
 import { Link, Route } from "react-router-dom";
 import Modal from "../../Modal";
-import MakeChatRoom from "./MakeChatRoom";
+import ConfigChatRoom from "./ConfigChatRoom";
 import Loading from "../../../loading/Loading";
 import NoResult from "../../../noresult/NoResult";
 
@@ -171,7 +171,7 @@ const ChatContent: FC = (): JSX.Element => {
           <button className="chat-room-btn">채팅방 만들기</button>
         </Link>
         <Route path={`/mainpage/chat/makechat`}>
-          <Modal id={Date.now()} content={<MakeChatRoom setIsMadeMyself={setIsMadeMyself}/>} smallModal/>
+          <Modal id={Date.now()} content={<ConfigChatRoom setIsMadeMyself={setIsMadeMyself}/>} smallModal/>
         </Route>
       </div>
     );

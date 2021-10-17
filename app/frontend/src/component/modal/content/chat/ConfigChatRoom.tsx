@@ -1,10 +1,10 @@
 import { Dispatch, FC, SetStateAction, useState } from "react";
-import "/src/scss/content/chat/MakeChatRoom.scss";
+import "/src/scss/content/chat/ConfigChatRoom.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { Redirect } from "react-router-dom";
 import { ChatRoom } from "./ChatRoomContent";
 
-interface MakeChatRoomProps {
+interface ConfigChatRoomProps {
   chatRoomInfo?: ChatRoom;
   setChatRoomInfo?: Dispatch<SetStateAction<ChatRoom>>;
   channelIdToBeSet?: string;
@@ -19,7 +19,7 @@ interface MakeChatRoomProps {
  * @param[in] channelIdToBeSet?: 설정변경할 채널의 아이디를 ChatRoomContent에서 받아옴
  * @param[in] setIsMadeMyself: 방을 직접 만드는 경우에만 true값으로 이 FC에서 바꿔줌
  */
-const MakeChatRoom: FC<MakeChatRoomProps> = (
+const ConfigChatRoom: FC<ConfigChatRoomProps> = (
     {chatRoomInfo, channelIdToBeSet, setIsMadeMyself, setChatRoomInfo}
   ): JSX.Element => {
 
@@ -77,7 +77,7 @@ const MakeChatRoom: FC<MakeChatRoomProps> = (
    *      여기서 socket을 prop으로 받아와서 emit을 해야 방 정보 변경이
    *      다른 사용자한테 웹소켓으로 정보가 갈 것 같다.
    */
-  const changeChatRoom = async () => {
+  const editChatRoom = async () => {
     if (checkFormat()) {
       const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/channel`, "POST");
 
@@ -198,7 +198,7 @@ const MakeChatRoom: FC<MakeChatRoomProps> = (
             <option className="mc-option" value={10}>10명</option>
           </select>
         </div>
-        <button className="mc-make" onClick={chatRoomInfo ? changeChatRoom : makeChatRoom}>
+        <button className="mc-make" onClick={chatRoomInfo ? editChatRoom : makeChatRoom}>
           {chatRoomInfo ? "변경하기" : "만들기"}
         </button>
       </div>
@@ -206,4 +206,4 @@ const MakeChatRoom: FC<MakeChatRoomProps> = (
   }
 };
 
-export default MakeChatRoom;
+export default ConfigChatRoom;
