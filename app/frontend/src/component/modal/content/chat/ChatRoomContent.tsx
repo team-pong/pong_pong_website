@@ -363,6 +363,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
               );
             })
           }
+          <span className="chat-room-participants">
+            참여자: {chatRoomInfo.current_people} / {chatRoomInfo.max_people}
+          </span>
           <div id="chat-room-menu">
             <Link to="/mainpage/chat/invite"><img className="chat-menu-img" src="/public/plus.svg" alt="invite" /></Link>
             <Link to="/mainpage/chat/config"><img className="chat-menu-img" src="/public/tools.svg" alt="config" /></Link>
