@@ -1,4 +1,5 @@
-import { FC, useState, FormEvent } from "react";
+import { FC, useState, FormEvent, useEffect } from "react";
+import "/src/scss/login/LoginTwoFactor.scss";
 
 const LoginTwoFactor: FC = (): JSX.Element => {
 
@@ -8,16 +9,21 @@ const LoginTwoFactor: FC = (): JSX.Element => {
     e.preventDefault();
     window.location.href = `${global.BE_HOST}/session/emailCode?code=${code}`;
   }
+
   return (
-    <>
-      이메일을 확인하세요
+    <div className="two-factor-container">
+      <div className="top-bar">
+        <span>이메일을 확인하세요</span>
+      </div>
       <form onSubmit={onSubmit}>
         <input type="text"
           value={code}
+          className="text"
+          placeholder="코드를 입력하세요"
           onChange={(e) => setCode(e.target.value)}/>
-        <input type="submit" value="확인"/>
+        <input type="submit" value="확인" className="submit"/>
       </form>
-    </>
+    </div>
   );
 }
 

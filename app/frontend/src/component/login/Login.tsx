@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Modal from '../modal/Modal';
 import LoginTwoFactor from './LoginTwoFactor';
-import "/src/scss/Login.scss";
+import "/src/scss/login/Login.scss";
 
 const PONG_SCREEN_WIDTH = 1920;
 const PONG_SCREEN_HEIGHT = 1080;
