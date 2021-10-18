@@ -72,58 +72,52 @@ const MainPage = ({match}): JSX.Element => {
     }
   }, [dmInfo]);
 
-  if (userInfo) {
-    return (
-      <>
-        <NavBar update={updateFriendList}/>
-        <Switch>
-          <Route path={`${match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
-          <Route path={`${match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
-          <Route path={`${match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route>
-        </Switch>
-        <main>
-          <div id="button-container">
-            <Link
-              to={`${match.url}/record`}
-              style={{textDecoration: "none"}}
-              className="buttons"
-              id="record">
-              전적
-              <span className="mp-explain-span">게임 전적을 보려면 누르세요!</span>
-            </Link>
-            <Link
-              to={`${match.url}/chat`}
-              style={{textDecoration: "none"}}
-              className="buttons"
-              id="chat">
-              채팅
-              <span className="mp-explain-span">친구와 채팅을 하려면 누르세요!</span>
-            </Link>
-            <Link
-              to={`${match.path}/game`}
-              style={{textDecoration: "none"}}
-              className="buttons"
-              id="game">
-                게임
-              <span className="mp-explain-span">게임을 하려면 누르세요!</span>
-            </Link>
-            <section id="dm-section">
-              {dmInfo.isDmOpen && <Dm />}
-              <button id="dm-controll-button" onClick={() => setDmInfo({isDmOpen: !dmInfo.isDmOpen, target: ""})}>
-                {unReadMsg && <div className="un-read-msg">!</div>}
-                {!dmInfo.isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
-                {dmInfo.isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
-              </button>
-            </section>
-          </div>
-        </main>
-      </>
-    );
-  } else {
-    return (
-      <Loading color="grey" style={{width: "100px", height: "100px"}} />
-    );
-  }
+  return (
+    <>
+      <NavBar update={updateFriendList}/>
+      <Switch>
+        <Route path={`${match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
+        <Route path={`${match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
+        <Route path={`${match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route>
+      </Switch>
+      <main>
+        <div id="button-container">
+          <Link
+            to={`${match.url}/record`}
+            style={{textDecoration: "none"}}
+            className="buttons"
+            id="record">
+            전적
+            <span className="mp-explain-span">게임 전적을 보려면 누르세요!</span>
+          </Link>
+          <Link
+            to={`${match.url}/chat`}
+            style={{textDecoration: "none"}}
+            className="buttons"
+            id="chat">
+            채팅
+            <span className="mp-explain-span">친구와 채팅을 하려면 누르세요!</span>
+          </Link>
+          <Link
+            to={`${match.path}/game`}
+            style={{textDecoration: "none"}}
+            className="buttons"
+            id="game">
+              게임
+            <span className="mp-explain-span">게임을 하려면 누르세요!</span>
+          </Link>
+          <section id="dm-section">
+            {dmInfo.isDmOpen && <Dm />}
+            <button id="dm-controll-button" onClick={() => setDmInfo({isDmOpen: !dmInfo.isDmOpen, target: ""})}>
+              {unReadMsg && <div className="un-read-msg">!</div>}
+              {!dmInfo.isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
+              {dmInfo.isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
+            </button>
+          </section>
+        </div>
+      </main>
+    </>
+  );
 }
 
 export default MainPage;
