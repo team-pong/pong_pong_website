@@ -74,5 +74,65 @@ export class ChatUsersService {
       }
     }
     return new ErrMsgDto(err0);
-  }  
+  }
+
+  async addUser(room_id: string, user_id: string) {
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      throw new ErrMsgDto(err2);
+    if (await this.chatRepo.count({channel_id: Number(room_id)}) === 0)  // 존재하지 않은 채널 이라면
+      throw new ErrMsgDto(err4);
+    await this.chatUsersRepo.save({user_id: user_id, channel_id: Number(room_id)});
+  }
+
+  async deleteUser(room_id: string, user_id: string) {
+    const rid = Number(room_id);
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      throw new ErrMsgDto(err2);
+    if (await this.chatRepo.count({channel_id: rid}) === 0)  // 존재하지 않은 채널 이라면
+      throw new ErrMsgDto(err4);
+    if (await this.chatUsersRepo.count({ user_id: user_id, channel_id: rid }) === 0)  // 유저가 해당 채널에 없다면
+      throw new ErrMsgDto(err13);
+    await this.chatUsersRepo.delete({ user_id: user_id, channel_id: rid }); // 목록에서 제거
+    if (await this.adminRepo.count({user_id: user_id, channel_id: rid}))  // 나간 유저가 admin 이면
+      await this.adminRepo.delete({user_id: user_id, channel_id: rid}); // 어드민 테이블에서 제거
+    if (await this.chatUsersRepo.count({channel_id: rid}) === 0)  // 해당 채널에 아무도 없다면
+      await this.chatRepo.delete({channel_id: rid}); // 채널 삭제
+    else{  // 채널에 누군가가 남아있다면
+      const channel = await this.chatRepo.findOne({channel_id: rid});
+      if (channel.owner_id == user_id){  // 나간 사람이 owner이라면
+        const newOwner = await this.chatUsersRepo.findOne({channel_id: rid});  // 채널에 남은 인원중 아무나 뽑기
+        await this.chatService.updateOwner(rid, newOwner.user_id);
+        // await axios.post(`${process.env.BACKEND_SERVER_URL}/chat/owner`, {channel_id: channel_id, owner_id: newOwner.user_id}) // owner변경
+      }
+    }
+  }
+
+  async getUserPosition(user_id: string, room_id: string) {
+    const admin = await this.adminRepo.count({user_id: user_id, channel_id: Number(room_id)});
+    const owner = await this.chatRepo.count({owner_id: user_id, channel_id: Number(room_id)});
+    if (owner) {
+      return 'owner';
+    } else if (admin) {
+      return 'admin';
+    } else {
+      return 'normal';
+    }
+  }
+
+  async getUserListInRoom(room_id: string) {
+    const rid = Number(room_id)
+    if (await this.chatRepo.count({channel_id: rid}) === 0)  // 존재하지 않은 채널 이라면
+      throw new ErrMsgDto(err4);
+    const ret = []
+    const users = await this.chatUsersRepo.find({channel_id: rid});  // 해당 채널의 유저들 검색
+    for (let user of users) {
+      const user_info = await this.usersRepo.findOne({user_id: user.user_id});
+      ret.push({
+        nick: user_info.nick,
+        avatar_url: user_info.avatar_url,
+        position: await this.getUserPosition(user.user_id, room_id),
+      })
+    }
+    return ret;
+  }
 }

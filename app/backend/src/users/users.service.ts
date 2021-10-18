@@ -99,4 +99,12 @@ export class UsersService {
     const user = await this.usersRepo.findOne({user_id: user_id});
     return (user.avatar_url);
   }
+
+  async getUserInfo(user_id: string) {
+    const user_info = await this.usersRepo.find({user_id: user_id});
+    if (user_info.length == 0) {
+      throw new ErrMsgDto(err2);
+    }
+    return user_info[0];
+  }
 }
