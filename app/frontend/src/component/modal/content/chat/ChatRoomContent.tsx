@@ -164,20 +164,33 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
   const { channel_id } = useParams<{channel_id: string}>();
   const [isProtected, setIsProtected] = useState(false);
-  const [socket, setSocket] = useState<Socket>(null);
+  const [socket, _setSocket] = useState<Socket>(null);
   const chatLogRef = useRef(chatLog);
   const [passwordPassed, setPasswordPassed] = useState(false);
+  const socketRef = useRef(socket);
 
   const myInfo = useContext(UserInfoContext);
+
+  /* TODO: 소켓 연결 두 번 되는것 로직 확인하자 
+  mute 구현 */
 
   /*!
    * @author donglee
    * @brief 웹소켓에서 이벤트리스너에 최신화된 chatLog state에 접근하기 위해서 ref훅을 사용함
    */
-  const setChatLog = (data) => {
+  const setChatLog = (data: ChatLog[]) => {
     chatLogRef.current = data;
     _setChatLog(data);
   };
+
+  /*!
+   * @author donglee
+   * @brief useEffect 에서 socket state가 null이어서 current로 참조하기 위함
+   */
+  const setSocket = (data: Socket) => {
+    socketRef.current = data;
+    _setSocket(data);
+  }
 
   /*!
    * @author donglee
@@ -225,7 +238,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         }
         setChatLog([{
           nick: data.nick,
-          position: "admin",
+          position: data.position,
           avatar_url: data.avatar_url,
           time: data.time,
           message: data.message
@@ -257,10 +270,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         setChatUsers(users);
       });
     }
-
-    return (() => {
-      if (socket) socket.disconnect();
-    })
   }, [socket]);
 
   /*!
@@ -305,6 +314,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     );
 
     return (() => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
       setIsMadeMyself(false);
     });
   }, []);

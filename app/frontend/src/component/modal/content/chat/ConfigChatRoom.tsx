@@ -63,7 +63,6 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
         "max_people": max,
       };
       const res = await easyfetch.fetch(body);
-
       if (!res.err_msg) {
         setChannelId(res.chatRoom.channel_id);
         setIsMadeMyself(true);
