@@ -41,8 +41,10 @@ export class SessionService {
 	 */
 	public async tester_login(req: Request, user_id: string, nickname: string, avatar_url: string) {
 		try {
-			// await this.usersService.createUsers(user_id, nickname, avatar_url);
-			await this.saveSession(req.session, user_id, 'tester_token');
+      req.session.id = user_id;
+      req.session.token = 'test_token';
+      req.session.loggedIn = true;
+      req.session.save();
 		} catch (err) {
 			console.log('tester user login error:', err);
 		}
@@ -75,17 +77,6 @@ export class SessionService {
         'Authorization': `Bearer ${access_token}`
       }
     });
-  }
-
-  /*!
-  * @author hna
-  * @brief id와 토큰값을 Session 객체의 속성에 추가하고 Postgres의 session 테이블에 저장.
-  * @warning 세션 객체에 새로운 값을 추가하는 경우 main.ts 에서 SessionData 인터페이스에 먼저 추가해야함
-  */
-  async saveSession(session: Session & Partial<SessionData>, id: string, token: string) {
-    session.userid = id;
-    session.token = token;
-    session.save();
   }
 
   /*!
@@ -126,10 +117,17 @@ export class SessionService {
           subject: '2차 인증 코드 안내',
           html: `<b>${random_code}</b>`,
         });
-        await this.authCodeRepo.save({user_id: req.session.userid, email_code: random_code});
+        req.session.userid = data.login;
+        req.session.token = access_token;
+        req.session.loggedIn = false;
+        req.session.save();
+        await this.authCodeRepo.save({user_id: data.login, email_code: random_code});
         return res.redirect(`${process.env.BACKEND_SERVER_URL}?twoFactor=email`);
       }
-      await this.saveSession(req.session, data.login, access_token);
+      req.session.userid = data.login;
+      req.session.token = access_token;
+      req.session.loggedIn = true;
+      req.session.save();
       await this.usersRepo.update(data.login, {status: 'online'});
       return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`);
     } catch (err: any | AxiosError) {

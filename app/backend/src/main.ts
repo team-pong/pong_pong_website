@@ -10,6 +10,7 @@ declare module 'express-session' {
   export interface SessionData {
     userid: string,
     token: string,
+    loggedIn: boolean,
   }
 };
 
