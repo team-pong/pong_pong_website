@@ -4,11 +4,11 @@ import EasyFetch from "../../../../utils/EasyFetch";
 import ChatRoomContent from "./ChatRoomContent";
 import { Link, Route } from "react-router-dom";
 import Modal from "../../Modal";
-import MakeChatRoom from "./MakeChatRoom";
+import ConfigChatRoom from "./ConfigChatRoom";
 import Loading from "../../../loading/Loading";
 import NoResult from "../../../noresult/NoResult";
 
-interface chatRoom {
+interface ChatRoom {
   channel_id: number,
   title: string,
   type: string,
@@ -16,15 +16,15 @@ interface chatRoom {
   max_people: number
 };
 
-interface chatRoomListProps {
+interface ChatRoomListProps {
   search: string,
   type: string,
 };
 
-const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
+const ChatRoomList: FC<ChatRoomListProps> = ({ search, type }): JSX.Element => {
 
-  const [publicChatRoom, setPublicChatRoom] = useState<chatRoom[]>([]);
-  const [protectedChatRoom, setProtectedChatRoom] = useState<chatRoom[]>([]);
+  const [publicChatRoom, setPublicChatRoom] = useState<ChatRoom[]>([]);
+  const [protectedChatRoom, setProtectedChatRoom] = useState<ChatRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   /*!
@@ -34,12 +34,15 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
    *         경우를 API 요청하는데 이 요청보다 현재 FC가 get하는 요청이 더 빠른 경우에
    *         chatRoom의 정보가 정확하지 않아서 에러가 나는 경우가 있는데 이를 if 문으로 예외처리함.
    */  
-  const chatRoomListGenerator = (chatRoom: chatRoom, idx: number) => {
+  const chatRoomListGenerator = (chatRoom: ChatRoom, idx: number) => {
     if (chatRoom.current_people === 0 || chatRoom.current_people.constructor == Object) {
       return ;
     }
     return (
-      <Link to={`/mainpage/chat/${chatRoom.channel_id}`} key={idx} style={{color: "inherit", textDecoration: "none"}}>
+      <Link
+        to={`/mainpage/chat/${chatRoom.channel_id}`}
+        key={idx}
+        style={{color: "inherit", textDecoration: "none"}}>
         <li className="chat-generator-li">
           <span className="chat-generator-span">{chatRoom.title}{chatRoom.type === "protected" ? <img className="chat-generator-lock-img" src="/public/lock.svg" alt="비밀방" /> : <></>}</span>
           <span className="chat-generator-span">{chatRoom.current_people}/{chatRoom.max_people}</span>
@@ -52,7 +55,7 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
    * @author donglee
    * @brief public과 protected로 각각 state에 저장함
    */
-  const sortChatRoomList = (list: chatRoom[]) => {
+  const sortChatRoomList = (list: ChatRoom[]) => {
     let sortedPublicList = [];
     let sortedProtectedList = [];
 
@@ -72,8 +75,8 @@ const ChatRoomList: FC<chatRoomListProps> = ({ search, type }): JSX.Element => {
     setProtectedChatRoom(sortedProtectedList);
   }
 
-  const getChatRoomList = async (): Promise<chatRoom[]> => {
-    let res: {chatList: chatRoom[]};
+  const getChatRoomList = async (): Promise<ChatRoom[]> => {
+    let res: {chatList: ChatRoom[]};
 
     if (search === "") {
       const easyfetch = new EasyFetch(`${global.BE_HOST}/chat`);
@@ -130,6 +133,7 @@ const ChatContent: FC = (): JSX.Element => {
   const [searchInputValue, setSearchInputValue] = useState("");
   const [chatRoomToFind, setChatRoomToFind] = useState("");
   const [chatRoomSelector, setChatRoomSelector] = useState("all");
+  const [isMadeMyself, setIsMadeMyself] = useState(false);
 
   if (window.location.pathname === "/mainpage/chat"
       || window.location.pathname === "/mainpage/chat/makechat") {
@@ -167,14 +171,12 @@ const ChatContent: FC = (): JSX.Element => {
           <button className="chat-room-btn">채팅방 만들기</button>
         </Link>
         <Route path={`/mainpage/chat/makechat`}>
-          <Modal id={Date.now()} content={<MakeChatRoom />} smallModal/>
+          <Modal id={Date.now()} content={<ConfigChatRoom setIsMadeMyself={setIsMadeMyself}/>} smallModal/>
         </Route>
       </div>
     );
   } else {
-    return (
-      <Route path="/mainpage/chat/:channel_id"><ChatRoomContent /></Route>
-    );
+    return <Route path="/mainpage/chat/:channel_id"><ChatRoomContent isMadeMyself={isMadeMyself} setIsMadeMyself={setIsMadeMyself}/></Route>;
   }
 }
 

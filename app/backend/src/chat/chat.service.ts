@@ -149,7 +149,8 @@ export class ChatService {
     if (max_people < current_people)
       return new ErrMsgDto(err24);
     const hashed_password = crypto.createHash('sha256').update(passwd).digest('base64');
-    await this.chatRepo.save({channel_id: channel_id, title: title, type: type, passwd: hashed_password, max_people: max_people});
+    // await this.chatRepo.save({channel_id: channel_id, title: title, type: type, passwd: hashed_password, max_people: max_people});
+    await this.chatRepo.update({channel_id: channel_id} ,{title: title, type: type, passwd: hashed_password, max_people: max_people});
     return new ErrMsgDto(err0);
   }
 
@@ -182,5 +183,24 @@ export class ChatService {
       chat: chatContent,
     };
     this.chatGateway.server.to(channel_id).emit('message', chat);
+  }
+
+  async getChannelInfo(channel_id: number){
+    if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널이면
+      throw new ErrMsgDto(err4);
+    const chanel = await this.chatRepo.find({channel_id: channel_id});  // 채널 찾기
+
+    let chatRoom = new ChatDto6();
+    chatRoom.title = chanel[0].title;
+    chatRoom.type = chanel[0].type;
+    chatRoom.passwd = chanel[0].passwd;
+    chatRoom.max_people = chanel[0].max_people;
+    let current_people;
+    current_people = await this.readPeople(channel_id);
+    chatRoom.current_people = current_people;
+    let owner = await this.usersService.readUsers(chanel[0].owner_id, 'user_id');
+    chatRoom.owner_nick = owner["nick"];
+    chatRoom.channel_id = chanel[0].channel_id;
+    return chatRoom;
   }
 }
