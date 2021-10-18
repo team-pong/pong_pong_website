@@ -111,6 +111,14 @@ export class ChatGateway {
     }
   }
 
+  @SubscribeMessage('setRoomInfo')
+  async sendRoomInfo(@ConnectedSocket() socket: Socket, @MessageBody() room_info: any) {
+    const room_id = this.socket_map[socket.id].room_id;
+    socket.to(room_id).emit('setRoomInfo', room_info);
+    console.log(`Receive setRoomInfo Message: ${this.socket_map[socket.id].user_id}, roomInfo: ${room_info}`);
+  }
+
+
   @SubscribeMessage('message')
   sendMessage(@ConnectedSocket() socket: Socket, @MessageBody() msg: string) {
     socket.to(this.socket_map[socket.id].room_id).emit('message', {

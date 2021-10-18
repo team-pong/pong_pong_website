@@ -149,7 +149,8 @@ export class ChatService {
     if (max_people < current_people)
       return new ErrMsgDto(err24);
     const hashed_password = crypto.createHash('sha256').update(passwd).digest('base64');
-    await this.chatRepo.save({channel_id: channel_id, title: title, type: type, passwd: hashed_password, max_people: max_people});
+    // await this.chatRepo.save({channel_id: channel_id, title: title, type: type, passwd: hashed_password, max_people: max_people});
+    await this.chatRepo.update({channel_id: channel_id} ,{title: title, type: type, passwd: hashed_password, max_people: max_people});
     return new ErrMsgDto(err0);
   }
 

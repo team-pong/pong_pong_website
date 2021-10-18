@@ -1,12 +1,12 @@
 import React, { FC, Dispatch, SetStateAction, useState, useEffect, useContext, useRef } from "react";
-import { Link, Route, RouteComponentProps, useLocation, useParams, withRouter } from "react-router-dom";
+import { Link, Route, RouteComponentProps, useParams, withRouter } from "react-router-dom";
 import Modal from "../../Modal";
-import ChatConfigContent from "./ChatConfigContent";
 import ChatInviteContent from "./ChatInviteContent";
 import ChatContextMenu from "./ChatContextMenu";
 import EasyFetch from "../../../../utils/EasyFetch";
 import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
+import ConfigChatRoom from "./ConfigChatRoom";
 import { io, Socket } from "socket.io-client";
 import { UserInfoContext } from "../../../../Context";
 import { UserInfo } from "../../../mainpage/MainPage";
@@ -119,12 +119,13 @@ const Password: FC<{
   );
 }
 
-interface ChatRoom {
+export interface ChatRoom {
   title: string,
   type: string,
   current_people: number,
   max_people: number,
   passwd: string,
+  channel_id: number,
 };
 
 interface ChatLog {
@@ -139,10 +140,6 @@ interface ChatUser {
   nick: string,
   avatar_url: string,
   position: string,
-};
-
-interface RouteState {
-  type: string;
 };
 
 interface ChatRoomContentProps {
@@ -167,10 +164,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
   const { channel_id } = useParams<{channel_id: string}>();
   const [isProtected, setIsProtected] = useState(false);
-  // const [isMadeMyself, setIsMadeMyself] = useState(false);
   const [socket, setSocket] = useState<Socket>(null);
   const chatLogRef = useRef(chatLog);
-  const {state} = useLocation<RouteState>();
   const [passwordPassed, setPasswordPassed] = useState(false);
 
   const myInfo = useContext(UserInfoContext);
@@ -191,6 +186,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   const getChatRoomInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${channel_id}`);
     const res = await easyfetch.fetch();
+    
     if (!res.err_msg) {
       setChatRoomInfo({
         title: res.title,
@@ -198,6 +194,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         current_people: res.current_people,
         max_people: res.max_people,
         passwd: res.passwd,
+        channel_id: res.channel_id,
       });
     } else {
       setNoReult(true);
@@ -246,6 +243,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
           current_people: data.current_people,
           max_people: data.max_people,
           passwd: data.passwd,
+          channel_id: data.channel_id,
         };
         setChatRoomInfo(roomInfo);
       });
@@ -365,6 +363,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
               );
             })
           }
+          <span className="chat-room-participants">
+            참여자: {chatRoomInfo.current_people} / {chatRoomInfo.max_people}
+          </span>
           <div id="chat-room-menu">
             <Link to="/mainpage/chat/invite"><img className="chat-menu-img" src="/public/plus.svg" alt="invite" /></Link>
             <Link to="/mainpage/chat/config"><img className="chat-menu-img" src="/public/tools.svg" alt="config" /></Link>
@@ -387,7 +388,16 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
                                   myPosition="owner"
                                   targetPosition={contextMenu.targetPosition}
                                   closer={setContextMenu}/>}
-        <Route path="/mainpage/chat/config"><Modal id={Date.now()} smallModal content={<ChatConfigContent/>}/></Route>
+        <Route path="/mainpage/chat/config">
+          <Modal id={Date.now()} smallModal content={
+            <ConfigChatRoom 
+              chatRoomInfo={chatRoomInfo}
+              channelIdToBeSet={`${chatRoomInfo.channel_id}`}
+              setIsMadeMyself={setIsMadeMyself}
+              setChatRoomInfo={setChatRoomInfo}
+              socket={socket}/>
+            } />
+        </Route>
         <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
       </div>
     );

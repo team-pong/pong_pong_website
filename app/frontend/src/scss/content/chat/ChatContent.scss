@@ -354,6 +354,15 @@ div.pw-container {
         background-color: $green;
       }
     }
+
+    .chat-room-participants {
+      position: absolute;
+      left: 95px;
+      top: 470px;
+      font-weight: bold;
+      color: rgb(177, 177, 177);
+    }
+
     #chat-room-menu {
       position: absolute;
       width: 181px;
