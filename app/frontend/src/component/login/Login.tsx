@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import "/src/scss/Login.scss";
+import Modal from '../modal/Modal';
+import LoginTwoFactor from './LoginTwoFactor';
+import "/src/scss/login/Login.scss";
 
 const PONG_SCREEN_WIDTH = 1920;
 const PONG_SCREEN_HEIGHT = 1080;
@@ -94,12 +96,10 @@ const BackGroundPingPongSVG = (): JSX.Element => {
 
 const Login = (): JSX.Element => {
   const UID: string = `1cbdbdbda9ab3cee5773541a19177fa2ae63ae10751dcf3c40466d9a1f0e3f9f`;
+  const [twoFactor, setTwoFactor] = useState(false);
 
   const loginOnClick = () => {
-    window.location.href = `https://api.intra.42.fr/oauth/authorize`
-    + `?client_id=${UID}`
-    + `&redirect_uri=http%3A%2F%2F127.0.0.1%2Fsession%2Foauth`
-    + `&response_type=code`;
+    window.location.href = `${global.BE_HOST}/session/login`;
   };
 
   const loginTest1 = () => {
@@ -118,6 +118,22 @@ const Login = (): JSX.Element => {
     window.location.href = `${global.BE_HOST}/session/test_user04`;
   }
 
+  useEffect(() => {
+    const key = window.location.search.split("=")[0].substr(1);
+    const value= window.location.search.split("=")[1];
+    if (key === "twoFactor" && value === "email") {
+      console.log("twoFactor");
+      setTwoFactor(true);
+    }
+  }, []);
+
+  if (twoFactor) {
+    return (
+      <>
+        <Modal id={Date.now()} content={<LoginTwoFactor />} smallModal/>
+      </>
+    );
+  }
   return (
     <section id="loginSection">
       <BackGroundPingPongSVG />

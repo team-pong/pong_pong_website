@@ -22,7 +22,7 @@ export class UsersController {
   @ApiBody({ type: UsersDto1, description: '유저 아이디, 닉네임, 아바타 url' })
   @Post()
   creatUsers(@Body() b: UsersDto1){
-    return this.usersService.createUsers(b.user_id, b.nick, b.avatar_url);
+    return this.usersService.createUsers(b.user_id, b.nick, b.avatar_url, '');
   }
 
   @ApiOperation({ summary: '유저 닉네임으로 유저의 프로필 검색'})

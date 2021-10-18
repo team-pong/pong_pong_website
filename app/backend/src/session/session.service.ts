@@ -11,6 +11,8 @@ import { session } from 'src/entities/session';
 import { err25 } from 'src/err';
 import { SessionDto1 } from 'src/dto/session';
 import { Users } from 'src/entities/users';
+import * as nodemailer from 'nodemailer';
+import { AuthCode } from 'src/entities/auth-code';
 
 const db = {
 	user: process.env.PG_PONG_ADMIN,
@@ -29,17 +31,20 @@ export class SessionService {
     private usersService: UsersService,
     @InjectRepository(session) private sessionRepo: Repository<session>,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
+    @InjectRepository(AuthCode) private authCodeRepo: Repository<AuthCode>,
     ){}
 
 	/*!
 	 * @brief 테스트 유저용 로그인 함수 (42api를 거치지 않음)
 	 * @detail 게임 매칭이 2인이라서 혼자 테스트하려면 2개 계정이 있어야해서 만듬
 	 * @todo production 환경에서 삭제되어야함
-	 */ 
+	 */
 	public async tester_login(req: Request, user_id: string, nickname: string, avatar_url: string) {
 		try {
-			// await this.usersService.createUsers(user_id, nickname, avatar_url);
-			await this.saveSession(req.session, user_id, 'tester_token');
+      req.session.id = user_id;
+      req.session.token = 'test_token';
+      req.session.loggedIn = true;
+      req.session.save();
 		} catch (err) {
 			console.log('tester user login error:', err);
 		}
@@ -65,7 +70,7 @@ export class SessionService {
     return axios.post(getTokenUrl, qs.stringify(requestBody), config);
   }
 
-  async getInfo(access_token: string) {
+  async getUserInfoFrom42Api(access_token: string) {
     const getUserUrl = "https://api.intra.42.fr/v2/me";
     return axios.get(getUserUrl, {
       headers: {
@@ -75,24 +80,12 @@ export class SessionService {
   }
 
   /*!
-  * @author hna
-  * @brief id와 토큰값을 Session 객체의 속성에 추가하고 Postgres의 session 테이블에 저장.
-  * @warning 세션 객체에 새로운 값을 추가하는 경우 main.ts 에서 SessionData 인터페이스에 먼저 추가해야함
-  */
-  async saveSession(session: Session & Partial<SessionData>, id: string, token: string) {
-    session.userid = id;
-    session.token = token;
-    session.save();
-  }
-
-
-  /*!
    * @author hna
    * @param[in] loginCodeDto Body로 들어온 code
    * @param[in] req Request 객체
    * @param[in] res Response 객체
    * @brief 유저 로그인시 세션 생성
-   * @detail 1. LoginCode를 받아 42api에서 토큰발급 
+   * @detail 1. LoginCode를 받아 42api에서 토큰발급
    * @       2. 토큰으로 유저 정보 조회
    * @       3. 유저 id와 avatar_url을 DB에 저장
    * @       4. 세션을 저장하고 응답 쿠키에 세션 아이디를 기록
@@ -102,21 +95,60 @@ export class SessionService {
     try {
       const result = await this.getToken(loginCodeDto)
       const { access_token } = result.data;
-      const {data} = await this.getInfo(access_token)
-      await this.usersService.createUsers(data.login, data.login, data.image_url);
-      await this.saveSession(req.session, data.login, access_token);
+      const { data } = await this.getUserInfoFrom42Api(access_token)
+      const user = await this.usersRepo.findOne({user_id: data.login});
+      if (!user) { // 회원가입이 필요한 경우
+        await this.usersService.createUsers(data.login, data.login, data.image_url, data.email);
+      } else if (user.two_factor_login) { // 2차인증이 켜져 있는 경우
+        const random_code = this.getRandomAuthCode(4);
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: true,
+          auth: {
+            user: process.env.EMAIL_ID,
+            pass: process.env.EMAIL_PW,
+          },
+        });
+        const info = await transporter.sendMail({
+          from: `"ft_trancendence team" <${process.env.EMAIL_ID}>`,
+          to: user.email,
+          subject: '2차 인증 코드 안내',
+          html: `<b>${random_code}</b>`,
+        });
+        req.session.userid = data.login;
+        req.session.token = access_token;
+        req.session.loggedIn = false;
+        req.session.save();
+        await this.authCodeRepo.save({user_id: data.login, email_code: random_code});
+        return res.redirect(`${process.env.BACKEND_SERVER_URL}?twoFactor=email`);
+      }
+      req.session.userid = data.login;
+      req.session.token = access_token;
+      req.session.loggedIn = true;
+      req.session.save();
       await this.usersRepo.update(data.login, {status: 'online'});
+      return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`);
     } catch (err: any | AxiosError) {
-      if (axios.isAxiosError(err)) {
+      if (axios.isAxiosError(err)) { // 42 응답에러
         console.log("42api error:", err.response.statusText);
         res.statusCode = err.response.status;
         res.statusMessage = err.response.statusText;
         res.json(err.response.data);
       }
-      else {
+      else { // 내부 에러
         console.log("login error:", err);
       }
     }
+  }
+
+  getRandomAuthCode(n: number) {
+    let ret = '';
+    for (let i = 0; i < n; i++) {
+      ret += String.fromCharCode(Math.floor(Math.random() * 25) + 97);
+    }
+    return ret;
   }
 
  /*!
@@ -171,5 +203,25 @@ export class SessionService {
     let user = new SessionDto1;
     user.user_id = user_id;
     return user;
+  }
+
+  async getMultiFactorAuthInfo(user_id: string) {
+    const user_info = await this.usersRepo.findOne({user_id: user_id});
+    if (user_info) {
+      return {email: user_info.two_factor_login};
+    }
+  }
+
+  async updateMultiFactorAuthInfo(user_id: string, two_factor_login: boolean) {
+    await this.usersRepo.update({user_id: user_id}, {two_factor_login: two_factor_login});
+  }
+
+  async isValidCode(user_id: string, code: string) {
+    const ret = await this.authCodeRepo.findOne({user_id: user_id, email_code: code});
+    if (ret) {
+      this.authCodeRepo.delete({user_id: user_id});
+      return true;
+    }
+    return false;
   }
 }
