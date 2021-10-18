@@ -99,10 +99,7 @@ const Login = (): JSX.Element => {
   const [twoFactor, setTwoFactor] = useState(false);
 
   const loginOnClick = () => {
-    window.location.href = `https://api.intra.42.fr/oauth/authorize`
-    + `?client_id=${UID}`
-    + `&redirect_uri=http%3A%2F%2F127.0.0.1%2Fsession%2Foauth`
-    + `&response_type=code`;
+    window.location.href = `${global.BE_HOST}/session/login`;
   };
 
   const loginTest1 = () => {
