@@ -3,11 +3,13 @@ import "/src/scss/content/chat/ConfigChatRoom.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { Redirect } from "react-router-dom";
 import { ChatRoom } from "./ChatRoomContent";
+import { Socket } from "socket.io-client";
 
 interface ConfigChatRoomProps {
   chatRoomInfo?: ChatRoom;
   setChatRoomInfo?: Dispatch<SetStateAction<ChatRoom>>;
   channelIdToBeSet?: string;
+  socket?: Socket;
   setIsMadeMyself: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -17,10 +19,11 @@ interface ConfigChatRoomProps {
  * @param[in] chatRoomInfo?: 대화방 만들기가 아닌 대화방 설정 변경 시에만 방 정보가 넘어옴
  * @param[in] setChatRoomInfo?: 설정을 변경한 후에 ChatRoomContent에 보여질 state를 업데이트하기 위함
  * @param[in] channelIdToBeSet?: 설정변경할 채널의 아이디를 ChatRoomContent에서 받아옴
+ * @param[in] socket?: 대화방 설정 변경 시에 다른 클라이언트에게 data보내기 위함
  * @param[in] setIsMadeMyself: 방을 직접 만드는 경우에만 true값으로 이 FC에서 바꿔줌
  */
 const ConfigChatRoom: FC<ConfigChatRoomProps> = (
-    {chatRoomInfo, channelIdToBeSet, setIsMadeMyself, setChatRoomInfo}
+    {chatRoomInfo, channelIdToBeSet, setIsMadeMyself, setChatRoomInfo, socket}
   ): JSX.Element => {
 
   const [title, setTitle] = useState(chatRoomInfo ? chatRoomInfo.title : "");
@@ -73,9 +76,6 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
   /*!
    * @author donglee
    * @brief 채팅방 설정 변경 요청 후 해당 채팅방으로 다시 뒤로가기함
-   * @TODO: 백엔드에서 뭔가 subscribe할 수 있는게 있어야 할 것 같다.
-   *      여기서 socket을 prop으로 받아와서 emit을 해야 방 정보 변경이
-   *      다른 사용자한테 웹소켓으로 정보가 갈 것 같다.
    */
   const editChatRoom = async () => {
     if (checkFormat()) {
@@ -92,6 +92,14 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
 
       if (res.err_msg === "에러가 없습니다.") {
         setChatRoomInfo({
+          title: title,
+          type: type,
+          current_people: chatRoomInfo.current_people,
+          max_people: max,
+          passwd: password,
+          channel_id: +channelIdToBeSet,
+        });
+        socket.emit("setRoomInfo", {
           title: title,
           type: type,
           current_people: chatRoomInfo.current_people,

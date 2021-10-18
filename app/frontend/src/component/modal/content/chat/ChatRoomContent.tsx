@@ -394,7 +394,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
               chatRoomInfo={chatRoomInfo}
               channelIdToBeSet={`${chatRoomInfo.channel_id}`}
               setIsMadeMyself={setIsMadeMyself}
-              setChatRoomInfo={setChatRoomInfo}/>
+              setChatRoomInfo={setChatRoomInfo}
+              socket={socket}/>
             } />
         </Route>
         <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
