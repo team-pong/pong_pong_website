@@ -1,6 +1,7 @@
 import { FC, Dispatch, SetStateAction, useContext } from "react";
 import { Link, RouteComponentProps, withRouter } from "react-router-dom";
-import { UserInfoContext } from "../../../../Context";
+import { Socket } from "socket.io-client";
+import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
 import "/src/scss/content/chat/ChatContextMenu.scss";
 
 interface chatContextMenuProps {
@@ -16,6 +17,7 @@ interface chatContextMenuProps {
     target: string,
     targetPosition: string
   }>>
+  socket: Socket,
 }
 
 const ConditionalContextMenu: FC<{myPosition: string, targetPosition: string}> = ({myPosition, targetPosition}) => {
@@ -44,6 +46,7 @@ const ConditionalContextMenu: FC<{myPosition: string, targetPosition: string}> =
 
 const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = ({match, x, y, myPosition, targetPosition, target, closer}): JSX.Element => {
   const myInfo = useContext(UserInfoContext);
+  const setDmInfo = useContext(SetDmInfoContext);
 
   return (
     <div id="chat-context-menu" onClick={() => {
@@ -62,6 +65,7 @@ const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = ({match,
         </Link>
         {myInfo.nick !== target ? 
           <>
+            <li className="chat-context-li" onClick={() => setDmInfo({isDmOpen: true, target: target})}>DM 보내기</li>
             <li className="chat-context-li">대전 신청</li>
             <ConditionalContextMenu myPosition={myPosition} targetPosition={targetPosition} />
           </>
