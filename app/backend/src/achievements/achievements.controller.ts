@@ -1,6 +1,6 @@
 import { Controller, Get, Delete, Query, UseGuards } from '@nestjs/common';
 import { achievementsService } from './achievements.service'
-import { AcievementDto2 } from '../dto/achievements'
+import { AcievementDto2, GetAchievementDto } from '../dto/achievements'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ErrMsgDto } from 'src/dto/utility';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
@@ -20,7 +20,7 @@ export class achievementsController {
     ` })
   @ApiQuery({ name: 'user_id', example:'jinbkim', description: '칭호를 검색할 유저아이디'})
   @Get()
-    readAchoevements(@Query() q){
+    readAchoevements(@Query() q: GetAchievementDto){
     return this.achievementsService.readAchievements(q.user_id);
   }
   
