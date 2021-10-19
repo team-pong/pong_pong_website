@@ -18,24 +18,72 @@ interface chatContextMenuProps {
     targetPosition: string
   }>>
   socket: Socket,
+  channelId: number,
 }
 
-const ConditionalContextMenu: FC<{myPosition: string, targetPosition: string}> = ({myPosition, targetPosition}) => {
+const ConditionalContextMenu: FC<{
+    myPosition: string,
+    targetPosition: string,
+    socket: Socket,
+    target: string,
+    channelId: number,
+  }> = (
+  {socket, myPosition, targetPosition, target, channelId}) => {
+
+  const addAdmin = () => {
+    /* TODO: socket.emit으로 누구를 관리자로 임명할 것인지 보내주면 그 정보를 가지고 백엔드에서 처리하고
+             소켓으로 방송하면 chatUsers 변경으로 받아오면 화면 렌더링이 다시 될 것이고 내가 당한거인지도 확인하면 된다. */
+  };
+
+  const deleteAdmin = () => {
+
+  };
+
+  const ban = () => {
+    /* TODO: 위와 마찬가지로 구현하고 그 다음에 강퇴당했다는 것을 알려주고 history.back 으로 나가면 될 것 같다. 
+             대신에 방에 처음에 들어갈 때 이 사람이 해당 방 채널에 강퇴당한 목록에 있다면 입장이 안 되도록 처리하는 부분도 있어야 한다. */
+  };
+
+  const mute = () => {
+    /* TODO: socket.emit 으로 누구를 뮤트시킬지를 보내주면(channelId, target) 백엔드에서
+             mute를 설정하고 다시 chatUsers가 바뀌었다는 것을 방송한다.
+             그러면 chatUsers 가 바뀔 때마다 myPosition을 업데이트하니까 그 때
+             myPosition 이 mute, ban 인 것을 확인해서 처리하면 될 것 같다. 
+             mute와 ban은 admin, owner 에게는 적용이 안 되니까 myPosition에 써도 될 것 같다. */
+  };
+
+  const unMute = () => {
+
+  };
+
   switch (myPosition) {
     case "owner":
       return (
         <>
-          <li className="chat-context-li">{targetPosition === "admin" ? "관리자 해임" : "관리자로 임명"}</li>
-          <li className="chat-context-li">강퇴하기</li>
-          <li className="chat-context-li">{targetPosition === "mute" ? "대화 차단 해제" : "대화 차단하기"}</li>
+          <li className="chat-context-li"
+              onClick={targetPosition === "admin" ? addAdmin : deleteAdmin}>
+            {targetPosition === "admin" ? "관리자 해임" : "관리자로 임명"}
+          </li>
+          <li className="chat-context-li" onClick={ban}>
+            강퇴하기
+          </li>
+          <li className="chat-context-li"
+              onClick={targetPosition === "mute" ? unMute : mute}>
+            {targetPosition === "mute" ? "대화 차단 해제" : "대화 차단하기"}
+          </li>
         </>
       );
     case "admin":
       if ((targetPosition !== "owner") && (targetPosition !== "admin")) {
         return (
           <>
-            <li className="chat-context-li">강퇴하기</li>
-            <li className="chat-context-li">{targetPosition === "mute" ? "대화 차단 해제" : "대화 차단하기"}</li>
+            <li className="chat-context-li" onClick={ban}>
+              강퇴하기
+            </li>
+            <li className="chat-context-li"
+                onClick={targetPosition === "mute" ? unMute : mute}>
+              {targetPosition === "mute" ? "대화 차단 해제" : "대화 차단하기"}
+            </li>
           </>
         );
       }
@@ -44,7 +92,8 @@ const ConditionalContextMenu: FC<{myPosition: string, targetPosition: string}> =
   };
 }
 
-const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = ({match, x, y, myPosition, targetPosition, target, closer}): JSX.Element => {
+const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
+  {socket, match, x, y, myPosition, targetPosition, target, closer, channelId}): JSX.Element => {
   const myInfo = useContext(UserInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
 
@@ -65,9 +114,16 @@ const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = ({match,
         </Link>
         {myInfo.nick !== target ? 
           <>
-            <li className="chat-context-li" onClick={() => setDmInfo({isDmOpen: true, target: target})}>DM 보내기</li>
+            <li className="chat-context-li" onClick={() => setDmInfo({isDmOpen: true, target: target})}>
+              DM 보내기
+            </li>
             <li className="chat-context-li">대전 신청</li>
-            <ConditionalContextMenu myPosition={myPosition} targetPosition={targetPosition} />
+            <ConditionalContextMenu
+              socket={socket}
+              myPosition={myPosition}
+              targetPosition={targetPosition}
+              target={target}
+              channelId={channelId}/>
           </>
           : <></>}
       </ul>

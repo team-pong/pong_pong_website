@@ -290,6 +290,12 @@ div.pw-container {
         width: calc(100% - 50px);
         user-select: text;
         margin-left: 10px;
+
+        img.message-status {
+          width: 15px;
+          height: 15px;
+          margin-left: 5px;
+        }
         
         #message-body {
           display: block;

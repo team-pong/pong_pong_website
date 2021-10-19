@@ -223,7 +223,15 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     return socket;
   };
 
-  const updateMyPosition = () => {
+  /* TODO: myPosition이 바뀔 때마다 내가 강퇴를 당한건지를 검사한다.
+           내가 mute 당한 것인지를 검사한다.
+           백엔드에서 position 정보가 업데이트 된 것이 넘어오지 않는다. */
+
+  /*!
+   * @author donglee
+   * @brief 소켓으로 chatUsers 정보가 변경되면 myPosition을 업데이트함
+   */
+  useEffect(() => {
     if (chatUsers.length !== 0) {
       const me = chatUsers.filter((user) => user.nick === myInfo.nick);
 
@@ -231,14 +239,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         setMyPosition(me[0].position);
       }
     }
-  }
-
-  /*!
-   * @author donglee
-   * @brief 소켓으로 chatUsers 정보가 변경되면 myPosition을 업데이트함
-   */
-  useEffect(() => {
-    updateMyPosition();
   }, [chatUsers])
 
   /*!
@@ -252,6 +252,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 메세지를 받았을 때 chatLog를 최신화해서 렌더링함
        */
       socket.on("message", (data: ChatLog & {user: string, chat: string}) => {
+        console.log("message socket on!");
         if (data.user) {
           return ;
         }
@@ -269,6 +270,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 대화방 정보가 변경될 경우 방 정보를 최신화함
        */
       socket.on("setRoomInfo", (data: ChatRoom) => {
+        console.log("setRoomInfo socket on!", data);
         const roomInfo = {
           title: data.title,
           type: data.type,
@@ -285,6 +287,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 대화방에 참여중인 사용자들이 변경될 때 최신화해서 렌더링함
        */
       socket.on("setRoomUsers", (data: ChatUser[]) => {
+        console.log("setRoomUsers socket on!", data);
         const users = [...data];
         setChatUsers(users);
       });
@@ -369,7 +372,14 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
                 <div key={idx} className="chat-room-message">
                   <img id="message-avatar" src={value.avatar_url}/>
                   <div id="message-content">
-                    <span id="message-nick"><b>{value.nick}</b></span>
+                    <span id="message-nick">
+                      <b>{value.nick}</b>
+                    </span>
+                    {console.log("test: ", value.position)}
+                    {/* {value.position === "owner" ? 
+                      <img className="message-status" src="/public/crown.png" alt="owner"/> : <></>}
+                    {value.position === "admin" ?
+                      <img className="message-status" src="/public/knight.png" alt="admin"/> : <></>} */}
                     <span id="message-time">{hour}:{minute}</span>
                     <span id="message-body">{value.message}</span>
                   </div>
@@ -382,7 +392,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
           {
             chatUsers.map((value, idx) => {
               return (
-                <div  key={idx}
+                <div key={idx}
                       className="chat-user"
                       onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position)}>
                   <img className="chat-room-user-img" src={value.avatar_url} alt={value.nick} />
@@ -422,7 +432,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
                                   targetPosition={contextMenu.targetPosition}
                                   closer={setContextMenu}
                                   target={contextMenu.target}
-                                  socket={socket}/>}
+                                  socket={socket}
+                                  channelId={chatRoomInfo.channel_id}/>}
         <Route path="/mainpage/chat/config">
           <Modal id={Date.now()} smallModal content={
             <ConfigChatRoom 
