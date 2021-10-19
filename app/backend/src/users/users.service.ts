@@ -97,7 +97,11 @@ export class UsersService {
 
   async getAvatarUrl(user_id: string) {
     const user = await this.usersRepo.findOne({user_id: user_id});
-    return (user.avatar_url);
+    if (user) {
+      return (user.avatar_url);
+    } else {
+      throw (`err2 | ${user_id}`);
+    }
   }
 
   async getUserInfo(user_id: string) {

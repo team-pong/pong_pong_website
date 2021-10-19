@@ -11,6 +11,14 @@ interface MultiFactorAuthState {
 	email: boolean,
 }
 
+function isNotTestUser(user_id: string) {
+	if (user_id.indexOf("tester") == -1) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 @ApiTags('Session')
 @Controller('session')
 export class SessionController {
@@ -63,7 +71,7 @@ export class SessionController {
 	@Get("/login")
 	async login(@Req() req: Request, @Res() res: Response) {
 		console.log("GET /login id:", req.session.userid, "| loggedIn:", req.session.loggedIn)
-		if (req.session.loggedIn == true) { // 이미 로그인 되어있는 유저라면
+		if (req.session.loggedIn == true && isNotTestUser(req.session.userid)) { // 이미 로그인 되어있는 유저라면
 			// 바로 로그인
 			return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
 		} else {
