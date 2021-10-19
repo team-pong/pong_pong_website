@@ -52,6 +52,7 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
    * @author donglee
    * @brief - 채팅방 만들기 요청 후 해당 채팅방으로 redirect함
    *        - 성공적으로 만들어졌으면 내가 직접 만든 방이라는 isMadeMyself 를 true로 바꿔줌(password없이 입장하기 위함)
+   *        - protected일 때만 isMadeMyself 를 true로 해줘야 두 번 연결하지 않음
    */
   const makeChatRoom = async () => {
     if (checkFormat()) {
@@ -65,7 +66,7 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
       const res = await easyfetch.fetch(body);
       if (!res.err_msg) {
         setChannelId(res.chatRoom.channel_id);
-        setIsMadeMyself(true);
+        if (type === "protected") setIsMadeMyself(true);
       } else {
         alert(res.err_msg);
       }

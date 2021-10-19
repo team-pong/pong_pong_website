@@ -171,9 +171,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
 
   const myInfo = useContext(UserInfoContext);
 
-  /* TODO: 소켓 연결 두 번 되는것 로직 확인하자 
-  mute 구현 */
-
   /*!
    * @author donglee
    * @brief 웹소켓에서 이벤트리스너에 최신화된 chatLog state에 접근하기 위해서 ref훅을 사용함
