@@ -90,8 +90,15 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
             <span className="nav-list-span">게임하기</span>
           </li>
         </Link>
+        <Link to={`${props.match.url}/contactUs`} style={{color: "inherit", textDecoration: "none"}}>
+          <li className="nav-list-button">
+            <img className="nav-list-img" src="/public/email.png"/>
+            <span className="nav-list-span">문의하기</span>
+          </li>
+        </Link>
       </ul>
       <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent />} smallModal/></Route>
+      <Route path={`${props.match.path}/contactUs`}><Modal id={Date.now()} content={<>contact</>} smallModal /></Route>
     </nav>
   );
 };

@@ -209,5 +209,12 @@
         outline: none;
       }
     }
+
+    /* 문의하기 버튼 (마지막 a 태그) */
+    a:last-of-type {
+      position: absolute;
+      width: 240px;
+      bottom: 0;
+    }
   }
 }
