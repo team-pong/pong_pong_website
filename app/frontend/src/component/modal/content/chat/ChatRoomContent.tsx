@@ -10,6 +10,7 @@ import ConfigChatRoom from "./ConfigChatRoom";
 import { io, Socket } from "socket.io-client";
 import { UserInfoContext } from "../../../../Context";
 import { UserInfo } from "../../../mainpage/MainPage";
+import ProfileContent from "../profile/ProfileContent";
 
 
 function submitMessage(myInfo: UserInfo, message: string, chatLog: ChatLog[], setChatLog: Dispatch<SetStateAction<any>>) {
@@ -147,7 +148,7 @@ interface ChatRoomContentProps {
   setIsMadeMyself: Dispatch<SetStateAction<boolean>>;
 };
 
-const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMadeMyself, setIsMadeMyself}): JSX.Element => {
+const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMadeMyself, setIsMadeMyself, match}): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
   const [chatLog, _setChatLog] = useState<ChatLog[]>([]);
@@ -164,9 +165,11 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
   const { channel_id } = useParams<{channel_id: string}>();
   const [isProtected, setIsProtected] = useState(false);
-  const [socket, setSocket] = useState<Socket>(null);
+  const [socket, _setSocket] = useState<Socket>(null);
   const chatLogRef = useRef(chatLog);
   const [passwordPassed, setPasswordPassed] = useState(false);
+  const socketRef = useRef(socket);
+  const [myPosition, setMyPosition] = useState("");
 
   const myInfo = useContext(UserInfoContext);
 
@@ -174,10 +177,19 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
    * @author donglee
    * @brief 웹소켓에서 이벤트리스너에 최신화된 chatLog state에 접근하기 위해서 ref훅을 사용함
    */
-  const setChatLog = (data) => {
+  const setChatLog = (data: ChatLog[]) => {
     chatLogRef.current = data;
     _setChatLog(data);
   };
+
+  /*!
+   * @author donglee
+   * @brief useEffect 에서 socket state가 null이어서 current로 참조하기 위함
+   */
+  const setSocket = (data: Socket) => {
+    socketRef.current = data;
+    _setSocket(data);
+  }
 
   /*!
    * @author donglee
@@ -209,6 +221,24 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     return socket;
   };
 
+  const updateMyPosition = () => {
+    if (chatUsers.length !== 0) {
+      const me = chatUsers.filter((user) => user.nick === myInfo.nick);
+
+      if (me[0]) {
+        setMyPosition(me[0].position);
+      }
+    }
+  }
+
+  /*!
+   * @author donglee
+   * @brief 소켓으로 chatUsers 정보가 변경되면 myPosition을 업데이트함
+   */
+  useEffect(() => {
+    updateMyPosition();
+  }, [chatUsers])
+
   /*!
    * @author donglee
    * @brief socket state가 처음에 연결되면 리스너들을 등록함
@@ -225,7 +255,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         }
         setChatLog([{
           nick: data.nick,
-          position: "admin",
+          position: data.position,
           avatar_url: data.avatar_url,
           time: data.time,
           message: data.message
@@ -257,10 +287,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         setChatUsers(users);
       });
     }
-
-    return (() => {
-      if (socket) socket.disconnect();
-    })
   }, [socket]);
 
   /*!
@@ -305,6 +331,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     );
 
     return (() => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
       setIsMadeMyself(false);
     });
   }, []);
@@ -355,7 +384,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
                       className="chat-user"
                       onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position)}>
                   <img className="chat-room-user-img" src={value.avatar_url} alt={value.nick} />
-                  <span className="chat-room-user-nick" >{value.nick}</span>
+                  <span className="chat-room-user-nick">{value.nick}</span>
                   {value.position === "owner" && <img className="position" src={"/public/crown.png"} alt="owner"/>}
                   {value.position === "admin" && <img className="position" src={"/public/knight.png"} alt="admin"/>}
                   {value.position === "mute" && <img className="position" src={"/public/mute.png"} alt="mute"/>}
@@ -368,7 +397,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
           </span>
           <div id="chat-room-menu">
             <Link to="/mainpage/chat/invite"><img className="chat-menu-img" src="/public/plus.svg" alt="invite" /></Link>
+            {myPosition === "owner" ?
             <Link to="/mainpage/chat/config"><img className="chat-menu-img" src="/public/tools.svg" alt="config" /></Link>
+            : <></>}
           </div>
         </div>
         <form className="chat-msg-form">
@@ -385,9 +416,10 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         {contextMenu.isOpen && <ChatContextMenu
                                   x={contextMenu.x}
                                   y={contextMenu.y}
-                                  myPosition="owner"
+                                  myPosition={myPosition}
                                   targetPosition={contextMenu.targetPosition}
-                                  closer={setContextMenu}/>}
+                                  closer={setContextMenu}
+                                  target={contextMenu.target}/>}
         <Route path="/mainpage/chat/config">
           <Modal id={Date.now()} smallModal content={
             <ConfigChatRoom 
@@ -399,6 +431,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
             } />
         </Route>
         <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
+        <Route path={`${match.url}/profile/:nick`}><Modal id={Date.now()} smallModal content={<ProfileContent readonly/>}/></Route>
       </div>
     );
   } 

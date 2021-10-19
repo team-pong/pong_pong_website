@@ -46,9 +46,9 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
     setSortedDmLog(result);
   }, [dmLog]);
 
-  const printChatLog = (msg: DMLog[]) => {
+  const printChatLog = (msg: DMLog[], idx: number) => {
     return (
-      <>
+      <div key={idx}>
         {msg.map((msg, idx) => {
           return (
             <li key={idx} className={`dm-log ${msg.from === "me" ? "me" : "other"}`}>
@@ -67,7 +67,7 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
             </li>
           )
         })}
-      </>
+      </div>
     );
   }
   
