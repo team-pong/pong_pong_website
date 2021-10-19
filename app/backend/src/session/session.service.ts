@@ -41,7 +41,7 @@ export class SessionService {
 	 */
 	public async tester_login(req: Request, user_id: string, nickname: string, avatar_url: string) {
 		try {
-      req.session.id = user_id;
+      req.session.userid = user_id;
       req.session.token = 'test_token';
       req.session.loggedIn = true;
       req.session.save();
