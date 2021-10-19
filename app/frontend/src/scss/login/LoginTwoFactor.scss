@@ -1,0 +1,35 @@
+div.two-factor-container {
+  div.top-bar {
+    position: absolute;
+    top: 0;
+    background-color: #FEC04C;
+    font-weight: bold;
+    font-size: 15pt;
+    width: 100%;
+    height: 60px;
+    color: white;
+    line-height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  form {
+    width: 100%;
+    height: 500px - 60px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    input.text {
+      padding: 5px;
+      width: 200px;
+      height: 30px;
+    }
+    input.submit {
+      margin-top: 5px;
+      width: 214px;
+      height: 30px;
+    }
+  }
+}

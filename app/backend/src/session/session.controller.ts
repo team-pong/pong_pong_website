@@ -7,6 +7,18 @@ import { SessionDto1 } from 'src/dto/session';
 import { NotLoggedInGuard } from 'src/auth/not-logged-in.guard';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
 
+interface MultiFactorAuthState {
+	email: boolean,
+}
+
+function isNotTestUser(user_id: string) {
+	if (user_id.indexOf("tester") == -1) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 @ApiTags('Session')
 @Controller('session')
 export class SessionController {
@@ -56,29 +68,34 @@ export class SessionController {
 		return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
 	}
 
+	@Get("/login")
+	async login(@Req() req: Request, @Res() res: Response) {
+		console.log("GET /login id:", req.session.userid, "| loggedIn:", req.session.loggedIn)
+		if (req.session.loggedIn == true && isNotTestUser(req.session.userid)) { // 이미 로그인 되어있는 유저라면
+			// 바로 로그인
+			return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
+		} else {
+			// 42api로 리디렉트
+    const login_api_url = `https://api.intra.42.fr/oauth/authorize`
+			+ `?client_id=${process.env.CLIENT_ID}`
+			+ `&redirect_uri=http%3A%2F%2F127.0.0.1%2Fsession%2Foauth`
+			+ `&response_type=code`;
+			return res.redirect(login_api_url);
+		}
+
+	}
+
+
   @ApiOperation({ summary: '42로그인 페이지에서 이 주소로 코드를 전송'})
   @Get("/oauth")
-  async login(@Query() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
+  async loginRedirectFor42Api(@Query() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
     try {
-      if (LoginCodeDto)
-        await this.sessionService.login(loginCodeDto, request, response);
-      return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
+      if (LoginCodeDto) {
+				return await this.sessionService.login(loginCodeDto, request, response);
+			}
     } catch (err){
       console.log("get42UserInfo Err: ", err);
     }
-  }
-
-  @ApiOperation({ summary: '로그인' })
-  @Post("/oauth")
-  public async get42UserInfo(@Body() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
-    return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
-  }
-
-  @ApiOperation({ summary: '입력받은 세션 ID와 토큰이 유효한지 체크해서 Body에 결과를 담는다' })
-	@UseGuards(new LoggedInGuard())
-  @Get("/valid")
-  isValidSession(@Req() request: Request, @Res() response: Response) {
-    return this.sessionService.sessionValidCheck(request.sessionID, response);
   }
 
   @ApiOperation({ summary: '세션 아이디로 유저아이디 검색'})
@@ -87,5 +104,27 @@ export class SessionController {
   @Get("/user_id")
   readUser(@Query() q){
     return this.sessionService.readUser(q.sid);
-  }  
+  }
+
+	@Get('/twoFactor')
+	getMultiFactorAuthInfo(@Req() req: Request) {
+		return this.sessionService.getMultiFactorAuthInfo(req.session.userid);
+	}
+
+	@Post('/twoFactor')
+	updateFactorAuth(@Req() req: Request, @Body() body: MultiFactorAuthState) {
+		this.sessionService.updateMultiFactorAuthInfo(req.session.userid, body.email);
+		return ({});
+	}
+
+	@Get('/emailCode')
+	async loginWithEmailCode(@Req() req: Request, @Query() query: any, @Res() res: Response) {
+		console.log("GET emailCode", req.session.userid, query.code);
+		if (await this.sessionService.isValidCode(req.session.userid, query.code)) {
+			req.session.loggedIn = true;
+			return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`);
+		} else {
+			return res.redirect(`${process.env.BACKEND_SERVER_URL}/?twoFactor=email`)
+		}
+	}
 }

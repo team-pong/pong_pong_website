@@ -8,6 +8,7 @@ import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 import Loading from "../../../loading/Loading";
 import { UserInfoContext, SetUserInfoContext } from "../../../../Context";
+import TwoFactorOnOff from "./TwoFactorOnOff";
 
 /*!
  * @author donglee
@@ -293,7 +294,9 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
             </Link>
             {!props.readonly ? 
             <>
-              <button className="pr-btn">2단계 인증</button>
+              <Link to={`${props.match.url}/twofactor`}>
+                <button className="pr-btn">2단계 인증</button>
+              </Link>
               <Link to={`${props.match.url}/manageFriend`}>
                 <button className="pr-btn">친구 관리</button>
               </Link>
@@ -352,6 +355,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
           : <></>}
         </div>
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={myInfo.nick}/>} /></Route>
+        <Route path={`${props.match.path}/twofactor`}><Modal id={Date.now()} content={<TwoFactorOnOff />} smallModal/></Route>
         <Route path={`${props.match.path}/manageFriend`}><Modal id={Date.now()} smallModal content={<ManageFriendContent nick={myInfo.nick}/>} /></Route>
       </div>
     );

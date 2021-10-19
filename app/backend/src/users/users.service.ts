@@ -28,12 +28,12 @@ export class UsersService {
     private muteService: MuteService,
     ){}
 
-  async createUsers(user_id: string, nick: string, avatar_url: string){
+  async createUsers(user_id: string, nick: string, avatar_url: string, email: string){
     if (await this.usersRepo.count({user_id: user_id}))  // 이미 존재하는 유저 이면
       return new ErrMsgDto(err2);
     if (await this.usersRepo.count({nick: nick}))  // 중복된 닉네임 이면
       return new ErrMsgDto(err22);
-    await this.usersRepo.save({user_id: user_id, nick: nick, avatar_url: avatar_url})
+    await this.usersRepo.save({user_id: user_id, nick: nick, avatar_url: avatar_url, two_factor_login: false, email: email})
     return new ErrMsgDto(err0);
   }
 
@@ -97,7 +97,11 @@ export class UsersService {
 
   async getAvatarUrl(user_id: string) {
     const user = await this.usersRepo.findOne({user_id: user_id});
-    return (user.avatar_url);
+    if (user) {
+      return (user.avatar_url);
+    } else {
+      throw (`err2 | ${user_id}`);
+    }
   }
 
   async getUserInfo(user_id: string) {

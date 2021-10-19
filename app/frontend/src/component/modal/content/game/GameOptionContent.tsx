@@ -1,5 +1,8 @@
-import { FC, useState } from "react";
-import { RouteComponentProps, useHistory, withRouter } from "react-router";
+import { FC, useState, Dispatch, SetStateAction } from "react";
+import { Route, RouteComponentProps, useHistory, withRouter } from "react-router";
+import { Link } from "react-router-dom";
+import Modal from "../../Modal";
+import GameMatchContent from "./GameMatchContent";
 import "/src/scss/content/game/GameOptionContent.scss";
 
 enum MAP {
@@ -19,7 +22,17 @@ function getMapImg(mapType: MAP): string {
   }
 }
 
-const GameOptionContent: FC<RouteComponentProps> = ({match: {url}}) => {
+interface GameOptionContent extends RouteComponentProps {
+  setIsMatched: Dispatch<SetStateAction<{
+    isMatched: boolean;
+    roomId: string;
+    opponent: string;
+    position: string;
+    socket: any;
+  }>>;
+}
+
+const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatched}) => {
   const [mapSelector, setMapSelector] = useState(0);
   const history = useHistory();
 
@@ -38,8 +51,11 @@ const GameOptionContent: FC<RouteComponentProps> = ({match: {url}}) => {
           <button className="map-btn-01" onClick={() => {setMapSelector(1)}}>막대기</button>
           <button className="map-btn-02" onClick={() => {setMapSelector(2)}}>거품</button>
         </div>
-        <button className="start" onClick={() => {history.push(`${url}/${mapSelector}`)}}>게임 찾기</button>
+        <Link to={`${url}/${mapSelector}`} className="start" >게임 찾기</Link>
       </form>
+      <Route path={`${path}/:map`}>
+        <Modal id={Date.now()} smallModal content={<GameMatchContent setIsMatched={setIsMatched}/>}/>
+      </Route>
     </div>
   );
 }
