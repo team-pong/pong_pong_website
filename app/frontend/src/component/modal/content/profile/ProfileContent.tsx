@@ -13,6 +13,7 @@ import { UserInfoContext, SetUserInfoContext } from "../../../../Context";
  * @author donglee
  * @brief Profile 컴포넌트
  * @detail 사용자 정보를 API에서 받아와서 화면에 렌더링함
+ * @param[in] readonly? : 메인화면에서 프로필수정하는 경우를 제외하고는 정보수정이 불가하게 하려는 boolean
  */
 
 interface UserInfo {
@@ -26,7 +27,7 @@ interface UserInfo {
   status: string;
 }
 
-const ProfileContent: React.FC<RouteComponentProps> = (props) => {
+const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (props) => {
 
   const myInfo = useContext(UserInfoContext);
   const setMyInfo = useContext(SetUserInfoContext);
@@ -290,10 +291,13 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
                 상세전적보기
               </button>
             </Link>
-            <button className="pr-btn">2단계 인증</button>
-            <Link to={`${props.match.url}/manageFriend`}>
-              <button className="pr-btn">친구 관리</button>
-            </Link>
+            {!props.readonly ? 
+            <>
+              <button className="pr-btn">2단계 인증</button>
+              <Link to={`${props.match.url}/manageFriend`}>
+                <button className="pr-btn">친구 관리</button>
+              </Link>
+            </> : <></>}
           </div>
           <div id="avatar-container">
             <img className="pr-avatar"
@@ -316,11 +320,13 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
                   onKeyDown={(e) => cancelEditNickKey(e)} />
               </form>
               <span className={"mf-nick" + (isEditNickClicked ? " mf-nick-clicked" : "")}>{myInfo.nick}</span>
+              {!props.readonly ? 
               <img
                 id="mf-edit-img"
                 src={isEditNickClicked ? "/public/check.png" : "/public/pencil.png"}
                 alt="편집"
                 onClick={!isEditNickClicked ? activateEdit : submitForm}/>
+              : <></>}
             </div>
             <div id="user-stat">
               <span id="win">{myInfo.win_games} 승</span>
@@ -336,12 +342,14 @@ const ProfileContent: React.FC<RouteComponentProps> = (props) => {
         </div>
         <div id="lower-part">
           <div id="blank"></div>
+          {!props.readonly ? 
           <div id="delete-user">
             <div id="delete-icon">
               <img className="pr-trash-btn" src="/public/delete.png" alt="회원탈퇴" />
             </div>
             <span className="pr-explain">클릭하면 회원님의 모든 데이터가 서버에서 삭제됩니다</span>
           </div>
+          : <></>}
         </div>
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={myInfo.nick}/>} /></Route>
         <Route path={`${props.match.path}/manageFriend`}><Modal id={Date.now()} smallModal content={<ManageFriendContent nick={myInfo.nick}/>} /></Route>
