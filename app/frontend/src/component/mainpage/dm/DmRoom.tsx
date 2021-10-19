@@ -23,24 +23,25 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
     let result: Array<DMLog[]> = [];
     let tmp: DMLog[] = [];
     const date = new Time(new Date().toString());
+    console.log(JSON.stringify(dmLog));
     dmLog.forEach((dm) => {
       date.setTime(dm.time);
-      dm.time = `${date.getTimeFormat()} ${date.getHour()}:${date.getMinuate()}`
+      let tmpTime = `${date.getTimeFormat()} ${date.getHour()}:${date.getMinuate()}`
       if (prev.time === "" && prev.from === "") {
         prev.from = dm.from;
-        prev.time = dm.time;
-        tmp.push(dm);
+        prev.time = tmpTime;
+        tmp.push({...dm, time: tmpTime});
         return ;
       }
-      if (dm.time === prev.time && dm.from === prev.from) {
-        tmp.push(dm);
+      if (tmpTime === prev.time && dm.from === prev.from) {
+        tmp.push({...dm, time: tmpTime});
         return ;
       }
       result.push(tmp);
       tmp = [];
       prev.from = dm.from;
-      prev.time = dm.time;
-      tmp.push(dm);
+      prev.time = tmpTime;
+      tmp.push({...dm, time: tmpTime});
     });
     result.push(tmp);
     setSortedDmLog(result);
