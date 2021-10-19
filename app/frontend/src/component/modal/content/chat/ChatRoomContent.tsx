@@ -8,7 +8,7 @@ import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
 import ConfigChatRoom from "./ConfigChatRoom";
 import { io, Socket } from "socket.io-client";
-import { UserInfoContext } from "../../../../Context";
+import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
 import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
 
@@ -172,6 +172,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   const [myPosition, setMyPosition] = useState("");
 
   const myInfo = useContext(UserInfoContext);
+  const setDmInfo = useContext(SetDmInfoContext);
+
 
   /*!
    * @author donglee
@@ -419,7 +421,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
                                   myPosition={myPosition}
                                   targetPosition={contextMenu.targetPosition}
                                   closer={setContextMenu}
-                                  target={contextMenu.target}/>}
+                                  target={contextMenu.target}
+                                  socket={socket}/>}
         <Route path="/mainpage/chat/config">
           <Modal id={Date.now()} smallModal content={
             <ConfigChatRoom 
