@@ -95,10 +95,11 @@ export class GlobalGateway {
    *        2. 상대방이 온라인 상태라면 소켓으로도 전송.
   */
   @SubscribeMessage('dm')
-  handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: DMSendMsg): any {
+  async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: DMSendMsg) {
     const user_id = findUIDwithSID(socket.id);
     const target_id = body.to;
-    if (this.isBlockedUserFrom(user_id, target_id)) {
+    console.log(`MSG globalSocket ${body}`);
+    if (await this.isBlockedUserFrom(user_id, target_id)) {
     } else {
       this.dmService.createDmStore(user_id, target_id, body.msg);
       const target_sid = socketMap[target_id]
