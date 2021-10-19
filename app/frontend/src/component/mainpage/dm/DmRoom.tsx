@@ -23,7 +23,6 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
     let result: Array<DMLog[]> = [];
     let tmp: DMLog[] = [];
     const date = new Time(new Date().toString());
-    console.log(JSON.stringify(dmLog));
     dmLog.forEach((dm) => {
       date.setTime(dm.time);
       let tmpTime = `${date.getTimeFormat()} ${date.getHour()}:${date.getMinuate()}`
