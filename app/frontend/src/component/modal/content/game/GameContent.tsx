@@ -1,7 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { Link, Redirect, Route, RouteComponentProps, withRouter } from "react-router-dom";
 import Modal from "../../Modal";
-import GameMatchContent from "./GameMatchContent";
 import GameRoomContent from "./GameRoomContent";
 import GameOptionContent from "./GameOptionContent";
 import "/src/scss/content/game/GameContent.scss";
@@ -43,10 +42,7 @@ const GameContent: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
 
       {/* 라우팅 */}
       <Route path={`${path}/match/:matchType`}>
-        <Modal id={Date.now()} content={<GameOptionContent />}/>
-      </Route>
-      <Route path={`${path}/match/:matchType/:map`}>
-        <Modal id={Date.now()} smallModal content={<GameMatchContent setIsMatched={setIsMatched}/>}/>
+        <Modal id={Date.now()} content={<GameOptionContent setIsMatched={setIsMatched}/>}/>
       </Route>
       <Route path={`${path}/game/:roomId`}>
         <Modal id={Date.now()} content={<GameRoomContent socket={isMatched.socket}/>} />
