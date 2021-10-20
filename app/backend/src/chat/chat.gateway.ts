@@ -16,9 +16,6 @@ interface JoinMsg{
 interface SocketInfo {
   room_id: string,
   user_id: string,
-  nickname: string,
-  avatar_url: string,
-  position: string,
 }
 
 interface ChatLog {
@@ -74,6 +71,7 @@ export class ChatGateway {
   // 3. 해당 유저 입장 시스템 메세지 전송
   @SubscribeMessage('join')
   async joinMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: JoinMsg) {
+    // 새로운 유저가 채팅방에 참여한 경우
     try {
       const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
       const user_id = await this.sessionService.readUserId(session_id);
@@ -84,23 +82,23 @@ export class ChatGateway {
       this.socket_map[socket.id] = {
         room_id: room_id,
         user_id: user_id,
-        nickname: user_info.nick,
-        avatar_url: user_info.avatar_url,
-        position: position,
       };
-  
+      
+      // 1. 소켓 room 접속
       socket.join(room_id);
+      // 2. chat-users에 유저 추가
       await this.chatUsersService.addUser(room_id, user_id);
       console.log(`Join Message user: ${user_id}, channel: ${room_id}`);
   
-      // 방 정보 전송
+      // 3. 참여중인 모두에게 방 정보 전송 (참여 인원이 바뀌도록)
       const room_info = await this.chatService.getChannelInfo(Number(room_id));
       this.server.to(room_id).emit('setRoomInfo', room_info);
     
-      // 유저 정보 리스트 전송
+      // 4. 모두에게 유저 정보 리스트 전송 (목록에 새로운 유저가 추가되도록)
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
       this.server.to(room_id).emit('setRoomUsers', user_list);
   
+      // 5. 시스템 메세지 전송
       this.server.to(room_id).emit('message', {
         user: 'system',
         chat: `${user_id}님이 입장하셨습니다.`
@@ -113,18 +111,25 @@ export class ChatGateway {
 
   @SubscribeMessage('setRoomInfo')
   async sendRoomInfo(@ConnectedSocket() socket: Socket, @MessageBody() room_info: any) {
+    // owner가 방 제목 | 비밀번호 | 방 타입 | 기타 사항을 변경한 경우
     const room_id = this.socket_map[socket.id].room_id;
+
+    // 1. chat db에 변경사항 업데이트
+    // 2. 모두에게 방 정보 전송 (방 제목이나 타입 등이 바뀌도록)
     socket.to(room_id).emit('setRoomInfo', room_info);
     console.log(`Receive setRoomInfo Message: ${this.socket_map[socket.id].user_id}, roomInfo: ${room_info}`);
   }
 
-
   @SubscribeMessage('message')
-  sendMessage(@ConnectedSocket() socket: Socket, @MessageBody() msg: string) {
+  async sendMessage(@ConnectedSocket() socket: Socket, @MessageBody() msg: string) {
+    const room_id = this.socket_map[socket.id].room_id;
+    const user_id = this.socket_map[socket.id].user_id;
+    const user_info = await this.usersService.getUserInfo(user_id);
+    
     socket.to(this.socket_map[socket.id].room_id).emit('message', {
-      nick: this.socket_map[socket.id].nickname,
-      position: this.socket_map[socket.id].position,
-      avatar_url: this.socket_map[socket.id].avatar_url,
+      nick: user_info.nick,
+      position: await this.chatUsersService.getUserPosition(user_id, room_id),
+      avatar_url: user_info.avatar_url,
       time: Date.now(),
       message: msg,
     })
