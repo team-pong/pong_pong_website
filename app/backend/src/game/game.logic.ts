@@ -255,7 +255,7 @@ export class GameLogic {
                 circle은 공의 좌표, square는 바 또는 장애물의 좌표
      */
 
-    isCollisionSC(circle : [number, number], radius : number, square : [number, number, number, number]) : Boolean {
+    isCollisionSC(circle : [number, number], radius : number, square : [number, number, number, number], movingValue : number) : Boolean {
         let edgeX = circle[0];
         let edgeY = circle[1];
         const squareWidth = Math.abs(square[2] - square[0]);
@@ -295,6 +295,7 @@ export class GameLogic {
                         this._direction[1] *= -1;
                     }
                 }
+                this.rotate(movingValue * this._correction);
                 // console.log("collision bar: " + horizonEdge + " " + verticalEdge);
             }
             return true;
@@ -308,13 +309,13 @@ export class GameLogic {
         if (type == 1) {
             // Square
             const squares = this._gameInfo.obstacle as SquareObstacle
-            if (this.isCollisionSC(this._ball, 10, squares.obs00)) {
+            if (this.isCollisionSC(this._ball, 10, squares.obs00, 0)) {
                 return true;
-            } else if (this.isCollisionSC(this._ball, 10, squares.obs01)) {
+            } else if (this.isCollisionSC(this._ball, 10, squares.obs01, 0)) {
                 return true;
-            } else if (this.isCollisionSC(this._ball, 10, squares.obs02)) {
+            } else if (this.isCollisionSC(this._ball, 10, squares.obs02, 0)) {
                 return true;
-            } else if (this.isCollisionSC(this._ball, 10, squares.obs03)) {
+            } else if (this.isCollisionSC(this._ball, 10, squares.obs03, 0)) {
                 return true;
             }
         } else if (type == 2) {
@@ -347,22 +348,18 @@ export class GameLogic {
         } else if (down >= this._bottomWall) {
             // direction 전환
             this._direction[1] *= -1;
-        } else if (this.isCollisionSC(this._ball, 10, this._bar00)) {
+        } else if (this.isCollisionSC(this._ball, 10, this._bar00, this._bar00_pre - this._bar00[1])) {
             // console.log("collision bar00");
             // bar의 움직임에 따라 방향 값 회전
             // console.log("bar : " + this._bar00[1]);
             // console.log('bar pre: ' + this._bar00_pre);
-            const movingValue = this._bar00[1] - this._bar00_pre;
             // console.log("bar movement: " + movingValue);
             // console.log("rotate: " + (movingValue * this._correction));
-            this.rotate(movingValue * this._correction);
-        } else if (this.isCollisionSC(this._ball, 10, this._bar01)) {
+        } else if (this.isCollisionSC(this._ball, 10, this._bar01, this._bar01_pre - this._bar01[1])) {
             // console.log("collision bar01");
             // bar의 움직임에 따라 방향 값 회전
-            const movingValue = this._bar01[1] - this._bar01_pre;
             // console.log("bar movement: " + movingValue);
             // console.log("rotate: " + (movingValue * this._correction));
-            this.rotate(movingValue * this._correction);
         } else if (this.checkCollisionType(this._type)) {
             // console.log("collision brick");
         } else {
