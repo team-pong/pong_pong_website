@@ -189,6 +189,8 @@ export class SetChatAdminDto{
 
 export class DeleteChatAdminDto extends SetChatAdminDto {}
 
+export class SetChatBanDto extends SetChatAdminDto {}
+
 // export class ChatDto6{
 //   @ApiProperty({
 // 		example: 'jinbkim',

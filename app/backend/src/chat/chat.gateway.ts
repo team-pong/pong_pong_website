@@ -8,9 +8,10 @@ import { ChatUsersService } from 'src/chat-users/chat-users.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
-import { DeleteChatAdminDto, SetChatAdminDto } from 'src/dto/chat';
+import { DeleteChatAdminDto, SetChatAdminDto, SetChatBanDto } from 'src/dto/chat';
 import { AdminService } from 'src/admin/admin.service';
 import { err0 } from 'src/err';
+import { BanService } from 'src/ban/ban.service';
 
 interface JoinMsg{
   room_id: string,
@@ -60,6 +61,8 @@ export class ChatGateway {
     private chatService: ChatService,
     @Inject(forwardRef(() => AdminService))
     private adminService: AdminService,
+    @Inject(forwardRef(() => BanService))
+    private banService: BanService,
   ) {}
 
   @WebSocketServer() public server: Server;
@@ -181,6 +184,33 @@ export class ChatGateway {
     }
   }
 
+  @SubscribeMessage('setBan')
+  async setBan(@ConnectedSocket() socket: Socket, @MessageBody() setChatBanDto: SetChatBanDto) {
+    // 특정 유저 밴하기 요청시
+    try {
+      // 1. 요청 보낸 유저의 권한 확인 (admin 또는 owner 인가?)
+      const room_id = this.socket_map[socket.id].room_id;
+      const user_id = this.socket_map[socket.id].user_id;
+      const position = await this.chatUsersService.getUserPosition(user_id, room_id);
+      const target_nick = setChatBanDto.nickname;
+      if (position != 'owner' && position != 'admin') {
+        throw ("당신은 밴 권한이 없습니다.")
+      }
+      // 2. 밴 하려는 유저 정보 조회 (id 가져오기)
+      const target = await this.usersService.getUserInfoWithNick(target_nick);
+      // 3. ban db에 추가
+      const ret = await this.banService.createBan(target.user_id, Number(room_id));
+      if (ret.err_msg != err0) {
+        throw (ret);
+      }
+      // 4. 유저 리스트 다시 전송하기 (다른 유저들에게도 어드민 표시가 보이도록)
+      const user_list = await this.chatUsersService.getUserListInRoom(room_id)
+      this.server.to(room_id).emit('setRoomUsers', user_list);
+    } catch (err) {
+      console.log(`Chat Socket setBan error | ${err}`);
+      return (err);
+    } 
+  }
 
   @SubscribeMessage('message')
   async sendMessage(@ConnectedSocket() socket: Socket, @MessageBody() msg: string) {
