@@ -111,4 +111,12 @@ export class UsersService {
     }
     return user_info[0];
   }
+
+  async getUserInfoWithNick(user_nick: string) {
+    const user_info = await this.usersRepo.findOne({nick: user_nick});
+    if (!user_info) {
+      throw (`존재하지 않는 닉네임 입니다. | ${user_nick}`);
+    }
+    return user_info;
+  }
 }

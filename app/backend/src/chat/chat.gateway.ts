@@ -8,6 +8,8 @@ import { ChatUsersService } from 'src/chat-users/chat-users.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
+import { SetChatAdminDto } from 'src/dto/chat';
+import { AdminService } from 'src/admin/admin.service';
 
 interface JoinMsg{
   room_id: string,
@@ -55,6 +57,8 @@ export class ChatGateway {
     private usersService: UsersService,
     @Inject(forwardRef(() => ChatService))
     private chatService: ChatService,
+    @Inject(forwardRef(() => AdminService))
+    private adminService: AdminService,
   ) {}
 
   @WebSocketServer() public server: Server;
@@ -119,6 +123,36 @@ export class ChatGateway {
     socket.to(room_id).emit('setRoomInfo', room_info);
     console.log(`Receive setRoomInfo Message: ${this.socket_map[socket.id].user_id}, roomInfo: ${room_info}`);
   }
+
+  @SubscribeMessage('setAdmin')
+  async setAdmin(@ConnectedSocket() socket: Socket, @MessageBody() setAdminDto: SetChatAdminDto) {
+    // 어드민 권한 주기 요청이 들어온 경우
+    // 1. 요청을 보낸 유저가 owner 인지 확인 (아니라면 에러)
+    try {
+      const room_id = this.socket_map[socket.id].room_id;
+      const user_id = this.socket_map[socket.id].user_id;
+      const position = await this.chatUsersService.getUserPosition(user_id, room_id);
+      const target_nick = setAdminDto.nickname;
+      if (position != 'owner') {
+        return ("당신은 채널 방장이 아닙니다.")
+      }
+      // 2. 바꾸려는 유저에 대한 정보 조회 (id 가져오려고)
+      const target = await this.usersService.getUserInfoWithNick(target_nick);
+      // 3. 어드민 권한 주기 (이미 어드민, 해당 유저없음 등 에러는 내부에서 return 됨)
+      const ret = await this.adminService.createAdmin(target.user_id, Number(room_id));
+      if (ret) {
+        throw (ret);
+      }
+      // 4. 유저 리스트 다시 전송하기 (다른 유저들에게도 어드민 표시가 보이도록)
+      const user_list = await this.chatUsersService.getUserListInRoom(room_id)
+      this.server.to(room_id).emit('setRoomUsers', user_list);
+    } catch (err) {
+      console.log(err)
+      return (err);
+    }
+
+  }
+
 
   @SubscribeMessage('message')
   async sendMessage(@ConnectedSocket() socket: Socket, @MessageBody() msg: string) {
