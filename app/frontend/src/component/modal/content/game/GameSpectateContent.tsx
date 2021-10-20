@@ -15,7 +15,7 @@ interface MatchInfo {
   myName: string,
 }
 
-const GameCanvasContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
+const GameSpectateContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
   const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
   const [canvasWidth, setCanvasWidth] = useState(700);
@@ -31,7 +31,6 @@ const GameCanvasContent: FC<{socket: any} & RouteComponentProps> = ({socket, mat
   const [rightY, setRightY] = useState(150);
   const [init, setInit] = useState(0);
   const [isExit, setIsExit] = useState(false);
-  const [showExitButton, setShowExitButton] = useState(false);
 
   const [obsRect00, setObsRect00] = useState<fabric.Rect>();
   const [obsRect01, setObsRect01] = useState<fabric.Rect>();
@@ -54,30 +53,9 @@ const GameCanvasContent: FC<{socket: any} & RouteComponentProps> = ({socket, mat
     myName: '',
   });
 
-  const onClickGiveUp = () => {
-    socket.emit("giveUp");
-  }
-
   const onClickExit = () => {
     socket.disconnect();
-    removeEventListener("keydown", keyDownEvent);
-    removeEventListener("keyup", keyUpEvent);
     setIsExit(true);
-  }
-
-  const [downKey, _setDownKey] = useState(0);
-  const downKeyRef = useRef(downKey)
-  const [upKey, _setUpKey] = useState(0);
-  const upKeyRef = useRef(upKey);
-
-  const setDownKey = (x) => {
-    downKeyRef.current = x;
-    _setDownKey(x);
-  }
-
-  const setUpKey = (x) => {
-    upKeyRef.current = x;
-    _setUpKey(x);
   }
 
   /*!
@@ -139,35 +117,6 @@ const GameCanvasContent: FC<{socket: any} & RouteComponentProps> = ({socket, mat
   }
   
   /*!
-   * @brief 키보드 이벤트
-   *        키의 눌림 상태를 변경한다.
-   *        여기서 서버로 상태를 전송
-   */
-  
-  const keyDownEvent = (e: KeyboardEvent) => {
-    
-    if (e.code === "ArrowDown" && downKeyRef.current == 0) {
-      socket.emit("keyEvent", {arrowUp: upKeyRef.current, arrowDown: true});
-      setDownKey(1);
-    }
-    else if (e.code === "ArrowUp" && upKeyRef.current == 0) {
-      socket.emit("keyEvent", {arrowUp: true, arrowDown: downKeyRef.current});
-      setUpKey(1);
-    }
-  };
-  
-  const keyUpEvent = (e: KeyboardEvent) => {
-    if (e.code === "ArrowDown") {
-      socket.emit("keyEvent", {arrowUp: upKeyRef.current, arrowDown: false});
-      setDownKey(0);
-    }
-    else if (e.code === "ArrowUp") {
-      socket.emit("keyEvent", {arrowUp: false, arrowDown: downKeyRef.current});
-      setUpKey(0);
-    }
-  };
-  
-  /*!
    * @brief 캔버스 초기화
    *        맨 처음 배경과 양쪽 바, 공을 그려준다
    */
@@ -211,13 +160,8 @@ const GameCanvasContent: FC<{socket: any} & RouteComponentProps> = ({socket, mat
       setResultWindow(initResultWindow(`YOU ${data}`));
     })
 
-    addEventListener("keydown", keyDownEvent);
-    addEventListener("keyup", keyUpEvent)
-
     return (() => {
       socket.disconnect();
-      removeEventListener("keydown", keyDownEvent);
-      removeEventListener("keyup", keyUpEvent);
     })
   }, []);
 
@@ -258,7 +202,6 @@ const GameCanvasContent: FC<{socket: any} & RouteComponentProps> = ({socket, mat
       });
       canvas.add(resultWindow);
       canvas.renderAll();
-      setShowExitButton(true);
     }
   }, [resultWindow])
 
@@ -326,10 +269,9 @@ const GameCanvasContent: FC<{socket: any} & RouteComponentProps> = ({socket, mat
     </div>
     <div className="ingame-side-bar">
       <div className="view-number">view {matchInfo.viewNumber}</div>
-      <button className="give-up" onClick={onClickGiveUp}>기권</button>
     </div>
     <div className="ingame-footer">
-      {showExitButton ? <button className="exit" onClick={onClickExit}>나가기</button> : null}
+      <button className="exit" onClick={onClickExit}>나가기</button>
     </div>
     <canvas id="ping-pong"></canvas>
     {isExit && <Redirect to="/mainpage" />}
@@ -337,4 +279,4 @@ const GameCanvasContent: FC<{socket: any} & RouteComponentProps> = ({socket, mat
   );
 };
 
-export default withRouter(GameRoomContent);
+export default withRouter(GameSpectateContent);
