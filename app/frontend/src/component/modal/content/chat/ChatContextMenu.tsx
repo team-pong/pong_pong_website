@@ -31,17 +31,15 @@ const ConditionalContextMenu: FC<{
   {socket, myPosition, targetPosition, target, channelId}) => {
 
   const addAdmin = () => {
-    /* TODO: socket.emit으로 누구를 관리자로 임명할 것인지 보내주면 그 정보를 가지고 백엔드에서 처리하고
-             소켓으로 방송하면 chatUsers 변경으로 받아오면 화면 렌더링이 다시 될 것이고 내가 당한거인지도 확인하면 된다. */
+    socket.emit("setAdmin", {nickname: target});
   };
 
   const deleteAdmin = () => {
-
+    socket.emit("deleteAdmin", {nickname: target});
   };
 
   const ban = () => {
-    /* TODO: 위와 마찬가지로 구현하고 그 다음에 강퇴당했다는 것을 알려주고 history.back 으로 나가면 될 것 같다. 
-             대신에 방에 처음에 들어갈 때 이 사람이 해당 방 채널에 강퇴당한 목록에 있다면 입장이 안 되도록 처리하는 부분도 있어야 한다. */
+    socket.emit("setBan", {nickname: target});
   };
 
   const mute = () => {
@@ -61,7 +59,7 @@ const ConditionalContextMenu: FC<{
       return (
         <>
           <li className="chat-context-li"
-              onClick={targetPosition === "admin" ? addAdmin : deleteAdmin}>
+              onClick={targetPosition === "admin" ? deleteAdmin : addAdmin}>
             {targetPosition === "admin" ? "관리자 해임" : "관리자로 임명"}
           </li>
           <li className="chat-context-li" onClick={ban}>

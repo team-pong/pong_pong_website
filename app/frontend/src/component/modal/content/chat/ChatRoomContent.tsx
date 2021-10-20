@@ -8,16 +8,21 @@ import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
 import ConfigChatRoom from "./ConfigChatRoom";
 import { io, Socket } from "socket.io-client";
-import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
+import { UserInfoContext } from "../../../../Context";
 import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
 
 
-function submitMessage(myInfo: UserInfo, message: string, chatLog: (ChatLog | ChatLogSystem)[], setChatLog: Dispatch<SetStateAction<any>>) {
+function submitMessage(
+  myInfo: UserInfo,
+  message: string,
+  chatLog: (ChatLog | ChatLogSystem)[],
+  setChatLog: Dispatch<SetStateAction<any>>,
+  myPosition: string) {
   if (message === "") return ;
   setChatLog([{
     nick: myInfo.nick,
-    position: "normal",
+    position: myPosition,
     avatar_url: myInfo.avatar_url,
     time: new Date().getTime(),
     message: message
@@ -26,11 +31,13 @@ function submitMessage(myInfo: UserInfo, message: string, chatLog: (ChatLog | Ch
 
 function controlTextAreaKeyDown(e: React.KeyboardEvent, myInfo: UserInfo,
                           message: string, setMessage: Dispatch<SetStateAction<string>>,
-                          chatLog: (ChatLog | ChatLogSystem)[], setChatLog: Dispatch<SetStateAction<any>>, socket: Socket) {
+                          chatLog: (ChatLog | ChatLogSystem)[],
+                          setChatLog: Dispatch<SetStateAction<any>>,
+                          socket: Socket, myPosition: string) {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     if (message === "") return ;
-    submitMessage(myInfo, message, chatLog, setChatLog);
+    submitMessage(myInfo, message, chatLog, setChatLog, myPosition);
     socket.emit("message", message);
     setMessage("");
   }
@@ -176,7 +183,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   const [myPosition, setMyPosition] = useState("");
 
   const myInfo = useContext(UserInfoContext);
-  const setDmInfo = useContext(SetDmInfoContext);
 
 
   /*!
@@ -227,18 +233,20 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     return socket;
   };
 
-  /* TODO: myPosition이 바뀔 때마다 내가 강퇴를 당한건지를 검사한다.
-           내가 mute 당한 것인지를 검사한다.
-           백엔드에서 position 정보가 업데이트 된 것이 넘어오지 않는다. */
   useEffect(() => {
     switch (myPosition) {
       case "ban":
         /* 대화방을 뒤로가기해서 나가게 하고 다시 못들어오게 해야 된다. */
+        console.log("나 밴 당함!");
+        history.back();
+        prompt("강제 퇴장 당했습니다.");
         break ;
       case "mute":
         /* 대화를 칠 때 마다 alert가 뜨도록 하면 될듯. 여기선 딱히 할 게 없음 */
+        // console.log("나 뮤트 당함!");
         break ;
       default:
+          // console.log("나한테는 아무 영향 없음!");
         break ;
     }
   }, [myPosition]);
@@ -306,7 +314,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 대화방에 참여중인 사용자들이 변경될 때 최신화해서 렌더링함
        */
       socket.on("setRoomUsers", (data: ChatUser[]) => {
-        // console.log("setRoomUsers socket on!", data);
+        console.log("setRoomUsers socket on!", data);
         const users = [...data];
         setChatUsers(users);
       });
@@ -362,7 +370,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     });
   }, []);
 
-  if (chatRoomInfo && isProtected) {
+  if (chatRoomInfo && chatLog && isProtected) {
     return (
       <Password
         setIsProtected={setIsProtected}
@@ -370,7 +378,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         channelId={channel_id}
         setPasswordPassed={setPasswordPassed}/>
     );
-  } else if (chatRoomInfo && !isProtected) {
+  } else if (chatRoomInfo && chatLog && !isProtected) {
     return (
       <div id="chat-room">
         <div id="chat-room-header">
@@ -401,11 +409,10 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
                       <span id="message-nick">
                         <b>{value.nick}</b>
                       </span>
-                      {console.log("test: ", value.position)}
-                      {/* {value.position === "owner" ? 
+                      {value.position === "owner" ? 
                         <img className="message-status" src="/public/crown.png" alt="owner"/> : <></>}
                       {value.position === "admin" ?
-                        <img className="message-status" src="/public/knight.png" alt="admin"/> : <></>} */}
+                        <img className="message-status" src="/public/knight.png" alt="admin"/> : <></>}
                       <span id="message-time">{hour}:{minute}</span>
                       <span id="message-body">{value.message}</span>
                     </div>
@@ -448,9 +455,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
             rows={4}
             cols={50}
             value={message}
-            onKeyPress={(e) => controlTextAreaKeyDown(e, myInfo, message, setMessage, chatLog, setChatLog, socket)}
+            onKeyPress={(e) => controlTextAreaKeyDown(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition)}
             onChange={({target: {value}}) => setMessage(value)}/>
-          {/* <button className="chat-msg-btn" onClick={() => submitMessage(myInfo, message, chatLog, setChatLog)}>전송</button> */}
+          <button className="chat-msg-btn" onClick={() => submitMessage(myInfo, message, chatLog, setChatLog, myPosition)}>전송</button>
         </form>
         {contextMenu.isOpen && <ChatContextMenu
                                   x={contextMenu.x}
