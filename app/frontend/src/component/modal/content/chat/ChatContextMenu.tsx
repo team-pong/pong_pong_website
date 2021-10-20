@@ -45,7 +45,7 @@ const ConditionalContextMenu: FC<{
   };
 
   const mute = () => {
-    /* TODO: socket.emit 으로 누구를 뮤트시킬지를 보내주면(channelId, target) 백엔드에서
+    /* TODO: socket.emit 으로 누구를 뮤트시킬지를 보내주면(target) 백엔드에서
              mute를 설정하고 다시 chatUsers가 바뀌었다는 것을 방송한다.
              그러면 chatUsers 가 바뀔 때마다 myPosition을 업데이트하니까 그 때
              myPosition 이 mute, ban 인 것을 확인해서 처리하면 될 것 같다. 

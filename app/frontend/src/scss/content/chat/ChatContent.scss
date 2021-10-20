@@ -275,9 +275,15 @@ div.pw-container {
     border-bottom: 1px solid #62c375;
     overflow: auto;
 
+    div.message-inform {
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
     .chat-room-message {
       padding: 10px 0;
       border-bottom: 1px solid #f8f8f8;
+
       #message-avatar {
         width: 35px;
         height: 35px;

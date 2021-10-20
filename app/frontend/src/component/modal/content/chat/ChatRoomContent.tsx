@@ -13,7 +13,7 @@ import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
 
 
-function submitMessage(myInfo: UserInfo, message: string, chatLog: ChatLog[], setChatLog: Dispatch<SetStateAction<any>>) {
+function submitMessage(myInfo: UserInfo, message: string, chatLog: (ChatLog | ChatLogSystem)[], setChatLog: Dispatch<SetStateAction<any>>) {
   if (message === "") return ;
   setChatLog([{
     nick: myInfo.nick,
@@ -26,7 +26,7 @@ function submitMessage(myInfo: UserInfo, message: string, chatLog: ChatLog[], se
 
 function controlTextAreaKeyDown(e: React.KeyboardEvent, myInfo: UserInfo,
                           message: string, setMessage: Dispatch<SetStateAction<string>>,
-                          chatLog: ChatLog[], setChatLog: Dispatch<SetStateAction<any>>, socket: Socket) {
+                          chatLog: (ChatLog | ChatLogSystem)[], setChatLog: Dispatch<SetStateAction<any>>, socket: Socket) {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     if (message === "") return ;
@@ -137,6 +137,10 @@ interface ChatLog {
   message: string,
 };
 
+interface ChatLogSystem {
+  inform: string,
+}
+
 interface ChatUser {
   nick: string,
   avatar_url: string,
@@ -151,7 +155,7 @@ interface ChatRoomContentProps {
 const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMadeMyself, setIsMadeMyself, match}): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
-  const [chatLog, _setChatLog] = useState<ChatLog[]>([]);
+  const [chatLog, _setChatLog] = useState<(ChatLog | ChatLogSystem)[]>([]);
   const [message, setMessage] = useState("");
   const [contextMenu, setContextMenu] = useState<{
     isOpen: boolean,
@@ -179,7 +183,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
    * @author donglee
    * @brief 웹소켓에서 이벤트리스너에 최신화된 chatLog state에 접근하기 위해서 ref훅을 사용함
    */
-  const setChatLog = (data: ChatLog[]) => {
+  const setChatLog = (data: (ChatLog | ChatLogSystem)[]) => {
     chatLogRef.current = data;
     _setChatLog(data);
   };
@@ -226,6 +230,18 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   /* TODO: myPosition이 바뀔 때마다 내가 강퇴를 당한건지를 검사한다.
            내가 mute 당한 것인지를 검사한다.
            백엔드에서 position 정보가 업데이트 된 것이 넘어오지 않는다. */
+  useEffect(() => {
+    switch (myPosition) {
+      case "ban":
+        /* 대화방을 뒤로가기해서 나가게 하고 다시 못들어오게 해야 된다. */
+        break ;
+      case "mute":
+        /* 대화를 칠 때 마다 alert가 뜨도록 하면 될듯. 여기선 딱히 할 게 없음 */
+        break ;
+      default:
+        break ;
+    }
+  }, [myPosition]);
 
   /*!
    * @author donglee
@@ -252,17 +268,20 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 메세지를 받았을 때 chatLog를 최신화해서 렌더링함
        */
       socket.on("message", (data: ChatLog & {user: string, chat: string}) => {
-        console.log("message socket on!");
+        // console.log("message socket on!", data);
         if (data.user) {
-          return ;
+          setChatLog([{
+            inform: data.chat,
+          }, ...chatLogRef.current]);
+        } else {
+          setChatLog([{
+            nick: data.nick,
+            position: data.position,
+            avatar_url: data.avatar_url,
+            time: data.time,
+            message: data.message
+          }, ...chatLogRef.current]);
         }
-        setChatLog([{
-          nick: data.nick,
-          position: data.position,
-          avatar_url: data.avatar_url,
-          time: data.time,
-          message: data.message
-        }, ...chatLogRef.current]);
       });
   
       /*!
@@ -270,7 +289,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 대화방 정보가 변경될 경우 방 정보를 최신화함
        */
       socket.on("setRoomInfo", (data: ChatRoom) => {
-        console.log("setRoomInfo socket on!", data);
+        // console.log("setRoomInfo socket on!", data);
         const roomInfo = {
           title: data.title,
           type: data.type,
@@ -287,7 +306,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 대화방에 참여중인 사용자들이 변경될 때 최신화해서 렌더링함
        */
       socket.on("setRoomUsers", (data: ChatUser[]) => {
-        console.log("setRoomUsers socket on!", data);
+        // console.log("setRoomUsers socket on!", data);
         const users = [...data];
         setChatUsers(users);
       });
@@ -364,27 +383,35 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         </div>
         <div id="chat-room-body">
           {
-            chatLog.map((value, idx) => {
-              const date = new Date(value.time);
-              const hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
-              const minute = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
-              return (
-                <div key={idx} className="chat-room-message">
-                  <img id="message-avatar" src={value.avatar_url}/>
-                  <div id="message-content">
-                    <span id="message-nick">
-                      <b>{value.nick}</b>
-                    </span>
-                    {console.log("test: ", value.position)}
-                    {/* {value.position === "owner" ? 
-                      <img className="message-status" src="/public/crown.png" alt="owner"/> : <></>}
-                    {value.position === "admin" ?
-                      <img className="message-status" src="/public/knight.png" alt="admin"/> : <></>} */}
-                    <span id="message-time">{hour}:{minute}</span>
-                    <span id="message-body">{value.message}</span>
+            chatLog.map((value: ChatLog & ChatLogSystem, idx) => {
+              if (value.inform) {
+                return (
+                  <div key={idx} className="message-inform chat-room-message">
+                    <span>{value.inform}</span>
                   </div>
-                </div>
-              );
+                );
+              } else {
+                const date = new Date(value.time);
+                const hour = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+                const minute = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+                return (
+                  <div key={idx} className="chat-room-message">
+                    <img id="message-avatar" src={value.avatar_url}/>
+                    <div id="message-content">
+                      <span id="message-nick">
+                        <b>{value.nick}</b>
+                      </span>
+                      {console.log("test: ", value.position)}
+                      {/* {value.position === "owner" ? 
+                        <img className="message-status" src="/public/crown.png" alt="owner"/> : <></>}
+                      {value.position === "admin" ?
+                        <img className="message-status" src="/public/knight.png" alt="admin"/> : <></>} */}
+                      <span id="message-time">{hour}:{minute}</span>
+                      <span id="message-body">{value.message}</span>
+                    </div>
+                  </div>
+                );
+              }
             })
           }
         </div>
@@ -423,7 +450,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
             value={message}
             onKeyPress={(e) => controlTextAreaKeyDown(e, myInfo, message, setMessage, chatLog, setChatLog, socket)}
             onChange={({target: {value}}) => setMessage(value)}/>
-          <button className="chat-msg-btn" onClick={() => submitMessage(myInfo, message, chatLog, setChatLog)}>전송</button>
+          {/* <button className="chat-msg-btn" onClick={() => submitMessage(myInfo, message, chatLog, setChatLog)}>전송</button> */}
         </form>
         {contextMenu.isOpen && <ChatContextMenu
                                   x={contextMenu.x}
