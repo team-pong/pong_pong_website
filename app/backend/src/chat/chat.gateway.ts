@@ -203,9 +203,10 @@ export class ChatGateway {
       if (ret.err_msg != err0) {
         throw (ret);
       }
-      // 4. 유저 리스트 다시 전송하기 (다른 유저들에게도 어드민 표시가 보이도록)
+      // 4. 유저 리스트 다시 전송하기는 (밴당한 유저의 position을 ban으로 바꾸면, 프론트에서 소켓 연결이 끊어지고 나가지게 된다.)
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
       this.server.to(room_id).emit('setRoomUsers', user_list);
+      
     } catch (err) {
       console.log(`Chat Socket setBan error | ${err}`);
       return (err);

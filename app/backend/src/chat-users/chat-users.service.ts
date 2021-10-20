@@ -11,6 +11,7 @@ import axios from 'axios';
 import { UsersDto3 } from 'src/dto/users';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from 'src/chat/chat.service';
+import { Ban } from 'src/entities/ban';
 
 @Injectable()
 export class ChatUsersService {
@@ -23,6 +24,7 @@ export class ChatUsersService {
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(Admin) private adminRepo: Repository<Admin>,
+    @InjectRepository(Ban) private banRepo: Repository<Ban>,
     ){}
 
   async createChatUsers(user_id: string, channel_id: number){
@@ -110,21 +112,28 @@ export class ChatUsersService {
   async getUserPosition(user_id: string, room_id: string) {
     const admin = await this.adminRepo.count({user_id: user_id, channel_id: Number(room_id)});
     const owner = await this.chatRepo.count({owner_id: user_id, channel_id: Number(room_id)});
-    if (owner) {
-      return 'owner';
+    const ban = await this.banRepo.count({user_id: user_id, channel_id: Number(room_id)});
+    if (ban) {
+      return 'ban';
     } else if (admin) {
       return 'admin';
+    } else if (owner) {
+      return 'owner';
     } else {
       return 'normal';
     }
   }
 
   async getUserListInRoom(room_id: string) {
+    // 채팅방에 접속해있는 유저 리스트 받아오기
     const rid = Number(room_id)
+    // 1. 채팅방 정보 확인.
     if (await this.chatRepo.count({channel_id: rid}) === 0)  // 존재하지 않은 채널 이라면
       throw new ErrMsgDto(err4);
     const ret = []
+    // 2. chat-user db에서 user_id 리스트 받아오기
     const users = await this.chatUsersRepo.find({channel_id: rid});  // 해당 채널의 유저들 검색
+    // 3. user_id 리스트로 닉네임, 아바타, 채팅방에서의 계급 받아오기 (프론트에서 쓰기 편하게 데이터 )
     for (let user of users) {
       const user_info = await this.usersRepo.findOne({user_id: user.user_id});
       ret.push({
