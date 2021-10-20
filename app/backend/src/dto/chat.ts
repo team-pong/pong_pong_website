@@ -187,6 +187,8 @@ export class SetChatAdminDto{
 	public nickname: string;
 }
 
+export class DeleteChatAdminDto extends SetChatAdminDto {}
+
 // export class ChatDto6{
 //   @ApiProperty({
 // 		example: 'jinbkim',
