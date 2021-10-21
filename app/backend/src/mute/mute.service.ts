@@ -57,4 +57,9 @@ export class MuteService {
     await this.muteRepo.delete({user_id: user_id});
     return new ErrMsgDto(err0);
   }
+
+  // 특정 채널에서 뮤트 해제
+  async unMute(user_id: string, room_id: number) {
+    await this.muteRepo.delete({user_id: user_id, channel_id: room_id});
+  }
 }

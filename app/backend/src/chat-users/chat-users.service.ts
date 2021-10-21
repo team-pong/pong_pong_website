@@ -12,6 +12,7 @@ import { UsersDto3 } from 'src/dto/users';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from 'src/chat/chat.service';
 import { Ban } from 'src/entities/ban';
+import { Mute } from 'src/entities/mute';
 
 @Injectable()
 export class ChatUsersService {
@@ -25,6 +26,7 @@ export class ChatUsersService {
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(Admin) private adminRepo: Repository<Admin>,
     @InjectRepository(Ban) private banRepo: Repository<Ban>,
+    @InjectRepository(Mute) private muteRepo: Repository<Mute>,
     ){}
 
   async createChatUsers(user_id: string, channel_id: number){
@@ -113,8 +115,11 @@ export class ChatUsersService {
     const admin = await this.adminRepo.count({user_id: user_id, channel_id: Number(room_id)});
     const owner = await this.chatRepo.count({owner_id: user_id, channel_id: Number(room_id)});
     const ban = await this.banRepo.count({user_id: user_id, channel_id: Number(room_id)});
+    const mute = await this.muteRepo.count({user_id: user_id, channel_id: Number(room_id)});
     if (ban) {
       return 'ban';
+    } else if (mute) {
+      return 'mute'
     } else if (admin) {
       return 'admin';
     } else if (owner) {

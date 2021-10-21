@@ -8,10 +8,11 @@ import { ChatUsersService } from 'src/chat-users/chat-users.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
-import { DeleteChatAdminDto, SetChatAdminDto, SetChatBanDto } from 'src/dto/chat';
+import { DeleteChatAdminDto, DeleteChatMuteDto, SetChatAdminDto, SetChatBanDto, SetChatMuteDto } from 'src/dto/chat';
 import { AdminService } from 'src/admin/admin.service';
 import { err0 } from 'src/err';
 import { BanService } from 'src/ban/ban.service';
+import { MuteService } from 'src/mute/mute.service';
 
 interface JoinMsg{
   room_id: string,
@@ -63,6 +64,8 @@ export class ChatGateway {
     private adminService: AdminService,
     @Inject(forwardRef(() => BanService))
     private banService: BanService,
+    @Inject(forwardRef(() => MuteService))
+    private muteService: MuteService
   ) {}
 
   @WebSocketServer() public server: Server;
@@ -206,11 +209,63 @@ export class ChatGateway {
       // 4. 유저 리스트 다시 전송하기는 (밴당한 유저의 position을 ban으로 바꾸면, 프론트에서 소켓 연결이 끊어지고 나가지게 된다.)
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
       this.server.to(room_id).emit('setRoomUsers', user_list);
-      
     } catch (err) {
       console.log(`Chat Socket setBan error | ${err}`);
       return (err);
-    } 
+    }
+  }
+
+  @SubscribeMessage('setMute')
+  async mute(@ConnectedSocket() socket: Socket, @MessageBody() setChatMuteDto: SetChatMuteDto) {
+    // 특정 유저 뮤트하기
+    try {
+      // 1. 요청 보낸 유저의 권한 확인 (admin 또는 owner 인가?)
+      const room_id = this.socket_map[socket.id].room_id;
+      const user_id = this.socket_map[socket.id].user_id;
+      const position = await this.chatUsersService.getUserPosition(user_id, room_id);
+      const target_nick = setChatMuteDto.nickname;
+      if (position != 'owner' && position != 'admin') {
+        throw ("당신은 밴 권한이 없습니다.")
+      }
+      // 2. 뮤트 하려는 유저 정보 조회 (id 가져오기)
+      const target = await this.usersService.getUserInfoWithNick(target_nick);
+      // 3. mute db에 추가
+      const ret = await this.muteService.createMute(target.user_id, Number(room_id));
+      if (ret.err_msg != err0) {
+        throw (ret);
+      }
+      // 4. 유저 리스트 다시 전송하기 (mute 상태 아이콘이 뜨도록 한다.)
+      const user_list = await this.chatUsersService.getUserListInRoom(room_id)
+      this.server.to(room_id).emit('setRoomUsers', user_list);
+    } catch (err) {
+      console.log(`Chat Socket setMute error | ${err}`);
+      return (err);
+    }
+  }
+
+  @SubscribeMessage('unMute')
+  async unMute(@ConnectedSocket() socket: Socket, @MessageBody() deleteChatMuteDto: DeleteChatMuteDto) {
+    // 특정 유저 뮤트하기
+    try {
+      // 1. 요청 보낸 유저의 권한 확인 (admin 또는 owner 인가?)
+      const room_id = this.socket_map[socket.id].room_id;
+      const user_id = this.socket_map[socket.id].user_id;
+      const position = await this.chatUsersService.getUserPosition(user_id, room_id);
+      const target_nick = deleteChatMuteDto.nickname;
+      if (position != 'owner' && position != 'admin') {
+        throw ("당신은 밴 권한이 없습니다.")
+      }
+      // 2. 뮤트 하려는 유저 정보 조회 (id 가져오기)
+      const target = await this.usersService.getUserInfoWithNick(target_nick);
+      // 3. mute db에서 삭제
+      await this.muteService.unMute(user_id, Number(room_id));
+      // 4. 유저 리스트 다시 전송하기 (mute 상태 아이콘이 제거되도록, position 갱신)
+      const user_list = await this.chatUsersService.getUserListInRoom(room_id)
+      this.server.to(room_id).emit('setRoomUsers', user_list);
+    } catch (err) {
+      console.log(`Chat Socket unMute error | ${err}`);
+      return (err);
+    }
   }
 
   @SubscribeMessage('message')
