@@ -203,4 +203,12 @@ export class ChatService {
     chatRoom.channel_id = chanel[0].channel_id;
     return chatRoom;
   }
+
+  async getMaxNumber(room_id: string) {
+    const channel = await this.chatRepo.findOne({channel_id: Number(room_id)});
+    if (!channel) {
+      throw err4;
+    }
+    return (channel.max_people);
+  }
 }
