@@ -19,12 +19,13 @@ function submitMessage(
   chatLog: (ChatLog | ChatLogSystem)[],
   setChatLog: Dispatch<SetStateAction<any>>,
   myPosition: string,
-  setMessage: Dispatch<SetStateAction<string>>,) {
+  setMessage: Dispatch<SetStateAction<string>>,
+  socket: Socket) {
   
   e.preventDefault();
   if (message === "") return ;
   if (myPosition === "mute") {
-    alert("관리자가 당신을 대화 차단했습니다. 잠시 후에 다시 시도하십시오.");
+    alert("관리자가 당신을 대화 차단했습니다.");
     return ;
   }
   setChatLog([{
@@ -34,6 +35,7 @@ function submitMessage(
     time: new Date().getTime(),
     message: message
   }, ...chatLog]);
+  socket.emit("message", message);
   setMessage("");
 };
 
@@ -45,12 +47,7 @@ function controlTextAreaKeyDown(e: React.KeyboardEvent, myInfo: UserInfo,
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     if (message === "") return ;
-    if (myPosition === "mute") {
-      alert("관리자가 당신을 대화 차단했습니다. 잠시 후에 다시 시도하십시오.");
-      return ;
-    }
-    submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, setMessage);
-    socket.emit("message", message);
+    submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, setMessage, socket);
     setMessage("");
   }
 };
@@ -243,11 +240,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     const res = await easyfetch.fetch()
     
     if (res.bool) {
-      console.log("ban???");
       history.back();
-      throw ("현재 대화방에서 차단되어서 입장할 수 없습니다.");
+      throw ("현재 대화방에서 차단되어서 입장할 수 없습니다. 잠시 후에 다시 시도하십시오.");
     }
-
     const socket = io(`${global.BE_HOST}/chat`);
 
     socket.emit('join', {room_id: channel_id});
@@ -258,14 +253,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     console.log("myPosition ", myPosition);
     switch (myPosition) {
       case "ban":
-        /* 대화방을 뒤로가기해서 나가게 하고 다시 못들어오게 해야 된다. */
-        console.log("나 밴 당함!");
         history.back();
-        alert("강제 퇴장 당했습니다.");
+        // alert("강제 퇴장 당했습니다.");
         break ;
       case "mute":
         /* 대화를 칠 때 마다 alert가 뜨도록 하면 될듯. 여기선 딱히 할 게 없음 */
-        // console.log("나 뮤트 당함!");
+        console.log("나 뮤트 당함!");
         break ;
       default:
           // console.log("나한테는 아무 영향 없음!");
@@ -335,7 +328,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 대화방에 참여중인 사용자들이 변경될 때 최신화해서 렌더링함
        */
       socket.on("setRoomUsers", (data: ChatUser[]) => {
-        // console.log("setRoomUsers socket on!", data);
+        console.log("setRoomUsers socket on!", data);
         const users = [...data];
         setChatUsers(users);
       });
@@ -487,7 +480,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
             value={message}
             onKeyPress={(e) => controlTextAreaKeyDown(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition)}
             onChange={({target: {value}}) => setMessage(value)}/>
-          <button className="chat-msg-btn" onClick={(e) => submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, setMessage)}>전송</button>
+          <button className="chat-msg-btn" onClick={(e) => submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, setMessage, socket)}>전송</button>
         </form>
         {contextMenu.isOpen && <ChatContextMenu
                                   x={contextMenu.x}
