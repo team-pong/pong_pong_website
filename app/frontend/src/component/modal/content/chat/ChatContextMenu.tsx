@@ -9,6 +9,7 @@ interface chatContextMenuProps {
   y: number,
   myPosition: string, /* "owner" || "admin" || "normal" || "mute" || "ban" */
   targetPosition: string,
+  targetState: string,
   target: string,
   closer: Dispatch<SetStateAction<{
     isOpen: boolean,
@@ -24,11 +25,12 @@ interface chatContextMenuProps {
 const ConditionalContextMenu: FC<{
     myPosition: string,
     targetPosition: string,
+    targetState: string,
     socket: Socket,
     target: string,
     channelId: number,
   }> = (
-  {socket, myPosition, targetPosition, target, channelId}) => {
+  {socket, myPosition, targetPosition, target, channelId, targetState}) => {
 
   const addAdmin = () => {
     socket.emit("setAdmin", {nickname: target});
@@ -49,7 +51,7 @@ const ConditionalContextMenu: FC<{
   };
 
   const unMute = () => {
-    socket.emit("unMute", {ninkname: target});
+    socket.emit("unMute", {nickname: target});
   };
 
   switch (myPosition) {
@@ -64,8 +66,8 @@ const ConditionalContextMenu: FC<{
             강퇴하기
           </li>
           <li className="chat-context-li"
-              onClick={targetPosition === "mute" ? unMute : mute}>
-            {targetPosition === "mute" ? "대화 차단 해제" : "대화 차단하기"}
+              onClick={targetState === "mute" ? unMute : mute}>
+            {targetState === "mute" ? "대화 차단 해제" : "대화 차단하기"}
           </li>
         </>
       );
@@ -77,8 +79,8 @@ const ConditionalContextMenu: FC<{
               강퇴하기
             </li>
             <li className="chat-context-li"
-                onClick={targetPosition === "mute" ? unMute : mute}>
-              {targetPosition === "mute" ? "대화 차단 해제" : "대화 차단하기"}
+                onClick={targetState === "mute" ? unMute : mute}>
+              {targetState === "mute" ? "대화 차단 해제" : "대화 차단하기"}
             </li>
           </>
         );
@@ -89,7 +91,7 @@ const ConditionalContextMenu: FC<{
 }
 
 const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
-  {socket, match, x, y, myPosition, targetPosition, target, closer, channelId}): JSX.Element => {
+  {socket, match, x, y, myPosition, targetPosition, targetState, target, closer, channelId}): JSX.Element => {
   const myInfo = useContext(UserInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
 
@@ -118,6 +120,7 @@ const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
               socket={socket}
               myPosition={myPosition}
               targetPosition={targetPosition}
+              targetState={targetState}
               target={target}
               channelId={channelId}/>
           </>

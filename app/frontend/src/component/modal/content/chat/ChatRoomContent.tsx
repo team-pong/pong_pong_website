@@ -19,12 +19,13 @@ function submitMessage(
   chatLog: (ChatLog | ChatLogSystem)[],
   setChatLog: Dispatch<SetStateAction<any>>,
   myPosition: string,
+  myState: string,
   setMessage: Dispatch<SetStateAction<string>>,
   socket: Socket) {
   
   e.preventDefault();
   if (message === "") return ;
-  if (myPosition === "mute") {
+  if (myState === "mute") {
     alert("관리자가 당신을 대화 차단했습니다.");
     return ;
   }
@@ -43,11 +44,11 @@ function controlTextAreaKeyDown(e: React.KeyboardEvent, myInfo: UserInfo,
                           message: string, setMessage: Dispatch<SetStateAction<string>>,
                           chatLog: (ChatLog | ChatLogSystem)[],
                           setChatLog: Dispatch<SetStateAction<any>>,
-                          socket: Socket, myPosition: string) {
+                          socket: Socket, myPosition: string, myState: string) {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     if (message === "") return ;
-    submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, setMessage, socket);
+    submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, myState, setMessage, socket);
     setMessage("");
   }
 };
@@ -55,14 +56,16 @@ function controlTextAreaKeyDown(e: React.KeyboardEvent, myInfo: UserInfo,
 function openContextMenu( e: React.MouseEvent,
                           setContextMenu: Dispatch<SetStateAction<any>>,
                           target: string,
-                          targetPosition: string) {
+                          targetPosition: string,
+                          targetState: string) {
   document.getElementById("chat-room-users").style.overflowY = "hidden";
   setContextMenu({
     isOpen: true,
     x: e.pageX,
     y: e.pageY,
     target,
-    targetPosition
+    targetPosition,
+    targetState,
   });
 };
 
@@ -161,6 +164,7 @@ interface ChatUser {
   nick: string,
   avatar_url: string,
   position: string,
+  state: string,
 };
 
 interface ChatRoomContentProps {
@@ -178,8 +182,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     x: number,
     y: number,
     target: string,
-    targetPosition: string
-  }>({isOpen: false, x: 0, y: 0, target: "", targetPosition: ""});
+    targetPosition: string,
+    targetState: string,
+  }>({isOpen: false, x: 0, y: 0, target: "", targetPosition: "", targetState: ""});
   const [noResult, setNoReult] = useState(false);
 
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
@@ -189,6 +194,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   const chatLogRef = useRef(chatLog);
   const [passwordPassed, setPasswordPassed] = useState(false);
   const socketRef = useRef(socket);
+  const [myState, setMyState] = useState("");
   const [myPosition, setMyPosition] = useState("");
 
   const myInfo = useContext(UserInfoContext);
@@ -249,32 +255,29 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     return socket;
   };
 
+  /*!
+   * @author donglee
+   * @brief myState가 바뀔 때마다 강제퇴장을 검사한다.
+   */
   useEffect(() => {
-    console.log("myPosition ", myPosition);
-    switch (myPosition) {
-      case "ban":
-        history.back();
-        // alert("강제 퇴장 당했습니다.");
-        break ;
-      case "mute":
-        /* 대화를 칠 때 마다 alert가 뜨도록 하면 될듯. 여기선 딱히 할 게 없음 */
-        console.log("나 뮤트 당함!");
-        break ;
-      default:
-          // console.log("나한테는 아무 영향 없음!");
-        break ;
+    console.log("myState ", myState);
+    if (myState === "ban") {
+      history.back();
+      socket.disconnect();
+      alert("강제 퇴장 당했습니다.");
     }
-  }, [myPosition]);
+  }, [myState]);
 
   /*!
    * @author donglee
-   * @brief 소켓으로 chatUsers 정보가 변경되면 myPosition을 업데이트함
+   * @brief 소켓으로 chatUsers 정보가 변경되면 myPosition, myState를 업데이트함
    */
   useEffect(() => {
     if (chatUsers.length !== 0) {
       const me = chatUsers.filter((user) => user.nick === myInfo.nick);
       if (me[0]) {
         setMyPosition(me[0].position);
+        setMyState(me[0].state);
       }
     }
   }, [chatUsers])
@@ -393,7 +396,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     });
   }, []);
 
-  if (chatRoomInfo && chatLog && isProtected) {
+  if (chatRoomInfo && isProtected) {
     return (
       <Password
         setIsProtected={setIsProtected}
@@ -401,7 +404,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         channelId={channel_id}
         setPasswordPassed={setPasswordPassed}/>
     );
-  } else if (chatRoomInfo && chatLog && !isProtected) {
+  } else if (chatRoomInfo && !isProtected) {
     return (
       <div id="chat-room">
         <div id="chat-room-header">
@@ -451,12 +454,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
               return (
                 <div key={idx}
                       className="chat-user"
-                      onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position)}>
+                      onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position, value.state)}>
                   <img className="chat-room-user-img" src={value.avatar_url} alt={value.nick} />
                   <span className="chat-room-user-nick">{value.nick}</span>
                   {value.position === "owner" && <img className="position" src={"/public/crown.png"} alt="owner"/>}
                   {value.position === "admin" && <img className="position" src={"/public/knight.png"} alt="admin"/>}
-                  {value.position === "mute" && <img className="position" src={"/public/mute.png"} alt="mute"/>}
+                  {value.state === "mute" && <img className="position" src={"/public/mute.png"} alt="mute"/>}
                 </div>
               );
             })
@@ -466,7 +469,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
           </span>
           <div id="chat-room-menu">
             <Link to="/mainpage/chat/invite"><img className="chat-menu-img" src="/public/plus.svg" alt="invite" /></Link>
-            {myPosition === "owner" ?
+            {myState === "owner" ?
             <Link to="/mainpage/chat/config"><img className="chat-menu-img" src="/public/tools.svg" alt="config" /></Link>
             : <></>}
           </div>
@@ -478,15 +481,16 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
             rows={4}
             cols={50}
             value={message}
-            onKeyPress={(e) => controlTextAreaKeyDown(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition)}
+            onKeyPress={(e) => controlTextAreaKeyDown(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition, myState)}
             onChange={({target: {value}}) => setMessage(value)}/>
-          <button className="chat-msg-btn" onClick={(e) => submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, setMessage, socket)}>전송</button>
+          <button className="chat-msg-btn" onClick={(e) => submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, myState, setMessage, socket)}>전송</button>
         </form>
         {contextMenu.isOpen && <ChatContextMenu
                                   x={contextMenu.x}
                                   y={contextMenu.y}
                                   myPosition={myPosition}
                                   targetPosition={contextMenu.targetPosition}
+                                  targetState={contextMenu.targetState}
                                   closer={setContextMenu}
                                   target={contextMenu.target}
                                   socket={socket}
