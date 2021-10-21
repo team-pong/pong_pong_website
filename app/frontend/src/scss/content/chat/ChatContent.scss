@@ -350,10 +350,11 @@ div.pw-container {
       .position {
         position: relative;
         float: right;
-        width: 30px;
-        height: 30px;
+        width: 20px;
+        height: 20px;
         vertical-align: middle;
         border-radius: 50%;
+        margin-top: 4px;
       }
       .chat-room-user-nick {
         &::before {
@@ -364,6 +365,14 @@ div.pw-container {
       &:hover {
         color: #fff;
         background-color: $green;
+      }
+    }
+
+    .chat-user-me {
+      background-color: #b3d2ec;
+
+      &:hover {
+        background-color: #2f97ec;
       }
     }
 
@@ -433,20 +442,21 @@ div.pw-container {
 
   #context-menu {
     list-style: none;
-    color: white;
+    color: #4a5148;
     padding: 0;
     border: 0;
     width: 135px;
+    background-color: #dfeadf;
 
     .chat-context-li {
-      padding: 5px 10px;
-      border-bottom: solid 1px #43926d;
+      padding: 8px 10px;
+      border-bottom: solid 1px #d8e3d4;
       font-size: 11pt;
     }
 
     .chat-context-li:hover {
       cursor: pointer;
-      background: #37795a;
+      background: #9ccab5;
     }
   }
 }

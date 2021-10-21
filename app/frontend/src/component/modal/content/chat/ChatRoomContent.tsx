@@ -459,7 +459,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
             chatUsers.map((value, idx) => {
               return (
                 <div key={idx}
-                      className="chat-user"
+                      className={"chat-user" + (value.nick === myInfo.nick ? " chat-user-me" : "")}
                       onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position, value.state)}>
                   <img className="chat-room-user-img" src={value.avatar_url} alt={value.nick} />
                   <span className="chat-room-user-nick">{value.nick}</span>
@@ -475,7 +475,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
           </span>
           <div id="chat-room-menu">
             <Link to="/mainpage/chat/invite"><img className="chat-menu-img" src="/public/plus.svg" alt="invite" /></Link>
-            {myState === "owner" ?
+            {myPosition === "owner" ?
             <Link to="/mainpage/chat/config"><img className="chat-menu-img" src="/public/tools.svg" alt="config" /></Link>
             : <></>}
           </div>
