@@ -25,7 +25,7 @@ function submitMessage(e: any, myInfo: UserInfo,
     e.preventDefault();
     if (message === "") return ;
     if (myState === "mute") {
-      alert("관리자가 당신을 대화 차단했습니다.");
+      alert("관리자가 당신을 차단했습니다.");
       return ;
     }
     setChatLog([{
@@ -239,7 +239,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
     
     if (res.bool) {
       history.back();
-      throw ("현재 대화방에서 차단되어서 입장할 수 없습니다. 잠시 후에 다시 시도하십시오.");
+      throw ("현재 대화방에서 강제퇴장 당해 입장할 수 없습니다. 잠시 후에 다시 시도하십시오.");
     }
     const socket = io(`${global.BE_HOST}/chat`);
 

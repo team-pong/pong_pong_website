@@ -82,7 +82,7 @@ const ConditionalContextMenu: FC<{
           </li>
           <li className="chat-context-li"
               onClick={targetState === "mute" ? unMute : mute}>
-            {targetState === "mute" ? "대화 차단 해제" : "대화 차단하기"}
+            {targetState === "mute" ? "차단 해제" : "차단하기"}
           </li>
           <li className="chat-context-li" onClick={ban}>
             강퇴하기
@@ -95,7 +95,7 @@ const ConditionalContextMenu: FC<{
           <>
             <li className="chat-context-li"
                 onClick={targetState === "mute" ? unMute : mute}>
-              {targetState === "mute" ? "대화 차단 해제" : "대화 차단하기"}
+              {targetState === "mute" ? "차단 해제" : "차단하기"}
             </li>
             <li className="chat-context-li" onClick={ban}>
               강퇴하기
