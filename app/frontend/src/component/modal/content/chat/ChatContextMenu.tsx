@@ -39,7 +39,9 @@ const ConditionalContextMenu: FC<{
   };
 
   const ban = () => {
-    socket.emit("setBan", {nickname: target});
+    const really = confirm(`${target} 님을 정말로 강퇴하시겠습니까?`);
+    if (really)
+      socket.emit("setBan", {nickname: target});
   };
 
   const mute = () => {

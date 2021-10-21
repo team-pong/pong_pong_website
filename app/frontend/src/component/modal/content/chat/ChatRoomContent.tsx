@@ -12,14 +12,21 @@ import { UserInfoContext } from "../../../../Context";
 import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
 
-
 function submitMessage(
+  e: any,
   myInfo: UserInfo,
   message: string,
   chatLog: (ChatLog | ChatLogSystem)[],
   setChatLog: Dispatch<SetStateAction<any>>,
-  myPosition: string) {
+  myPosition: string,
+  setMessage: Dispatch<SetStateAction<string>>,) {
+  
+  e.preventDefault();
   if (message === "") return ;
+  if (myPosition === "mute") {
+    alert("관리자가 당신을 대화 차단했습니다. 잠시 후에 다시 시도하십시오.");
+    return ;
+  }
   setChatLog([{
     nick: myInfo.nick,
     position: myPosition,
@@ -27,6 +34,7 @@ function submitMessage(
     time: new Date().getTime(),
     message: message
   }, ...chatLog]);
+  setMessage("");
 };
 
 function controlTextAreaKeyDown(e: React.KeyboardEvent, myInfo: UserInfo,
@@ -37,7 +45,11 @@ function controlTextAreaKeyDown(e: React.KeyboardEvent, myInfo: UserInfo,
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     if (message === "") return ;
-    submitMessage(myInfo, message, chatLog, setChatLog, myPosition);
+    if (myPosition === "mute") {
+      alert("관리자가 당신을 대화 차단했습니다. 잠시 후에 다시 시도하십시오.");
+      return ;
+    }
+    submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, setMessage);
     socket.emit("message", message);
     setMessage("");
   }
@@ -226,7 +238,16 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     return res;
   };
 
-  const connectSocket = () => {
+  const connectSocket = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/ban?channel_id=${channel_id}&nick=${myInfo.nick}`);
+    const res = await easyfetch.fetch()
+    
+    if (res.bool) {
+      console.log("ban???");
+      history.back();
+      throw ("현재 대화방에서 차단되어서 입장할 수 없습니다.");
+    }
+
     const socket = io(`${global.BE_HOST}/chat`);
 
     socket.emit('join', {room_id: channel_id});
@@ -234,12 +255,13 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   };
 
   useEffect(() => {
+    console.log("myPosition ", myPosition);
     switch (myPosition) {
       case "ban":
         /* 대화방을 뒤로가기해서 나가게 하고 다시 못들어오게 해야 된다. */
         console.log("나 밴 당함!");
         history.back();
-        prompt("강제 퇴장 당했습니다.");
+        alert("강제 퇴장 당했습니다.");
         break ;
       case "mute":
         /* 대화를 칠 때 마다 alert가 뜨도록 하면 될듯. 여기선 딱히 할 게 없음 */
@@ -258,7 +280,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
   useEffect(() => {
     if (chatUsers.length !== 0) {
       const me = chatUsers.filter((user) => user.nick === myInfo.nick);
-
       if (me[0]) {
         setMyPosition(me[0].position);
       }
@@ -314,7 +335,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 대화방에 참여중인 사용자들이 변경될 때 최신화해서 렌더링함
        */
       socket.on("setRoomUsers", (data: ChatUser[]) => {
-        console.log("setRoomUsers socket on!", data);
+        // console.log("setRoomUsers socket on!", data);
         const users = [...data];
         setChatUsers(users);
       });
@@ -327,8 +348,11 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
    */
   useEffect(() => {
     if (passwordPassed) {
-      const socket = connectSocket();
-      setSocket(socket);
+      connectSocket().then((socket) => {
+        setSocket(socket)
+      }).catch((err) => {
+        alert(err);
+      });
     }
   }, [passwordPassed]);
 
@@ -338,8 +362,11 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
    */
   useEffect(() => {
     if (isMadeMyself) {
-      const socket = connectSocket();
-      setSocket(socket);
+      connectSocket().then((socket) => {
+        setSocket(socket)
+      }).catch((err) => {
+        alert(err);
+      });
     }
   }, [isMadeMyself]);
 
@@ -356,8 +383,11 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
         if (res.type === "protected") {
           setIsProtected(true);
         } else {
-          const socket = connectSocket();
-          setSocket(socket);
+          connectSocket().then((socket) => {
+            setSocket(socket)
+          }).catch((err) => {
+            alert(err);
+          });
         }
       }
     );
@@ -457,7 +487,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
             value={message}
             onKeyPress={(e) => controlTextAreaKeyDown(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition)}
             onChange={({target: {value}}) => setMessage(value)}/>
-          <button className="chat-msg-btn" onClick={() => submitMessage(myInfo, message, chatLog, setChatLog, myPosition)}>전송</button>
+          <button className="chat-msg-btn" onClick={(e) => submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, setMessage)}>전송</button>
         </form>
         {contextMenu.isOpen && <ChatContextMenu
                                   x={contextMenu.x}

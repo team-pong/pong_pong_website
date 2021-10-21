@@ -94,7 +94,6 @@ export class ChatGateway {
         room_id: room_id,
         user_id: user_id,
       };
-      
       // 1. 소켓 room 접속
       socket.join(room_id);
       // 2. chat-users에 유저 추가
