@@ -12,43 +12,30 @@ import { UserInfoContext } from "../../../../Context";
 import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
 
-function submitMessage(
-  e: any,
-  myInfo: UserInfo,
-  message: string,
-  chatLog: (ChatLog | ChatLogSystem)[],
-  setChatLog: Dispatch<SetStateAction<any>>,
-  myPosition: string,
-  myState: string,
-  setMessage: Dispatch<SetStateAction<string>>,
-  socket: Socket) {
-  
-  e.preventDefault();
-  if (message === "") return ;
-  if (myState === "mute") {
-    alert("관리자가 당신을 대화 차단했습니다.");
-    return ;
-  }
-  setChatLog([{
-    nick: myInfo.nick,
-    position: myPosition,
-    avatar_url: myInfo.avatar_url,
-    time: new Date().getTime(),
-    message: message
-  }, ...chatLog]);
-  socket.emit("message", message);
-  setMessage("");
-};
-
-function controlTextAreaKeyDown(e: React.KeyboardEvent, myInfo: UserInfo,
+/*!
+ * @author donglee
+ * @brief Enter를 누르거나 버튼을 클릭했을 때 메세지를 제출하고 state를 업데이트함.(mute 검사)
+ */
+function submitMessage(e: any, myInfo: UserInfo,
                           message: string, setMessage: Dispatch<SetStateAction<string>>,
                           chatLog: (ChatLog | ChatLogSystem)[],
                           setChatLog: Dispatch<SetStateAction<any>>,
                           socket: Socket, myPosition: string, myState: string) {
-  if (e.key === "Enter" && !e.shiftKey) {
+  if ((e.key === "Enter" && !e.shiftKey) || e.type === "click") {
     e.preventDefault();
     if (message === "") return ;
-    submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, myState, setMessage, socket);
+    if (myState === "mute") {
+      alert("관리자가 당신을 대화 차단했습니다.");
+      return ;
+    }
+    setChatLog([{
+      nick: myInfo.nick,
+      position: myPosition,
+      avatar_url: myInfo.avatar_url,
+      time: new Date().getTime(),
+      message: message
+    }, ...chatLog]);
+    socket.emit("message", message);
     setMessage("");
   }
 };
@@ -172,7 +159,8 @@ interface ChatRoomContentProps {
   setIsMadeMyself: Dispatch<SetStateAction<boolean>>;
 };
 
-const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMadeMyself, setIsMadeMyself, match}): JSX.Element => {
+const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
+  {isMadeMyself, setIsMadeMyself, match}): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
   const [chatLog, _setChatLog] = useState<(ChatLog | ChatLogSystem)[]>([]);
@@ -241,6 +229,10 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
     return res;
   };
 
+  /*!
+   * @author donglee
+   * @brief socket을 연결함. 연결하기 전에 ban당한 유저인지를 확인하고 ban당했으면 뒤로가기후 alert.
+   */
   const connectSocket = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/ban?channel_id=${channel_id}&nick=${myInfo.nick}`);
     const res = await easyfetch.fetch()
@@ -257,10 +249,21 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
 
   /*!
    * @author donglee
+   * @brief 대화방에 인원이 꽉 차 있으면 입장을 불가하게 함
+   */
+  const checkMax = async (res: Promise<ChatRoom>) => {
+    if ((await res).max_people <= (await res).current_people) {
+      history.back();
+      throw("대화방에 남은 자리가 없습니다.");
+    } 
+    return res;
+  };
+
+  /*!
+   * @author donglee
    * @brief myState가 바뀔 때마다 강제퇴장을 검사한다.
    */
   useEffect(() => {
-    console.log("myState ", myState);
     if (myState === "ban") {
       history.back();
       socket.disconnect();
@@ -293,7 +296,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 메세지를 받았을 때 chatLog를 최신화해서 렌더링함
        */
       socket.on("message", (data: ChatLog & {user: string, chat: string}) => {
-        // console.log("message socket on!", data);
         if (data.user) {
           setChatLog([{
             inform: data.chat,
@@ -314,7 +316,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 대화방 정보가 변경될 경우 방 정보를 최신화함
        */
       socket.on("setRoomInfo", (data: ChatRoom) => {
-        // console.log("setRoomInfo socket on!", data);
         const roomInfo = {
           title: data.title,
           type: data.type,
@@ -331,7 +332,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
        * @brief 대화방에 참여중인 사용자들이 변경될 때 최신화해서 렌더링함
        */
       socket.on("setRoomUsers", (data: ChatUser[]) => {
-        console.log("setRoomUsers socket on!", data);
         const users = [...data];
         setChatUsers(users);
       });
@@ -375,6 +375,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
    */
   useEffect(() => {
     getChatRoomInfo()
+    .then(checkMax)
     .then((res) => {
         if (res.type === "protected") {
           setIsProtected(true);
@@ -386,7 +387,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
           });
         }
       }
-    );
+    ).catch((err) => {
+      alert(err);
+    });
 
     return (() => {
       if (socketRef.current) {
@@ -481,9 +484,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
             rows={4}
             cols={50}
             value={message}
-            onKeyPress={(e) => controlTextAreaKeyDown(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition, myState)}
+            onKeyPress={(e) => submitMessage(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition, myState)}
             onChange={({target: {value}}) => setMessage(value)}/>
-          <button className="chat-msg-btn" onClick={(e) => submitMessage(e, myInfo, message, chatLog, setChatLog, myPosition, myState, setMessage, socket)}>전송</button>
+          <button className="chat-msg-btn" onClick={(e) => submitMessage(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition, myState)}>전송</button>
         </form>
         {contextMenu.isOpen && <ChatContextMenu
                                   x={contextMenu.x}
@@ -493,8 +496,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = ({isMade
                                   targetState={contextMenu.targetState}
                                   closer={setContextMenu}
                                   target={contextMenu.target}
-                                  socket={socket}
-                                  channelId={chatRoomInfo.channel_id}/>}
+                                  socket={socket}/>}
         <Route path="/mainpage/chat/config">
           <Modal id={Date.now()} smallModal content={
             <ConfigChatRoom 

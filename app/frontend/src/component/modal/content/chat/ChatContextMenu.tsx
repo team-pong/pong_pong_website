@@ -19,7 +19,6 @@ interface chatContextMenuProps {
     targetPosition: string
   }>>
   socket: Socket,
-  channelId: number,
 }
 
 const ConditionalContextMenu: FC<{
@@ -28,9 +27,8 @@ const ConditionalContextMenu: FC<{
     targetState: string,
     socket: Socket,
     target: string,
-    channelId: number,
   }> = (
-  {socket, myPosition, targetPosition, target, channelId, targetState}) => {
+  {socket, myPosition, targetPosition, target, targetState}) => {
 
   const addAdmin = () => {
     socket.emit("setAdmin", {nickname: target});
@@ -91,7 +89,7 @@ const ConditionalContextMenu: FC<{
 }
 
 const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
-  {socket, match, x, y, myPosition, targetPosition, targetState, target, closer, channelId}): JSX.Element => {
+  {socket, match, x, y, myPosition, targetPosition, targetState, target, closer}): JSX.Element => {
   const myInfo = useContext(UserInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
 
@@ -121,8 +119,7 @@ const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
               myPosition={myPosition}
               targetPosition={targetPosition}
               targetState={targetState}
-              target={target}
-              channelId={channelId}/>
+              target={target}/>
           </>
           : <></>}
       </ul>
