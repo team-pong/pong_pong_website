@@ -1,18 +1,52 @@
 div.chat-invite-content {
-  height: 100%;
 
   div.invite-header {
-    background-color: burlywood;
+
+    h2.invite-title {
+      margin-left: 20px;
+    }
+
+    div.invite-input-container {
+      display: flex;
+      justify-content: center;
+      margin: 30px 0;
+
+      input.invite-input {
+        border: none;
+        border-bottom: solid 2px black;
+        width: 50%;
+      }
+
+      button.invite-search-btn {
+        color: #fff;
+        font-size: 1rem;
+        background-color: #3164ff;
+        border: solid 2px #3164ff;
+        border-radius: 6px;
+        cursor: pointer;
+        padding: 5px 19px;
+        margin-left: 10px;
+
+        &:hover {
+          background-color: rgb(242, 245, 255);
+          color: rgb(49, 100, 255);
+        }
+      }
+    }
   }
 
-  div.invite-list {
-    
-    li.invite-result-list {
+  div.invite-result {
+    margin: 15px 20px;
 
-      .fl-user-info {
+    li.invite-result-list {
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      margin: 15px 0;
+
+      .ci-user-info {
         display: flex;
-  
-        .fl-avatar {
+        .ci-avatar {
           width: 40px;
           height: 40px;
           border-radius: 50%;
@@ -23,12 +57,12 @@ div.chat-invite-content {
           margin-top: 3px;
         }
   
-        .fl-user-info-text {
+        .ci-user-info-text {
           margin-top: 3px;
         }
   
         div {
-          .fl-nickname {
+          .ci-nickname {
             display: block;
             margin-left: 10px;
             font-weight: bold;
@@ -36,7 +70,7 @@ div.chat-invite-content {
             margin-top: 2px;
           }
   
-          .fl-title {
+          .ci-title {
             margin-top: 4px;
             font-style: italic;
             font-size: 9pt;
@@ -46,7 +80,7 @@ div.chat-invite-content {
             margin-right: 5px;
           }
   
-          .fl-title-icon {
+          .ci-title-icon {
             width: 13px;
             height: 13px;
             margin-top: 6px;
@@ -55,11 +89,18 @@ div.chat-invite-content {
         }
       }
   
-      .fl-buttons {
+      .ci-button-container {
         display: flex;
         align-items: center;
         width: 70px;
         justify-content: center;
+
+        .ci-invite-btn {
+          font-size: 12pt;
+          font-weight: bold;
+          color: rgb(179, 176, 176);
+          margin: 0;
+        }
       }
     }
   }

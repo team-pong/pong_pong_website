@@ -474,9 +474,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
             참여자: {chatRoomInfo.current_people} / {chatRoomInfo.max_people}
           </span>
           <div id="chat-room-menu">
-            <Link to="/mainpage/chat/invite"><img className="chat-menu-img" src="/public/plus.svg" alt="invite" /></Link>
+            <Link to={`${match.url}/invite`}><img className="chat-menu-img" src="/public/plus.svg" alt="invite" /></Link>
             {myPosition === "owner" ?
-            <Link to="/mainpage/chat/config"><img className="chat-menu-img" src="/public/tools.svg" alt="config" /></Link>
+            <Link to={`${match.url}/config`}><img className="chat-menu-img" src="/public/tools.svg" alt="config" /></Link>
             : <></>}
           </div>
         </div>
@@ -500,7 +500,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
                                   closer={setContextMenu}
                                   target={contextMenu.target}
                                   socket={socket}/>}
-        <Route path="/mainpage/chat/config">
+        <Route path={`${match.url}/config`}>
           <Modal id={Date.now()} smallModal content={
             <ConfigChatRoom 
               chatRoomInfo={chatRoomInfo}
@@ -510,7 +510,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
               socket={socket}/>
             } />
         </Route>
-        <Route path="/mainpage/chat/invite"><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
+        <Route path={`${match.url}/invite`}><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
         <Route path={`${match.url}/profile/:nick`}><Modal id={Date.now()} smallModal content={<ProfileContent readonly/>}/></Route>
       </div>
     );
