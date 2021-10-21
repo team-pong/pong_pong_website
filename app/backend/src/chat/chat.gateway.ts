@@ -210,7 +210,6 @@ export class ChatGateway {
       const room_id = this.socket_map[socket.id].room_id;
       const user_id = this.socket_map[socket.id].user_id;
       const position = await this.chatUsersService.getUserPosition(user_id, room_id);
-      console.log('a');
       const target_nick = setChatBanDto.nickname;
       // 1. 요청 보낸 유저의 권한 확인 (admin 또는 owner 인가?)
       if (position != 'owner' && position != 'admin') {
@@ -222,10 +221,8 @@ export class ChatGateway {
       if (!this.hasPermissionOf(position, target_pos)) {
         throw (`${position}는 ${target_pos} 에게 해당 명령 권한이 없습니다.`);
       }
-      console.log('b');
       // 3. ban db에 추가
       const ret = await this.banService.createBan(target.user_id, Number(room_id));
-      console.log('c');
       if (ret.err_msg != err0) {
         throw (ret.err_msg);
       }
@@ -279,7 +276,6 @@ export class ChatGateway {
       const user_id = this.socket_map[socket.id].user_id;
       const position = await this.chatUsersService.getUserPosition(user_id, room_id);
       const target_nick = deleteChatMuteDto.nickname;
-      console.log(`a | target_nick: ${target_nick}`);
       if (position != 'owner' && position != 'admin') {
         throw ("당신은 밴 권한이 없습니다.")
       }
@@ -289,10 +285,8 @@ export class ChatGateway {
       if (!this.hasPermissionOf(position, target_pos)) {
         throw (`${position}는 ${target_pos} 에게 해당 명령 권한이 없습니다.`);
       }
-      console.log('b');
-      // 3. mute db에서 삭제
-      await this.muteService.unMute(user_id, Number(room_id));
-      console.log('c');
+      // 3. mute db에서 타겟 id 삭제
+      await this.muteService.unMute(target.user_id, Number(room_id));
       // 4. 유저 리스트 다시 전송하기 (mute 상태 아이콘이 제거되도록, position 갱신)
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
       this.server.to(room_id).emit('setRoomUsers', user_list);
@@ -335,21 +329,27 @@ export class ChatGateway {
       const rid = this.socket_map[socket.id].room_id;
 
       console.log('Chat Socket Disconnected', uid);
+      // 1-1. chat-users db에서 제거
       await this.chatUsersService.deleteUser(rid, uid); // 남은 유저가 없는 경우까지 이 메서드에서 처리
 
-      // 방 정보 전송
+      // 2. 변경된 방 정보 전송 (방 인원수 줄음)
       const room_info = await this.chatService.getChannelInfo(Number(rid));
       this.server.to(rid).emit('setRoomInfo', room_info);
     
-      // 유저 정보 리스트 전송 닉 ,아바타, 포지션
+      // 3. 유저 정보 리스트 전송 (빠진 인원 갱신)
       const user_list = await this.chatUsersService.getUserListInRoom(rid)
       this.server.to(rid).emit('setRoomUsers', user_list);
 
+      // 4. 시스템 메세지 전송
       socket.to(rid).emit('message', {
         user: 'system',
         chat: `${uid} 님이 퇴장하셨습니다.`,
       })
+
+      // 5. 해당소켓 leave
       socket.leave(rid);
+
+      // 6. 해당 소켓 정보 제거
       delete this.socket_map[socket.id];
     } catch (err) {
       console.error(err);
