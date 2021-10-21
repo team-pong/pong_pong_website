@@ -5,7 +5,7 @@ import { setAchievementStr, setAchievementImg } from "../../../../utils/setAchie
 import Loading from "../../../loading/Loading";
 import NoResult from "../../../noresult/NoResult";
 
-interface Friend {
+export interface Friend {
 	user_id: string;
 	nick: string;
 	avatar_url: string;
@@ -70,7 +70,7 @@ const FriendList: React.FC = () => {
 
 	const getFriendList = async () => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
-		const res = await easyfetch.fetch()
+		const res = await easyfetch.fetch();
 
 		if (res.friendList.length === 0) {
 			setNoResult(true);

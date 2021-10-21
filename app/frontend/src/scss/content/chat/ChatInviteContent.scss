@@ -1,0 +1,66 @@
+div.chat-invite-content {
+  height: 100%;
+
+  div.invite-header {
+    background-color: burlywood;
+  }
+
+  div.invite-list {
+    
+    li.invite-result-list {
+
+      .fl-user-info {
+        display: flex;
+  
+        .fl-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border-style: solid;
+          border-width: 2px;
+          border-color: white;
+          box-shadow: 0 0 3px rgb(122, 122, 122);
+          margin-top: 3px;
+        }
+  
+        .fl-user-info-text {
+          margin-top: 3px;
+        }
+  
+        div {
+          .fl-nickname {
+            display: block;
+            margin-left: 10px;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-top: 2px;
+          }
+  
+          .fl-title {
+            margin-top: 4px;
+            font-style: italic;
+            font-size: 9pt;
+            font-weight: bold;
+            color: rgb(194, 194, 194);
+            margin-left: 10px;
+            margin-right: 5px;
+          }
+  
+          .fl-title-icon {
+            width: 13px;
+            height: 13px;
+            margin-top: 6px;
+            margin-left: 2px;
+          }
+        }
+      }
+  
+      .fl-buttons {
+        display: flex;
+        align-items: center;
+        width: 70px;
+        justify-content: center;
+      }
+    }
+  }
+}
