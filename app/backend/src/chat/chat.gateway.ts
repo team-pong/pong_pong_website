@@ -142,12 +142,16 @@ export class ChatGateway {
       if (position != 'owner') {
         throw ("당신은 채널 방장이 아닙니다.")
       }
-      // 2. 바꾸려는 유저에 대한 정보 조회 (id 가져오려고)
+      // 2. 바꾸려는 유저에 대한 정보 조회 (id 가져오려고, 권한 확인)
       const target = await this.usersService.getUserInfoWithNick(target_nick);
+      const target_pos = await this.chatUsersService.getUserPosition(target.user_id, room_id);
+      if (!this.hasPermissionOf(position, target_pos)) {
+        throw (`${position}는 ${target_pos} 에게 해당 명령 권한이 없습니다.`);
+      }
       // 3. 어드민 권한 주기 (이미 어드민, 해당 유저없음 등 에러는 내부에서 return 됨)
       const ret = await this.adminService.createAdmin(target.user_id, Number(room_id));
       if (ret.err_msg != err0) {
-        throw (ret);
+        throw (ret.err_msg);
       }
       // 4. 유저 리스트 다시 전송하기 (다른 유저들에게도 어드민 표시가 보이도록)
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
@@ -170,12 +174,16 @@ export class ChatGateway {
       if (position != 'owner') {
         throw ("당신은 채널 방장이 아닙니다.")
       }
-      // 2. 바꾸려는 유저에 대한 정보 조회 (id 가져오기)
+      // 2. 바꾸려는 유저에 대한 정보 조회 (id 가져오기, 권한 확인)
       const target = await this.usersService.getUserInfoWithNick(target_nick);
+      const target_pos = await this.chatUsersService.getUserPosition(target.user_id, room_id);
+      if (!this.hasPermissionOf(position, target_pos)) {
+        throw (`${position}는 ${target_pos} 에게 해당 명령 권한이 없습니다.`);
+      }
       // 3. 어드민 권한 제거 (setAdmin이랑 이 부분만 다름)
       const ret = await this.adminService.deleteAdmin(target.user_id, Number(room_id));
       if (ret.err_msg != err0) {
-        throw (ret);
+        throw (ret.err_msg);
       }
       // 4. 유저 리스트 다시 전송하기 (다른 유저들에게도 어드민 표시가 보이도록)
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
@@ -186,24 +194,40 @@ export class ChatGateway {
     }
   }
 
+  hasPermissionOf(order: string, target: string) {
+    if ((order == 'admin' || order == 'owner') && target == 'normal') {
+      return true;
+    } else if (order == 'owner' && target == 'admin') {
+      return true;
+    }
+    return false;
+  } 
+
   @SubscribeMessage('setBan')
   async setBan(@ConnectedSocket() socket: Socket, @MessageBody() setChatBanDto: SetChatBanDto) {
     // 특정 유저 밴하기 요청시
     try {
-      // 1. 요청 보낸 유저의 권한 확인 (admin 또는 owner 인가?)
       const room_id = this.socket_map[socket.id].room_id;
       const user_id = this.socket_map[socket.id].user_id;
       const position = await this.chatUsersService.getUserPosition(user_id, room_id);
+      console.log('a');
       const target_nick = setChatBanDto.nickname;
+      // 1. 요청 보낸 유저의 권한 확인 (admin 또는 owner 인가?)
       if (position != 'owner' && position != 'admin') {
         throw ("당신은 밴 권한이 없습니다.")
       }
-      // 2. 밴 하려는 유저 정보 조회 (id 가져오기)
+      // 2. 밴 하려는 유저 정보 권한 확인 ()
       const target = await this.usersService.getUserInfoWithNick(target_nick);
+      const target_pos = await this.chatUsersService.getUserPosition(target.user_id, room_id);
+      if (!this.hasPermissionOf(position, target_pos)) {
+        throw (`${position}는 ${target_pos} 에게 해당 명령 권한이 없습니다.`);
+      }
+      console.log('b');
       // 3. ban db에 추가
       const ret = await this.banService.createBan(target.user_id, Number(room_id));
+      console.log('c');
       if (ret.err_msg != err0) {
-        throw (ret);
+        throw (ret.err_msg);
       }
       // 4. 유저 리스트 다시 전송하기는 (밴당한 유저의 position을 ban으로 바꾸면, 프론트에서 소켓 연결이 끊어지고 나가지게 된다.)
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
@@ -226,12 +250,16 @@ export class ChatGateway {
       if (position != 'owner' && position != 'admin') {
         throw ("당신은 밴 권한이 없습니다.")
       }
-      // 2. 뮤트 하려는 유저 정보 조회 (id 가져오기)
+      // 2. 뮤트 하려는 유저 정보 조회 (id 가져오기, 권한 확인)
       const target = await this.usersService.getUserInfoWithNick(target_nick);
+      const target_pos = await this.chatUsersService.getUserPosition(target.user_id, room_id);
+      if (!this.hasPermissionOf(position, target_pos)) {
+        throw (`${position}는 ${target_pos} 에게 해당 명령 권한이 없습니다.`);
+      }
       // 3. mute db에 추가
       const ret = await this.muteService.createMute(target.user_id, Number(room_id));
       if (ret.err_msg != err0) {
-        throw (ret);
+        throw (ret.err_msg);
       }
       // 4. 유저 리스트 다시 전송하기 (mute 상태 아이콘이 뜨도록 한다.)
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
@@ -251,13 +279,20 @@ export class ChatGateway {
       const user_id = this.socket_map[socket.id].user_id;
       const position = await this.chatUsersService.getUserPosition(user_id, room_id);
       const target_nick = deleteChatMuteDto.nickname;
+      console.log(`a | target_nick: ${target_nick}`);
       if (position != 'owner' && position != 'admin') {
         throw ("당신은 밴 권한이 없습니다.")
       }
-      // 2. 뮤트 하려는 유저 정보 조회 (id 가져오기)
+      // 2. 뮤트 하려는 유저 정보 조회 (id 가져오기, 권한 확인)
       const target = await this.usersService.getUserInfoWithNick(target_nick);
+      const target_pos = await this.chatUsersService.getUserPosition(target.user_id, room_id);
+      if (!this.hasPermissionOf(position, target_pos)) {
+        throw (`${position}는 ${target_pos} 에게 해당 명령 권한이 없습니다.`);
+      }
+      console.log('b');
       // 3. mute db에서 삭제
       await this.muteService.unMute(user_id, Number(room_id));
+      console.log('c');
       // 4. 유저 리스트 다시 전송하기 (mute 상태 아이콘이 제거되도록, position 갱신)
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
       this.server.to(room_id).emit('setRoomUsers', user_list);

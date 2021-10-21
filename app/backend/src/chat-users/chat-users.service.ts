@@ -111,16 +111,22 @@ export class ChatUsersService {
     }
   }
 
-  async getUserPosition(user_id: string, room_id: string) {
-    const admin = await this.adminRepo.count({user_id: user_id, channel_id: Number(room_id)});
-    const owner = await this.chatRepo.count({owner_id: user_id, channel_id: Number(room_id)});
-    const ban = await this.banRepo.count({user_id: user_id, channel_id: Number(room_id)});
+  async getUserState(user_id: string, room_id: number) {
+    const ban = await this.banRepo.count({user_id: user_id, channel_id: room_id});
     const mute = await this.muteRepo.count({user_id: user_id, channel_id: Number(room_id)});
     if (ban) {
       return 'ban';
     } else if (mute) {
-      return 'mute'
-    } else if (admin) {
+      return 'mute';
+    } else {
+      return 'normal';
+    }
+  }
+
+  async getUserPosition(user_id: string, room_id: string) {
+    const admin = await this.adminRepo.count({user_id: user_id, channel_id: Number(room_id)});
+    const owner = await this.chatRepo.count({owner_id: user_id, channel_id: Number(room_id)});
+    if (admin) {
       return 'admin';
     } else if (owner) {
       return 'owner';
@@ -145,6 +151,7 @@ export class ChatUsersService {
         nick: user_info.nick,
         avatar_url: user_info.avatar_url,
         position: await this.getUserPosition(user.user_id, room_id),
+        state: await this.getUserState(user.user_id, Number(room_id))
       })
     }
     return ret;
