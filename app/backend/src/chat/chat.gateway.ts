@@ -8,15 +8,11 @@ import { ChatUsersService } from 'src/chat-users/chat-users.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
-import { DeleteChatAdminDto, DeleteChatMuteDto, SetChatAdminDto, SetChatBanDto, SetChatMuteDto } from 'src/dto/chat';
+import { DeleteChatAdminDto, DeleteChatMuteDto, JoinChatDto, SetChatAdminDto, SetChatBanDto, SetChatMuteDto } from 'src/dto/chat';
 import { AdminService } from 'src/admin/admin.service';
 import { err0 } from 'src/err';
 import { BanService } from 'src/ban/ban.service';
 import { MuteService } from 'src/mute/mute.service';
-
-interface JoinMsg{
-  room_id: string,
-}
 
 interface SocketInfo {
   room_id: string,
@@ -30,7 +26,6 @@ interface ChatLog {
   time: number, // Date.now()
   message: string, // msg
 };
-
 
 interface ChatRoomInfo {
   title: string,
@@ -76,12 +71,21 @@ export class ChatGateway {
     console.log('Chat Server Init');
   }
 
+  async isChannelFull(room_id: string) {
+    const user_nums = await this.chatUsersService.getUserNumber(room_id);
+    const max_people = await this.chatService.getMaxNumber(room_id);
+    if (user_nums >= max_people) {
+      return true;
+    }
+    return false;
+  }
+
   // 채널 접속시
   // 1. 해당 room에 join
   // 2. db 채팅방 유저 리스트에 추가요청
   // 3. 해당 유저 입장 시스템 메세지 전송
   @SubscribeMessage('join')
-  async joinMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: JoinMsg) {
+  async joinMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: JoinChatDto) {
     // 새로운 유저가 채팅방에 참여한 경우
     try {
       const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
@@ -94,7 +98,8 @@ export class ChatGateway {
         room_id: room_id,
         user_id: user_id,
       };
-      // 1. 소켓 room 접속
+      // 1. 소켓 room 접속 (풀방인지 체크)
+      if (await this.isChannelFull(room_id)) throw "채널이 꽉 찼습니다.";
       socket.join(room_id);
       // 2. chat-users에 유저 추가
       await this.chatUsersService.addUser(room_id, user_id);

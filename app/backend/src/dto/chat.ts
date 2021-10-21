@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class ChatDto1{
 	@ApiProperty({
@@ -194,6 +194,15 @@ export class SetChatBanDto extends SetChatAdminDto {}
 export class SetChatMuteDto extends SetChatAdminDto {}
 
 export class DeleteChatMuteDto extends SetChatMuteDto {}
+
+export class JoinChatDto {
+	@ApiProperty({
+		example: 1,
+		description: '채널 id',
+	})
+	@IsNotEmpty()
+	room_id: string
+}
 
 // export class ChatDto6{
 //   @ApiProperty({

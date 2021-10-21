@@ -159,4 +159,9 @@ export class ChatUsersService {
     }
     return ret;
   }
+
+  async getUserNumber(room_id: string) {
+    const ret = await this.chatUsersRepo.count({channel_id: Number(room_id)});
+    return (ret);
+  }
 }
