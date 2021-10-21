@@ -250,9 +250,11 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   /*!
    * @author donglee
    * @brief 대화방에 인원이 꽉 차 있으면 입장을 불가하게 함
+   * @troubleShooting res에 type을 Promise<ChatRoom> 또는 ChatRoom으로 지정하면 뒤로가기를 눌렀을 때
+   *                  메모리릭 에러가 발생함.
    */
-  const checkMax = async (res: Promise<ChatRoom>) => {
-    if ((await res).max_people <= (await res).current_people) {
+  const checkMax = async (res) => {
+    if (res.max_people <= res.current_people) {
       history.back();
       throw("대화방에 남은 자리가 없습니다.");
     } 
@@ -368,7 +370,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
 
   /*!
    * @author donglee
-   * @brief - 내가 직접 만든 비공개방일 경우에는 Password에 props을 줘서 첫 1회만 비번없이 입장 가능하도록 함
+   * @brief - 방의 인원이 가득 차있는지를 검사
+   *        - 내가 직접 만든 비공개방일 경우에는 Password에 props을 줘서 첫 1회만 비번없이 입장 가능하도록 함
    *        - 채팅방 정보를 받아온 후 비공개방일 경우에는 state를 바꿔서 Password 컴포넌트 렌더링 하도록 함
    *        - protected 가 아닌 대화방의 경우는 바로 소켓 연결함
    *        - clean-up : 내가 만든 방을 최초 1회만 적용하기 위해서 false로 값을 바꿔줌
