@@ -91,22 +91,16 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
       const res = await easyfetch.fetch(body);
 
       if (res.err_msg === "에러가 없습니다.") {
-        setChatRoomInfo({
+        const newRoomInfo = {
           title: title,
           type: type,
           current_people: chatRoomInfo.current_people,
           max_people: max,
           passwd: password,
           channel_id: +channelIdToBeSet,
-        });
-        socket.emit("setRoomInfo", {
-          title: title,
-          type: type,
-          current_people: chatRoomInfo.current_people,
-          max_people: max,
-          passwd: password,
-          channel_id: +channelIdToBeSet,
-        });
+        };
+        setChatRoomInfo(newRoomInfo);
+        socket.emit("setRoomInfo", newRoomInfo);
         history.back();
       } else {
         alert(res.err_msg);

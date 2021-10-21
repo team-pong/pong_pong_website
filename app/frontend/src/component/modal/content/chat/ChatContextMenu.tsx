@@ -7,8 +7,9 @@ import "/src/scss/content/chat/ChatContextMenu.scss";
 interface chatContextMenuProps {
   x: number,
   y: number,
-  myPosition: string, /* "owner" || "admin" || "normal" || "mute" || "ban" */
-  targetPosition: string,
+  myPosition: string, /* "owner" || "admin" || "normal" */
+  targetPosition: string, /* "owner" || "admin" || "normal" */
+  targetState: string, /* "mute" || "ban" || "normal" */
   target: string,
   closer: Dispatch<SetStateAction<{
     isOpen: boolean,
@@ -20,22 +21,85 @@ interface chatContextMenuProps {
   socket: Socket,
 }
 
-const ConditionalContextMenu: FC<{myPosition: string, targetPosition: string}> = ({myPosition, targetPosition}) => {
+const ConditionalContextMenu: FC<{
+    myPosition: string,
+    targetPosition: string,
+    targetState: string,
+    socket: Socket,
+    target: string,
+  }> = (
+  {socket, myPosition, targetPosition, target, targetState}) => {
+
+  /*!
+   * @author donglee
+   * @brief 관리자 임명
+   */
+  const addAdmin = () => {
+    socket.emit("setAdmin", {nickname: target});
+  };
+
+  /*!
+   * @author donglee
+   * @brief 관리자 해임
+   */
+  const deleteAdmin = () => {
+    socket.emit("deleteAdmin", {nickname: target});
+  };
+
+  /*!
+   * @author donglee
+   * @brief 강퇴하기
+   */
+  const ban = () => {
+    const really = confirm(`${target} 님을 정말로 강퇴하시겠습니까?`);
+    if (really)
+      socket.emit("setBan", {nickname: target});
+  };
+
+  /*!
+   * @author donglee
+   * @brief 대화 차단하기
+   */
+  const mute = () => {
+    socket.emit("setMute", {nickname: target});
+  };
+
+  /*!
+   * @author donglee
+   * @brief 대화 차단 해제
+   */
+  const unMute = () => {
+    socket.emit("unMute", {nickname: target});
+  };
+
   switch (myPosition) {
     case "owner":
       return (
         <>
-          <li className="chat-context-li">{targetPosition === "admin" ? "관리자 해임" : "관리자로 임명"}</li>
-          <li className="chat-context-li">강퇴하기</li>
-          <li className="chat-context-li">{targetPosition === "mute" ? "대화 차단 해제" : "대화 차단하기"}</li>
+          <li className="chat-context-li"
+              onClick={targetPosition === "admin" ? deleteAdmin : addAdmin}>
+            {targetPosition === "admin" ? "관리자 해임" : "관리자로 임명"}
+          </li>
+          <li className="chat-context-li"
+              onClick={targetState === "mute" ? unMute : mute}>
+            {targetState === "mute" ? "차단 해제" : "차단하기"}
+          </li>
+          <li className="chat-context-li" onClick={ban}>
+            강퇴하기
+          </li>
         </>
       );
     case "admin":
       if ((targetPosition !== "owner") && (targetPosition !== "admin")) {
         return (
           <>
-            <li className="chat-context-li">강퇴하기</li>
-            <li className="chat-context-li">{targetPosition === "mute" ? "대화 차단 해제" : "대화 차단하기"}</li>
+            <li className="chat-context-li"
+                onClick={targetState === "mute" ? unMute : mute}>
+              {targetState === "mute" ? "차단 해제" : "차단하기"}
+            </li>
+            <li className="chat-context-li" onClick={ban}>
+              강퇴하기
+            </li>
           </>
         );
       }
@@ -44,7 +108,8 @@ const ConditionalContextMenu: FC<{myPosition: string, targetPosition: string}> =
   };
 }
 
-const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = ({match, x, y, myPosition, targetPosition, target, closer}): JSX.Element => {
+const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
+  {socket, match, x, y, myPosition, targetPosition, targetState, target, closer}): JSX.Element => {
   const myInfo = useContext(UserInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
 
@@ -65,9 +130,16 @@ const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = ({match,
         </Link>
         {myInfo.nick !== target ? 
           <>
-            <li className="chat-context-li" onClick={() => setDmInfo({isDmOpen: true, target: target})}>DM 보내기</li>
+            <li className="chat-context-li" onClick={() => setDmInfo({isDmOpen: true, target: target})}>
+              DM 보내기
+            </li>
             <li className="chat-context-li">대전 신청</li>
-            <ConditionalContextMenu myPosition={myPosition} targetPosition={targetPosition} />
+            <ConditionalContextMenu
+              socket={socket}
+              myPosition={myPosition}
+              targetPosition={targetPosition}
+              targetState={targetState}
+              target={target}/>
           </>
           : <></>}
       </ul>

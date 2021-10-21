@@ -11,6 +11,8 @@ import axios from 'axios';
 import { UsersDto3 } from 'src/dto/users';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from 'src/chat/chat.service';
+import { Ban } from 'src/entities/ban';
+import { Mute } from 'src/entities/mute';
 
 @Injectable()
 export class ChatUsersService {
@@ -23,6 +25,8 @@ export class ChatUsersService {
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(Admin) private adminRepo: Repository<Admin>,
+    @InjectRepository(Ban) private banRepo: Repository<Ban>,
+    @InjectRepository(Mute) private muteRepo: Repository<Mute>,
     ){}
 
   async createChatUsers(user_id: string, channel_id: number){
@@ -95,9 +99,12 @@ export class ChatUsersService {
     await this.chatUsersRepo.delete({ user_id: user_id, channel_id: rid }); // 목록에서 제거
     if (await this.adminRepo.count({user_id: user_id, channel_id: rid}))  // 나간 유저가 admin 이면
       await this.adminRepo.delete({user_id: user_id, channel_id: rid}); // 어드민 테이블에서 제거
-    if (await this.chatUsersRepo.count({channel_id: rid}) === 0)  // 해당 채널에 아무도 없다면
+    if (await this.chatUsersRepo.count({channel_id: rid}) === 0) {// 해당 채널에 아무도 없다면
       await this.chatRepo.delete({channel_id: rid}); // 채널 삭제
-    else{  // 채널에 누군가가 남아있다면
+      await this.muteRepo.delete({channel_id: rid}); // 뮤트정보 삭제
+      await this.adminRepo.delete({channel_id: rid}); // 어드민정보 삭제
+      await this.banRepo.delete({channel_id: rid}); // 밴 정보 삭제
+    } else{  // 채널에 누군가가 남아있다면
       const channel = await this.chatRepo.findOne({channel_id: rid});
       if (channel.owner_id == user_id){  // 나간 사람이 owner이라면
         const newOwner = await this.chatUsersRepo.findOne({channel_id: rid});  // 채널에 남은 인원중 아무나 뽑기
@@ -107,32 +114,54 @@ export class ChatUsersService {
     }
   }
 
+  async getUserState(user_id: string, room_id: number) {
+    const ban = await this.banRepo.count({user_id: user_id, channel_id: room_id});
+    const mute = await this.muteRepo.count({user_id: user_id, channel_id: Number(room_id)});
+    if (ban) {
+      return 'ban';
+    } else if (mute) {
+      return 'mute';
+    } else {
+      return 'normal';
+    }
+  }
+
   async getUserPosition(user_id: string, room_id: string) {
     const admin = await this.adminRepo.count({user_id: user_id, channel_id: Number(room_id)});
     const owner = await this.chatRepo.count({owner_id: user_id, channel_id: Number(room_id)});
-    if (owner) {
-      return 'owner';
-    } else if (admin) {
+    if (admin) {
       return 'admin';
+    } else if (owner) {
+      return 'owner';
     } else {
       return 'normal';
     }
   }
 
   async getUserListInRoom(room_id: string) {
+    // 채팅방에 접속해있는 유저 리스트 받아오기
     const rid = Number(room_id)
+    // 1. 채팅방 정보 확인.
     if (await this.chatRepo.count({channel_id: rid}) === 0)  // 존재하지 않은 채널 이라면
       throw new ErrMsgDto(err4);
     const ret = []
+    // 2. chat-user db에서 user_id 리스트 받아오기
     const users = await this.chatUsersRepo.find({channel_id: rid});  // 해당 채널의 유저들 검색
+    // 3. user_id 리스트로 닉네임, 아바타, 채팅방에서의 계급 받아오기 (프론트에서 쓰기 편하게 데이터 )
     for (let user of users) {
       const user_info = await this.usersRepo.findOne({user_id: user.user_id});
       ret.push({
         nick: user_info.nick,
         avatar_url: user_info.avatar_url,
         position: await this.getUserPosition(user.user_id, room_id),
+        state: await this.getUserState(user.user_id, Number(room_id))
       })
     }
     return ret;
+  }
+
+  async getUserNumber(room_id: string) {
+    const ret = await this.chatUsersRepo.count({channel_id: Number(room_id)});
+    return (ret);
   }
 }
