@@ -1,9 +1,53 @@
 import "../../../../scss/content/chat/ChatInviteContent.scss";
-import { FC, useContext, useEffect, useState } from "react";
+import { Dispatch, FC, SetStateAction, useContext, useEffect, useState } from "react";
 import { SetDmInfoContext } from "../../../../Context";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 import { Friend } from "../profile/ManageFriendContent";
+import NoResult from "../../../noresult/NoResult";
+
+interface FriendListProps {
+  friendList: Friend[],
+  setDmInfo: Dispatch<SetStateAction<{isDmOpen: boolean, target: string}>>,
+}
+
+/* TODO: 검색하면 검색결과가 리스트에 결과로 나와야 함 
+         초대를 보내면 DM이 켜지면서 자동으로 초대메세지가 가도록 해야 함
+         초대 메세지 디자인도 해서 DM도 수정해야 함. */
+         
+const FriendList: FC<FriendListProps> = ({friendList, setDmInfo}): JSX.Element => {
+  
+  return (
+    <div className="invite-result">
+      <div className="invite-fl-header-container">
+        <span className="invite-friendList-header">친구 목록</span>
+      </div>
+      {friendList.length === 0 ?
+        <NoResult text="등록된 친구가 없습니다." style={{marginLeft: "75px"}}/>
+      :
+        <div className="invite-fl-list-container">
+          {friendList.map((friend, key) => {
+            return (
+              <li key={key} className="invite-result-list">
+                <div className="ci-user-info">
+                  <img className="ci-avatar" src={friend.avatar_url} alt="프로필" />
+                  <img className="ci-friend-status" src={`/public/status/${friend.status}.svg`} />
+                  <div className="ci-user-info-text">
+                    <span className="ci-nickname">{friend.nick}</span>
+                    <span className="ci-title">{setAchievementStr(friend.ladder_level)}</span>
+                    <img className="ci-title-icon" src={setAchievementImg(friend.ladder_level)} alt="타이틀로고" />
+                  </div>
+                </div>
+                <div className="ci-button-container">
+                  {friend.status === "online" ? <span className="ci-invite-btn" onClick={() => setDmInfo({isDmOpen: true, target: friend.nick})}>초대하기</span> : <></>}
+                </div>
+              </li>
+            );
+          })}
+        </div>}
+    </div>
+  );
+}
 
 const ChatInviteContent: FC = (): JSX.Element => {
 
@@ -12,6 +56,7 @@ const ChatInviteContent: FC = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
   const setDmInfo = useContext(SetDmInfoContext);
   const [search, setSearch] = useState("");
+  const [userToFind, setUserToFind] = useState("");
 
 	const getFriendList = async () => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
@@ -25,8 +70,7 @@ const ChatInviteContent: FC = (): JSX.Element => {
   };
   
   const searchNick = async () => {
-    /* TODO: API를 만들어서 여기서 한 글자 쓸 때마다 결과를 가져와서
-             검색내용이랑 부분적으로 일치하는 모든 user를 보여주는 것은 어떤가? */
+    
   };
 
   useEffect(() => {
@@ -38,29 +82,15 @@ const ChatInviteContent: FC = (): JSX.Element => {
       <div className="invite-header">
         <h2 className="invite-title">대화방 초대하기</h2>
         <div className="invite-input-container">
-          <input type="text" className="invite-input" value={search} onChange={(e) => {setSearch(e.target.value); searchNick();}}/>
-          <button className="invite-search-btn">검색</button>
+          <input
+            type="text" className="invite-input"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {if (e.key === "Enter") setUserToFind(search)}}/>
+          <img className="invite-search-btn" src="/public/search.svg" alt="검색"/>
         </div>
       </div>
-      <div className="invite-result">
-        {friendList.map((friend, key) => {
-          return (
-						<li key={key} className="invite-result-list">
-							<div className="ci-user-info">
-								<img className="ci-avatar" src={friend.avatar_url} alt="프로필" />
-								<div className="ci-user-info-text">
-									<span className="ci-nickname">{friend.nick}</span>
-									<span className="ci-title">{setAchievementStr(friend.ladder_level)}</span>
-									<img className="ci-title-icon" src={setAchievementImg(friend.ladder_level)} alt="타이틀로고" />
-								</div>
-							</div>
-							<div className="ci-button-container">
-								<span className="ci-invite-btn" onClick={() => setDmInfo({isDmOpen: true, target: friend.nick})}>초대</span>
-							</div>
-						</li>
-          );
-        })}
-      </div>
+      <FriendList friendList={friendList} setDmInfo={setDmInfo}/>
     </div>
   );
 };
