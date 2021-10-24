@@ -8,6 +8,7 @@ import "/src/scss/navbar/NavBar-mobile.scss";
 import Modal from "../../modal/Modal";
 import EasyFetch from "../../../utils/EasyFetch";
 import ProfileContent from "../../modal/content/profile/ProfileContent";
+import ContactUs from "./contactUs/ContactUs";
 import { UserInfoContext } from "../../../Context";
 import { UserInfo } from "../MainPage";
 
@@ -98,7 +99,7 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
         </Link>
       </ul>
       <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent />} smallModal/></Route>
-      <Route path={`${props.match.path}/contactUs`}><Modal id={Date.now()} content={<>contact</>} smallModal /></Route>
+      <Route path={`${props.match.path}/contactUs`}><Modal id={Date.now()} content={<ContactUs />} smallModal /></Route>
     </nav>
   );
 };
