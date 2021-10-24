@@ -11,16 +11,22 @@ import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { ChatGateway } from './chat.gateway';
 import * as crypto from 'crypto';
+import { Mute } from 'src/entities/mute';
+import { MuteService } from 'src/mute/mute.service';
 
 @Injectable()
 export class ChatService {
   constructor(
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    @Inject(forwardRef(() => MuteService))
+    private muteService: MuteService,
+    
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(ChatUsers) private chatUsersRepo: Repository<ChatUsers>,
     @InjectRepository(Admin) private adminRepo: Repository<Admin>,
+    // @InjectRepository(Mute) private muteRepo: Repository<Mute>,
 
     private chatGateway: ChatGateway,
     ){}
@@ -164,6 +170,9 @@ export class ChatService {
     if (await this.adminRepo.count({user_id: owner_id}) != 0)  // owner가 되려는 유저가 admin 이면
       await this.adminRepo.delete({channel_id: channel_id, user_id: owner_id});
     // await this.chatRepo.save({channel_id: channel_id, owner_id: owner_id});
+    let isMute = await this.muteService.isMute(owner_id, channel_id);
+    if (isMute)  // mute 돼있는 상태 라면
+      await this.muteService.deleteMute2(owner_id, channel_id);
     await this.chatRepo.update(channel_id, {owner_id: owner_id});
     return new ErrMsgDto(err0);
   }

@@ -36,13 +36,13 @@ export class MuteService {
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
       return new ErrMsgDto(err2);
     if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널 이라면
-      return err4;
+      return new ErrMsgDto(err4);
     if (await this.muteRepo.count({user_id: user_id, channel_id: channel_id}) === 0)  // mute 당하지 않았다면
       return new Bool(false);
     const mute = await this.muteRepo.find({user_id: user_id, channel_id: channel_id});
     const muteTime = mute[0].createdAt;
-    muteTime.setSeconds(muteTime.getSeconds() + 60);
-    if (muteTime < new Date()){  // mute 당한지 60초가 넘었으면
+    muteTime.setSeconds(muteTime.getSeconds() + 600);
+    if (muteTime < new Date()){  // mute 당한지 600초가 넘었으면
       await this.muteRepo.delete({user_id: user_id, channel_id: channel_id});
       return new Bool(false);
     }
@@ -53,6 +53,15 @@ export class MuteService {
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
       return new ErrMsgDto(err2);
     await this.muteRepo.delete({user_id: user_id});
+    return new ErrMsgDto(err0);
+  }
+
+  async deleteMute2(user_id: string, channel_id: number){
+    if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
+      return new ErrMsgDto(err2);
+    if (await this.chatRepo.count({channel_id: channel_id}) === 0)  // 존재하지 않은 채널 이라면
+      return new ErrMsgDto(err4);
+    await this.muteRepo.delete({user_id: user_id, channel_id: channel_id});
     return new ErrMsgDto(err0);
   }
 
