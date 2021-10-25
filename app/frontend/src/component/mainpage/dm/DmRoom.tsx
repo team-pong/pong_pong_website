@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState, useRef } from "react";
+import { DmInfo } from "../../../Context";
 import "../../../scss/dm/DmRoom.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 import Time from "../../../utils/Time";
@@ -9,9 +10,17 @@ interface DMLog {
   from: string          /* e.g.) "me" || "hna" */
 };
 
-const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
+const DmLogList: FC<{dmLog: DMLog[], dmInfo: DmInfo}> = ({dmLog, dmInfo}) => {
 
   const [sortedDmLog, setSortedDmLog] = useState<Array<DMLog[]>>([]);
+
+  const approveChatInvite = () => {
+    /* Redirect 하는 코드 */
+  };
+
+  const rejectChatInvite = () => {
+    /* 클래스를 추가해서 css 다르게 먹도록 구현 */
+  }
 
   /*!
   * @author yochoi
@@ -47,6 +56,36 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
   }, [dmLog]);
 
   const printChatLog = (msg: DMLog[], idx: number) => {
+    /* msg 에 백엔드에서 다른 포맷으로 와야된다. 그걸 캐치해서 그 해당 msg에 대해서는
+    다른 정보를 보여줘야 한다 */
+    //Test
+    if (idx === 1) {
+      return (
+        <div key={idx} className="dm-request-container">
+          <div className="dm-invitation-part">
+            <span className="dm-request-msg">donglee 님이 아무나 와봐라 이녀석들아 대화방에 당신을 초대했습니다.</span>
+            <div className="dm-request-btn-container">
+              <div className="dm-request-approve">
+                <img
+                  className="dm-reply-img"
+                  src="/public/green-check.png"
+                  alt="승낙"
+                  onClick={approveChatInvite} />
+              </div>
+              <div className="dm-request-reject">
+                <img
+                  className="dm-reply-img"
+                  src="/public/red-x.png" 
+                  alt="거절"
+                  onClick={rejectChatInvite} />
+              </div>
+            </div>
+          </div>
+          <span className="dm-request-time">{"오후 12:23"}</span>
+        </div>
+      );
+    }
+
     return (
       <div key={idx}>
         {msg.map((msg, idx) => {
@@ -79,10 +118,10 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
 }
 
 interface DmRoomProps {
-  dmTarget: string;
+  dmInfo: DmInfo;
 }
 
-const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
+const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
 
   const [dmLog, _setDmLog] = useState<DMLog[]>([]);
   const dmLogRef = useRef(dmLog);
@@ -100,10 +139,15 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
   const sendDm = (e: React.FormEvent) => {
     e.preventDefault();
     if (textAreaMsg === "") return ;
-    global.socket.emit("dm", {to: dmTarget, msg: textAreaMsg});
+    global.socket.emit("dm", {to: dmInfo.target, msg: textAreaMsg});
     getDmLog();
     setTextAreaMsg("");
   }
+
+  const sendRequest = () => {
+    /* 여기서 필요한 정보들을 백엔드에 보내준다 dmInfo.request */
+    // global.socket.emit("request", function);
+  };
 
   const controllTextAreaKeyDown = (e: React.KeyboardEvent) => {
     const keyCode = e.key;
@@ -115,7 +159,7 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
   };
 
   const getDmLog = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?receiver_nick=${dmTarget}`);
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?receiver_nick=${dmInfo.target}`);
     const res = await easyfetch.fetch();
     setDmLog(res);
   }
@@ -123,6 +167,10 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
   useEffect(() => {
     getDmLog();
 
+    //test DM을 실행했을 때 request이면 아래 함수 실행
+    if (dmInfo.request) {
+      sendRequest();
+    }
     const dmOn = (dm) => {
       setDmLog([{...dm}, ...dmLogRef.current]);
     }
@@ -132,7 +180,7 @@ const DmRoom: FC<DmRoomProps> = ({dmTarget}): JSX.Element => {
 
   return (
     <div className="dm-room">
-      <DmLogList dmLog={dmLog} />
+      <DmLogList dmLog={dmLog} dmInfo={dmInfo}/>
       <form className="dm-form">
         <textarea
           className="dm-msg-textarea"

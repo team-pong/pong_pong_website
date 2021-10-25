@@ -1,18 +1,39 @@
 import "../../../../scss/content/chat/ChatInviteContent.scss";
 import { Dispatch, FC, SetStateAction, useContext, useEffect, useState } from "react";
-import { SetDmInfoContext } from "../../../../Context";
+import { DmInfo, SetDmInfoContext, UserInfoContext } from "../../../../Context";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 import { Friend } from "../profile/ManageFriendContent";
 import NoResult from "../../../noresult/NoResult";
 import { UserInfo } from "../../../mainpage/MainPage";
 
+/*!
+ * @author donglee
+ * @brief 검색 결과를 보여주는 FC
+ * @param[in] result: 검색 결과를 담은 UserInfo 객체
+ * @param[in] setDmInfo: 초대하기를 DM으로 보내기 위함
+ */
+
 interface ResultProps {
   result: UserInfo,
-  setDmInfo: Dispatch<SetStateAction<{isDmOpen: boolean, target: string}>>,
+  setDmInfo: Dispatch<SetStateAction<DmInfo>>,
 };
 
 const Result: FC<ResultProps> = ({result, setDmInfo}): JSX.Element => {
+
+  /* TODO: 초대를 보낼 때 
+  from: string,
+  to: string  target(string)
+  chatTitle: string,
+  channelId: number,
+  type: string  "game" || "chat";
+  를 보내줘야  한다. 
+  
+  이 정보들을 보내주면 DM FC에서 sendRequest 함수를 실행하면서 
+  socket.emit("request", function) 식으로 해주면
+  백엔드에서 받아서 받는 사람에게 socker으로 방송해주면
+  그 사람 클라에서 DM이 뜨도록 하면 된다. 
+  time 에 대해서는 yochoi님한테 물어보자 */
 
   return (
     <div className="invite-result">
@@ -32,7 +53,8 @@ const Result: FC<ResultProps> = ({result, setDmInfo}): JSX.Element => {
               className={"ci-invite-btn" + (result.status !== "online" ?
                 " ci-deactivated-btn" : "")}
               onClick={result.status === "online" ?
-                () => setDmInfo({isDmOpen: true, target: result.nick})
+              /* TODO: 이 FC에 prop으로 필요한 정보들(channelId, channelTitle 등)을 받아오자 */
+                () => setDmInfo({isDmOpen: true, target: result.nick, request: null})
                 : () => {}}>
               초대하기
             </span>
@@ -43,14 +65,17 @@ const Result: FC<ResultProps> = ({result, setDmInfo}): JSX.Element => {
   );
 };
 
+/*!
+ * @author donglee
+ * @brief 친구 목록을 보여주는 FC
+ * @param[in] friendList: 친구 객체를 담은 배열
+ * @param[in] setDmInfo: 초대하기를 DM으로 보내기 위함
+ */
+
 interface FriendListProps {
   friendList: Friend[],
-  setDmInfo: Dispatch<SetStateAction<{isDmOpen: boolean, target: string}>>,
+  setDmInfo: Dispatch<SetStateAction<DmInfo>>,
 }
-
-/* TODO: 검색하면 검색결과가 리스트에 결과로 나와야 함 
-         초대를 보내면 DM이 켜지면서 자동으로 초대메세지가 가도록 해야 함
-         초대 메세지 디자인도 해서 DM도 수정해야 함. */
          
 const FriendList: FC<FriendListProps> = ({friendList, setDmInfo}): JSX.Element => {
   
@@ -80,7 +105,7 @@ const FriendList: FC<FriendListProps> = ({friendList, setDmInfo}): JSX.Element =
                     className={"ci-invite-btn" + (friend.status !== "online" ?
                       " ci-deactivated-btn" : "")}
                     onClick={friend.status === "online" ?
-                      () => setDmInfo({isDmOpen: true, target: friend.nick})
+                      () => setDmInfo({isDmOpen: true, target: friend.nick, request: null})
                       : () => {}}>
                     초대하기
                   </span>
@@ -93,25 +118,42 @@ const FriendList: FC<FriendListProps> = ({friendList, setDmInfo}): JSX.Element =
   );
 }
 
+/*!
+ * @author donglee
+ * @brief 대화방 내부에서 초대하기를 눌러 검색 후 초대를 보낼 수 있는 컴포넌트
+ */
 const ChatInviteContent: FC = (): JSX.Element => {
 
   const [friendList, setFriendList] = useState<Friend[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const setDmInfo = useContext(SetDmInfoContext);
   const [search, setSearch] = useState("");
   const [result, setResult] = useState<UserInfo>(null);
 
+  const myInfo = useContext(UserInfoContext);
+
+  /*!
+   * @author donglee
+   * @brief 검색하는 search를 통해서 enter나 검색버튼을 클릭할시 API요청을 보냄
+   */
   const getUserToFind = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${search}`);
     const res = await easyfetch.fetch();
 
     if (!res.err_msg) {
+      if (res.nick === myInfo.nick) {
+        alert("자기 자신을 초대할 수 없습니다.");
+        return ;
+      }
       setResult(res);
     } else {
       alert(res.err_msg);
     }
   };
 
+  /*!
+   * @author donglee
+   * @brief 초대하기에서 친구들 목록을 처음에 보여주기 위해 API로 받아옴
+   */
 	const getFriendList = async () => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
 		const res = await easyfetch.fetch();

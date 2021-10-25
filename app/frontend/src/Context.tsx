@@ -11,7 +11,16 @@ interface UserInfo {
   status: string;
 }
 
-interface DmInfo {
+export interface Request {
+  type: string,
+  from: string,
+  to: string,
+  chatTitle: string,
+  channelId: number,  
+};
+
+export interface DmInfo {
+  request?: Request;
   isDmOpen: boolean;
   target: string;
 }
@@ -34,7 +43,10 @@ const Global: FC = ({children}): JSX.Element => {
     ladder_level: 0,
     status: ""
   });
+
+  /* 전역객체다 보니 보내고 나서는 바로 null로 초기화해줘야 한다 */
   const [dmInfo, setDmInfo] = useState<DmInfo>({
+    request: null,
     isDmOpen: false,
     target: ""
   });

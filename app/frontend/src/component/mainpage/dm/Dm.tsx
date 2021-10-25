@@ -26,7 +26,7 @@ const Dm: FC = (): JSX.Element => {
             }
           </span>
         </div>
-        {dmInfo.target === "" ? <DmList /> : <DmRoom dmTarget={dmInfo.target}/>}
+        {dmInfo.target === "" ? <DmList /> : <DmRoom dmInfo={dmInfo}/>}
       </div>
     </div>
   )
