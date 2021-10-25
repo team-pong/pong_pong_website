@@ -5,6 +5,43 @@ import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 import { Friend } from "../profile/ManageFriendContent";
 import NoResult from "../../../noresult/NoResult";
+import { UserInfo } from "../../../mainpage/MainPage";
+
+interface ResultProps {
+  result: UserInfo,
+  setDmInfo: Dispatch<SetStateAction<{isDmOpen: boolean, target: string}>>,
+};
+
+const Result: FC<ResultProps> = ({result, setDmInfo}): JSX.Element => {
+
+  return (
+    <div className="invite-result">
+      <div className="invite-fl-list-container">
+        <li className="invite-result-list">
+          <div className="ci-user-info">
+            <img className="ci-avatar" src={result.avatar_url} alt="프로필" />
+            <img className="ci-friend-status" src={`/public/status/${result.status}.svg`} />
+            <div className="ci-user-info-text">
+              <span className="ci-nickname">{result.nick}</span>
+              <span className="ci-title">{setAchievementStr(result.ladder_level)}</span>
+              <img className="ci-title-icon" src={setAchievementImg(result.ladder_level)} alt="타이틀로고" />
+            </div>
+          </div>
+          <div className="ci-button-container">
+            <span
+              className={"ci-invite-btn" + (result.status !== "online" ?
+                " ci-deactivated-btn" : "")}
+              onClick={result.status === "online" ?
+                () => setDmInfo({isDmOpen: true, target: result.nick})
+                : () => {}}>
+              초대하기
+            </span>
+          </div>
+        </li>
+      </div>
+    </div>
+  );
+};
 
 interface FriendListProps {
   friendList: Friend[],
@@ -39,7 +76,14 @@ const FriendList: FC<FriendListProps> = ({friendList, setDmInfo}): JSX.Element =
                   </div>
                 </div>
                 <div className="ci-button-container">
-                  {friend.status === "online" ? <span className="ci-invite-btn" onClick={() => setDmInfo({isDmOpen: true, target: friend.nick})}>초대하기</span> : <></>}
+                  <span
+                    className={"ci-invite-btn" + (friend.status !== "online" ?
+                      " ci-deactivated-btn" : "")}
+                    onClick={friend.status === "online" ?
+                      () => setDmInfo({isDmOpen: true, target: friend.nick})
+                      : () => {}}>
+                    초대하기
+                  </span>
                 </div>
               </li>
             );
@@ -51,26 +95,28 @@ const FriendList: FC<FriendListProps> = ({friendList, setDmInfo}): JSX.Element =
 
 const ChatInviteContent: FC = (): JSX.Element => {
 
-  const [noResult, setNoResult] = useState(false);
   const [friendList, setFriendList] = useState<Friend[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const setDmInfo = useContext(SetDmInfoContext);
   const [search, setSearch] = useState("");
-  const [userToFind, setUserToFind] = useState("");
+  const [result, setResult] = useState<UserInfo>(null);
+
+  const getUserToFind = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${search}`);
+    const res = await easyfetch.fetch();
+
+    if (!res.err_msg) {
+      setResult(res);
+    } else {
+      alert(res.err_msg);
+    }
+  };
 
 	const getFriendList = async () => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
 		const res = await easyfetch.fetch();
 
-		if (res.friendList.length === 0) {
-			setNoResult(true);
-			return ;
-		}
 		setFriendList(res.friendList);
-  };
-  
-  const searchNick = async () => {
-    
   };
 
   useEffect(() => {
@@ -86,11 +132,21 @@ const ChatInviteContent: FC = (): JSX.Element => {
             type="text" className="invite-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {if (e.key === "Enter") setUserToFind(search)}}/>
-          <img className="invite-search-btn" src="/public/search.svg" alt="검색"/>
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                getUserToFind();
+              } else {
+                setResult(null);
+              }}}/>
+          <img
+            className="invite-search-btn"
+            src="/public/search.svg"
+            alt="검색"
+            onClick={getUserToFind}/>
         </div>
       </div>
-      <FriendList friendList={friendList} setDmInfo={setDmInfo}/>
+      {!search && !result && <FriendList friendList={friendList} setDmInfo={setDmInfo} />}
+      {result && <Result result={result} setDmInfo={setDmInfo} />}
     </div>
   );
 };

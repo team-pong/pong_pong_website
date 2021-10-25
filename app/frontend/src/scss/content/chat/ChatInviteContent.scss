@@ -144,12 +144,22 @@ div.chat-invite-content {
           span.ci-invite-btn {
             font-size: 12pt;
             font-weight: bold;
-            color: rgb(179, 176, 176);
+            color: rgb(44, 43, 43);
             margin: 0;
             cursor: pointer;
   
             &:hover {
-              color: rgb(37, 36, 39);
+              color: #3164ff;
+            }
+          }
+
+          span.ci-deactivated-btn {
+            cursor: default;
+            color: rgb(199, 195, 195);
+            text-decoration: line-through;
+
+            &:hover {
+              color: rgb(199, 195, 195);
             }
           }
         }
