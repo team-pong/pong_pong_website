@@ -68,7 +68,7 @@ async function bootstrap() {
       // forbidNonWhitelisted -> 엔티티 데코레이터에 없는 값 인입시 그 값에 대한 에러메세지 알려줌
       // transform -> 컨트롤러가 값을 받을때 컨트롤러에 정의한 타입으로 형변환
       new ValidationPipe({
-        whitelist: true,
+        whitelist: false,
         forbidNonWhitelisted: true,
         transform: true
       })

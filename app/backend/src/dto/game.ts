@@ -1,8 +1,7 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsIn, IsInstance, IsNotEmpty, IsString } from "class-validator";
 
-type Map = '0' | '1' | '2';
 export class GameMapDto {
-	@IsString()
+	@IsIn(['0', '1', '2'])
 	@IsNotEmpty()
-	map: Map;
+	map: string;
 }

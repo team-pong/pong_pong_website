@@ -1,10 +1,12 @@
-import { Req, UseGuards } from '@nestjs/common';
+import { Req, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect } from '@nestjs/websockets';
 import { WebSocketServer, OnGatewayConnection, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
+import { GameMapDto } from 'src/dto/game';
+import { WsExceptionFilter } from 'src/filter/ws.filter';
 import * as globalService_1 from 'src/global/global.service';
 import { MatchService } from 'src/match/match.service';
 import { SessionService } from 'src/session/session.service';
@@ -63,6 +65,8 @@ type Position = 'l' | 'r';
  * @			 2. 프론트에서 소켓 서버 연결시 withCredentials: true 옵션을 추가해줘야 connect.sid 쿠키가 전달되고,
  * @					그래야 백엔드에서 연결된 소켓의 유저가 누구인지 알 수 있다. (더 나은 방법이 있는지 확인해야 함)
  */
+@UseFilters(WsExceptionFilter)
+@UsePipes(new ValidationPipe())
 @WebSocketGateway({ namespace: 'game', cors: true })
 export class GameGateway {
 	constructor(
@@ -220,10 +224,11 @@ export class GameGateway {
 		}
 	}
 
+	
   @SubscribeMessage('normal')
-  async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: string) {
+  async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: GameMapDto) {
 		try {
-			const map_type = Number(map);
+			const map_type = Number(map.map);
 			const game_type = 'normal';
 			// 쿠키에서 sid 파싱
 			const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
@@ -245,7 +250,7 @@ export class GameGateway {
 			const waiters = this.normal_queue.filter((element) => element.map == map_type);
 			if (waiters.length >= 2) {
 				
-				const gameLogic = new GameLogic(700, 450, Number(map), this.server);
+				const gameLogic = new GameLogic(700, 450, Number(map.map), this.server);
 				const playerLeft = waiters[0];
 				const playerRight = waiters[1];
 	
@@ -307,10 +312,8 @@ export class GameGateway {
 		}
   }
 
-	
-
 	@SubscribeMessage('ladder')
-	async handdleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: string) {
+	async handdleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: GameMapDto) {
 		try {
 			const map_type = Number(map);
 			const game_type = 'ladder';
