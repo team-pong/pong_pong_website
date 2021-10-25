@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsIn, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class ChatDto1{
 	@ApiProperty({
@@ -202,6 +202,31 @@ export class JoinChatDto {
 	})
 	@IsNotEmpty()
 	room_id: string
+}
+
+export class SendChatMessageDto {
+	@IsString()
+	msg: string;
+}
+
+export class SetChatRoomInfoDto {
+	@IsString()
+	title: string;
+
+	@IsIn(['public', 'protected', 'private'])
+	type: string;
+
+	@IsNumber()
+	current_people: number;
+
+	@IsNumber()
+	max_people: number;
+
+	@IsString()
+	passwd: string;
+
+	@IsNumber()
+	channel_id: number;
 }
 
 // export class ChatDto6{
