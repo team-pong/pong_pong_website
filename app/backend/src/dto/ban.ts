@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class BanDto1{
   // @ApiProperty({
@@ -10,8 +11,12 @@ export class BanDto1{
 		example: 'jinbkim',
 		description: '유저 닉네임',
 	})
+	@IsString()
+	@IsNotEmpty()
 	public nick: string;
 
+	@IsNumber()
+	@IsNotEmpty()
 	@ApiProperty({
 		example: 1,
 		description: '채널 아이디',

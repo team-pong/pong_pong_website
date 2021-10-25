@@ -86,7 +86,7 @@ export class BlockController {
   // @ApiQuery({ name: 'user_nick', example: 'jinbkim', description: '유저 닉네임' })
   @ApiQuery({ name: 'block_nick', example: 'hna', description: '차단 해제 할 유저 닉네임' })
   @Delete()
-  async deleteBlock(@Query() q, @Req() req: Request){
+  async deleteBlock(@Query() q: BlockDto1, @Req() req: Request){
     let user_id, block;
     // user = await this.usersService.readUsers(q.user_nick, 'nick');
     user_id = await this.sessionService.readUserId(req.sessionID);
@@ -95,11 +95,13 @@ export class BlockController {
     // return await this.blockService.deleteBlock(user.user_id, block.user_id);
     // return this.blockService.deleteBlock(q.user_id, q.block_id);
   }
+  
   @ApiOperation({ summary: '해당 유저에 대한 모든 차단 관계 해제', description: '회원 탈퇴시 에만 사용됨'})
   @ApiResponse({ type: ErrMsgDto, description: '차단 해제 실패시 실패이유' })
   @ApiQuery({ name: 'user_id', example: 'jinbkim' ,description: '모든 차단 관계를 해제할 유저 아이디' })
   @Delete('all')
   deleteAllBlock(@Query() q){
+     // session 사용하는거로 바뀌면 DTO가 필요 없어질거같음
     return this.blockService.deleteAllBlock(q.user_id);
   }
 }
