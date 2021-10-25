@@ -47,9 +47,9 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatc
         src={getMapImg(mapSelector)} />
       <form className="map-select-form">
         <div className="map-btn-group">
-          <button className="map-btn-00" onClick={() => {setMapSelector(0)}}>일반</button>
-          <button className="map-btn-01" onClick={() => {setMapSelector(1)}}>막대기</button>
-          <button className="map-btn-02" onClick={() => {setMapSelector(2)}}>거품</button>
+          <button className="map-btn-00" onClick={(e) => {e.preventDefault();setMapSelector(0)}}>일반</button>
+          <button className="map-btn-01" onClick={(e) => {e.preventDefault();setMapSelector(1)}}>막대기</button>
+          <button className="map-btn-02" onClick={(e) => {e.preventDefault();setMapSelector(2)}}>거품</button>
         </div>
         <Link to={`${url}/${mapSelector}`} className="start" >게임 찾기</Link>
       </form>
