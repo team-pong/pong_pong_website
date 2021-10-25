@@ -1,0 +1,60 @@
+div.contact-us {
+  .top-bar {
+    background-color: rgb(255, 96, 121);
+    font-weight: bold;
+    font-size: 15pt;
+    height: 60px;
+    line-height: 60px;
+    padding-left: 20px;
+  }
+  form.contact-us-form {
+    width: 400px;
+    height: 400px;
+    color: #000;
+    display: grid;
+    grid-template-areas: 
+      "head head-content head-content head-content"
+      "email email-content email-content email-content"
+      "body body-content body-content body-content"
+      ". body-content body-content body-content"
+      ". body-content body-content body-content";
+    row-gap: 5px;
+    span.head, span.email, span.body {
+      margin-left: 5px;
+    }
+    span.head {
+      margin-top: 5px;
+      grid-area: head;
+    }
+    span.email {
+      grid-area: email;
+    }
+    span.body {
+      grid-area: body;
+    }
+    input.head-content, input.email-content, textarea.body-content {
+      margin-right: 5px;
+      &:focus {
+        outline: none;
+      }
+    }
+    input.head-content {
+      margin-top: 5px;
+      grid-area: head-content;
+    }
+    input.email-content {
+      grid-area: email-content;
+    }
+    textarea.body-content {
+      grid-area: body-content;
+      resize: none;
+    }
+    input.submit {
+      position: absolute;
+      bottom: 5px;
+      left: 100px;
+      width: 200px;
+      height: 50px;
+    }
+  }
+}

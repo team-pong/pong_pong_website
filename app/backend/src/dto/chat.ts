@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class ChatDto1{
 	@ApiProperty({
@@ -174,6 +175,33 @@ export class ChatDto6{
 		description: '채널 아이디',
 	})
 	public channel_id: number;
+}
+
+export class SetChatAdminDto{
+	@ApiProperty({
+		example: 'hna',
+		description: '유저 아이디',
+	})
+	@IsString()
+	@IsNotEmpty()
+	public nickname: string;
+}
+
+export class DeleteChatAdminDto extends SetChatAdminDto {}
+
+export class SetChatBanDto extends SetChatAdminDto {}
+
+export class SetChatMuteDto extends SetChatAdminDto {}
+
+export class DeleteChatMuteDto extends SetChatMuteDto {}
+
+export class JoinChatDto {
+	@ApiProperty({
+		example: 1,
+		description: '채널 id',
+	})
+	@IsNotEmpty()
+	room_id: string
 }
 
 // export class ChatDto6{

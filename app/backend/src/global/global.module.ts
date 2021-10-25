@@ -9,12 +9,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from 'src/entities/users';
 import { Friend } from 'src/entities/friend';
 import { DmStoreModule } from 'src/dm-store/dm-store.module';
+import { Block } from 'src/entities/block';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Users,
       Friend,
+      Block
     ]),
     SessionModule,
     FriendModule,

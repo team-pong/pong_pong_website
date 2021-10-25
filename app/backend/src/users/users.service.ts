@@ -97,7 +97,11 @@ export class UsersService {
 
   async getAvatarUrl(user_id: string) {
     const user = await this.usersRepo.findOne({user_id: user_id});
-    return (user.avatar_url);
+    if (user) {
+      return (user.avatar_url);
+    } else {
+      throw (`err2 | ${user_id}`);
+    }
   }
 
   async getUserInfo(user_id: string) {
@@ -106,5 +110,14 @@ export class UsersService {
       throw new ErrMsgDto(err2);
     }
     return user_info[0];
+  }
+
+  async getUserInfoWithNick(user_nick: string) {
+    const user_info = await this.usersRepo.findOne({nick: user_nick});
+    console.log(user_info);
+    if (!user_info) {
+      throw (`존재하지 않는 닉네임 입니다. | ${user_nick}`);
+    }
+    return user_info;
   }
 }

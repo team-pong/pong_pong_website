@@ -6,16 +6,22 @@
   }
 }
 
-button.start {
+a.start {
+  display: block;
   width: 240px;
   height: 60px;
+  text-decoration: none;
   background-color: ghostwhite;
   font-family: 'NanumSquareRound';
   font-size: 30px;
   border-radius: 5px;
+  border: 1px solid black;
+  text-align: center;
+  border-radius: 5px;
+  line-height: 60px;
 }
 
-button.start:hover {
+a.start:hover {
   background-color: #828282;
 }
 

@@ -28,8 +28,6 @@ export class MuteService {
       return new ErrMsgDto(err4);
     if (await this.chatUsersRepo.count({user_id: user_id, channel_id: channel_id}) === 0)  // 해당 채널에 유저가 없다면
       return new ErrMsgDto(err13);
-    if (await this.adminRepo.count({user_id: user_id, channel_id: channel_id}))  // 해당 유저가 admin 이면
-      return new ErrMsgDto(err14);
     await this.muteRepo.save({user_id: user_id, channel_id: channel_id})
     return new ErrMsgDto(err0);
   }
@@ -56,5 +54,11 @@ export class MuteService {
       return new ErrMsgDto(err2);
     await this.muteRepo.delete({user_id: user_id});
     return new ErrMsgDto(err0);
+  }
+
+  // 특정 채널에서 뮤트 해제
+  async unMute(user_id: string, room_id: number) {
+    console.log(`unmute query ${user_id}, ${room_id}`)
+    await this.muteRepo.delete({user_id: user_id, channel_id: room_id});
   }
 }

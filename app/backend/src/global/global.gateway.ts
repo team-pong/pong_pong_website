@@ -15,6 +15,7 @@ import { DmStoreService } from 'src/dm-store/dm-store.service';
 import { string } from 'joi';
 import { UseGuards } from '@nestjs/common';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
+import { Block } from 'src/entities/block';
 
 // key: user id / value: socket id
 const socketMap = {};
@@ -43,6 +44,7 @@ export class GlobalGateway {
   constructor(
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Friend) private friendRepo: Repository<Friend>,
+    @InjectRepository(Block) private blockRepo: Repository<Block>,
     private sessionService: SessionService, // readUserId 함수 쓰려고 가져옴
     private friendService: FriendService,
     private globalService: GlobalService,
@@ -78,23 +80,36 @@ export class GlobalGateway {
     }  
   }
 
+  async isBlockedUserFrom(target: string, from: string) {
+    if (await this.blockRepo.count({user_id: from, block_id: target})) {
+      console.log(`${target} is blocked by ${from}`);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /*!
    * @brief 사용자가 DM을 보내는 경우
    *        1. DB에 저장.
    *        2. 상대방이 온라인 상태라면 소켓으로도 전송.
   */
   @SubscribeMessage('dm')
-  handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: DMSendMsg): any {
+  async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: DMSendMsg) {
     const user_id = findUIDwithSID(socket.id);
     const target_id = body.to;
-    this.dmService.createDmStore(user_id, target_id, body.msg);
-    const target_sid = socketMap[target_id]
-    if (target_sid) {
-      this.server.to(target_sid).emit('dm', {
-        from: user_id,
-        msg: body.msg,
-        time: Date.now(),
-      })
+    console.log(`MSG globalSocket ${body}`);
+    if (await this.isBlockedUserFrom(user_id, target_id)) {
+    } else {
+      this.dmService.createDmStore(user_id, target_id, body.msg);
+      const target_sid = socketMap[target_id]
+      if (target_sid) {
+        this.server.to(target_sid).emit('dm', {
+          from: user_id,
+          msg: body.msg,
+          time: Date.now(),
+        })
+      }
     }
   }
 

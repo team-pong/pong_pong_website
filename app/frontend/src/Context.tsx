@@ -24,8 +24,20 @@ export const SetDmInfoContext = createContext(null);
 
 const Global: FC = ({children}): JSX.Element => {
 
-  const [userInfo, setUserInfo] = useState<UserInfo>(null);
-  const [dmInfo, setDmInfo] = useState<DmInfo>({isDmOpen: false, target: ""});
+  const [userInfo, setUserInfo] = useState<UserInfo>({
+    user_id: "",
+    nick: "",
+    avatar_url: "",
+    total_games: 0,
+    win_games: 0,
+    loss_games: 0,
+    ladder_level: 0,
+    status: ""
+  });
+  const [dmInfo, setDmInfo] = useState<DmInfo>({
+    isDmOpen: false,
+    target: ""
+  });
 
   return (
     <UserInfoContext.Provider value={userInfo}>

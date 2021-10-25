@@ -11,6 +11,9 @@ import { Admin } from 'src/entities/admin';
 import { GlobalModule } from 'src/global/global.module';
 import { SessionModule } from 'src/session/session.module';
 import { ChatUsersModule } from 'src/chat-users/chat-users.module';
+import { AdminModule } from 'src/admin/admin.module';
+import { BanModule } from 'src/ban/ban.module';
+import { MuteModule } from 'src/mute/mute.module';
 
 @Module({
   imports: [
@@ -19,6 +22,9 @@ import { ChatUsersModule } from 'src/chat-users/chat-users.module';
     forwardRef(() => GlobalModule),
     forwardRef(() => SessionModule),
     forwardRef(() => ChatUsersModule),
+    forwardRef(() => AdminModule),
+    forwardRef(() => BanModule),
+    forwardRef(() => MuteModule),
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway],

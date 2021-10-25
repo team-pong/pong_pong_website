@@ -25,30 +25,30 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
     const date = new Time(new Date().toString());
     dmLog.forEach((dm) => {
       date.setTime(dm.time);
-      dm.time = `${date.getTimeFormat()} ${date.getHour()}:${date.getMinuate()}`
+      let tmpTime = `${date.getTimeFormat()} ${date.getHour()}:${date.getMinuate()}`
       if (prev.time === "" && prev.from === "") {
         prev.from = dm.from;
-        prev.time = dm.time;
-        tmp.push(dm);
+        prev.time = tmpTime;
+        tmp.push({...dm, time: tmpTime});
         return ;
       }
-      if (dm.time === prev.time && dm.from === prev.from) {
-        tmp.push(dm);
+      if (tmpTime === prev.time && dm.from === prev.from) {
+        tmp.push({...dm, time: tmpTime});
         return ;
       }
       result.push(tmp);
       tmp = [];
       prev.from = dm.from;
-      prev.time = dm.time;
-      tmp.push(dm);
+      prev.time = tmpTime;
+      tmp.push({...dm, time: tmpTime});
     });
     result.push(tmp);
     setSortedDmLog(result);
   }, [dmLog]);
 
-  const printChatLog = (msg: DMLog[]) => {
+  const printChatLog = (msg: DMLog[], idx: number) => {
     return (
-      <>
+      <div key={idx}>
         {msg.map((msg, idx) => {
           return (
             <li key={idx} className={`dm-log ${msg.from === "me" ? "me" : "other"}`}>
@@ -67,7 +67,7 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
             </li>
           )
         })}
-      </>
+      </div>
     );
   }
   
