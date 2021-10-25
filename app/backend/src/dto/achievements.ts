@@ -24,6 +24,8 @@ export class GetAchievementDto {
 	user_id: string;
 }
 
+export class DeleteAllAchievementsDto extends GetAchievementDto {}
+
 export class AcievementDto2{
 	@ApiProperty({
 		example: `
