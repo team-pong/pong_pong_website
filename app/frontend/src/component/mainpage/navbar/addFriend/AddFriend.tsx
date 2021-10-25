@@ -70,7 +70,7 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
       setNoticeInfo({
         isOpen: true,
         seconds: 3,
-        content: "친구 추가에 실패했습니다.",
+        content: res.err_msg,
         backgroundColor: "#CE4D36" //red
       });
     } else {
