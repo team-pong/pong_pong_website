@@ -118,6 +118,12 @@ div.dm-room {
         }
       }
 
+      div.dm-deactivate-request {
+        background-color: rgb(192, 192, 192);
+        pointer-events: none;
+        opacity: 0.3;
+      }
+
       span.dm-request-time {
         font-size: 0.5rem;
         opacity: 0.5;

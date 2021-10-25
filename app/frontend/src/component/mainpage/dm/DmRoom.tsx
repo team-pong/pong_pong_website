@@ -13,13 +13,16 @@ interface DMLog {
 const DmLogList: FC<{dmLog: DMLog[], dmInfo: DmInfo}> = ({dmLog, dmInfo}) => {
 
   const [sortedDmLog, setSortedDmLog] = useState<Array<DMLog[]>>([]);
+  const requestRef = useRef<HTMLDivElement>(null);
 
   const approveChatInvite = () => {
     /* Redirect 하는 코드 */
   };
 
   const rejectChatInvite = () => {
-    /* 클래스를 추가해서 css 다르게 먹도록 구현 */
+    requestRef.current.className += " dm-deactivate-request";
+    /* 여기서 문제는 연속으로 여러 개의 request가 오면 하나만 눌러도
+    전부 다 거절 처리가 될 것이다. 어떻게 해결해야 할까? */
   }
 
   /*!
@@ -62,7 +65,7 @@ const DmLogList: FC<{dmLog: DMLog[], dmInfo: DmInfo}> = ({dmLog, dmInfo}) => {
     if (idx === 1) {
       return (
         <div key={idx} className="dm-request-container">
-          <div className="dm-invitation-part">
+          <div className="dm-invitation-part" ref={requestRef}>
             <span className="dm-request-msg">donglee 님이 아무나 와봐라 이녀석들아 대화방에 당신을 초대했습니다.</span>
             <div className="dm-request-btn-container">
               <div className="dm-request-approve">
