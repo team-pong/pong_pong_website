@@ -23,7 +23,7 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setI
     
     setIsMatched({isMatched: false, roomId: '', opponent: '', position: '', socket: null});
     const socket = io(`${global.BE_HOST}/game`);
-    socket.emit(params.matchType, map);
+    socket.emit(params.matchType, {map: map});
     socket.on("matched", ({roomId, opponent, position}) => {
       isMatched = true;
       setIsMatched({isMatched: true, roomId, opponent, position, socket});
