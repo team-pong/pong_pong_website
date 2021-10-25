@@ -1,4 +1,5 @@
-import { FC, createContext, useState } from "react";
+import { FC, createContext, useState, SetStateAction, Dispatch } from "react";
+import Notice, { NoticeState } from "./component/notice/Notice";
 
 interface UserInfo {
   user_id: string;
@@ -22,6 +23,8 @@ export const SetUserInfoContext = createContext(null);
 export const DmInfoContext = createContext(null);
 export const SetDmInfoContext = createContext(null);
 
+export const SetNoticeInfoContext = createContext<Dispatch<SetStateAction<NoticeState>>>(null);
+
 const Global: FC = ({children}): JSX.Element => {
 
   const [userInfo, setUserInfo] = useState<UserInfo>({
@@ -38,17 +41,28 @@ const Global: FC = ({children}): JSX.Element => {
     isDmOpen: false,
     target: ""
   });
+  const [noticeInfo, setNoticeInfo] = useState<NoticeState>({
+    isOpen: false,
+    seconds: 0,
+    content: "",
+    backgroundColor: ""
+  });
 
   return (
-    <UserInfoContext.Provider value={userInfo}>
-      <SetUserInfoContext.Provider value={setUserInfo}>
-        <DmInfoContext.Provider value={dmInfo}>
-          <SetDmInfoContext.Provider value={setDmInfo}>
-            {children}
-          </SetDmInfoContext.Provider>
-        </DmInfoContext.Provider>
-      </SetUserInfoContext.Provider>
-    </UserInfoContext.Provider>
+    <>
+      <UserInfoContext.Provider value={userInfo}>
+        <SetUserInfoContext.Provider value={setUserInfo}>
+          <DmInfoContext.Provider value={dmInfo}>
+            <SetDmInfoContext.Provider value={setDmInfo}>
+              <SetNoticeInfoContext.Provider value={setNoticeInfo}>
+                {children}
+              </SetNoticeInfoContext.Provider>
+            </SetDmInfoContext.Provider>
+          </DmInfoContext.Provider>
+        </SetUserInfoContext.Provider>
+      </UserInfoContext.Provider>
+      <Notice noticeInfo={noticeInfo} setNoticeInfo={setNoticeInfo} />
+    </>
   );
 }
 
