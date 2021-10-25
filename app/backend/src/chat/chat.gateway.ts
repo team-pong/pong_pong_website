@@ -325,7 +325,7 @@ export class ChatGateway {
     const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
     const user_id = await this.sessionService.readUserId(session_id);
 
-    console.log('Chat 웹소켓 연결됨:', user_id);
+    console.log('Chat Socket Connected:', user_id);
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
@@ -333,7 +333,7 @@ export class ChatGateway {
       const uid = this.socket_map[socket.id].user_id;
       const rid = this.socket_map[socket.id].room_id;
 
-      console.log('Chat Socket Disconnected', uid);
+      console.log('Chat Socket Disconnected:', uid);
       // 1-1. chat-users db에서 제거
       await this.chatUsersService.deleteUser(rid, uid); // 남은 유저가 없는 경우까지 이 메서드에서 처리
 
