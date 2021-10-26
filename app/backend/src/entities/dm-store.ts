@@ -12,4 +12,6 @@ export class DmStore{
   content: string;
 	@CreateDateColumn()
 	created_at: Date;
+	@Column({default: 'normal'})
+	type: string;
 }

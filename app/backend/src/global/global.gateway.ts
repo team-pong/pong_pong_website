@@ -100,6 +100,7 @@ export class GlobalGateway {
 
   @SubscribeMessage('chatInvite')
   async inviteChat(@ConnectedSocket() socket: Socket, @MessageBody() body: InviteDto) {
+    const user_id = findUIDwithSID(socket.id);
     // 1. 초대 받은사람 정보 가져오기
     const target_info = await this.userService.getUserInfoWithNick(body.target);
 
@@ -109,6 +110,8 @@ export class GlobalGateway {
       // 오프라인 상태 인 경우 처리
       return ;
     }
+
+    await this.dmService.createInvite(user_id, target_info.user_id, {chatTitle: body.chatTitle, channelId: body.channelId})
 
     // 3. 초대 받을 사람에게 메세지 전달
     this.server.to(target_sid).emit('chatInvite', body);
