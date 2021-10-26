@@ -123,7 +123,7 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
               placeholder="대화방 이름을 입력하세요."
               required
               minLength={2}
-              maxLength={25}
+              maxLength={15}
               value={title}
               onChange={(e) => setTitle(e.target.value)}/>
           </form>

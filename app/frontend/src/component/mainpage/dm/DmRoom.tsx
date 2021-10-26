@@ -78,7 +78,7 @@ const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
       const parsedMsg = JSON.parse(msg[0].msg);
       
       return (
-        <div key={idx} className="dm-request-container">
+        <div key={idx} className={`dm-request-container ${msg[0].from === myInfo.nick ? "me" : "other"}`}>
           <div className="dm-invitation-part" ref={requestRef}>
             <span className="dm-request-msg">{msg[0].from} 님이 {parsedMsg.chatTitle} 대화방에 초대했습니다.</span>
             <div className="dm-request-btn-container">
@@ -180,7 +180,11 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
       target: dmInfo.target,
       request: null,
     });
+    getDmLog();
   };
+  /* TODO: 문제가 뭔지 잘 모르겠다. 초대를 보낸 후 부터는 그 즉시 DM을 보내도 가질 않는다
+  DB에는 정상적으로 저장이 되는데 렌더링이 안 된다. 
+  기본적으로 DM에 문제가 있는데 디버깅을 통해서 어떻게 처리가 되는지를 분석해야한다. */
 
   const controllTextAreaKeyDown = (e: React.KeyboardEvent) => {
     const keyCode = e.key;
@@ -195,6 +199,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?receiver_nick=${dmInfo.target}`);
     const res = await easyfetch.fetch();
 
+    console.log("getDmLog: ", res);
     setDmLog(res);
   }
 

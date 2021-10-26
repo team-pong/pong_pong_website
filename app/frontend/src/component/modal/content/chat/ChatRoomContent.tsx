@@ -147,7 +147,7 @@ interface ChatLogSystem {
   inform: string,
 }
 
-interface ChatUser {
+export interface ChatUser {
   nick: string,
   avatar_url: string,
   position: string,
@@ -516,7 +516,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
             smallModal
             content={<ChatInviteContent
                         chatTitle={chatRoomInfo.title}
-                        channelId={chatRoomInfo.channel_id} />}/>
+                        channelId={chatRoomInfo.channel_id} 
+                        chatUsers={chatUsers}/>}/>
         </Route>
         <Route path={`${match.url}/profile/:nick`}>
           <Modal id={Date.now()} smallModal content={<ProfileContent readonly/>}/>

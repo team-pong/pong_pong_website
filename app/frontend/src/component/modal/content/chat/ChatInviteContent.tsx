@@ -6,6 +6,7 @@ import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchie
 import { Friend } from "../profile/ManageFriendContent";
 import NoResult from "../../../noresult/NoResult";
 import { UserInfo } from "../../../mainpage/MainPage";
+import { ChatUser } from "./ChatRoomContent";
 
 /*!
  * @author donglee
@@ -22,10 +23,11 @@ interface ResultProps {
   chatTitle: string,
   channelId: number,
   myInfo: UserInfo,
+  chatUsers: ChatUser[],
 };
 
 const Result: FC<ResultProps> = (
-  {result, setDmInfo, chatTitle, channelId, myInfo}): JSX.Element => {
+  {result, setDmInfo, chatTitle, channelId, myInfo, chatUsers}): JSX.Element => {
 
   /* TODO: 초대를 보낼 때 
   from: string,
@@ -92,11 +94,42 @@ interface FriendListProps {
   chatTitle: string,
   channelId: number,
   myInfo: UserInfo,
+  chatUsers: ChatUser[],
 };
          
 const FriendList: FC<FriendListProps> = (
-  {friendList, setDmInfo, chatTitle, channelId, myInfo}): JSX.Element => {
-  
+  {friendList, setDmInfo, chatTitle, channelId, myInfo, chatUsers}): JSX.Element => {
+
+  /*!
+   * @author donglee
+   * @brief 대화방 내부에 초대할 사람이 이미 있는지 검사해서 여부를 boolean으로 반환
+   */
+  const isAlreadyHere = (to: string): boolean => {
+    return (chatUsers.some((user) => {
+      return user.nick === to;
+    }));
+  };
+
+  /*!
+   * @author donglee
+   * @brief 이미 대화방에 있는지 검사 후 DM을 보냄
+   */
+  const sendInvite = (to: string) => {
+    if (isAlreadyHere(to)) {
+      alert(`${to} 님은 이미 대화방에 참여중입니다.`);
+      return ;
+    }
+    setDmInfo({
+      isDmOpen: true,
+      target: to,
+      request: {
+        from: myInfo.nick,
+        chatTitle: chatTitle,
+        channelId: channelId,
+      },
+    });
+  };
+
   return (
     <div className="invite-result">
       <div className="invite-fl-header-container">
@@ -122,16 +155,7 @@ const FriendList: FC<FriendListProps> = (
                   <span
                     className={"ci-invite-btn" + (friend.status !== "online" ?
                       " ci-deactivated-btn" : "")}
-                    onClick={friend.status === "online" ?
-                      () => setDmInfo({
-                        isDmOpen: true,
-                        target: friend.nick,
-                        request: {
-                          from: myInfo.nick,
-                          chatTitle: chatTitle,
-                          channelId: channelId,
-                        }})
-                      : () => {}}>
+                    onClick={friend.status === "online" ? () => sendInvite(friend.nick) : () => {}}>
                     초대하기
                   </span>
                 </div>
@@ -152,9 +176,10 @@ const FriendList: FC<FriendListProps> = (
 interface ChatinviteContentProps {
   chatTitle: string,
   channelId: number,
+  chatUsers: ChatUser[],
 };
 
-const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId}): JSX.Element => {
+const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, chatUsers}): JSX.Element => {
 
   const [friendList, setFriendList] = useState<Friend[]>([]);
   const setDmInfo = useContext(SetDmInfoContext);
@@ -224,13 +249,15 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId}): 
                                 setDmInfo={setDmInfo}
                                 chatTitle={chatTitle}
                                 channelId={channelId}
-                                myInfo={myInfo} />}
+                                myInfo={myInfo}
+                                chatUsers={chatUsers} />}
       {result && <Result
                     result={result}
                     setDmInfo={setDmInfo}
                     chatTitle={chatTitle}
                     channelId={channelId}
-                    myInfo={myInfo} />}
+                    myInfo={myInfo}
+                    chatUsers={chatUsers} />}
     </div>
   );
 };
