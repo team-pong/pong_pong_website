@@ -510,8 +510,17 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
               socket={socket}/>
             } />
         </Route>
-        <Route path={`${match.url}/invite`}><Modal id={Date.now()} smallModal content={<ChatInviteContent/>}/></Route>
-        <Route path={`${match.url}/profile/:nick`}><Modal id={Date.now()} smallModal content={<ProfileContent readonly/>}/></Route>
+        <Route path={`${match.url}/invite`}>
+          <Modal
+            id={Date.now()}
+            smallModal
+            content={<ChatInviteContent
+                        chatTitle={chatRoomInfo.title}
+                        channelId={chatRoomInfo.channel_id} />}/>
+        </Route>
+        <Route path={`${match.url}/profile/:nick`}>
+          <Modal id={Date.now()} smallModal content={<ProfileContent readonly/>}/>
+        </Route>
       </div>
     );
   } 

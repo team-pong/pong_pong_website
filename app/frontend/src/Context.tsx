@@ -12,9 +12,7 @@ interface UserInfo {
 }
 
 export interface Request {
-  type: string,
   from: string,
-  to: string,
   chatTitle: string,
   channelId: number,  
 };

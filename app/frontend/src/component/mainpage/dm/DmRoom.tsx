@@ -131,7 +131,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   const setDmLog = (x) => {
     dmLogRef.current = x;
     _setDmLog(x);
-  }
+  };
 
   const [textAreaMsg, setTextAreaMsg] = useState("");
 
@@ -148,8 +148,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   }
 
   const sendRequest = () => {
-    /* 여기서 필요한 정보들을 백엔드에 보내준다 dmInfo.request */
-    // global.socket.emit("request", function);
+    // global.socket.emit("request", data);
   };
 
   const controllTextAreaKeyDown = (e: React.KeyboardEvent) => {
@@ -170,15 +169,23 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   useEffect(() => {
     getDmLog();
 
-    //test DM을 실행했을 때 request이면 아래 함수 실행
     if (dmInfo.request) {
       sendRequest();
     }
     const dmOn = (dm) => {
       setDmLog([{...dm}, ...dmLogRef.current]);
     }
+
+    // const chatInviteOn = (request) => {
+    //   setDmLog([{...request}, ...dmLogRef.current]);
+    // }
+
     global.socket.on("dm", dmOn);
-    return (() => global.socket.off("dm", dmOn));
+    // global.socket.on("chatInvite", chatInviteOn);
+    return (() => {
+      global.socket.off("dm", dmOn);
+      // global.socket.off("chatInvite", chatInviteOn);
+    });
   }, []);
 
   return (

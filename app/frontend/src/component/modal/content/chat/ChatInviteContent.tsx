@@ -12,14 +12,20 @@ import { UserInfo } from "../../../mainpage/MainPage";
  * @brief 검색 결과를 보여주는 FC
  * @param[in] result: 검색 결과를 담은 UserInfo 객체
  * @param[in] setDmInfo: 초대하기를 DM으로 보내기 위함
+ * @param[in] chatTitle: 초대하기를 할 때 전달할 대화방 이름
+ * @param[in] setDmInfo: 초대하기를 할 때 전달할 대화방 channelId
  */
 
 interface ResultProps {
   result: UserInfo,
   setDmInfo: Dispatch<SetStateAction<DmInfo>>,
+  chatTitle: string,
+  channelId: number,
+  myInfo: UserInfo,
 };
 
-const Result: FC<ResultProps> = ({result, setDmInfo}): JSX.Element => {
+const Result: FC<ResultProps> = (
+  {result, setDmInfo, chatTitle, channelId, myInfo}): JSX.Element => {
 
   /* TODO: 초대를 보낼 때 
   from: string,
@@ -53,8 +59,14 @@ const Result: FC<ResultProps> = ({result, setDmInfo}): JSX.Element => {
               className={"ci-invite-btn" + (result.status !== "online" ?
                 " ci-deactivated-btn" : "")}
               onClick={result.status === "online" ?
-              /* TODO: 이 FC에 prop으로 필요한 정보들(channelId, channelTitle 등)을 받아오자 */
-                () => setDmInfo({isDmOpen: true, target: result.nick, request: null})
+                () => setDmInfo({
+                  isDmOpen: true,
+                  target: result.nick,
+                  request: {
+                    from: myInfo.nick,
+                    chatTitle: chatTitle,
+                    channelId: channelId,
+                  }})
                 : () => {}}>
               초대하기
             </span>
@@ -70,14 +82,20 @@ const Result: FC<ResultProps> = ({result, setDmInfo}): JSX.Element => {
  * @brief 친구 목록을 보여주는 FC
  * @param[in] friendList: 친구 객체를 담은 배열
  * @param[in] setDmInfo: 초대하기를 DM으로 보내기 위함
+ * @param[in] chatTitle: 초대하기를 할 때 전달할 대화방 이름
+ * @param[in] setDmInfo: 초대하기를 할 때 전달할 대화방 channelId
  */
 
 interface FriendListProps {
   friendList: Friend[],
   setDmInfo: Dispatch<SetStateAction<DmInfo>>,
-}
+  chatTitle: string,
+  channelId: number,
+  myInfo: UserInfo,
+};
          
-const FriendList: FC<FriendListProps> = ({friendList, setDmInfo}): JSX.Element => {
+const FriendList: FC<FriendListProps> = (
+  {friendList, setDmInfo, chatTitle, channelId, myInfo}): JSX.Element => {
   
   return (
     <div className="invite-result">
@@ -105,7 +123,14 @@ const FriendList: FC<FriendListProps> = ({friendList, setDmInfo}): JSX.Element =
                     className={"ci-invite-btn" + (friend.status !== "online" ?
                       " ci-deactivated-btn" : "")}
                     onClick={friend.status === "online" ?
-                      () => setDmInfo({isDmOpen: true, target: friend.nick, request: null})
+                      () => setDmInfo({
+                        isDmOpen: true,
+                        target: friend.nick,
+                        request: {
+                          from: myInfo.nick,
+                          chatTitle: chatTitle,
+                          channelId: channelId,
+                        }})
                       : () => {}}>
                     초대하기
                   </span>
@@ -121,8 +146,15 @@ const FriendList: FC<FriendListProps> = ({friendList, setDmInfo}): JSX.Element =
 /*!
  * @author donglee
  * @brief 대화방 내부에서 초대하기를 눌러 검색 후 초대를 보낼 수 있는 컴포넌트
+ * @param[in] chatTitle: 초대하기를 할 때 전달할 대화방 이름
+ * @param[in] setDmInfo: 초대하기를 할 때 전달할 대화방 channelId
  */
-const ChatInviteContent: FC = (): JSX.Element => {
+interface ChatinviteContentProps {
+  chatTitle: string,
+  channelId: number,
+};
+
+const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId}): JSX.Element => {
 
   const [friendList, setFriendList] = useState<Friend[]>([]);
   const setDmInfo = useContext(SetDmInfoContext);
@@ -187,8 +219,18 @@ const ChatInviteContent: FC = (): JSX.Element => {
             onClick={getUserToFind}/>
         </div>
       </div>
-      {!search && !result && <FriendList friendList={friendList} setDmInfo={setDmInfo} />}
-      {result && <Result result={result} setDmInfo={setDmInfo} />}
+      {!search && !result && <FriendList
+                                friendList={friendList}
+                                setDmInfo={setDmInfo}
+                                chatTitle={chatTitle}
+                                channelId={channelId}
+                                myInfo={myInfo} />}
+      {result && <Result
+                    result={result}
+                    setDmInfo={setDmInfo}
+                    chatTitle={chatTitle}
+                    channelId={channelId}
+                    myInfo={myInfo} />}
     </div>
   );
 };
