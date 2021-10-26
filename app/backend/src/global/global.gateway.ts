@@ -17,6 +17,7 @@ import { UseGuards } from '@nestjs/common';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
 import { Block } from 'src/entities/block';
 import { UsersService } from 'src/users/users.service';
+import { DmStore } from 'src/entities/dm-store';
 
 // key: user id / value: socket id
 const socketMap = {};
@@ -52,6 +53,7 @@ export class GlobalGateway {
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(Friend) private friendRepo: Repository<Friend>,
     @InjectRepository(Block) private blockRepo: Repository<Block>,
+    @InjectRepository(DmStore) private dmRepo: Repository<DmStore>,
     private sessionService: SessionService, // readUserId 함수 쓰려고 가져옴
     private friendService: FriendService,
     private globalService: GlobalService,
@@ -112,9 +114,14 @@ export class GlobalGateway {
     }
 
     await this.dmService.createInvite(user_id, target_info.user_id, {chatTitle: body.chatTitle, channelId: body.channelId})
-
+    const dm = await this.dmRepo.findOne({sender_id: user_id, receiver_id: target_info.user_id});
     // 3. 초대 받을 사람에게 메세지 전달
-    this.server.to(target_sid).emit('chatInvite', body);
+    this.server.to(target_sid).emit('chatInvite', {
+      time: dm.created_at,
+      msg: dm.content,
+      from: dm.sender_id,
+      type: dm.type
+    });
   }
 
   /*!

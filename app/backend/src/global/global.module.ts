@@ -10,13 +10,15 @@ import { Users } from 'src/entities/users';
 import { Friend } from 'src/entities/friend';
 import { DmStoreModule } from 'src/dm-store/dm-store.module';
 import { Block } from 'src/entities/block';
+import { DmStore } from 'src/entities/dm-store';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Users,
       Friend,
-      Block
+      Block,
+      DmStore
     ]),
     SessionModule,
     FriendModule,
