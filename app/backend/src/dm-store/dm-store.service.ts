@@ -20,6 +20,7 @@ export interface DMLog {
   time: string,
   msg: string,
   from: string,
+  type: string,
 }
 
 @Injectable()
@@ -42,7 +43,7 @@ export class DmStoreService {
 
   async createInvite(from: string, to: string, inviteMsg: any) {
     console.log('invite dm saving...');
-    const ret = await this.dmStoreRepo.save({sender_id: from, receiver_id: to, content: JSON.stringify(inviteMsg)})
+    const ret = await this.dmStoreRepo.save({sender_id: from, receiver_id: to, content: JSON.stringify(inviteMsg), type: 'chat'})
     console.log(ret);
   }
 
@@ -62,6 +63,7 @@ export class DmStoreService {
         time: dm.created_at,
         msg: dm.content,
         from: dm.sender_id == user_id ? "me" : dm.sender_id,
+        type: dm.type,
       });
     }
     return dmList;
@@ -92,7 +94,7 @@ export class DmStoreService {
           avatar_url: await this.usersService.getAvatarUrl(msg.sender_id),
           nick: msg.sender_id,
         },
-        lastMsg: msg.content,
+        lastMsg: msg.type == 'normal' ? msg.content : msg.type == 'chat' ? "채팅방 초대를 받았습니다." : "대전 신청을 받았습니다.",
         lastMsgTime: (msg.created_at),
       })
     }
@@ -111,7 +113,7 @@ export class DmStoreService {
           avatar_url: await this.usersService.getAvatarUrl(msg.receiver_id),
           nick: msg.receiver_id,
         },
-        lastMsg: msg.content,
+        lastMsg: msg.type == 'normal' ? msg.content : msg.type == 'chat' ? "채팅방 초대를 받았습니다." : "대전 신청을 받았습니다.",
         lastMsgTime: msg.created_at,
       })
     }
