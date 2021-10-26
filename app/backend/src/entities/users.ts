@@ -22,4 +22,6 @@ export class Users{
 	two_factor_login: boolean;
 	@Column({default: ''})
 	email: string;
+	@Column({default: false})
+	admin: boolean;
 }
