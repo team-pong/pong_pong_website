@@ -63,12 +63,22 @@ const MainPage = ({match}): JSX.Element => {
     });
   }, []);
 
+  /*!
+   * @author donglee
+   * @troubleShooting socket.on, socket.off 에서 같은 함수를 참조하기 위해 유명함수로 선언
+   */
+  const socketSenUnReadMsg = () => {
+    setUnReadMsg(true);
+  };
+
   useEffect(() => {
     if (!dmInfo.isDmOpen) {
-      global.socket.on("dm", () => setUnReadMsg(true));
+      global.socket.on("dm", socketSenUnReadMsg);
+      global.socket.on("chatInvite", socketSenUnReadMsg);
     } else if (dmInfo.isDmOpen) {
       setUnReadMsg(false);
-      global.socket.off("dm", () => setUnReadMsg(true));
+      global.socket.off("dm", socketSenUnReadMsg);
+      global.socket.off("chatInvite", socketSenUnReadMsg);
     }
   }, [dmInfo]);
 

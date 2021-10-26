@@ -148,7 +148,13 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   }
 
   const sendRequest = () => {
-    // global.socket.emit("request", data);
+    console.log("sendRequest!");
+    global.socket.emit("chatInvite", {
+      from: dmInfo.request.from,
+      target: dmInfo.target,
+      chatTitle: dmInfo.request.chatTitle,
+      channelId: dmInfo.request.channelId,
+    });
   };
 
   const controllTextAreaKeyDown = (e: React.KeyboardEvent) => {
@@ -163,6 +169,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   const getDmLog = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?receiver_nick=${dmInfo.target}`);
     const res = await easyfetch.fetch();
+    console.log("res: ", res);
     setDmLog(res);
   }
 
@@ -176,15 +183,17 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
       setDmLog([{...dm}, ...dmLogRef.current]);
     }
 
-    // const chatInviteOn = (request) => {
-    //   setDmLog([{...request}, ...dmLogRef.current]);
-    // }
+    const chatInviteOn = (request) => {
+      // setDmLog([{...request}, ...dmLogRef.current]);
+      console.log("from socket: ", request);
+      console.log("chatInviteOn: ", dmLogRef.current);
+    }
 
     global.socket.on("dm", dmOn);
-    // global.socket.on("chatInvite", chatInviteOn);
+    global.socket.on("chatInvite", chatInviteOn);
     return (() => {
       global.socket.off("dm", dmOn);
-      // global.socket.off("chatInvite", chatInviteOn);
+      global.socket.off("chatInvite", chatInviteOn);
     });
   }, []);
 

@@ -34,6 +34,8 @@ const DmList: FC = (): JSX.Element => {
   const getDmList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/list`);
     const res: DM[] = await easyfetch.fetch();
+
+    console.log("dmList: ", res);
     res.sort((a, b) => {
       if (a.lastMsgTime > b.lastMsgTime) return (-1);
       if (a.lastMsgTime === b.lastMsgTime) return (0);
