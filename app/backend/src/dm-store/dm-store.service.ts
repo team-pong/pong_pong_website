@@ -62,7 +62,7 @@ export class DmStoreService {
       dmList.push({
         time: dm.created_at,
         msg: dm.content,
-        from: dm.sender_id == user_id ? "me" : dm.sender_id,
+        from: dm.sender_id,
         type: dm.type,
       });
     }
@@ -113,7 +113,7 @@ export class DmStoreService {
           avatar_url: await this.usersService.getAvatarUrl(msg.receiver_id),
           nick: msg.receiver_id,
         },
-        lastMsg: msg.type == 'normal' ? msg.content : msg.type == 'chat' ? "채팅방 초대를 받았습니다." : "대전 신청을 받았습니다.",
+        lastMsg: msg.type == 'normal' ? msg.content : msg.type == 'chat' ? "채팅방 초대를 보냈습니다." : "대전 신청을 보냈습니다.",
         lastMsgTime: msg.created_at,
       })
     }
