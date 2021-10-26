@@ -16,6 +16,7 @@ import { string } from 'joi';
 import { UseGuards } from '@nestjs/common';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
 import { Block } from 'src/entities/block';
+import { UsersService } from 'src/users/users.service';
 
 // key: user id / value: socket id
 const socketMap = {};
@@ -25,6 +26,12 @@ interface DMSendMsg {
   msg: string,
 }
 
+interface InviteDto {
+  from: string, // nick
+  target: string, // nick
+  chatTitle: string,
+  channelId: number
+};
 // 3. dm 보내는 경우, dm 내용 db에 저장. 해당유저가 offline인 경우) db에 저장만 + 알람부분 col 추가?
 //                                 online인 경우) 소켓으로 보냄
 // 4. dm 받는 경우. online 상태에서) 소켓을 통해 받는다
@@ -49,6 +56,7 @@ export class GlobalGateway {
     private friendService: FriendService,
     private globalService: GlobalService,
     private dmService: DmStoreService,
+    private userService: UsersService,
   ) {}
 
   @WebSocketServer() public server: Server;
@@ -87,6 +95,23 @@ export class GlobalGateway {
     } else {
       return false;
     }
+  }
+
+
+  @SubscribeMessage('chatInvite')
+  async inviteChat(@ConnectedSocket() socket: Socket, @MessageBody() body: InviteDto) {
+    // 1. 초대 받은사람 정보 가져오기
+    const target_info = await this.userService.getUserInfoWithNick(body.target);
+
+    // 2. 초대 받은사람 소켓 아이디 가져오기 (온라인 상태가 아니라면 global 소켓 id가 없음)
+    const target_sid = socketMap[target_info.user_id]
+    if (!target_sid) {
+      // 오프라인 상태 인 경우 처리
+      return ;
+    }
+
+    // 3. 초대 받을 사람에게 메세지 전달
+    this.server.to(target_sid).emit('chatInvite', body);
   }
 
   /*!
