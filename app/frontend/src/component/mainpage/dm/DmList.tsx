@@ -35,7 +35,6 @@ const DmList: FC = (): JSX.Element => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/list`);
     const res: DM[] = await easyfetch.fetch();
 
-    console.log("dmList: ", res);
     res.sort((a, b) => {
       if (a.lastMsgTime > b.lastMsgTime) return (-1);
       if (a.lastMsgTime === b.lastMsgTime) return (0);
@@ -54,8 +53,21 @@ const DmList: FC = (): JSX.Element => {
   */
   useEffect(() => {
     getDmList();
-    global.socket.on("dm", () => getDmList());
-    return (() => global.socket.off("dm", () => getDmList()))
+
+    /*!
+     * @author donglee
+     * @troubleShooting socket.on, socket.off 에서 같은 함수를 참조하기 위해 유명함수로 선언
+     */
+    const socketGetDmList = () => {
+      getDmList();
+    };
+
+    global.socket.on("dm", socketGetDmList);
+    global.socket.on("chatInvite", socketGetDmList);
+    return (() => {
+      global.socket.off("dm", socketGetDmList);
+      global.socket.off("chatInvite", socketGetDmList);
+    });
   }, []);
 
   return (

@@ -5,9 +5,10 @@ import EasyFetch from "../../../utils/EasyFetch";
 import Time from "../../../utils/Time";
 
 interface DMLog {
-  time: string,         /* e.g.) "2021-07-31T05:41:48.342Z"     */
-  msg: string,          /* e.g.) "반갑다"        */
-  from: string          /* e.g.) "me" || "hna" */
+  time: string, /* e.g.) "2021-07-31T05:41:48.342Z" */
+  msg: string,  /* e.g.) "반갑다" */
+  from: string, /* e.g.) "me" || "hna" */
+  type: string, /* e.g.) "normal" || "chat"(대화방 초대) || "game"(게임 초대) */
 };
 
 const DmLogList: FC<{dmLog: DMLog[], dmInfo: DmInfo}> = ({dmLog, dmInfo}) => {
@@ -59,35 +60,32 @@ const DmLogList: FC<{dmLog: DMLog[], dmInfo: DmInfo}> = ({dmLog, dmInfo}) => {
   }, [dmLog]);
 
   const printChatLog = (msg: DMLog[], idx: number) => {
-    /* msg 에 백엔드에서 다른 포맷으로 와야된다. 그걸 캐치해서 그 해당 msg에 대해서는
-    다른 정보를 보여줘야 한다 */
-    //Test
-    if (idx === 1) {
-      return (
-        <div key={idx} className="dm-request-container">
-          <div className="dm-invitation-part" ref={requestRef}>
-            <span className="dm-request-msg">donglee 님이 아무나 와봐라 이녀석들아 대화방에 당신을 초대했습니다.</span>
-            <div className="dm-request-btn-container">
-              <div className="dm-request-approve">
-                <img
-                  className="dm-reply-img"
-                  src="/public/green-check.png"
-                  alt="승낙"
-                  onClick={approveChatInvite} />
-              </div>
-              <div className="dm-request-reject">
-                <img
-                  className="dm-reply-img"
-                  src="/public/red-x.png" 
-                  alt="거절"
-                  onClick={rejectChatInvite} />
-              </div>
-            </div>
-          </div>
-          <span className="dm-request-time">{"오후 12:23"}</span>
-        </div>
-      );
-    }
+    // if (msg[0].type === "chat") {
+    //   return (
+    //     <div key={idx} className="dm-request-container">
+    //       <div className="dm-invitation-part" ref={requestRef}>
+    //         <span className="dm-request-msg">{dmInfo.request.from} 님이 {dmInfo.request.chatTitle} 대화방에 당신을 초대했습니다.</span>
+    //         <div className="dm-request-btn-container">
+    //           <div className="dm-request-approve">
+    //             <img
+    //               className="dm-reply-img"
+    //               src="/public/green-check.png"
+    //               alt="승낙"
+    //               onClick={approveChatInvite} />
+    //           </div>
+    //           <div className="dm-request-reject">
+    //             <img
+    //               className="dm-reply-img"
+    //               src="/public/red-x.png" 
+    //               alt="거절"
+    //               onClick={rejectChatInvite} />
+    //           </div>
+    //         </div>
+    //       </div>
+    //       <span className="dm-request-time">{msg[0].time}</span>
+    //     </div>
+    //   );
+    // }
 
     return (
       <div key={idx}>
@@ -148,7 +146,6 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   }
 
   const sendRequest = () => {
-    console.log("sendRequest!");
     global.socket.emit("chatInvite", {
       from: dmInfo.request.from,
       target: dmInfo.target,
@@ -169,7 +166,6 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   const getDmLog = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?receiver_nick=${dmInfo.target}`);
     const res = await easyfetch.fetch();
-    console.log("res: ", res);
     setDmLog(res);
   }
 
