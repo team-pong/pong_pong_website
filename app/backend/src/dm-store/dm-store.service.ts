@@ -42,9 +42,7 @@ export class DmStoreService {
 
   async createInvite(from: string, to: string, inviteMsg: any) {
     console.log('invite dm saving...');
-    const ret = await this.dmStoreRepo.save({sender_id: from, receiver_id: to, content: `{
-chatTitle: ${inviteMsg.chatTitle},
-channelId: ${inviteMsg.channelId}}`})
+    const ret = await this.dmStoreRepo.save({sender_id: from, receiver_id: to, content: JSON.stringify(inviteMsg)})
     console.log(ret);
   }
 
