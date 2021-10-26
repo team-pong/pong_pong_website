@@ -104,10 +104,14 @@
     }
 
     .nav-list-button {
+      display: block;
+      width: 240px;
       padding: 1em;
       font-size: 0.95em;
       transition: all 0.15s linear;
       cursor: pointer;
+      color: #fff;
+      text-decoration: none;
 
       .nav-list-span {
         margin-left: 35px;
