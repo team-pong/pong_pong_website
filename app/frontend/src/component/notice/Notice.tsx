@@ -1,32 +1,37 @@
 import { FC, Dispatch, SetStateAction, useEffect, useRef, CSSProperties } from "react";
 import "/src/scss/notice/Notice.scss";
 
-interface NoticeProps {
+export interface NoticeState {
+  isOpen: boolean,
   seconds: number,
   content: string,
-  backgroundColor?: string,
-  isNoticeOpen: boolean,
-  setIsNoticeOpen: Dispatch<SetStateAction<boolean>>
+  backgroundColor: string,
+}
+
+interface NoticeProps {
+  noticeInfo: NoticeState,
+  setNoticeInfo: Dispatch<SetStateAction<NoticeState>>
 }
 
 /*!
   * @author yochoi
   * @brief 지정된 초 만큼 알림을 띄우고 사라지는 컴포넌트
   * @params[in]
-  *             seconds: 알림을 띄울 시간, 초 단위
-  *             content: 알림 안에 들어갈 문장
-  *             backgroundColor: 알림창 색을 지정할 문자열, 기본값은 #62C375
-  *             isNoticeOpen: 알림을 띄울지 결정하는 State로, true면 알림을 띄우고 지정된 시간이 지나면 다시 false로 세팅됨
-  *             setIsNoticeOpen: 지정된 시간만큼의 시간이 지나면 isNoticeOpen 을 false 로 세팅하기 위한 함수
+  *             noticeInfo: {
+  *               isOpen: boolean         -> notice open 여부
+  *               seconds: number         -> notice가 몇초 뒤에 꺼질지 정할 수
+  *               content: string         -> notice 안에 들어갈 문자열
+  *               backgroundColor: string -> notice의 색
+  *             }
+  *             setNoticeInfo: 지정된 시간만큼의 시간이 지나면 noticeInfo.isOpen 을 false 로 세팅하기 위한 함수
   * @details
-  *             1. const [isNoticeOpen, setIsNoticeOpen] = useState(false);
-  *             2. <Notice
-  *                  seconds={3}
-  *                  content="알림 안에 들어갈 내용을 입력해 주세요"
-  *                  backgroundColor="green"
-  *                  isNoticeOpen={isNoticeOpen}
-  *                  setIsNoticeOpen={setIsNoticeOpen}/>
-  *             3. <button onClick={() => setIsNoticeOpen(true)}/>
+  *             1. const setNoticeInfo = useContext(SetNoticeInfoContext);
+  *             2. setNoticeInfo({
+  *                 isOpen: true,
+  *                 seconds: 3,
+  *                 content: "안녕하세요"
+  *                 backgroundColor: "#62C375"
+  *                });
   * @warning
   *             out 애니메이션 시간이 1초 이므로,
   *             애니메이션 시간까지 고려하면 Notice가 완전히
@@ -34,18 +39,15 @@ interface NoticeProps {
   */
 
 const Notice: FC<NoticeProps> = ({
-  seconds,
-  content,
-  backgroundColor,
-  isNoticeOpen,
-  setIsNoticeOpen
+  noticeInfo: {isOpen, seconds, content, backgroundColor},
+  setNoticeInfo
 }): JSX.Element => {
 
   const noticeRef = useRef<HTMLDivElement>(null);
   const progressBarAnimation = useRef<HTMLDivElement>(null);
 
   const openNotice = () => {
-    setTimeout(() => setIsNoticeOpen(false), seconds * 1000);
+    setTimeout(() => setNoticeInfo({isOpen: false, seconds: seconds, content: content, backgroundColor: backgroundColor}), seconds * 1000);
     noticeRef.current.className = "notice active";
     progressBarAnimation.current.style.animation = `notice-progress-animation ${seconds}s linear`;
   }
@@ -56,12 +58,12 @@ const Notice: FC<NoticeProps> = ({
   }
 
   useEffect(() => {
-    if (isNoticeOpen) {
+    if (isOpen) {
       openNotice();
     } else {
       closeNotice();
     }
-  }, [isNoticeOpen]);
+  }, [isOpen]);
 
   useEffect(() => {
     noticeRef.current.className = "notice";
