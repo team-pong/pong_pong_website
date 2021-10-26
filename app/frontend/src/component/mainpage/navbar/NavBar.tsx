@@ -96,15 +96,17 @@ const NavBar: FC<NavBarProps> = (props): JSX.Element => {
             <img className="nav-list-img" src="/public/email.png"/>
             <span className="nav-list-span">문의하기</span>
           </Link>
-          <button className="nav-list-button" onClick={() => {
-            props.setMainPageMode(() => {
-              if (props.mainPageMode === "user") return ("admin")
-              else return ("user")
-            })
-          }}>
-            <img className="nav-list-img" src="/public/tools.svg"/>
-            <span className="nav-list-span">{props.mainPageMode === "user" ? "관리자 모드" : "유저 모드"}</span>
-          </button>
+          {userInfo.admin === true &&
+            <button className="nav-list-button" onClick={() => {
+              props.setMainPageMode(() => {
+                if (props.mainPageMode === "user") return ("admin")
+                else return ("user")
+              })
+            }}>
+              <img className="nav-list-img" src="/public/tools.svg"/>
+              <span className="nav-list-span">{props.mainPageMode === "user" ? "관리자 모드" : "유저 모드"}</span>
+            </button>
+          }
         </div>
       </ul>
       <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent />} smallModal/></Route>

@@ -19,6 +19,7 @@ export interface UserInfo {
   total_games: number;
   user_id: string;
   win_games: number;
+  admin: boolean;
 }
 
 type MainPageMode = "user" | "admin";
@@ -42,7 +43,6 @@ const MainPage = ({match}): JSX.Element => {
   const getUserInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
     const res = await easyfetch.fetch();
-    
     return res;
   }
 
@@ -84,7 +84,7 @@ const MainPage = ({match}): JSX.Element => {
         <Route path={`${match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route>
       </Switch>
       <main>
-        {mainPageMode === "user" &&
+        {mainPageMode === "user" ?
           <div id="button-container">
             <Link
               to={`${match.url}/record`}
@@ -119,8 +119,7 @@ const MainPage = ({match}): JSX.Element => {
               </button>
             </section>
           </div>
-        }
-        {mainPageMode === "admin" &&
+        :
           <div></div>
         }
       </main>
