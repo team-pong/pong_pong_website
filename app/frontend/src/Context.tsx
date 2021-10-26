@@ -19,7 +19,7 @@ export interface Request {
 };
 
 export interface DmInfo {
-  request?: Request;
+  request?: Request;  //대화방, 게임 초대의 경우 해당 객체에 정보가 set됨
   isDmOpen: boolean;
   target: string;
 }
@@ -45,7 +45,6 @@ const Global: FC = ({children}): JSX.Element => {
     status: ""
   });
 
-  /* 전역객체다 보니 보내고 나서는 바로 null로 초기화해줘야 한다 */
   const [dmInfo, setDmInfo] = useState<DmInfo>({
     request: null,
     isDmOpen: false,

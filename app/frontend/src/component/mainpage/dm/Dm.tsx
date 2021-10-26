@@ -9,11 +9,9 @@ const Dm: FC = (): JSX.Element => {
   const dmInfo = useContext(DmInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
 
-  const dmRef = useRef<HTMLDivElement>(null);
-
   return (
     <div id="dm-outside" onClick={(e) => {if(e.target === e.currentTarget) setDmInfo({isDmOpen: false, target: ""})}}>
-      <div className="dm-container" ref={dmRef}>
+      <div className="dm-container">
         <div className="top-bar">
           <span>
             {
