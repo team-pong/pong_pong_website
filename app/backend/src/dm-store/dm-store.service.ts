@@ -40,6 +40,13 @@ export class DmStoreService {
     return err0;
   }
 
+  async createInvite(from: string, to: string, inviteMsg: any) {
+    console.log('invite dm saving...');
+    const ret = await this.dmStoreRepo.save({sender_id: from, receiver_id: to, content: `{
+chatTitle: ${inviteMsg.chatTitle},
+channelId: ${inviteMsg.channelId}}`})
+    console.log(ret);
+  }
 
   async readDmStore(user_id: string, other_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
