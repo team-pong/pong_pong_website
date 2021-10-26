@@ -29,11 +29,11 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
       if (prev.time === "" && prev.from === "") {
         prev.from = dm.from;
         prev.time = tmpTime;
-        tmp.push({...dm, time: tmpTime});
+        tmp.unshift({...dm, time: tmpTime});
         return ;
       }
       if (tmpTime === prev.time && dm.from === prev.from) {
-        tmp.push({...dm, time: tmpTime});
+        tmp.unshift({...dm, time: tmpTime});
         return ;
       }
       result.push(tmp);
