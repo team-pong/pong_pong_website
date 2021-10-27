@@ -47,6 +47,9 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
   }, [dmLog]);
 
   const printChatLog = (msg: DMLog[], idx: number) => {
+
+    let length = msg.length;
+  
     return (
       <div key={idx}>
         {msg.map((msg, idx) => {
@@ -63,7 +66,7 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
                   })
                 }
               </span>
-              {idx === 0 && <span className="dm-log-time">{msg.time}</span>}
+              {idx + 1 === length && <span className="dm-log-time">{msg.time}</span>}
             </li>
           )
         })}
