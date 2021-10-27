@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export class MatchDto1{
   // @ApiProperty({
@@ -182,4 +183,14 @@ export class MatchDto5{
 		description: '유저 닉네임, 아바타 이미지 url, 이긴 게임수, 진게임수 래더 점수 데이터를 담은 배열',
 	})
 	public rankList: MatchDto4[];
+}
+
+export class ReadMatchDto {
+	@ApiProperty({
+		example: `yochoi`,
+		description: '유저 닉네임',
+	})
+	@IsString()
+	@IsNotEmpty()
+	public nick: string;
 }
