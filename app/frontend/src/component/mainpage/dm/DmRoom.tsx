@@ -23,7 +23,8 @@ const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
    */
   const approveChatInvite = (channelId: number) => {
     console.log("channelId: ", channelId);
-    /* Redirect 하는 코드 */
+    /* Redirect 하는 코드 
+       여기서 Redirect하려는 주소가 현재 주소와 같다면 하지 않도록 처리하자 */
   };
 
   /*!
@@ -31,9 +32,12 @@ const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
    * @breif 대화방 초대를 거절하면 css디자인을 바꿔서 클릭이벤트가 발생하지 않도록 함
    */
   const rejectChatInvite = () => {
-    requestRef.current.className += " dm-deactivate-request";
+    if (!requestRef.current.className.includes("dm-deactivate-request"))
+      requestRef.current.className += " dm-deactivate-request";
+    console.log("reject! ", requestRef.current.className);
     /* 여기서 문제는 연속으로 여러 개의 request가 오면 하나만 눌러도
-    전부 다 거절 처리가 될 것이다. 어떻게 해결해야 할까? */
+    전부 다 거절 처리가 될 것이다. 어떻게 해결해야 할까? 
+    id로 하면 각자 따로따로 되려나? */
   }
 
   /*!
@@ -75,6 +79,7 @@ const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
    */
   const printChatLog = (msg: DMLog[], idx: number) => {
     if (msg[0] && msg[0].type === "chat") {
+      console.log("chat: msg[0]", msg[0]);
       const parsedMsg = JSON.parse(msg[0].msg);
       
       return (
@@ -102,6 +107,7 @@ const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
         </div>
       );
     } else {
+      console.log("normal ", msg);
       return (
         <div key={idx}>
           {msg.map((msg, idx) => {
@@ -146,9 +152,10 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     dmLogRef.current = x;
     _setDmLog(x);
   };
+  const [textAreaMsg, setTextAreaMsg] = useState("");
+
   const setDmInfo = useContext(SetDmInfoContext);
   const myInfo = useContext(UserInfoContext);
-  const [textAreaMsg, setTextAreaMsg] = useState("");
 
   /*! 
    * @author yochoi
@@ -182,9 +189,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     });
     getDmLog();
   };
-  /* TODO: 문제가 뭔지 잘 모르겠다. 초대를 보낸 후 부터는 그 즉시 DM을 보내도 가질 않는다
-  DB에는 정상적으로 저장이 되는데 렌더링이 안 된다. 
-  기본적으로 DM에 문제가 있는데 디버깅을 통해서 어떻게 처리가 되는지를 분석해야한다. */
+  /* TODO: 초대를 보낸 직후 메세지를 보내면 DM에는 저장이 되지만 내 화면에 렌더링이 되질 않는다. */
 
   const controllTextAreaKeyDown = (e: React.KeyboardEvent) => {
     const keyCode = e.key;
@@ -199,7 +204,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?receiver_nick=${dmInfo.target}`);
     const res = await easyfetch.fetch();
 
-    console.log("getDmLog: ", res);
+    // console.log("getDmLog: ", res);
     setDmLog(res);
   }
 
@@ -215,9 +220,8 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     }
 
     const chatInviteOn = (request) => {
+      console.log("chatInviteOn!");
       setDmLog([{...request}, ...dmLogRef.current]);
-      console.log("ChatInviteOn from socket: ", request);
-      console.log("chatInviteOn current dmLog: ", dmLogRef.current);
     }
 
     global.socket.on("dm", dmOn);
