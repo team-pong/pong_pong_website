@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, forwardRef, Get, Inject, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AdminDto1 } from 'src/dto/admin';
+import { AdminDto1, DeleteChannelAdminDto, GetChannelAdminDto, IsChannelAdminDto } from 'src/dto/admin';
 import { UsersDto5 } from 'src/dto/users';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { SessionService } from 'src/session/session.service';
@@ -52,9 +52,10 @@ export class AdminController {
     `})
   @ApiQuery({ name: 'channel_id', example: 1, description: 'admin을 검색할 채널아이디' })
   @Get()
-  readAdmin(@Query() q){
+  readAdmin(@Query() q: GetChannelAdminDto){
     return this.adminService.readAdmin(q.channel_id);
   }
+
   @ApiOperation({ summary: '해당 유저가 해당 채널의 admin 인지 확인'})
   @ApiResponse({ 
     type: Bool,
@@ -66,7 +67,7 @@ export class AdminController {
   @ApiQuery({ name:'nick', example: 'jinbkim', description: 'admin인지 확인할 유저닉네임' })
   @ApiQuery({ name:'channel_id', example: 1, description: 'admin인지 확인할 채널아이디' })
   @Get('isAdmin')
-  async isAdmin(@Query() q){
+  async isAdmin(@Query() q: IsChannelAdminDto){
     let user;
     user = await this.usersService.readUsers(q.nick, 'nick');
     return await this.adminService.isAdmin(q.nick, q.channel_id);
@@ -79,7 +80,7 @@ export class AdminController {
   @ApiQuery({ name:'nick', example: 'jinbkim', description: 'admin 제거할 유저 닉네임' })
   @ApiQuery({ name: 'channel_id', example: 1, description: 'admin 제거할 채널아이디' })
   @Delete()
-  async deleteAdmin(@Query() q, @Req() req: Request){
+  async deleteAdmin(@Query() q: DeleteChannelAdminDto, @Req() req: Request){
     let user, user_id, owner;
 
     user_id = await this.sessionService.readUserId(req.sessionID);

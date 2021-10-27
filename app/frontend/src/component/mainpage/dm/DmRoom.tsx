@@ -107,12 +107,13 @@ const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
         </div>
       );
     } else {
-      console.log("normal ", msg);
+      let length = msg.length;
+  
       return (
         <div key={idx}>
           {msg.map((msg, idx) => {
             return (
-              <li key={idx} className={`dm-log ${msg.from === myInfo.nick ? "me" : "other"}`}>
+              <li key={idx} className={`dm-log ${msg.from === "me" ? "me" : "other"}`}>
                 <span className="dm-log-msg">
                   {
                     /*!
@@ -124,7 +125,7 @@ const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
                     })
                   }
                 </span>
-                {idx === 0 && <span className="dm-log-time">{msg.time}</span>}
+                {idx + 1 === length && <span className="dm-log-time">{msg.time}</span>}
               </li>
             )
           })}

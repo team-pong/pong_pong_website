@@ -1,18 +1,19 @@
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect } from '@nestjs/websockets';
 import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Inject, forwardRef, UseGuards } from '@nestjs/common';
+import { Inject, forwardRef, UseGuards, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { GlobalService } from 'src/global/global.service';
 import { SessionService } from 'src/session/session.service';
 import { ChatUsersService } from 'src/chat-users/chat-users.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
-import { DeleteChatAdminDto, DeleteChatMuteDto, JoinChatDto, SetChatAdminDto, SetChatBanDto, SetChatMuteDto } from 'src/dto/chat';
+import { DeleteChatAdminDto, DeleteChatMuteDto, JoinChatDto, SetChatAdminDto, SetChatBanDto, SetChatMuteDto, SetChatRoomInfoDto } from 'src/dto/chat';
 import { AdminService } from 'src/admin/admin.service';
 import { err0 } from 'src/err';
 import { BanService } from 'src/ban/ban.service';
 import { MuteService } from 'src/mute/mute.service';
+import { WsExceptionFilter } from 'src/filter/ws.filter';
 
 interface SocketInfo {
   room_id: string,
@@ -42,6 +43,8 @@ interface ChatUserInfo {
   position: string,
 };
 
+@UseFilters(WsExceptionFilter)
+@UsePipes(new ValidationPipe())
 @WebSocketGateway({ namespace: 'chat' })
 export class ChatGateway {
   constructor(
@@ -125,7 +128,7 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('setRoomInfo')
-  async sendRoomInfo(@ConnectedSocket() socket: Socket, @MessageBody() room_info: any) {
+  async sendRoomInfo(@ConnectedSocket() socket: Socket, @MessageBody() room_info: SetChatRoomInfoDto) {
     // owner가 방 제목 | 비밀번호 | 방 타입 | 기타 사항을 변경한 경우
     const room_id = this.socket_map[socket.id].room_id;
 
@@ -325,7 +328,7 @@ export class ChatGateway {
     const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
     const user_id = await this.sessionService.readUserId(session_id);
 
-    console.log('Chat 웹소켓 연결됨:', user_id);
+    console.log('Chat Socket Connected:', user_id);
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
@@ -333,7 +336,7 @@ export class ChatGateway {
       const uid = this.socket_map[socket.id].user_id;
       const rid = this.socket_map[socket.id].room_id;
 
-      console.log('Chat Socket Disconnected', uid);
+      console.log('Chat Socket Disconnected:', uid);
       // 1-1. chat-users db에서 제거
       await this.chatUsersService.deleteUser(rid, uid); // 남은 유저가 없는 경우까지 이 메서드에서 처리
 

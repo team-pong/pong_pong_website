@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export class BlockDto1{
   // @ApiProperty({
@@ -21,6 +22,8 @@ export class BlockDto1{
 		example: 'donglee',
 		description: '차단 유저 닉네임',
 	})
+	@IsString()
+	@IsNotEmpty()
 	public block_nick: string;
 }
 
