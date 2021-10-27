@@ -1,7 +1,7 @@
 import { Body, Controller, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
-import { QuestionsDto1, QuestionsDto3, QuestionsDto4 } from 'src/dto/questions';
+import { QuestionsDto1, QuestionsDto2, QuestionsDto4 } from 'src/dto/questions';
 import { ErrMsgDto } from 'src/dto/utility';
 import { SessionService } from 'src/session/session.service';
 import { QuestionsService } from './questions.service';
@@ -28,7 +28,7 @@ export class QuestionsController {
   }
 
   @ApiOperation({ summary: '모든 문의 사항 검색' })
-  @ApiResponse({ type: QuestionsDto3, description: '모든 문의 사항 리스트' })
+  @ApiResponse({ type: [QuestionsDto2], description: '모든 문의 사항 리스트' })
   @Get()
   async readAllQuestions() {
     return this.questionsSerive.readAllQuestions();
