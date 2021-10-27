@@ -20,7 +20,7 @@ export class achievementsController {
     ` })
   @ApiQuery({ name: 'user_id', example:'jinbkim', description: '칭호를 검색할 유저아이디'})
   @Get()
-    readAchoevements(@Query() q: GetAchievementDto){
+    readAchievements(@Query() q: GetAchievementDto){
     return this.achievementsService.readAchievements(q.user_id);
   }
   
