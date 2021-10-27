@@ -23,7 +23,6 @@ export class ChatDto1{
 		description: '방 비밀번호',
 	})
 	@IsString()
-	@IsNotEmpty()
 	public passwd: string;
 
   @ApiProperty({
@@ -182,7 +181,7 @@ export class ReadOneChatDto {
 		example: 1,
 		description: '채널 아이디',
 	})
-	@IsNumber()
+	@IsNumberString()
 	@IsNotEmpty()
 	public channel_id: number;
 }

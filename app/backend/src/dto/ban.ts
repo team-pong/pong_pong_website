@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumberString, IsString } from "class-validator";
 
 export class BanDto1{
   // @ApiProperty({
@@ -15,7 +15,7 @@ export class BanDto1{
 	@IsNotEmpty()
 	public nick: string;
 
-	@IsNumber()
+	@IsNumberString()
 	@IsNotEmpty()
 	@ApiProperty({
 		example: 1,
