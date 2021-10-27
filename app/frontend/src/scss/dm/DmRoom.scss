@@ -128,8 +128,14 @@ div.dm-room {
         font-size: 0.5rem;
         opacity: 0.5;
         padding-top: 110px;
-        margin-left: 7px;
+        margin: 0 7px;
       }
+    }
+
+    div.other {
+      flex-direction: row-reverse;
+      margin-left: 85px;
+      pointer-events: none;
     }
   }
   form.dm-form {

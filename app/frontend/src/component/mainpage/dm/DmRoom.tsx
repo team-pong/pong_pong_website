@@ -37,10 +37,10 @@ const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
   }
 
   /*!
-  * @author yochoi
-  * @breif  dmLog를 돌면서 이전 메세지와 같은 사람, 같은 시간에 보낸 메세지면
-  *         같은 그룹으로 묶어주는 함수
-  */
+   * @author yochoi
+   * @breif  dmLog를 돌면서 이전 메세지와 같은 사람, 같은 시간에 보낸 메세지면
+   *         같은 그룹으로 묶어주는 함수
+   */
   useEffect(() => {
     let prev = {time: "", from: ""};
     let result: Array<DMLog[]> = [];
@@ -78,7 +78,7 @@ const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
       const parsedMsg = JSON.parse(msg[0].msg);
       
       return (
-        <div key={idx} className={`dm-request-container ${msg[0].from === myInfo.nick ? "me" : "other"}`}>
+        <div key={idx} className={`dm-request-container ${msg[0].from === myInfo.nick ? "other" : "me"}`}>
           <div className="dm-invitation-part" ref={requestRef}>
             <span className="dm-request-msg">{msg[0].from} 님이 {parsedMsg.chatTitle} 대화방에 초대했습니다.</span>
             <div className="dm-request-btn-container">

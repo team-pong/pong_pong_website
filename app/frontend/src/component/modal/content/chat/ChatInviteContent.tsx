@@ -29,19 +29,35 @@ interface ResultProps {
 const Result: FC<ResultProps> = (
   {result, setDmInfo, chatTitle, channelId, myInfo, chatUsers}): JSX.Element => {
 
-  /* TODO: 초대를 보낼 때 
-  from: string,
-  to: string  target(string)
-  chatTitle: string,
-  channelId: number,
-  type: string  "game" || "chat";
-  를 보내줘야  한다. 
-  
-  이 정보들을 보내주면 DM FC에서 sendRequest 함수를 실행하면서 
-  socket.emit("request", function) 식으로 해주면
-  백엔드에서 받아서 받는 사람에게 socker으로 방송해주면
-  그 사람 클라에서 DM이 뜨도록 하면 된다. 
-  time 에 대해서는 yochoi님한테 물어보자 */
+  /*!
+   * @author donglee
+   * @brief 대화방 내부에 초대할 사람이 이미 있는지 검사해서 여부를 boolean으로 반환
+   */
+  const isAlreadyHere = (to: string): boolean => {
+    return (chatUsers.some((user) => {
+      return user.nick === to;
+    }));
+  };
+
+  /*!
+   * @author donglee
+   * @brief 이미 대화방에 있는지 검사 후 DM을 보냄
+   */
+  const sendInvite = (to: string) => {
+    if (isAlreadyHere(to)) {
+      alert(`${to} 님은 이미 대화방에 참여중입니다.`);
+      return ;
+    }
+    setDmInfo({
+      isDmOpen: true,
+      target: to,
+      request: {
+        from: myInfo.nick,
+        chatTitle: chatTitle,
+        channelId: channelId,
+      },
+    });
+  };
 
   return (
     <div className="invite-result">
@@ -60,16 +76,7 @@ const Result: FC<ResultProps> = (
             <span
               className={"ci-invite-btn" + (result.status !== "online" ?
                 " ci-deactivated-btn" : "")}
-              onClick={result.status === "online" ?
-                () => setDmInfo({
-                  isDmOpen: true,
-                  target: result.nick,
-                  request: {
-                    from: myInfo.nick,
-                    chatTitle: chatTitle,
-                    channelId: channelId,
-                  }})
-                : () => {}}>
+              onClick={result.status === "online" ? () => sendInvite(result.nick) : () => {}}>
               초대하기
             </span>
           </div>
