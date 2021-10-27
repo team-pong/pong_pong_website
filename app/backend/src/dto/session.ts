@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBooleanString, IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsBooleanString, IsNotEmpty, IsString } from "class-validator";
 
 export class SessionDto1{
   @ApiProperty({
@@ -23,7 +23,7 @@ export class UpdateMultiFactorLoginDto {
 		example: true,
 		description: '2차 인증 방법중 email 사용 여부'
 	})
-	@IsBooleanString()
+	@IsBoolean()
 	@IsNotEmpty()
 	public email: boolean;
 }
