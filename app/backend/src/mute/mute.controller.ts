@@ -58,7 +58,7 @@ export class MuteController {
   @ApiQuery({ name: 'nick', example: 'yochoi', description: 'mute인지 확인할 유저닉네임' })
   @ApiQuery({ name: 'channel_id', example: 1, description: 'mute인지 확인할 채널아이디' })
   @Get()
-  async isMute(@Query() q){
+  async isMute(@Query() q: MuteDto1){
     let user;
     user = await this.usersService.readUsers(q.nick, 'nick');
     return await this.muteService.isMute(user.user_id, q.channel_id);
@@ -69,7 +69,7 @@ export class MuteController {
   @ApiResponse({ type: ErrMsgDto, description: 'mute 제거 실패시 실패 이유' })
   @ApiQuery({ name: 'user_id', example: 'yochoi', description: 'mute 제거할 유저아이디' })
   @Delete()
-  deletemute(@Query() q){
-    return this.muteService.deleteMute(q.user_id);
+  deletemute(@Req() req: Request){
+    return this.muteService.deleteMute(req.session.userid);
   }
 }

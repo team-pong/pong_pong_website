@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export class UsersDto1{
   @ApiProperty({
@@ -136,4 +137,24 @@ export class UsersDto5{
 		description: '유저객체 배열',
 	})
 	public users_arr: UsersDto3[];
+}
+
+export class ReadUserDto {
+	@ApiProperty({
+		example: 'tester01',
+		description: '유저 닉네임',
+	})
+	@IsString()
+	@IsNotEmpty()
+	public nick: string;
+}
+
+export class ReadUserWithIdDto {
+	@ApiProperty({
+		example: 'tester01',
+		description: '유저 아이디',
+	})
+	@IsString()
+	@IsNotEmpty()
+	public user_id: string;
 }

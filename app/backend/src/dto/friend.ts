@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export class FriendDto1{
   // @ApiProperty({
@@ -22,6 +23,8 @@ export class FriendDto1{
 		example: 'donglee',
 		description: '친구 유저 닉네임',
 	})
+	@IsString()
+	@IsNotEmpty()
 	public friend_nick: string;
 }
 
