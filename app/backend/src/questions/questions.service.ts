@@ -26,15 +26,15 @@ export class QuestionsService {
 
   async readAllQuestions() {
     let questions = await this.QuestionsRepo.find();  // 모든 문의사항
-    let questionsList = { questionsList: Array<QuestionsDto2>() };
+    let questionsList = Array<QuestionsDto2>();
     let user;
     // 문의사항의 아이디, 제목, 닉네임만 담기
     for(var i in questions) {
-      questionsList.questionsList.push(new QuestionsDto2());
-      questionsList.questionsList[i].question_id = questions[i].question_id;
-      questionsList.questionsList[i].title = questions[i].title;
+      questionsList.push(new QuestionsDto2());
+      questionsList[i].question_id = questions[i].question_id;
+      questionsList[i].title = questions[i].title;
       user = await this.usersService.readUsers(questions[i].user_id, 'user_id');
-      questionsList.questionsList[i].nick = user["nick"];
+      questionsList[i].nick = user["nick"];
     }
     return questionsList;
   }
