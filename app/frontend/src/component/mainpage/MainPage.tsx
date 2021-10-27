@@ -1,6 +1,7 @@
 import Modal, { ChatContent, RecordContent, GameContent } from '../modal/Modal';
 import { UserInfoContext, SetUserInfoContext, DmInfoContext, SetDmInfoContext } from '../../Context';
 import NavBar from './navbar/NavBar';
+import AdminView from './AdminView';
 import Dm from './dm/Dm';
 import { useContext, useEffect, useState } from "react";
 import "/src/scss/mainpage/MainPage.scss";
@@ -120,7 +121,7 @@ const MainPage = ({match}): JSX.Element => {
             </section>
           </div>
         :
-          <div></div>
+          <AdminView />
         }
       </main>
     </>
