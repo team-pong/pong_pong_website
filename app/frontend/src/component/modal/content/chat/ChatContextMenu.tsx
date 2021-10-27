@@ -1,11 +1,16 @@
-import { FC, Dispatch, SetStateAction } from "react";
+import { FC, Dispatch, SetStateAction, useContext } from "react";
+import { Link, RouteComponentProps, withRouter } from "react-router-dom";
+import { Socket } from "socket.io-client";
+import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
 import "/src/scss/content/chat/ChatContextMenu.scss";
 
 interface chatContextMenuProps {
   x: number,
   y: number,
-  myPosition: string, /* "owner" || "admin" || "user" */
-  targetPosition: string,
+  myPosition: string, /* "owner" || "admin" || "normal" */
+  targetPosition: string, /* "owner" || "admin" || "normal" */
+  targetState: string, /* "mute" || "ban" || "normal" */
+  target: string,
   closer: Dispatch<SetStateAction<{
     isOpen: boolean,
     x: number,
@@ -13,31 +18,101 @@ interface chatContextMenuProps {
     target: string,
     targetPosition: string
   }>>
+  socket: Socket,
 }
 
-const ConditionalContextMenu: FC<{myPosition: string, targetPosition: string}> = ({myPosition, targetPosition}) => {
+const ConditionalContextMenu: FC<{
+    myPosition: string,
+    targetPosition: string,
+    targetState: string,
+    socket: Socket,
+    target: string,
+  }> = (
+  {socket, myPosition, targetPosition, target, targetState}) => {
+
+  /*!
+   * @author donglee
+   * @brief 관리자 임명
+   */
+  const addAdmin = () => {
+    socket.emit("setAdmin", {nickname: target});
+  };
+
+  /*!
+   * @author donglee
+   * @brief 관리자 해임
+   */
+  const deleteAdmin = () => {
+    socket.emit("deleteAdmin", {nickname: target});
+  };
+
+  /*!
+   * @author donglee
+   * @brief 강퇴하기
+   */
+  const ban = () => {
+    const really = confirm(`${target} 님을 정말로 강퇴하시겠습니까?`);
+    if (really)
+      socket.emit("setBan", {nickname: target});
+  };
+
+  /*!
+   * @author donglee
+   * @brief 대화 차단하기
+   */
+  const mute = () => {
+    socket.emit("setMute", {nickname: target});
+  };
+
+  /*!
+   * @author donglee
+   * @brief 대화 차단 해제
+   */
+  const unMute = () => {
+    socket.emit("unMute", {nickname: target});
+  };
+
   switch (myPosition) {
     case "owner":
       return (
         <>
-          {targetPosition === "admin" ? <li className="chat-context-li">관리자 해임</li> : <li className="chat-context-li">관리자 임명</li>}
-          <li className="chat-context-li">유저 밴</li>
-          {targetPosition === "mute" ? <li className="chat-context-li">뮤트 해제</li> :<li className="chat-context-li">유저 뮤트</li>}
+          <li className="chat-context-li"
+              onClick={targetPosition === "admin" ? deleteAdmin : addAdmin}>
+            {targetPosition === "admin" ? "관리자 해임" : "관리자로 임명"}
+          </li>
+          <li className="chat-context-li"
+              onClick={targetState === "mute" ? unMute : mute}>
+            {targetState === "mute" ? "차단 해제" : "차단하기"}
+          </li>
+          <li className="chat-context-li" onClick={ban}>
+            강퇴하기
+          </li>
         </>
       );
     case "admin":
       if ((targetPosition !== "owner") && (targetPosition !== "admin")) {
         return (
           <>
-            <li className="chat-context-li">유저 밴</li>
-            {targetPosition === "mute" ? <li className="chat-context-li">뮤트 해제</li> :<li className="chat-context-li">유저 뮤트</li>}
+            <li className="chat-context-li"
+                onClick={targetState === "mute" ? unMute : mute}>
+              {targetState === "mute" ? "차단 해제" : "차단하기"}
+            </li>
+            <li className="chat-context-li" onClick={ban}>
+              강퇴하기
+            </li>
           </>
         );
       }
+    default:
+      return <></>
   };
 }
 
-const ChatContextMenu: FC<chatContextMenuProps> = ({x, y, myPosition, targetPosition, closer}): JSX.Element => {
+const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
+  {socket, match, x, y, myPosition, targetPosition, targetState, target, closer}): JSX.Element => {
+  const myInfo = useContext(UserInfoContext);
+  const setDmInfo = useContext(SetDmInfoContext);
+
   return (
     <div id="chat-context-menu" onClick={() => {
       document.getElementById("chat-room-users").style.overflowY = "auto";
@@ -50,12 +125,26 @@ const ChatContextMenu: FC<chatContextMenuProps> = ({x, y, myPosition, targetPosi
       })
     }}>
       <ul id="context-menu" style={{ top: y, left: x, }}>
-        <li className="chat-context-li">프로필 보기</li>
-        <li className="chat-context-li">대전 신청</li>
-        <ConditionalContextMenu myPosition={myPosition} targetPosition={targetPosition} />
+        <Link to={`${match.url}/profile/${target}`} style={{color: "inherit", textDecoration: "none"}}>
+          <li className="chat-context-li">프로필 보기</li>
+        </Link>
+        {myInfo.nick !== target ? 
+          <>
+            <li className="chat-context-li" onClick={() => setDmInfo({isDmOpen: true, target: target})}>
+              DM 보내기
+            </li>
+            <li className="chat-context-li">대전 신청</li>
+            <ConditionalContextMenu
+              socket={socket}
+              myPosition={myPosition}
+              targetPosition={targetPosition}
+              targetState={targetState}
+              target={target}/>
+          </>
+          : <></>}
       </ul>
     </div>
   );
 };
 
-export default ChatContextMenu;
+export default withRouter(ChatContextMenu);

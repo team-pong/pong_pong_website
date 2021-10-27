@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString } from "class-validator";
 
 // export class AcievementDto1{
 // 	@ApiProperty({
@@ -13,6 +14,17 @@ import { ApiProperty } from "@nestjs/swagger";
 // 	})
 // 	public achievement: string;
 // }
+
+export class GetAchievementDto {
+	@ApiProperty({
+		example: `hna`
+	, description: `유저 ID`})
+	@IsString()
+	@IsNotEmpty()
+	user_id: string;
+}
+
+export class DeleteAllAchievementsDto extends GetAchievementDto {}
 
 export class AcievementDto2{
 	@ApiProperty({

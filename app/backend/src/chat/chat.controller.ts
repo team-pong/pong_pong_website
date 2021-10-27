@@ -3,7 +3,7 @@ import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/s
 import { Request, Response } from 'express';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
 import { NotLoggedInGuard } from 'src/auth/not-logged-in.guard';
-import { ChatDto1, ChatDto2, ChatDto3, ChatDto4, ChatDto5, ChatDto6 } from 'src/dto/chat';
+import { ChatDto1, ChatDto2, ChatDto3, ChatDto4, ChatDto5, ChatDto6, CheckChatPasswordDto, ReadChatTitleDto, ReadOneChatDto, ReadOwnerDto } from 'src/dto/chat';
 import { UsersDto3 } from 'src/dto/users';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from 'src/users/users.service';
@@ -41,7 +41,7 @@ export class ChatController {
   @ApiResponse({ type: ChatDto6, description: `채널의 제목, 타입, 비밀번호, 최대인원, 현재인원, 유저 닉네임, 채널 아이디` })
   @Get('oneChat')
   @ApiQuery({ name: 'channel_id', example: 1, description: '채널 아이디' })
-  readOneChat(@Query() q){
+  readOneChat(@Query() q: ReadOneChatDto){
     return this.chatService.readOneChat(q.channel_id);
   }
   
@@ -49,7 +49,7 @@ export class ChatController {
   @ApiResponse({ type: ChatDto3, description: `모든 채널의 제목, 타입, 현재인원, 최대인원, 채널 아이디` })
   @Get('title')
   @ApiQuery({ name: 'title', example:'아무나', description: '검색할 채널 제목' })
-  readTitle(@Query() q){
+  readTitle(@Query() q: ReadChatTitleDto){
     return this.chatService.readTitle(q.title);
   }
 
@@ -63,7 +63,7 @@ export class ChatController {
     ` })
   @ApiQuery({ name: 'channel_id', example: 1, description: '채널 아이디' })
   @Get('owner')
-  readOwner(@Query() q){
+  readOwner(@Query() q: ReadOwnerDto){
     return this.chatService.readOwner(q.channel_id);
   }
 
@@ -77,7 +77,7 @@ export class ChatController {
   @Get('checkPasswd')
   @ApiQuery({ name: 'passwd', example: '1234', description: '채널 비밀번호' })
   @ApiQuery({ name: 'channel_id', example: 1, description: '채널 아이디' })
-  checkPasswd(@Query() q){
+  checkPasswd(@Query() q: CheckChatPasswordDto){
     return this.chatService.checkPasswd(q.channel_id, q.passwd);
   }
 
@@ -88,6 +88,7 @@ export class ChatController {
   updateChat(@Body() b: ChatDto4){
     return this.chatService.updateChat(b.channel_id, b.title, b.type, b.passwd, b.max_people);
   }
+
   @ApiOperation({ summary: '채널 owner 변경'})
   @ApiResponse({ type: ErrMsgDto, description: '채널 owner 실패시 실패이유' })
   // @ApiBody({ type: ChatDto5, description: 'owner 변경할 채널 아이디, 유저 아이디' })
@@ -99,6 +100,8 @@ export class ChatController {
     return await this.chatService.updateOwner(b.channel_id, user.user_id);
     // return this.chatService.updateOwner(b.channel_id, b.owner_id);
   }
+
+  // 아래 api들은 없애야 할 것 같음
 
   @ApiOperation({ summary: '채널 제거'})
   @ApiResponse({ type: ErrMsgDto, description: '채널 제거 실패시 실패이유' })

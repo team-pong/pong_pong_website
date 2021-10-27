@@ -104,10 +104,14 @@
     }
 
     .nav-list-button {
+      display: block;
+      width: 240px;
       padding: 1em;
       font-size: 0.95em;
       transition: all 0.15s linear;
       cursor: pointer;
+      color: #fff;
+      text-decoration: none;
 
       .nav-list-span {
         margin-left: 35px;
@@ -208,6 +212,13 @@
       &:focus {
         outline: none;
       }
+    }
+
+    /* 문의하기 버튼 (마지막 a 태그) */
+    a:last-of-type {
+      position: absolute;
+      width: 240px;
+      bottom: 0;
     }
   }
 }

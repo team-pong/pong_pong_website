@@ -20,7 +20,7 @@ export class LoggedInWsGuard implements CanActivate {
 			if (cookie) {
 				console.log('쿠키 확인');
 				const session_id = cookie.split('.')[1].substring(8);
-				const user_id = axios.get(`${process.env.BACKEND_SERVER_URL}/session/user_id?sid=${session_id}`).then((val) => {
+				axios.get(`${process.env.BACKEND_SERVER_URL}/session/user_id?sid=${session_id}`).then((val) => {
 					console.log('axios 요청 완료: ', val);
 					if (val) {
 						console.log('유저 아이디 확인');

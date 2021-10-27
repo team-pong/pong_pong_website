@@ -29,11 +29,11 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
       if (prev.time === "" && prev.from === "") {
         prev.from = dm.from;
         prev.time = tmpTime;
-        tmp.push({...dm, time: tmpTime});
+        tmp.unshift({...dm, time: tmpTime});
         return ;
       }
       if (tmpTime === prev.time && dm.from === prev.from) {
-        tmp.push({...dm, time: tmpTime});
+        tmp.unshift({...dm, time: tmpTime});
         return ;
       }
       result.push(tmp);
@@ -46,9 +46,12 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
     setSortedDmLog(result);
   }, [dmLog]);
 
-  const printChatLog = (msg: DMLog[]) => {
+  const printChatLog = (msg: DMLog[], idx: number) => {
+
+    let length = msg.length;
+  
     return (
-      <>
+      <div key={idx}>
         {msg.map((msg, idx) => {
           return (
             <li key={idx} className={`dm-log ${msg.from === "me" ? "me" : "other"}`}>
@@ -63,11 +66,11 @@ const DmLogList: FC<{dmLog: DMLog[]}> = ({dmLog}) => {
                   })
                 }
               </span>
-              {idx === 0 && <span className="dm-log-time">{msg.time}</span>}
+              {idx + 1 === length && <span className="dm-log-time">{msg.time}</span>}
             </li>
           )
         })}
-      </>
+      </div>
     );
   }
   

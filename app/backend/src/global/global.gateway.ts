@@ -13,17 +13,14 @@ import { GlobalService } from './global.service';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { DmStoreService } from 'src/dm-store/dm-store.service';
 import { string } from 'joi';
-import { UseGuards } from '@nestjs/common';
+import { UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
 import { Block } from 'src/entities/block';
+import { WsExceptionFilter } from 'src/filter/ws.filter';
+import { GlobalSendDmDto } from 'src/dto/global';
 
 // key: user id / value: socket id
 const socketMap = {};
-
-interface DMSendMsg {
-  to: string,
-  msg: string,
-}
 
 // 3. dm 보내는 경우, dm 내용 db에 저장. 해당유저가 offline인 경우) db에 저장만 + 알람부분 col 추가?
 //                                 online인 경우) 소켓으로 보냄
@@ -39,6 +36,8 @@ function findUIDwithSID(sid: string) {
   }
 }
 
+@UseFilters(WsExceptionFilter)
+@UsePipes(new ValidationPipe())
 @WebSocketGateway({ namespace: 'global'})
 export class GlobalGateway {
   constructor(
@@ -60,14 +59,16 @@ export class GlobalGateway {
   // 1. 로그인 한 경우 자기를 친구추가한 사람 중 온라인인 사람에게 online status 전송
   // 문제: 그 사람의 소켓을 어떻게 가져올것인가?
   // 해결: 소켓 연결시 소켓 맵에 저장
-  async handleConnection(@ConnectedSocket() socket: Socket, data: string) {
+  async handleConnection(@ConnectedSocket() socket: Socket) {
     try {
       const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
       const userid = await this.sessionService.readUserId(sid);
 
+      // 1. online 상태로 업데이트
       await this.usersRepo.update(userid, {status: 'online'});
       socketMap[userid] = socket.id;
-      console.log('socket connected', sid, userid);
+      console.log(`Global Socket Connected: ${userid}`);
+      // 2. 친구 목록을 불러와서 online인 사람에게 online 메세지 전송 (status가 초록불로 바뀌도록)
       const friend_list = await this.friendRepo.find({friend_id: userid});
       let friend_id: string = '';
       for (let i in friend_list) {
@@ -95,13 +96,17 @@ export class GlobalGateway {
    *        2. 상대방이 온라인 상태라면 소켓으로도 전송.
   */
   @SubscribeMessage('dm')
-  async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: DMSendMsg) {
+  async dmMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: GlobalSendDmDto) {
     const user_id = findUIDwithSID(socket.id);
     const target_id = body.to;
     console.log(`MSG globalSocket ${body}`);
+    // 1. 내가 dm을 보낸 대상에게 차단 당했는지 확인
     if (await this.isBlockedUserFrom(user_id, target_id)) {
+      // 1-1. 차단당했으면 dm 요청시 아무 동작도 안함
     } else {
+      // 2. dm 메세지 저장
       this.dmService.createDmStore(user_id, target_id, body.msg);
+      // 3. 해당 유저가 소켓맵에 있다면 메세지 전송 (소켓맵에 있다는건 online 상태라는 의미)
       const target_sid = socketMap[target_id]
       if (target_sid) {
         this.server.to(target_sid).emit('dm', {
@@ -115,10 +120,9 @@ export class GlobalGateway {
 
   // 2) 로그아웃시 나를 친추한 사람의 소켓에 오프라인 메세지 전송
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
-    console.log('disconnected', socket.nsp.name);
-
     // 1. 소켓맵에서 내 소켓 찾기
     const user_id = findUIDwithSID(socket.id);
+    console.log(`Global Socket Disconnected: ${user_id}`);
 
     // 2. DB에서 내 상태를 offline으로 변경
     await this.usersRepo.update({user_id: user_id}, {status: 'offline'});

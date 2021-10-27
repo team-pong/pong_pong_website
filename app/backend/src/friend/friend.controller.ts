@@ -84,7 +84,7 @@ export class FriendController {
   // @ApiQuery({ name: 'user_nick', example: 'jinbkim' ,description: 'friend인지 확인할 유저 닉네임' })
   @ApiQuery({ name: 'friend_nick', example: 'donglee' ,description: 'friend인지 확인할 상대 닉네임' })
   @Get()
-  async isFriend(@Query() q, @Req() req: Request){
+  async isFriend(@Query() q: FriendDto1, @Req() req: Request){
     let user_id, friend;
     // user = await this.usersService.readUsers(q.user_nick, 'nick');
     user_id = await this.sessionService.readUserId(req.sessionID);
@@ -100,7 +100,7 @@ export class FriendController {
   // @ApiQuery({ name: 'user_nick', example: 'jinbkim', description: '내 유저 닉네임' })
   @ApiQuery({ name: 'friend_nick', example: 'donglee', description: '친구 삭제할 유저 닉네임' })
   @Delete()
-  async deleteFriend(@Query() q, @Req() req: Request){
+  async deleteFriend(@Query() q: FriendDto1, @Req() req: Request){
     let user_id, friend;
     // user = await this.usersService.readUsers(q.user_nick, 'nick');
     user_id = await this.sessionService.readUserId(req.sessionID);
@@ -115,7 +115,7 @@ export class FriendController {
   @ApiResponse({ type: ErrMsgDto, description: `모든 친구 관계 삭제 실패시 실패 이유` })
   @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '모든 친구 관계를 삭제할 유저 아이디' })
   @Delete('all')
-  deleteAllFriend(@Query() q){
-    return this.friendService.deleteAllFriend(q.user_id);
+  deleteAllFriend(@Req() req: Request){
+    return this.friendService.deleteAllFriend(req.session.userid);
   } 
 }

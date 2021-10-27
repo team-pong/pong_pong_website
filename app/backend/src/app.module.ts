@@ -20,6 +20,7 @@ import { GameModule } from './game/game.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { GlobalModule } from './global/global.module';
+import { QuestionsModule } from './questions/questions.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { GlobalModule } from './global/global.module';
       rootPath: join(__dirname, '..', '..', 'client'),
     }),
     GlobalModule,
+    QuestionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

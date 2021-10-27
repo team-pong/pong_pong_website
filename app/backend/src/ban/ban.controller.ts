@@ -57,13 +57,13 @@ export class BanController {
   @ApiQuery({ name:'nick', example: 'donglee', description: 'ban인지 확인할 유저 닉네임' })
   @ApiQuery({ name:'channel_id', example: 2, description: 'ban인지 확인할 채널아이디' })
   @Get()
-  async isBan(@Query() q){
+  async isBan(@Query() q: BanDto1){
     let user;
     user = await this.usersService.readUsers(q.nick, 'nick');
     return this.banService.isBan(user.user_id, q.channel_id);
-    // return this.banService.isBan(q.user_id, q.channel_id);
   }
 
+  // session 사용하는거로 바뀌면 DTO가 필요 없어질거같음
   @ApiOperation({ summary: '한 유저의 모든 ban 제거', description: '회원 탈퇴시 에만 사용됨'})
   @ApiResponse({ type: ErrMsgDto, description: 'ban 제거 실패시 실패이유' })
   @ApiQuery({ name: 'user_id', example: 'hna' ,description: 'ban 제거할 유저아이디' })
