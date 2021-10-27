@@ -122,6 +122,7 @@ const FriendList: FC<FriendListProps> = (
    * @brief 이미 대화방에 있는지 검사 후 DM을 보냄
    */
   const sendInvite = (to: string) => {
+    console.log('1')
     if (isAlreadyHere(to)) {
       alert(`${to} 님은 이미 대화방에 참여중입니다.`);
       return ;
