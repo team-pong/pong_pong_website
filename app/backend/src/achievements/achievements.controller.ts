@@ -1,6 +1,6 @@
 import { Controller, Get, Delete, Query, UseGuards } from '@nestjs/common';
 import { achievementsService } from './achievements.service'
-import { AcievementDto2 } from '../dto/achievements'
+import { AcievementDto2, DeleteAllAchievementsDto, GetAchievementDto } from '../dto/achievements'
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ErrMsgDto } from 'src/dto/utility';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
@@ -20,7 +20,7 @@ export class achievementsController {
     ` })
   @ApiQuery({ name: 'user_id', example:'jinbkim', description: '칭호를 검색할 유저아이디'})
   @Get()
-    readAchoevements(@Query() q){
+    readAchievements(@Query() q: GetAchievementDto){
     return this.achievementsService.readAchievements(q.user_id);
   }
   
@@ -28,7 +28,7 @@ export class achievementsController {
   @ApiResponse({ type: ErrMsgDto, description: '칭호 삭제 실패시 실패 이유' })
   @ApiQuery({ name: 'user_id', example:'jinbkim', description: '모든 칭호를 삭제할 유저아이디'})
   @Delete()
-  deleteAllAchievements(@Query() q){
+  deleteAllAchievements(@Query() q: DeleteAllAchievementsDto){
     console.log(q);
     return this.achievementsService.deleteAllAchievements(q.user_id);
   }
