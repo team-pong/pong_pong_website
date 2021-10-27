@@ -73,29 +73,21 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
           {isAddFriendOpen ? <AddFriend setState={setIsAddFriendOpen} friendList={friendList} setFriendList={setFriendList} /> : <></>}
         </li>
         {isFriendListOpen ? <FriendList friendList={friendList} setFriendList={setFriendList} /> : <></>}
-        <Link to={`${props.match.url}/record`} style={{color: "inherit", textDecoration: "none"}}>
-          <li className="nav-list-button">
-            <img className="nav-list-img" src="/public/line-graph.svg"/>
-            <span className="nav-list-span">전적</span>
-          </li>
+        <Link to={`${props.match.url}/record`} className="nav-list-button">
+          <img className="nav-list-img" src="/public/line-graph.svg"/>
+          <span className="nav-list-span">전적</span>
         </Link>
-        <Link to={`${props.match.url}/chat`} style={{color: "inherit", textDecoration: "none"}}>
-          <li className="nav-list-button">
-            <img className="nav-list-img" src="/public/chat.svg"/>
-            <span className="nav-list-span">채팅</span>
-          </li>
+        <Link to={`${props.match.url}/chat`} className="nav-list-button">
+          <img className="nav-list-img" src="/public/chat.svg"/>
+          <span className="nav-list-span">채팅</span>
         </Link>
-        <Link to={`${props.match.url}/game`} style={{color: "inherit", textDecoration: "none"}}>
-          <li className="nav-list-button">
-            <img className="nav-list-img" src="/public/controller-play.svg"/>
-            <span className="nav-list-span">게임하기</span>
-          </li>
+        <Link to={`${props.match.url}/game`} className="nav-list-button">
+          <img className="nav-list-img" src="/public/controller-play.svg"/>
+          <span className="nav-list-span">게임하기</span>
         </Link>
-        <Link to={`${props.match.url}/contactUs`} style={{color: "inherit", textDecoration: "none"}}>
-          <li className="nav-list-button">
-            <img className="nav-list-img" src="/public/email.png"/>
-            <span className="nav-list-span">문의하기</span>
-          </li>
+        <Link to={`${props.match.url}/contactUs`} className="nav-list-button">
+          <img className="nav-list-img" src="/public/email.png"/>
+          <span className="nav-list-span">문의하기</span>
         </Link>
       </ul>
       <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent />} smallModal/></Route>

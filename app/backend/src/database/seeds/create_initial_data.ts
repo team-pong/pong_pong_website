@@ -10,6 +10,7 @@ import { Friend } from "../../entities/friend";
 import { Match } from "../../entities/match";
 import { Mute } from "../../entities/mute";
 import { Block } from "../../entities/block";
+import { Questions } from "../../entities/questions";
 
 export class createInitialData implements Seeder {
 	public async run(factory: Factory, connection: Connection): Promise<any>{
@@ -98,6 +99,13 @@ export class createInitialData implements Seeder {
 				{user_id: 'tester02', nick: 'tester02', avatar_url: 'https://gravatar.com/avatar/d9344b9901723e7ec67159e63c4f299?s=400&d=robohash&r=x'},
 				{user_id: 'tester03', nick: 'tester03', avatar_url: 'https://gravatar.com/avatar/d9341b9901723e7ec67159e63c4f918?s=400&d=robohash&r=x'},
 				{user_id: 'tester04', nick: 'tester04', avatar_url: 'https://gravatar.com/avatar/d9341b9901723e7ec67159e63c4f928?s=400&d=robohash&r=x'},
+			])
+			.execute();
+			await connection
+			.createQueryBuilder().insert().into(Questions)
+			.values([
+				{user_id: "jinbkim", title: "운영자님 이것좀 보소", email: "jinbkim@naver.com", content: "버그가 개쩌네"},
+				{user_id: "donglee", title: "문의 사항있음", email: "donglee@naver.com", content: "너무 재밌어"},
 			])
 			.execute();
 	}

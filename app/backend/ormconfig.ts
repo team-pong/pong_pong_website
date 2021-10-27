@@ -13,6 +13,7 @@ import { session } from './src/entities/session'
 import { Users } from './src/entities/users'
 import { Block } from './src/entities/block';
 import { AuthCode } from './src/entities/auth-code';
+import { Questions } from './src/entities/questions';
 
 dotenv.config();
 const config: TypeOrmModuleOptions = {
@@ -35,7 +36,8 @@ const config: TypeOrmModuleOptions = {
     session,
     Users,
     Block,
-    AuthCode
+    AuthCode,
+    Questions
   ],
   migrations: [__dirname + '/src/migrations/*.ts'],
   cli: { migrationsDir: 'src/migrations' },
