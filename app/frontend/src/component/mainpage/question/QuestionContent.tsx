@@ -1,5 +1,6 @@
-import { FC, useEffect, useState } from "react";
+import { FC, FormEvent, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { SetNoticeInfoContext } from "../../../Context";
 import EasyFetch from "../../../utils/EasyFetch";
 import "/src/scss/content/QuestionContent.scss";
 
@@ -26,6 +27,8 @@ const QuestionContent: FC = (): JSX.Element => {
 
   const history = useHistory();
 
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
+
   const getQuestionInfo = async () => {
     /* get question info */
     const questionId = +history.location.pathname.split("/")[3];
@@ -44,6 +47,17 @@ const QuestionContent: FC = (): JSX.Element => {
     getQuestionInfo();
   }, []);
 
+  const sendReply = async (e: FormEvent) => {
+    e.preventDefault();
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/reply`, "POST");
+    const res = await easyfetch.fetch({
+      email: answerEmail,
+      content: answerBody
+    });
+    if (res.err_msg || res.statusCode === 400) setNoticeInfo({isOpen: true, seconds: 3, content: "답변 전송에 실패했습니다.", backgroundColor: "#CE4D36"});
+    else setNoticeInfo({isOpen: true, seconds: 3, content: "답변을 성공적으로 보냈습니다.", backgroundColor: "#62C375"});
+  }
+
   return (
     <div className="question-content">
       <div className="top-bar">
@@ -59,7 +73,7 @@ const QuestionContent: FC = (): JSX.Element => {
         <div className="question-info-content">{questionInfo.content}</div>
       </section>
       <section className="question-answer">
-        <form>
+        <form onSubmit={sendReply}>
           <label className="email-target-label">이메일: </label>
           <input
             type="text"
