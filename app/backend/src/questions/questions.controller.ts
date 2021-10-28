@@ -1,7 +1,7 @@
-import { Body, Controller, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
-import { QuestionsDto1, QuestionsDto2, QuestionsDto4, ReplyDto } from 'src/dto/questions';
+import { DeleteQuestionDto, QuestionsDto1, QuestionsDto2, QuestionsDto4, ReplyDto } from 'src/dto/questions';
 import { ErrMsgDto } from 'src/dto/utility';
 import { SessionService } from 'src/session/session.service';
 import { QuestionsService } from './questions.service';
@@ -53,5 +53,18 @@ export class QuestionsController {
   @Get('oneQuestion')
   async readOneQuestion(@Query() q) {
     return this.questionsSerive.readOneQuestion(q.question_id);
-  }  
+  }
+
+  @ApiOperation({ summary: '문의 사항 제거' })
+  @ApiResponse({ type: ErrMsgDto, description: '에러 객체' })
+  @ApiBody({ type: DeleteQuestionDto, description: '문의 사항 아이디' })
+  @Delete('')
+  async deleteQuestion(@Body() b: DeleteQuestionDto, @Req() req: Request) {
+    try {
+      await this.questionsSerive.deleteQuestion(req.session.userid, b.question_id);
+      return {};
+    } catch (err) {
+      return (err);
+    }
+  }
 }

@@ -64,4 +64,11 @@ export class QuestionsService {
       html: `<b>${content}</b>`,
     })
   }
+
+  async deleteQuestion(user_id: string, question_id: number) {
+    if (!await this.sessionService.isAdmin(user_id)) {
+      throw {err_msg: "삭제 권한이 없습니다."};
+    }
+    await this.QuestionsRepo.delete({question_id: question_id});
+  }
 }
