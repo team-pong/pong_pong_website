@@ -1,12 +1,13 @@
 import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { string } from 'joi';
-import { DmStoreDto1, DmStoreDto3, ReadDmStoreDto } from 'src/dto/dm-store';
+import { LoggedInGuard } from 'src/auth/logged-in.guard';
+import { DmStoreDto1, ReadDmStoreDto } from 'src/dto/dm-store';
+import { ErrMsgDto } from 'src/dto/utility';
 import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
 import { DmStoreService } from './dm-store.service';
-import { Request } from 'express';
-import { LoggedInGuard } from 'src/auth/logged-in.guard';
 
 @ApiTags('DM-Store')
 @Controller('dm-store')
@@ -62,6 +63,16 @@ export class DmStoreController {
       user_id = await this.sessionService.readUserId(req.sessionID);
       receiver = await this.usersService.readUsers(q.receiver_nick, 'nick');
       return await this.dmStoreService.readDmStore(user_id, receiver.user_id);
+  }
+
+  @ApiOperation({ 
+    summary: 'DM 로그 하나 삭제', 
+    description: ` 입력받은 DM 로그 아이디에 해당하는 DM 로그 삭제 `})
+  @ApiResponse({ type: ErrMsgDto, description: 'DM 로그 삭제 실패시 실패 이유' })
+  @ApiQuery({ name: 'dm_log_id', example: '1' ,description: '삭제할 DM 로그 아이디' })
+  @Delete('oneLog')
+  deleteDmLog(@Query() q){
+    return this.dmStoreService.deleteDmLog(q.dm_log_id);
   }
 
   @ApiOperation({ 
