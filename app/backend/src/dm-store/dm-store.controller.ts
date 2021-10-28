@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { string } from 'joi';
-import { DmStoreDto1, DmStoreDto3 } from 'src/dto/dm-store';
+import { DmStoreDto1, DmStoreDto3, ReadDmStoreDto } from 'src/dto/dm-store';
 import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
 import { DmStoreService } from './dm-store.service';
@@ -20,6 +20,7 @@ export class DmStoreController {
     private sessionService: SessionService,
   ){}
 
+  // 사용하지 않을 수 있음 (대신 소켓, dmStoreService 사용)
   @ApiOperation({ summary: 'DM 저장'})
   @ApiResponse({ type: string, description: 'DM 저장 실패시 실패 이유' })
   // @ApiBody({ type: DmStoreDto1, description: 'DM 보낸 유저 아이디, 받은 유저 아이디, 내용' })
@@ -56,7 +57,7 @@ export class DmStoreController {
     `})
   @ApiQuery({ name: 'receiver_nick', example: 'donglee', description: 'DM 로그 검색할 상대 닉네임' })
   @Get()
-  async readDmStore(@Query() q, @Req() req: Request){
+  async readDmStore(@Query() q: ReadDmStoreDto, @Req() req: Request){
       let user_id, receiver;
       user_id = await this.sessionService.readUserId(req.sessionID);
       receiver = await this.usersService.readUsers(q.receiver_nick, 'nick');
@@ -72,7 +73,7 @@ export class DmStoreController {
   @ApiResponse({ type: string, description: 'DM 로그 삭제 실패시 실패 이유' })
   @ApiQuery({ name: 'user_id', example: 'jinbkim' ,description: 'DM 로그 삭제할 유저 아이디' })
   @Delete()
-  deleteDmStore(@Query() q){
-    return this.dmStoreService.deleteDmStore(q.user_id);
+  deleteDmStore(@Req() req: Request){
+    return this.dmStoreService.deleteDmStore(req.session.userid);
   }
 }
