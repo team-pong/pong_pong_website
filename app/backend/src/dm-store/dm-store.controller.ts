@@ -48,6 +48,7 @@ export class DmStoreController {
     return this.dmStoreService.getDmListOf(user_id);
   }
 
+  // 한 사람과 대화했던 내용들
   @ApiOperation({ summary: 'DM 로그 검색'})
   @ApiResponse({ 
     type: Array, 
