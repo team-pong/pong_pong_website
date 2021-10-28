@@ -23,8 +23,6 @@ export interface UserInfo {
   admin: boolean;
 }
 
-type MainPageMode = "user" | "admin";
-
 /*!
  * @author yochoi, donglee
  * @brief NavBar를 상시 보이게 하고 Record, Match-game, Chat 모달 버튼이 있는 메인페이지
@@ -33,7 +31,6 @@ type MainPageMode = "user" | "admin";
 const MainPage = ({match}): JSX.Element => {
 
   const [updateFriendList, setUpdateFriendList] = useState({state: "", user_id: ""});
-  const [mainPageMode, setMainPageMode] = useState<MainPageMode>("admin");
   const [unReadMsg, setUnReadMsg] = useState(false);
 
   const userInfo = useContext<UserInfo>(UserInfoContext);
@@ -78,14 +75,14 @@ const MainPage = ({match}): JSX.Element => {
 
   return (
     <>
-      <NavBar update={updateFriendList} mainPageMode={mainPageMode} setMainPageMode={setMainPageMode} />
+      <NavBar update={updateFriendList}/>
       <Switch>
         <Route path={`${match.path}/record`}><Modal id={Date.now()} content={<RecordContent/>} /></Route>
         <Route path={`${match.path}/chat`}><Modal id={Date.now()} content={<ChatContent/>} /></Route>
         <Route path={`${match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route>
       </Switch>
       <main>
-        {mainPageMode === "user" ?
+        <Route path={`${match.path}`} exact>
           <div id="button-container">
             <Link
               to={`${match.url}/record`}
@@ -111,18 +108,17 @@ const MainPage = ({match}): JSX.Element => {
                 게임
               <span className="mp-explain-span">게임을 하려면 누르세요!</span>
             </Link>
-            <section id="dm-section">
-              {dmInfo.isDmOpen && <Dm />}
-              <button id="dm-controll-button" onClick={() => setDmInfo({isDmOpen: !dmInfo.isDmOpen, target: ""})}>
-                {unReadMsg && <div className="un-read-msg">!</div>}
-                {!dmInfo.isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
-                {dmInfo.isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
-              </button>
-            </section>
           </div>
-        :
-          <AdminView />
-        }
+        </Route>
+        {userInfo.admin && <Route path={`${match.path}/adminView`}><AdminView /></Route>}
+        <section id="dm-section">
+          {dmInfo.isDmOpen && <Dm />}
+          <button id="dm-controll-button" onClick={() => setDmInfo({isDmOpen: !dmInfo.isDmOpen, target: ""})}>
+            {unReadMsg && <div className="un-read-msg">!</div>}
+            {!dmInfo.isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
+            {dmInfo.isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
+          </button>
+        </section>
       </main>
     </>
   );
