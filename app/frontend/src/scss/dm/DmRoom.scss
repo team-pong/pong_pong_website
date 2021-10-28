@@ -118,12 +118,6 @@ div.dm-room {
         }
       }
 
-      div.dm-deactivate-request {
-        background-color: rgb(192, 192, 192);
-        pointer-events: none;
-        opacity: 0.3;
-      }
-
       span.dm-request-time {
         font-size: 0.5rem;
         opacity: 0.5;
@@ -132,10 +126,14 @@ div.dm-room {
       }
     }
 
-    div.other {
+    div.me {
       flex-direction: row-reverse;
       margin-left: 85px;
       pointer-events: none;
+
+      div.dm-request-btn-container {
+        opacity: 0.35;
+      }
     }
   }
   form.dm-form {

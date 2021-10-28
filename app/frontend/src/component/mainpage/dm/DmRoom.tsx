@@ -1,5 +1,6 @@
-import React, { FC, useEffect, useState, useRef, useContext } from "react";
-import { DmInfo, UserInfoContext } from "../../../Context";
+import React, { FC, useEffect, useState, useRef, useContext, Dispatch, SetStateAction } from "react";
+import { Redirect } from "react-router-dom";
+import { DmInfo, SetDmInfoContext, UserInfoContext } from "../../../Context";
 import "../../../scss/dm/DmRoom.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 import Time from "../../../utils/Time";
@@ -10,34 +11,51 @@ interface DMLog {
   msg: string,  /* e.g.) "반갑다" */
   from: string, /* e.g.) "me" || "hna" */
   type: string, /* e.g.) "normal" || "chat"(대화방 초대) || "game"(게임 초대) */
+  id: number,
 };
 
-const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
+interface DmLogListProps {
+  dmLog: DMLog[],
+  myInfo: UserInfo,
+  setChannelId: Dispatch<SetStateAction<number>>,
+};
+
+const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId}) => {
 
   // const [sortedDmLog, setSortedDmLog] = useState<Array<DMLog[]>>([]);
-  const requestRef = useRef<HTMLDivElement>(null);
 
   /*!
    * @author donglee
-   * @breif 대화방 초대를 승낙하면 해당 channelId를 이용해 redirect함
+   * @breif - 대화방 초대를 승낙하면 해당 channelId를 이용해 redirect함
+   *        - DB에서 해당 로그를 삭제함
    */
-  const approveChatInvite = (channelId: number) => {
-    console.log("channelId: ", channelId);
-    /* Redirect 하는 코드 
-       여기서 Redirect하려는 주소가 현재 주소와 같다면 하지 않도록 처리하자 */
+  const approveChatInvite = async (channelId: number) => {
+    // const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?Log_id=${}`, "DELETE");
+    // const res = await easyfetch.fetch();
+
+    // if (!res.err_msg) {
+    //   setChannelId(channelId);
+    // } else {
+    //   alert(res.err_msg);
+    // }
   };
 
   /*!
    * @author donglee
-   * @breif 대화방 초대를 거절하면 css디자인을 바꿔서 클릭이벤트가 발생하지 않도록 함
+   * @breif DB에서 해당 로그를 삭제하고 현재 화면에서 해당 로그 html node를 삭제해서 안 보이게 함
    */
-  const rejectChatInvite = () => {
-    if (!requestRef.current.className.includes("dm-deactivate-request"))
-      requestRef.current.className += " dm-deactivate-request";
-    console.log("reject! ", requestRef.current.className);
-    /* 여기서 문제는 연속으로 여러 개의 request가 오면 하나만 눌러도
-    전부 다 거절 처리가 될 것이다. 어떻게 해결해야 할까? 
-    id로 하면 각자 따로따로 되려나? */
+  const rejectChatInvite = (e: React.MouseEvent) => {
+    // const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?Log_id=${}`, "DELETE");
+    // const res = await easyfetch.fetch();
+
+    // if (res.err_msg) {
+    //   alert(res.err_msg);
+    // }
+    const target = e.target as HTMLImageElement;
+    const nodeToRemove = target.parentNode.parentNode.parentNode.parentNode as HTMLDivElement;
+    const parent = nodeToRemove.parentNode as HTMLUListElement;
+
+    parent.removeChild(nodeToRemove);
   }
 
   /*!
@@ -82,8 +100,8 @@ const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
       const parsedMsg = JSON.parse(msg.msg);
       
       return (
-        <div key={idx} className={`dm-request-container ${msg.from === myInfo.nick ? "other" : "me"}`}>
-          <div className="dm-invitation-part" ref={requestRef}>
+        <div key={idx} className={`dm-request-container ${msg.from === myInfo.nick ? "me" : "other"}`}>
+          <div className="dm-invitation-part">
             <span className="dm-request-msg">{msg.from} 님이 {parsedMsg.chatTitle} 대화방에 초대했습니다.</span>
             <div className="dm-request-btn-container">
               <div className="dm-request-approve">
@@ -98,7 +116,7 @@ const DmLogList: FC<{dmLog: DMLog[], myInfo: UserInfo}> = ({dmLog, myInfo}) => {
                   className="dm-reply-img"
                   src="/public/red-x.png" 
                   alt="거절"
-                  onClick={rejectChatInvite} />
+                  onClick={(e) => rejectChatInvite(e)} />
               </div>
             </div>
           </div>
@@ -203,6 +221,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     _setDmLog(x);
   };
   const [textAreaMsg, setTextAreaMsg] = useState("");
+  const [channelId, setChannelId] = useState(0);
 
   const myInfo = useContext(UserInfoContext);
 
@@ -225,7 +244,6 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
    *        전역객체이므로 null로 바꿔주지 않으면 계속 유지되기 때문임
    */
   const sendRequest = () => {
-    console.log("sendRequest! ", dmInfo.request);
     global.socket.emit("chatInvite", {
       from: dmInfo.request.from,
       target: dmInfo.target,
@@ -263,7 +281,6 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     };
 
     const chatInviteOn = (request) => {
-      console.log("chatInviteOn!", request);
       setDmLog([{...request}, ...dmLogRef.current]);
     };
 
@@ -275,10 +292,15 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     });
   }, []);
 
+  if (channelId) {
+    return ( <Redirect push to={{
+      pathname: `/mainpage/chat/${channelId}`,
+      state: {isInvited: true},
+    }}></Redirect> );
+  }
   return (
     <div className="dm-room">
-      {console.log("dmLog: ", dmLogRef.current)}
-      <DmLogList dmLog={dmLog} myInfo={myInfo}/>
+      <DmLogList dmLog={dmLog} myInfo={myInfo} setChannelId={setChannelId}/>
       <form className="dm-form">
         <textarea
           className="dm-msg-textarea"

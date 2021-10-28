@@ -8,7 +8,7 @@ import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
 import ConfigChatRoom from "./ConfigChatRoom";
 import { io, Socket } from "socket.io-client";
-import { UserInfoContext } from "../../../../Context";
+import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
 import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
 
@@ -160,7 +160,7 @@ interface ChatRoomContentProps {
 };
 
 const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
-  {isMadeMyself, setIsMadeMyself, match}): JSX.Element => {
+  {isMadeMyself, setIsMadeMyself, match, location}): JSX.Element => {
 
   const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
   const [chatLog, _setChatLog] = useState<(ChatLog | ChatLogSystem)[]>([]);
@@ -186,6 +186,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   const [myPosition, setMyPosition] = useState("");
 
   const myInfo = useContext(UserInfoContext);
+  const setDmInfo = useContext(SetDmInfoContext);
 
 
   /*!
@@ -368,15 +369,25 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
     }
   }, [isMadeMyself]);
 
+  interface LocationState {
+    isInvited: boolean,
+  };
   /*!
    * @author donglee
-   * @brief - 방의 인원이 가득 차있는지를 검사
+   * @brief - 대화방에서 초대돼서 온 거라면 DM 컴포넌트를 닫아줌
+   *        - 방의 인원이 가득 차있는지를 검사
    *        - 내가 직접 만든 비공개방일 경우에는 Password에 props을 줘서 첫 1회만 비번없이 입장 가능하도록 함
    *        - 채팅방 정보를 받아온 후 비공개방일 경우에는 state를 바꿔서 Password 컴포넌트 렌더링 하도록 함
    *        - protected 가 아닌 대화방의 경우는 바로 소켓 연결함
    *        - clean-up : 내가 만든 방을 최초 1회만 적용하기 위해서 false로 값을 바꿔줌
    */
   useEffect(() => {
+    if (location.state) {
+      setDmInfo({
+        isDmOpen: false,
+        target: "",
+      });
+    }
     getChatRoomInfo()
     .then(checkMax)
     .then((res) => {
