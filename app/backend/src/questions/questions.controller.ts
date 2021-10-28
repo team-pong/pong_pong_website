@@ -1,7 +1,7 @@
 import { Body, Controller, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
-import { QuestionsDto1, QuestionsDto2, QuestionsDto4 } from 'src/dto/questions';
+import { QuestionsDto1, QuestionsDto2, QuestionsDto4, ReplyDto } from 'src/dto/questions';
 import { ErrMsgDto } from 'src/dto/utility';
 import { SessionService } from 'src/session/session.service';
 import { QuestionsService } from './questions.service';
@@ -16,6 +16,21 @@ export class QuestionsController {
     @Inject(forwardRef(() => SessionService))
     private sessionService: SessionService,
   ){}
+
+  @ApiOperation({ summary: '문의 답변 보내기' })
+  @ApiResponse({ type: ErrMsgDto, description: '답변 실패 이유' })
+  @ApiBody({ type: ReplyDto, description: '문의 사항 제목, 유저 이메일, 문의 사항 내용' })
+  @Post('reply')
+  async sendReply(@Req() req: Request, @Body() body: ReplyDto) {
+    try {
+      this.questionsSerive.reply(req.session.userid, body.email, body.content);
+    } catch (err) {
+      if (err instanceof ErrMsgDto) {
+        return (err.err_msg);
+      }
+      return (err);
+    }
+  }
 
   @ApiOperation({ summary: '문의 사항 생성' })
   @ApiResponse({ type: ErrMsgDto, description: '문의 사항 생성 실패시 실패 이유' })

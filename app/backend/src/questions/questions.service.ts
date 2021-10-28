@@ -7,12 +7,17 @@ import { Users } from 'src/entities/users';
 import { err0, err2, err29 } from 'src/err';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
+import * as nodemailer from 'nodemailer';
+import { transportOption } from 'src/mail/mailer.option';
+import { SessionService } from 'src/session/session.service';
 
 @Injectable()
 export class QuestionsService {
   constructor(
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+    @Inject(forwardRef(() => SessionService))
+    private sessionService: SessionService,
     @InjectRepository(Questions) private QuestionsRepo: Repository<Questions>,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
   ) {}
@@ -44,5 +49,19 @@ export class QuestionsService {
       return new ErrMsgDto(err29);
     let question = await this.QuestionsRepo.findOne({question_id: question_id});
     return question;
+  }
+
+  // email 주소로 메일 보내기
+  async reply(sender_id: string, email: string, content: string) {
+    if (!await this.sessionService.isAdmin(sender_id)) {
+      throw "답변 권한이 없습니다.";
+    }
+    const transporter = nodemailer.createTransport(transportOption);
+    await transporter.sendMail({
+      from: `"${sender_id}" <${process.env.EMAIL_ID}>`,
+      to: email,
+      subject: '문의사항 답변',
+      html: `<b>${content}</b>`,
+    })
   }
 }
