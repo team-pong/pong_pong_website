@@ -1,16 +1,20 @@
 import { FC, useEffect, useState } from "react";
+import { Route, RouteComponentProps, withRouter } from "react-router";
+import { Link } from "react-router-dom";
 import EasyFetch from "../../utils/EasyFetch";
+import Modal from "../modal/Modal";
+import QuestionContent from "./question/QuestionContent";
 import "/src/scss/adminview/AdminView.scss";
 
-interface Question {
+interface QuestionPrev {
   question_id: number;
   title: string;
   nick: string;
 }
 
-const AdminView: FC = (): JSX.Element => {
+const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
 
-  const [questionList, setQuestionList] = useState<Question[]>([]);
+  const [questionList, setQuestionList] = useState<QuestionPrev[]>([]);
 
   const getQuestionList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/questions`, "GET");
@@ -26,15 +30,19 @@ const AdminView: FC = (): JSX.Element => {
       <ul className="question-list">
         {questionList.map((question, idx) => {
           return (
-            <li className="question" key={idx}>
+            <Link
+              to={`${path}/${question.question_id}`}
+              className="question"
+              key={idx}>
               <span>제목: {question.title}</span>
               <span>작성자: {question.nick}</span>
-            </li>
+            </Link>
           );
         })}
       </ul>
+      <Route path={`${path}/:question_id`}><Modal id={Date.now()} content={<QuestionContent />}/></Route>
     </div>
   )
 }
 
-export default AdminView;
+export default withRouter(AdminView);

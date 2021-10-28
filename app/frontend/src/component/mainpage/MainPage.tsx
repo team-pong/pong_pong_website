@@ -33,7 +33,7 @@ type MainPageMode = "user" | "admin";
 const MainPage = ({match}): JSX.Element => {
 
   const [updateFriendList, setUpdateFriendList] = useState({state: "", user_id: ""});
-  const [mainPageMode, setMainPageMode] = useState<MainPageMode>("user");
+  const [mainPageMode, setMainPageMode] = useState<MainPageMode>("admin");
   const [unReadMsg, setUnReadMsg] = useState(false);
 
   const userInfo = useContext<UserInfo>(UserInfoContext);

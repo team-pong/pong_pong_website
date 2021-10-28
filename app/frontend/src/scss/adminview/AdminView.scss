@@ -1,9 +1,10 @@
 div.admin-view {
   margin-left: 240px;
-  color: white;
   ul.question-list {
-    li.question {
-
+    a.question {
+      display: block;
+      color: #fff;
+      text-decoration: none;
     }
   }
 }
