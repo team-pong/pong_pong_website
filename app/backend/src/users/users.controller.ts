@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UsersDto1, UsersDto2, UsersDto3, UsersDto4 } from 'src/dto/users';
+import { ReadUserDto, ReadUserWithIdDto, UsersDto1, UsersDto2, UsersDto3, UsersDto4 } from 'src/dto/users';
 import { ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from './users.service';
 import { Request } from 'express';
@@ -17,13 +17,13 @@ export class UsersController {
     private sessionService: SessionService,
   ){}
 
-  @ApiOperation({ summary: '유저 생성' })
-  @ApiResponse({ type: ErrMsgDto, description: '유저 생성 실패시 실패 이유' })
-  @ApiBody({ type: UsersDto1, description: '유저 아이디, 닉네임, 아바타 url' })
-  @Post()
-  creatUsers(@Body() b: UsersDto1){
-    return this.usersService.createUsers(b.user_id, b.nick, b.avatar_url, '');
-  }
+  // @ApiOperation({ summary: '유저 생성' })
+  // @ApiResponse({ type: ErrMsgDto, description: '유저 생성 실패시 실패 이유' })
+  // @ApiBody({ type: UsersDto1, description: '유저 아이디, 닉네임, 아바타 url' })
+  // @Post()
+  // creatUsers(@Body() b: UsersDto1){
+  //   return this.usersService.createUsers(b.user_id, b.nick, b.avatar_url, '');
+  // }
 
   @ApiOperation({ summary: '유저 닉네임으로 유저의 프로필 검색'})
   @ApiResponse({ 
@@ -34,9 +34,10 @@ export class UsersController {
     ` })
   @ApiQuery({ name: 'nick', example: 'jinbkim',description: '프로필을 검색할 유저 닉네임' })
   @Get()
-  readUsers1(@Query() q){
+  readUsers1(@Query() q: ReadUserDto){
     return this.usersService.readUsers(q.nick, 'nick');
   }
+
   @ApiOperation({ summary: '유저 아이디로 유저의 프로필 검색'})
   @ApiResponse({ 
     type: UsersDto3, 
@@ -46,7 +47,7 @@ export class UsersController {
     ` })
   @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '프로필을 검색할 유저 아이디' })
   @Get('user')
-  readUsers2(@Query() q){
+  readUsers2(@Query() q: ReadUserWithIdDto){
     return this.usersService.readUsers(q.user_id, 'user_id');
   }
 
@@ -54,32 +55,16 @@ export class UsersController {
   @ApiResponse({ type: ErrMsgDto, description: '유저 정보 변경 실패시 실패 이유' })
   @ApiBody({ type: UsersDto2, description: '변경할 유저 아이디, 유저 닉네임, 아바타 이미지 url' })
   @Post('info')
-  updateUsers(@Body() b: UsersDto2){
-    return this.usersService.updateUsers(b.user_id, b.nick, b.avatar_url);
-  }
-
-  @ApiOperation({ summary: '유저 상태 변경'})
-  @ApiResponse({ type: ErrMsgDto, description: '유저 상태 변경 실패시 실패 이유' })
-  // @ApiBody({ type: UsersDto4, description: '변경할 유저 아이디, 유저 상태' })
-  @ApiBody({ type: UsersDto4, description: '변경할 유저 닉네임, 유저 상태' })
-  @Post('status')
-  async updateStatus(@Body() b: UsersDto4){
-    let user;
-    user = await this.usersService.readUsers(b.nick, 'nick');
-    return await this.usersService.updateStatus(user.user_id, b.status);
-    // return this.usersService.updateStatus(b.user_id, b.status);
+  async updateUsers(@Req() req: Request){
+    const user_info = await this.usersService.getUserInfo(req.session.userid);
+    return this.usersService.updateUsers(user_info.user_id, user_info.nick, user_info.avatar_url);
   }
 
   @ApiOperation({ summary: '유저 제거'})
   @ApiResponse({ type: ErrMsgDto, description: '유저 제거 실패시 실패 이유' })
-  // @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '제거할 유저 아이디' })
-  @ApiQuery({ name: 'user_id', example: 'jinbkim', description: '제거할 유저 닉네임' })
   @Delete()
-  async deleteUsers(@Query() q){
-    let user;
-    user = await this.usersService.readUsers(q.nick, 'nick');
-    return await this.usersService.deleteUsers(user.user_id);
-    // return this.usersService.deleteUsers(q.user_id);
+  async deleteUsers(@Req() req: Request){
+    return await this.usersService.deleteUsers(req.session.userid);
   }
 
   @ApiOperation({ summary: '나의 정보 검색'})

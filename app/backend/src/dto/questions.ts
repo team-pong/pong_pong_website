@@ -1,22 +1,28 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString } from "class-validator";
 
 export class QuestionsDto1{
   @ApiProperty({
 		example: '운영자님 이거 보세요',
 		description: '문의 사항 제목',
 	})
+	@IsString()
+	@IsNotEmpty()
 	public title: string;
 
 	@ApiProperty({
 		example: 'jinbkim@naver.com',
 		description: '유저 이메일',
 	})
+	@IsString()
+	@IsNotEmpty()
 	public email: string;
 
     @ApiProperty({
 		example: '버그가 있어요',
 		description: '문의 사항 내용',
 	})
+	@IsString()
 	public content: string;
 }
 

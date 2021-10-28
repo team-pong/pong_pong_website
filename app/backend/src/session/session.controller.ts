@@ -3,13 +3,9 @@ import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginCodeDto } from 'src/dto/login-token-dto';
 import { SessionService } from './session.service';
 import { Request, Response } from 'express';
-import { SessionDto1 } from 'src/dto/session';
+import { LoginWithEmailCodeDto, ReadUserWithSessionDto, SessionDto1, UpdateMultiFactorLoginDto } from 'src/dto/session';
 import { NotLoggedInGuard } from 'src/auth/not-logged-in.guard';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
-
-interface MultiFactorAuthState {
-	email: boolean,
-}
 
 function isNotTestUser(user_id: string) {
 	if (user_id.indexOf("tester") == -1) {
@@ -82,9 +78,7 @@ export class SessionController {
 			+ `&response_type=code`;
 			return res.redirect(login_api_url);
 		}
-
 	}
-
 
   @ApiOperation({ summary: '42로그인 페이지에서 이 주소로 코드를 전송'})
   @Get("/oauth")
@@ -102,7 +96,7 @@ export class SessionController {
   @ApiResponse({ type: SessionDto1, description: '유저 아이디' })
   @ApiQuery({ name: 'sid', example: '0TBeNj59PUBZ_XjbXGKq9sHHPHCkZky4', description: '세션아이디' })
   @Get("/user_id")
-  readUser(@Query() q){
+  readUser(@Query() q: ReadUserWithSessionDto){
     return this.sessionService.readUser(q.sid);
   }
 
@@ -112,13 +106,13 @@ export class SessionController {
 	}
 
 	@Post('/twoFactor')
-	updateFactorAuth(@Req() req: Request, @Body() body: MultiFactorAuthState) {
+	updateFactorAuth(@Req() req: Request, @Body() body: UpdateMultiFactorLoginDto) {
 		this.sessionService.updateMultiFactorAuthInfo(req.session.userid, body.email);
 		return ({});
 	}
 
 	@Get('/emailCode')
-	async loginWithEmailCode(@Req() req: Request, @Query() query: any, @Res() res: Response) {
+	async loginWithEmailCode(@Req() req: Request, @Query() query: LoginWithEmailCodeDto, @Res() res: Response) {
 		console.log("GET emailCode", req.session.userid, query.code);
 		if (await this.sessionService.isValidCode(req.session.userid, query.code)) {
 			req.session.loggedIn = true;

@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ChatUsersDto1, ChatUsersDto2 } from 'src/dto/chat-users';
+import { ChatUsersDto1 } from 'src/dto/chat-users';
 import { UsersDto5 } from 'src/dto/users';
 import { Bool, ErrMsgDto } from 'src/dto/utility';
 import { SessionService } from 'src/session/session.service';
@@ -40,7 +40,7 @@ export class ChatUsersController {
   @ApiResponse({ type: UsersDto5, description: '해당 채널에 있는 유저 객체 배열' })
   @ApiQuery({ name: 'channel_id', example: 1, description: '유저를 검색할 채널 아이디' })
   @Get()
-  readChatUsers(@Query() q){
+  readChatUsers(@Query() q: ChatUsersDto1){
     return this.chatUsersService.readChatUsers(q.channel_id);
   }
 
@@ -61,9 +61,9 @@ export class ChatUsersController {
   @ApiQuery({ name: 'nick', example: 'donglee', description: '채널에서 나갈 유저 닉네임' })
   // @ApiQuery({ name: 'channel_id', example: 1, description: '채널에서 나갈 채널 아이디' })
   @Delete()
-  async deleteChatUsers(@Query() q, @Req() req: Request){
+  async deleteChatUsers(@Query() q: ChatUsersDto1, @Req() req: Request){
     let user_id;
-    
+
     user_id = await this.sessionService.readUserId(req.sessionID);
     return await this.chatUsersService.deleteChatUsers(user_id, q.channel_id);
     // return this.chatUsersService.deleteChatUsers(q.user_id, q.channel_id);

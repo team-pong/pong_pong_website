@@ -1,6 +1,17 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString } from "class-validator";
 
-export class DmStoreDto1{
+export class ReadDmStoreDto {
+	@ApiProperty({
+		example: 'donglee',
+		description: 'dm 받은 유저 닉네임',
+	})
+	@IsString()
+	@IsNotEmpty()
+	public receiver_nick: string;
+}
+
+export class DmStoreDto1 extends ReadDmStoreDto {
   // @ApiProperty({
 	// 	example: 'jinbkim',
 	// 	description: 'dm 보낸 유저 아이디',
@@ -17,17 +28,12 @@ export class DmStoreDto1{
 	// 	description: 'dm 보낸 유저 닉네임',
 	// })
 	// public sender_nick: string;
-
-	@ApiProperty({
-		example: 'donglee',
-		description: 'dm 받은 유저 닉네임',
-	})
-	public receiver_nick: string;
-
   @ApiProperty({
 		example: '안뇽~',
 		description: 'dm 내용',
 	})
+	@IsString()
+	@IsNotEmpty()
 	public content: string;
 }
 
