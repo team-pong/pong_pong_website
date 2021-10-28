@@ -119,4 +119,9 @@ export class UsersService {
     }
     return user_info;
   }
+
+  // 유저의 db에 저장된 avatar_url을 업데이트
+  async updateUserAvatar(user_id: string, avatar_url: string) {
+    await this.usersRepo.update({user_id: user_id}, {avatar_url: avatar_url})
+  }
 }
