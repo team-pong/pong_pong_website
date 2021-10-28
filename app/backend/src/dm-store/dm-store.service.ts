@@ -17,6 +17,7 @@ interface DM {
 }
 
 export interface DMLog {
+  id: number,
   time: string,
   msg: string,
   from: string,
@@ -60,6 +61,7 @@ export class DmStoreService {
     let dmList: DMLog[] = [];
     for (let dm of dms){
       dmList.push({
+        id: dm.id,
         time: dm.created_at,
         msg: dm.content,
         from: dm.sender_id,
