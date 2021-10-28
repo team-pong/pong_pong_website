@@ -24,10 +24,8 @@ export class QuestionsController {
   async sendReply(@Req() req: Request, @Body() body: ReplyDto) {
     try {
       this.questionsSerive.reply(req.session.userid, body.email, body.content);
+      return {}
     } catch (err) {
-      if (err instanceof ErrMsgDto) {
-        return (err.err_msg);
-      }
       return (err);
     }
   }

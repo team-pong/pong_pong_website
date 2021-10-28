@@ -54,7 +54,7 @@ export class QuestionsService {
   // email 주소로 메일 보내기
   async reply(sender_id: string, email: string, content: string) {
     if (!await this.sessionService.isAdmin(sender_id)) {
-      throw "답변 권한이 없습니다.";
+      throw {err_msg: "답변 권한이 없습니다."};
     }
     const transporter = nodemailer.createTransport(transportOption);
     await transporter.sendMail({
