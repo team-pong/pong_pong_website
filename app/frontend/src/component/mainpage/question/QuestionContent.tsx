@@ -58,6 +58,13 @@ const QuestionContent: FC = (): JSX.Element => {
     else setNoticeInfo({isOpen: true, seconds: 3, content: "답변을 성공적으로 보냈습니다.", backgroundColor: "#62C375"});
   }
 
+  const deleteQuestion = async (e: FormEvent) => {
+    e.preventDefault();
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/questions`, "DELETE");
+    const res = await easyfetch.fetch({question_id: questionInfo.question_id});
+    setNoticeInfo({isOpen: true, seconds: 3, content: "문의를 삭제했습니다.", backgroundColor: "#62C375"});
+  }
+
   return (
     <div className="question-content">
       <div className="top-bar">
@@ -85,7 +92,8 @@ const QuestionContent: FC = (): JSX.Element => {
             className="body"
             value={answerBody}
             onChange={(e) => setAnswerBody(e.target.value)}/>
-          <input className="send" type="submit" value="답변 보내기" />
+          <input className="send" type="submit" name="send" value="답변 보내기" />
+          <button className="delete" onClick={deleteQuestion}>문의 삭제하기</button>
         </form>
       </section>
     </div>
