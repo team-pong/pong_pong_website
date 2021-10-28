@@ -29,8 +29,8 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId}) => {
    * @breif - 대화방 초대를 승낙하면 해당 channelId를 이용해 redirect함
    *        - DB에서 해당 로그를 삭제함
    */
-  const approveChatInvite = async (channelId: number) => {
-    // const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?Log_id=${}`, "DELETE");
+  const approveChatInvite = async (channelId: number, logId: number) => {
+    // const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?Log_id=${logId}`, "DELETE");
     // const res = await easyfetch.fetch();
 
     // if (!res.err_msg) {
@@ -44,8 +44,8 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId}) => {
    * @author donglee
    * @breif DB에서 해당 로그를 삭제하고 현재 화면에서 해당 로그 html node를 삭제해서 안 보이게 함
    */
-  const rejectChatInvite = (e: React.MouseEvent) => {
-    // const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?Log_id=${}`, "DELETE");
+  const rejectChatInvite = (e: React.MouseEvent, logId: number) => {
+    // const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?Log_id=${logId}`, "DELETE");
     // const res = await easyfetch.fetch();
 
     // if (res.err_msg) {
@@ -109,14 +109,14 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId}) => {
                   className="dm-reply-img"
                   src="/public/green-check.png"
                   alt="승낙"
-                  onClick={() => approveChatInvite(parsedMsg.channelId)} />
+                  onClick={() => approveChatInvite(parsedMsg.channelId, msg.id)} />
               </div>
               <div className="dm-request-reject">
                 <img
                   className="dm-reply-img"
                   src="/public/red-x.png" 
                   alt="거절"
-                  onClick={(e) => rejectChatInvite(e)} />
+                  onClick={(e) => rejectChatInvite(e, msg.id)} />
               </div>
             </div>
           </div>

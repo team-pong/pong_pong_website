@@ -125,6 +125,7 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
               minLength={2}
               maxLength={15}
               value={title}
+              autoComplete="off"
               onChange={(e) => setTitle(e.target.value)}/>
           </form>
         </div>

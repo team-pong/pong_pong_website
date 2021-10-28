@@ -369,9 +369,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
     }
   }, [isMadeMyself]);
 
-  interface LocationState {
-    isInvited: boolean,
-  };
   /*!
    * @author donglee
    * @brief - 대화방에서 초대돼서 온 거라면 DM 컴포넌트를 닫아줌
