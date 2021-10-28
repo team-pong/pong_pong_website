@@ -225,7 +225,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
    *        전역객체이므로 null로 바꿔주지 않으면 계속 유지되기 때문임
    */
   const sendRequest = () => {
-    console.log("sendReuqest!", dmInfo.request);
+    console.log("sendRequest! ", dmInfo.request);
     global.socket.emit("chatInvite", {
       from: dmInfo.request.from,
       target: dmInfo.target,
@@ -252,23 +252,19 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   };
 
   useEffect(() => {
-    console.log('2');
     getDmLog();
 
     if (dmInfo.request) {
-      console.log('3');
       sendRequest();
     }
 
     const dmOn = (dm) => {
-      console.log("dmOn!");
       setDmLog([{...dm}, ...dmLogRef.current]);
     };
 
-    /* TODO: 왜 데이터에 이상한게 들어가는지 분석해보자 */
     const chatInviteOn = (request) => {
-      console.log("4 chatInviteOn!", request);
-      setDmLog([...dmLogRef.current, {...request}]);
+      console.log("chatInviteOn!", request);
+      setDmLog([{...request}, ...dmLogRef.current]);
     };
 
     global.socket.on("dm", dmOn);
@@ -281,7 +277,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
 
   return (
     <div className="dm-room">
-      {console.log("dmLog: ", dmLog)}
+      {console.log("dmLog: ", dmLogRef.current)}
       <DmLogList dmLog={dmLog} myInfo={myInfo}/>
       <form className="dm-form">
         <textarea

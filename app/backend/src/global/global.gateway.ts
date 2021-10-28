@@ -120,7 +120,8 @@ export class GlobalGateway {
     }
 
     await this.dmService.createInvite(user_id, target_info.user_id, {chatTitle: body.chatTitle, channelId: body.channelId})
-    const dm = await this.dmRepo.findOne({sender_id: user_id, receiver_id: target_info.user_id});
+    const dm = await this.dmRepo.findOne({sender_id: user_id, receiver_id: target_info.user_id}, {order: {id: "DESC"}});
+    console.log("backend dm에는 뭐가있지?? ", dm);
     // 3. 초대 받을 사람에게 메세지 전달
     this.server.to(target_sid).emit('chatInvite', {
       time: dm.created_at,

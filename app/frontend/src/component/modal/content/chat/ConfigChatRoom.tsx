@@ -82,7 +82,7 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
       const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/channel`, "POST");
 
       const body = {
-        "channel_id": channelIdToBeSet,
+        "channel_id": +channelIdToBeSet,
         "title": title,
         "type": type,
         "passwd": password,
