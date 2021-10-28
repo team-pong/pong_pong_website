@@ -28,7 +28,7 @@ const QuestionContent: FC = (): JSX.Element => {
 
   const getQuestionInfo = async () => {
     /* get question info */
-    const questionId = +history.location.pathname.split("/")[2];
+    const questionId = +history.location.pathname.split("/")[3];
     const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/oneQuestion?question_id=${questionId}`, "GET");
     const res: Question = await easyfetch.fetch();
 
