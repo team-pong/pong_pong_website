@@ -1,9 +1,10 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DmStoreDto2 } from 'src/dto/dm-store';
+import { ErrMsgDto } from 'src/dto/utility';
 import { DmStore } from 'src/entities/dm-store';
 import { Users } from 'src/entities/users';
-import { err0, err2 } from 'src/err';
+import { err0, err2, err30 } from 'src/err';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 
@@ -144,6 +145,13 @@ export class DmStoreService {
     });
 
     return filtered;
+  }
+
+  async deleteDmLog(id: number) {
+    if (await this.dmStoreRepo.count({id: id}) === 0)  // 존재하지 않은 로그 라면
+      return new ErrMsgDto(err30);
+    await this.dmStoreRepo.delete({id: id});
+    return new Boolean(true);
   }
 
   async deleteDmStore(user_id: string){
