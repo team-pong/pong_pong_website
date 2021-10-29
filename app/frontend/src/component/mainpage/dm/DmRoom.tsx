@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState, useRef, useContext, Dispatch, SetStateAction } from "react";
 import { Redirect } from "react-router-dom";
-import { DmInfo, SetDmInfoContext, UserInfoContext } from "../../../Context";
+import { DmInfo, UserInfoContext } from "../../../Context";
 import "../../../scss/dm/DmRoom.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 import Time from "../../../utils/Time";
@@ -30,14 +30,14 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId}) => {
    *        - DB에서 해당 로그를 삭제함
    */
   const approveChatInvite = async (channelId: number, logId: number) => {
-    // const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?Log_id=${logId}`, "DELETE");
-    // const res = await easyfetch.fetch();
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/oneLog?dm_log_id=${logId}`, "DELETE");
+    const res = await easyfetch.fetch();
 
-    // if (!res.err_msg) {
-    //   setChannelId(channelId);
-    // } else {
-    //   alert(res.err_msg);
-    // }
+    if (!res.err_msg) {
+      setChannelId(channelId);
+    } else {
+      alert(res.err_msg);
+    }
   };
 
   /*!
@@ -45,12 +45,13 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId}) => {
    * @breif DB에서 해당 로그를 삭제하고 현재 화면에서 해당 로그 html node를 삭제해서 안 보이게 함
    */
   const rejectChatInvite = async (e: React.MouseEvent, logId: number) => {
-    // const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?Log_id=${logId}`, "DELETE");
-    // const res = await easyfetch.fetch();
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/oneLog?dm_log_id=${logId}`, "DELETE");
+    const res = await easyfetch.fetch();
 
-    // if (res.err_msg) {
-    //   alert(res.err_msg);
-    // }
+    if (res.err_msg) {
+      alert(res.err_msg);
+      return ;
+    }
     const target = e.target as HTMLImageElement;
     const nodeToRemove = target.parentNode.parentNode.parentNode.parentNode as HTMLDivElement;
     const parent = nodeToRemove.parentNode as HTMLUListElement;
