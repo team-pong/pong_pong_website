@@ -76,39 +76,39 @@ main {
         background-color: #3a8a4a;
       }
     }
-    section#dm-section {
-      position: fixed;
-      bottom: 1em;
-      right: 1em;
-      button#dm-controll-button {
-        position: relative;
-        width: 60px;
-        height: 60px;
+  }
+  section#dm-section {
+    position: fixed;
+    bottom: 1em;
+    right: 1em;
+    button#dm-controll-button {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #282438;
+      border: 1px solid #fff;
+      cursor: pointer;
+      div.un-read-msg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: red;
         border-radius: 50%;
-        background-color: #282438;
-        border: 1px solid #fff;
-        cursor: pointer;
-        div.un-read-msg {
-          position: absolute;
-          top: 0;
-          left: 0;
-          background-color: red;
-          border-radius: 50%;
-          color: #fff;
-          line-height: 1.5em;
-          width: 1.5em;
-          height: 1.5em;
+        color: #fff;
+        line-height: 1.5em;
+        width: 1.5em;
+        height: 1.5em;
+      }
+      img.dm-img {
+        width: 30px;
+        height: 30px;
+        margin-top: 5px;
+        &.dm {
+          animation: dm-animation .25s;
         }
-        img.dm-img {
-          width: 30px;
-          height: 30px;
-          margin-top: 5px;
-          &.dm {
-            animation: dm-animation .25s;
-          }
-          &.closer {
-            animation: dm-closer-animation .25s;
-          }
+        &.closer {
+          animation: dm-closer-animation .25s;
         }
       }
     }

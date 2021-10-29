@@ -1,0 +1,126 @@
+@import "./../../colors.scss";
+
+div.question-content {
+  display: flex;
+  width: 100%;
+  height: 550px;
+  .top-bar {
+    color: #fff;
+    background-color: $blue;
+    font-weight: bold;
+    font-size: 15pt;
+    width: 800px;
+    height: 50px;
+    line-height: 50px;
+    padding-left: 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  section.question-info {
+    width: 50%;
+    height: 100%;
+    padding: 10px;
+    padding-bottom: 0;
+    box-sizing: border-box;
+    border-right: 1px solid rgba(128, 128, 128, 0.267);
+    h1.question-info-title {
+      all: initial;
+      display: block;
+      font-size: 2em;
+      text-align: center;
+      margin-top: 5px;
+    }
+    div.inquirer-info {
+      display: grid;
+      margin: 5px;
+      margin-bottom: 10px;
+      column-gap: 5px;
+      grid-template-areas:
+        "img from from from"
+        "img email email email";
+      grid-template-columns: 52px auto auto auto;
+      img.question-info-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 1px solid rgba(128, 128, 128, 0.267);
+        grid-area: img;
+      }
+      div.question-info-from {
+        grid-area: from;
+        align-self: center;
+      }
+      div.question-info-email {
+        grid-area: email;
+        align-self: center;
+      }
+    }
+    div.question-info-content {
+      border-top: 1px solid rgba(128, 128, 128, 0.267);
+      padding: 10px 10px 0 10px;
+      height: 80%;
+      overflow: scroll;
+    }
+  }
+  section.question-answer {
+    width: 50%;
+    height: 100%;
+    padding: 15px 20px;
+    padding-bottom: 0;
+    box-sizing: border-box;
+    form {
+      height: 100%;
+      display: grid;
+      row-gap: 13px;
+      column-gap: 5px;
+      grid-template-areas: 
+        "email ec ec ec ec ec"
+        "body bc bc bc bc bc"
+        ". bc bc bc bc bc"
+        ". bc bc bc bc bc"
+        ". bc bc bc bc bc"
+        "send send send delete delete delete";
+      label.email-target-label {
+        margin-top: 5px;
+        grid-area: email;
+      }
+      input.email-target {
+        padding: 5px 5px;
+        grid-area: ec;
+        border: none;
+        border-bottom: 1px solid rgba(128, 128, 128, 0.267);
+        &:focus {
+          outline: none;
+        }
+      }
+      label.body-label {
+        grid-area: body;
+      }
+      textarea.body {
+        grid-area: bc;
+        resize: none;
+        border: 1px solid rgba(128, 128, 128, 0.267);
+        &:focus {
+          outline: none;
+        }
+      }
+      input.send {
+        grid-area: send;
+        height: 46px;
+        margin-bottom: 5px;
+        color: #fff;
+        background-color: $blue;
+        border-color: $blue;
+      }
+      button.delete {
+        grid-area: delete;
+        height: 46px;
+        margin-bottom: 5px;
+        color: #fff;
+        background-color: $red;
+        border-color: $red;
+      }
+    }
+  }
+}

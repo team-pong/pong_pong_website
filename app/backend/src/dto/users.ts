@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString, IsBoolean } from "class-validator";
 
 export class UsersDto1{
   @ApiProperty({
@@ -89,6 +89,14 @@ export class UsersDto3{
 		description: '유저의 상태',
 	})
 	public status: string;
+
+  @ApiProperty({
+		example: 'game',
+		description: '유저의 상태',
+	})
+	@IsBoolean()
+	@IsNotEmpty()
+	public admin: boolean;
 }
 
 export class UsersDto4{
