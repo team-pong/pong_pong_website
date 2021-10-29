@@ -11,29 +11,51 @@ interface DMLog {
   msg: string,  /* e.g.) "반갑다" */
   from: string, /* e.g.) "me" || "hna" */
   type: string, /* e.g.) "normal" || "chat"(대화방 초대) || "game"(게임 초대) */
-  id: number,
+  id: number,   /* 초대 승낙, 거절 할 시 해당 데이터를 DB에서 제거하기 위함 */
 };
+
+/*!
+ * @author yochoi, donglee
+ * @breif DmRoom 안에서 DmLog를 보여주는 FC
+ * @param[in] dmLog: DmRoom에서 관리하는 dmLog state
+ * @param[in] myInfo: 전역객체인 내 정보(내가 보낸 것과 받은 것을 구분하기 위함)
+ * @param[in] setChannelId: 초대 승낙할 때 해당 channelId로 Redirect 하기 위함
+ * @param[in] setDmLog: 승낙, 거절 후 초대 메세지를 지우기 위해 state를 update함
+ */
 
 interface DmLogListProps {
   dmLog: DMLog[],
   myInfo: UserInfo,
   setChannelId: Dispatch<SetStateAction<number>>,
+  setDmLog: Dispatch<SetStateAction<DMLog[]>>,
 };
 
-const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId}) => {
+const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog}) => {
 
   // const [sortedDmLog, setSortedDmLog] = useState<Array<DMLog[]>>([]);
 
   /*!
    * @author donglee
+   * @breif 승낙, 거절을 누르면 DmLoom에서 초대장을 제거하고 새로 보여주기 위함
+   */
+  const updateDmLog = (logId: number) => {
+    const updatedDmLog: DMLog[] = dmLog.filter((log) => {
+      return (log.id !== logId);
+    });
+    setDmLog(updatedDmLog);
+  };
+
+  /*!
+   * @author donglee
    * @breif - 대화방 초대를 승낙하면 해당 channelId를 이용해 redirect함
-   *        - DB에서 해당 로그를 삭제함
+   *        - DB에서 해당 로그를 삭제하고 DmLog를 업데이트함
    */
   const approveChatInvite = async (channelId: number, logId: number) => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/oneLog?dm_log_id=${logId}`, "DELETE");
     const res = await easyfetch.fetch();
 
     if (!res.err_msg) {
+      updateDmLog(logId);
       setChannelId(channelId);
     } else {
       alert(res.err_msg);
@@ -42,7 +64,7 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId}) => {
 
   /*!
    * @author donglee
-   * @breif DB에서 해당 로그를 삭제하고 현재 화면에서 해당 로그 html node를 삭제해서 안 보이게 함
+   * @breif DB에서 해당 로그를 삭제하고 현재 화면에서 DmLog를 update함
    */
   const rejectChatInvite = async (e: React.MouseEvent, logId: number) => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/oneLog?dm_log_id=${logId}`, "DELETE");
@@ -52,11 +74,7 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId}) => {
       alert(res.err_msg);
       return ;
     }
-    const target = e.target as HTMLImageElement;
-    const nodeToRemove = target.parentNode.parentNode.parentNode.parentNode as HTMLDivElement;
-    const parent = nodeToRemove.parentNode as HTMLUListElement;
-
-    parent.removeChild(nodeToRemove);
+    updateDmLog(logId);
   }
 
   /*!
@@ -217,7 +235,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
 
   const [dmLog, _setDmLog] = useState<DMLog[]>([]);
   const dmLogRef = useRef(dmLog);
-  const setDmLog = (x) => {
+  const setDmLog = (x: DMLog[]) => {
     dmLogRef.current = x;
     _setDmLog(x);
   };
@@ -240,9 +258,8 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
 
   /*!
    * @author donglee
-   * @breif dmInfo의 request가 null이 아닐 때 소켓으로 데이터를 전달하고
-   *        즉시 다른 값은 그대로지만 request값을 null로 바꿔준다.
-   *        전역객체이므로 null로 바꿔주지 않으면 계속 유지되기 때문임
+   * @breif 초대하기를 누르면 DmRoom 컴포넌트가 열리면서 이 함수가 바로 실행됨
+   *        소켓으로 데이터를 전달하여 target에게 DM이 가도록 함
    */
   const sendRequest = () => {
     global.socket.emit("chatInvite", {
@@ -301,7 +318,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   }
   return (
     <div className="dm-room">
-      <DmLogList dmLog={dmLog} myInfo={myInfo} setChannelId={setChannelId}/>
+      <DmLogList dmLog={dmLog} myInfo={myInfo} setChannelId={setChannelId} setDmLog={setDmLog}/>
       <form className="dm-form">
         <textarea
           className="dm-msg-textarea"
