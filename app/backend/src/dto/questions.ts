@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class QuestionsDto1{
   @ApiProperty({
@@ -95,4 +95,32 @@ export class QuestionsDto4{
 		description: '문의 사항 내용',
 	})
 	public content: string;
+}
+
+export class ReplyDto {
+	@ApiProperty({
+		example: 'hna@student.42seoul.kr',
+		description: '문의 한 사람의 이메일 주소'
+	})
+	@IsEmail()
+	@IsNotEmpty()
+	public email: string;
+
+	@ApiProperty({
+		example: '감사합니다.',
+		description: '답변 내용'
+	})
+	@IsString()
+	@IsNotEmpty()
+	public content: string;
+}
+
+export class DeleteQuestionDto{
+	@ApiProperty({
+		example: '1',
+		description: '문의 사항 아이디',
+	})
+	@IsNumber()
+	@IsNotEmpty()
+	public question_id: number;
 }

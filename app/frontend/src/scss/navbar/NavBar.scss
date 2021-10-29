@@ -104,6 +104,7 @@
     }
 
     .nav-list-button {
+      all: initial;
       display: block;
       width: 240px;
       padding: 1em;
@@ -214,10 +215,9 @@
       }
     }
 
-    /* 문의하기 버튼 (마지막 a 태그) */
-    a:last-of-type {
+    /* 문의하기, 관리자 모드 등 NavBar의 맨 밑에 들어갈 버튼들 */
+    div.end-of-list {
       position: absolute;
-      width: 240px;
       bottom: 0;
     }
   }

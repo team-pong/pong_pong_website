@@ -1,5 +1,5 @@
 import { FC, useEffect, useState, useRef, useContext } from "react";
-import { Link, Route, RouteComponentProps, withRouter } from "react-router-dom";
+import { Link, Route, RouteComponentProps, useHistory, withRouter } from "react-router-dom";
 import AddFriend from "./addFriend/AddFriend";
 import FriendList from "./friendlist/FriendList";
 import "/src/scss/navbar/NavBar.scss";
@@ -12,13 +12,17 @@ import ContactUs from "./contactUs/ContactUs";
 import { UserInfoContext } from "../../../Context";
 import { UserInfo } from "../MainPage";
 
+interface NavBarProps extends RouteComponentProps {
+  update: {state: string, user_id: string};
+}
+
 /*!
  * @author donglee
  * @brief 좌측에 NavBar가 상시 나타나있음
  *        NavBar 버튼들을 누르면 router로 url을 변경해주면서 모달이 뜨게 함
  */
 
-const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProps> = (props): JSX.Element => {
+const NavBar: FC<NavBarProps> = (props): JSX.Element => {
   
   const userInfo = useContext(UserInfoContext);
 
@@ -27,6 +31,8 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
   const [friendList, setFriendList] = useState<UserInfo[]>(null);
 
   const avatarImgRef = useRef(null);
+
+  const history = useHistory();
 
 
   /*!
@@ -85,10 +91,27 @@ const NavBar: FC<{update: {state: string, user_id: string}} & RouteComponentProp
           <img className="nav-list-img" src="/public/controller-play.svg"/>
           <span className="nav-list-span">게임하기</span>
         </Link>
-        <Link to={`${props.match.url}/contactUs`} className="nav-list-button">
-          <img className="nav-list-img" src="/public/email.png"/>
-          <span className="nav-list-span">문의하기</span>
-        </Link>
+        <div className="end-of-list">
+          <Link to={`${props.match.url}/contactUs`} className="nav-list-button">
+            <img className="nav-list-img" src="/public/email.png"/>
+            <span className="nav-list-span">문의하기</span>
+          </Link>
+
+          {/* user가 어드민이고, 현재 location이 mainpage인 경우 adminView로 이동할 수 있는 버튼을 보여줌*/}
+          {userInfo.admin === true && history.location.pathname === "/mainpage" &&
+            <Link to={`${props.match.url}/adminView`} className="nav-list-button">
+              <img className="nav-list-img" src="/public/tools.svg"/>
+              <span className="nav-list-span">관리자 모드</span>
+            </Link>
+          }
+          {/* user가 어드민이고, 현재 location이 adminView 경우 mainpage인 이동할 수 있는 버튼을 보여줌*/}
+          {userInfo.admin === true && history.location.pathname === "/mainpage/adminView" &&
+            <Link to={`${props.match.url}`} className="nav-list-button">
+              <img className="nav-list-img" src="/public/tools.svg"/>
+              <span className="nav-list-span">유저 모드</span>
+            </Link>
+          }
+        </div>
       </ul>
       <Route path={`${props.match.path}/profile/:nick`}><Modal id={Date.now()} content={<ProfileContent />} smallModal/></Route>
       <Route path={`${props.match.path}/contactUs`}><Modal id={Date.now()} content={<ContactUs />} smallModal /></Route>
