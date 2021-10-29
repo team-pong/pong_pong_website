@@ -124,6 +124,7 @@ export class GlobalGateway {
     console.log("backend dm에는 뭐가있지?? ", dm);
     // 3. 초대 받을 사람에게 메세지 전달
     this.server.to(target_sid).emit('chatInvite', {
+      id: dm.id,
       time: dm.created_at,
       msg: dm.content,
       from: dm.sender_id,
