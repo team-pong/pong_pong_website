@@ -178,7 +178,8 @@ const FriendList: FC<FriendListProps> = (
  * @author donglee
  * @brief 대화방 내부에서 초대하기를 눌러 검색 후 초대를 보낼 수 있는 컴포넌트
  * @param[in] chatTitle: 초대하기를 할 때 전달할 대화방 이름
- * @param[in] setDmInfo: 초대하기를 할 때 전달할 대화방 channelId
+ * @param[in] channelId: 초대하기를 할 때 전달할 대화방 channelId
+ * @param[in] chatUsers: 초대하기를 할 때 이미 대화방에 존재하는지 여부를 알기 위한 리스트
  */
 interface ChatinviteContentProps {
   chatTitle: string,
@@ -200,14 +201,15 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
    * @brief 검색하는 search를 통해서 enter나 검색버튼을 클릭할시 API요청을 보냄
    */
   const getUserToFind = async () => {
+    if (search === myInfo.nick) {
+      alert("자기 자신을 초대할 수 없습니다.");
+      return ;
+    }
+
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${search}`);
     const res = await easyfetch.fetch();
 
     if (!res.err_msg) {
-      if (res.nick === myInfo.nick) {
-        alert("자기 자신을 초대할 수 없습니다.");
-        return ;
-      }
       setResult(res);
     } else {
       alert(res.err_msg);
@@ -238,7 +240,7 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
             type="text" className="invite-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
+            onKeyPress={(e) => {
               if (e.key === "Enter") {
                 getUserToFind();
               } else {
