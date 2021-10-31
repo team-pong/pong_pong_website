@@ -34,7 +34,7 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
               to={`${path}/${question.question_id}`}
               className="question"
               key={idx}>
-              <span>제목: {question.title}</span>
+              <span>제목: {question.title}</span><br/>
               <span>작성자: {question.nick}</span>
             </Link>
           );
