@@ -44,6 +44,13 @@ export class QuestionsDto2{
 		description: '유저 닉네임',
 	})
 	public nick: string;
+
+  @ApiProperty({
+		example: '2021-07-31T05:41:48.342Z',
+		description: '문의 보낸 시간',
+	})
+	public question_time: Date;
+
 }
 
 export class QuestionsDto3{
@@ -90,11 +97,43 @@ export class QuestionsDto4{
 	})
 	public email: string;
 
-    @ApiProperty({
+  @ApiProperty({
 		example: '버그가 있어요',
 		description: '문의 사항 내용',
 	})
 	public content: string;
+
+	@ApiProperty({
+		example: '버그 해결했어요',
+		description: '문의 답변 내용',
+	})
+	public answer: string;
+
+	@ApiProperty({
+		example: '2021-07-31T05:41:48.342Z',
+		description: '문의 사항 시간',
+	})
+	public question_time: Date;
+
+	@ApiProperty({
+		example: '2021-07-31T05:41:48.342Z',
+		description: '문의 사항 답변 시간',
+	})
+	public answer_time: Date;
+}
+
+export class QuestionsDto5{
+	@ApiProperty({
+		example: '1',
+		description: '문의 사항 아이디',
+	})
+	public question_id: number;
+
+	@ApiProperty({
+		example: '버그 해결했어요',
+		description: '문의 답변 내용',
+	})
+	public answer: string;
 }
 
 export class ReplyDto {
