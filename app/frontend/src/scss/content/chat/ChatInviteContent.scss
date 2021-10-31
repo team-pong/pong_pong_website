@@ -1,0 +1,169 @@
+div.chat-invite-content {
+  height: 470px;
+
+  div.invite-header {
+
+    h2.invite-title {
+      margin: 30px 30px;
+      margin-bottom: 10px;
+    }
+
+    div.invite-input-container {
+      display: flex;
+      justify-content: center;
+
+      input.invite-input {
+        border: none;
+        border-bottom: solid 2px black;
+        width: 50%;
+        font-size: 1.2rem;
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      img.invite-search-btn {
+        background-color: #3164ff;
+        border: solid 1px #3164ff;
+        border-radius: 7px;
+        cursor: pointer;
+        padding: 4px 15px;
+        margin-left: 10px;
+        width: 20px;
+        height: 20px;
+        opacity: 0.8;
+        transform: scale(0.9);
+        transition: 0.1s all ease-in-out;
+
+        &:hover {
+          opacity: 1;
+          transform: scale(1);
+          transition: 0.2s all ease-in-out;
+        }
+      }
+    }
+  }
+
+  div.invite-result {
+    margin: 15px 20px;
+    height: 74%;
+
+    div.invite-fl-header-container {
+      display: flex;
+      justify-content: center;
+      margin: 0px 15px;
+      padding: 10px 5px;
+
+      span.invite-friendList-header {
+        font-weight: bold;
+        font-size: 1rem;
+      }
+    }
+
+    div.invite-fl-list-container {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+    div.invite-fl-list-container::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera*/
+    }
+
+    div.invite-fl-list-container {
+      height: 100%;
+      overflow: auto;
+
+      li.invite-result-list {
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        margin: 5px 15px;
+        border-bottom: solid 1px #ececf3;
+        padding: 5px 5px;
+  
+        div.ci-user-info {
+          display: flex;
+          img.ci-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-style: solid;
+            border-width: 2px;
+            border-color: white;
+            box-shadow: 0 0 3px rgb(122, 122, 122);
+            margin-top: 3px;
+          }
+  
+          img.ci-friend-status {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            left: 67px;
+            margin-top: 27px;
+            transform: translate3d(-17px, 1px, 0);
+          }
+    
+          div.ci-user-info-text {
+            margin-top: 3px;
+          }
+    
+          div {
+            span.ci-nickname {
+              display: block;
+              margin-left: 10px;
+              font-weight: bold;
+              font-size: 13pt;
+              margin-top: 2px;
+            }
+    
+            span.ci-title {
+              margin-top: 4px;
+              font-style: italic;
+              font-size: 9pt;
+              font-weight: bold;
+              color: rgb(194, 194, 194);
+              margin-left: 10px;
+              margin-right: 5px;
+            }
+    
+            img.ci-title-icon {
+              width: 13px;
+              height: 13px;
+              margin-top: 6px;
+              margin-left: 2px;
+            }
+          }
+        }
+    
+        div.ci-button-container {
+          display: flex;
+          align-items: center;
+          width: 70px;
+          justify-content: center;
+  
+          span.ci-invite-btn {
+            font-size: 12pt;
+            font-weight: bold;
+            color: rgb(44, 43, 43);
+            margin: 0;
+            cursor: pointer;
+  
+            &:hover {
+              color: #3164ff;
+            }
+          }
+
+          span.ci-deactivated-btn {
+            cursor: default;
+            color: rgb(199, 195, 195);
+            text-decoration: line-through;
+
+            &:hover {
+              color: rgb(199, 195, 195);
+            }
+          }
+        }
+      }
+    }
+  }
+}

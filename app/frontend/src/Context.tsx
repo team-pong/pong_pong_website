@@ -15,7 +15,14 @@ interface UserInfo {
   admin: boolean;
 }
 
-interface DmInfo {
+export interface Request {
+  from: string,
+  chatTitle: string,
+  channelId: number,  
+};
+
+export interface DmInfo {
+  request?: Request;  //대화방, 게임 초대의 경우 해당 객체에 정보가 set됨
   isDmOpen: boolean;
   target: string;
 }
@@ -41,7 +48,9 @@ const Global: FC = ({children}): JSX.Element => {
     status: "",
     admin: false
   });
+
   const [dmInfo, setDmInfo] = useState<DmInfo>({
+    request: null,
     isDmOpen: false,
     target: ""
   });
