@@ -104,8 +104,8 @@ export class createInitialData implements Seeder {
 			await connection
 			.createQueryBuilder().insert().into(Questions)
 			.values([
-				{user_id: "jinbkim", title: "운영자님 이것좀 보소", email: "jinbkim@naver.com", content: "버그가 개쩌네"},
-				{user_id: "donglee", title: "문의 사항있음", email: "donglee@naver.com", content: "너무 재밌어"},
+				{user_id: "jinbkim", title: "운영자님 이것좀 보소", email: "jinbkim@naver.com", content: "버그가 개쩌네", answer: "버그 못고치겠어"},
+				{user_id: "donglee", title: "문의 사항있음", email: "donglee@naver.com", content: "너무 재밌어", answer: ""},
 			])
 			.execute();
 	}
