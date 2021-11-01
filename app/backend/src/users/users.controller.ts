@@ -101,13 +101,13 @@ export class UsersController {
     }),
   }))
   async uploadAvatar(@Req() req: Request, @UploadedFile() file: Express.Multer.File){
-    const user_info = await this.usersService.getUserInfo(req.session.userid);
-    const response = {
-      originalname: file.originalname,
-      filename: file.filename,
-      path: file.path
-    }
     console.log(file);
+    // const user_info = await this.usersService.getUserInfo(req.session.userid);
+    // const response = {
+    //   originalname: file.originalname,
+    //   filename: file.filename,
+    //   path: file.path
+    // }
     return await this.usersService.updateUserAvatar(req.session.userid, `${file.filename}`)
   }
 

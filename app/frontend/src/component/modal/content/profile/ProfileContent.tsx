@@ -103,28 +103,44 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     setIsEditNickClicked(false);
   };
 
-  const postAvatarChange = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/????`, "POST");
-    const body = {
-      /* body */
-    }
-    const res = await easyfetch.fetch(body);
+  const postAvatarChange = async (image: File) => {
+    // const easyfetch = new EasyFetch(`${global.BE_HOST}/users/avatar`, "POST");
+    const formData = new FormData;
+    await formData.append("image", image);
 
-    if (!res.err_msg) {
-      return res;
-    } else {
-      alert(res.err_msg);
-      return null;
-    }
+    const data = new URLSearchParams(formData);
+    // for (const pair of new FormData(image)) {
+    //   data.append(pair[0], pair[1]);
+    // }
+    // data.append(formData[0], formData[1]);
+    
+    const header = {
+      'Content-Type': 'multipart/form-data; boundary="X-TEST-BOUNDARY"',
+      'Accept': 'application/json',
+    };
+    const res = await fetch(`${global.BE_HOST}/users/avatar`, {
+      method: 'POST',
+      headers: header,
+      body: data,
+    });
+    // const res = await easyfetch.fetch(body, header);
+
+    console.log("res: ", res);
+    // if (!res.err_msg) {
+    //   return res;
+    // } else {
+    //   alert(res.err_msg);
+    //   return null;
+    // }
   };
 
-  const handleChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeAvatar = async (e: React.FormEvent<HTMLFormElement>) => {
     if (e.target.files[0].size > 2097152) {
       alert("파일이 너무 큽니다. 이미지 파일은 2MB 이하여야 합니다.");
       return ;
     }
-    await postAvatarChange();
-    setAvatarToBeChanged(e.target.files[0]);
+    await postAvatarChange(e.target.files[0]);
+    // setAvatarToBeChanged(e.target.files[0]);
   };
 
   useEffect(() => {
@@ -344,11 +360,13 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
                 onError={() => {avatarImgRef.current.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="}}
                 alt="프로필사진" />
             </label>
-            <input
-              id="input-file"
-              type="file"
-              onChange={(e) => handleChangeAvatar(e)}
-              accept="image/*" />
+            <form onSubmit={(e) => handleChangeAvatar(e)}>
+              <input
+                id="input-file"
+                type="file"
+                // onChange={(e) => handleChangeAvatar(e)}
+                accept="image/*" />
+            </form>
           </div>
           <div id="user-info">
             <div id="user-id">
