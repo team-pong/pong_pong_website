@@ -33,8 +33,7 @@ div.question-content {
     }
     div.inquirer-info {
       display: grid;
-      margin: 5px;
-      margin-bottom: 10px;
+      margin: 5px 5px 10px;
       row-gap: 5px;
       column-gap: 5px;
       grid-template-areas:
@@ -64,7 +63,7 @@ div.question-content {
     div.question-info-content {
       border-top: 1px solid rgba(128, 128, 128, 0.267);
       padding: 10px 10px 0 10px;
-      height: 80%;
+      height: 77%;
       overflow: scroll;
     }
   }
