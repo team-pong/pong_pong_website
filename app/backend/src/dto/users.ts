@@ -166,3 +166,13 @@ export class ReadUserWithIdDto {
 	@IsNotEmpty()
 	public user_id: string;
 }
+
+export class UpdateNickDto {
+	@ApiProperty({
+		example: 'asdfsf',
+		description: '변경 할 닉네임',
+	})
+	@IsString()
+	@IsNotEmpty()
+	public nick: string;
+}
