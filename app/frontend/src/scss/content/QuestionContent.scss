@@ -80,7 +80,7 @@ div.question-content {
         ". bc bc bc bc bc"
         ". bc bc bc bc bc"
         ". bc bc bc bc bc"
-        "send send send delete delete delete";
+        "send send send send send send";
       label.email-target-label {
         margin-top: 5px;
         grid-area: email;
@@ -105,6 +105,9 @@ div.question-content {
           outline: none;
         }
       }
+      textarea.body:read-only, input.email-target:read-only {
+        cursor: default;
+      }
       input.send {
         grid-area: send;
         height: 46px;
@@ -112,14 +115,6 @@ div.question-content {
         color: #fff;
         background-color: $blue;
         border-color: $blue;
-      }
-      button.delete {
-        grid-area: delete;
-        height: 46px;
-        margin-bottom: 5px;
-        color: #fff;
-        background-color: $red;
-        border-color: $red;
       }
     }
   }
