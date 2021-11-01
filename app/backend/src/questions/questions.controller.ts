@@ -42,14 +42,14 @@ export class QuestionsController {
 
   @ApiOperation({ summary: '모든 답변 전 문의 사항 검색' })
   @ApiResponse({ type: [QuestionsDto2], description: '모든 답변 전 문의 사항 리스트' })
-  @Get('beforeAnswerQuestion')
+  @Get('beforeAnswerQuestions')
   async readAllBeforeAnswerQuestions() {
     return this.questionsSerive.readAllBeforeAnswerQuestions();
   }
 
   @ApiOperation({ summary: '모든 답변 한 문의 사항 검색' })
   @ApiResponse({ type: [QuestionsDto2], description: '모든 답변 한 문의 사항 리스트' })
-  @Get('afterAnswerQuestionss')
+  @Get('afterAnswerQuestions')
   async readAllAfterAnswerQuestions() {
     return this.questionsSerive.readAllAfterAnswerQuestions();
   }
