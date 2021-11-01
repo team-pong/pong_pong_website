@@ -1,4 +1,4 @@
-import React, { FormEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { FormEvent, FormEventHandler, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-router-dom";
 import "/src/scss/content/profile/ProfileContent.scss";
 import Modal from "../../Modal";
@@ -39,6 +39,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
   const [isBlockedFriend, setIsBlockedFriend] = useState(false);
   const [isMyProfile, setIsMyProfile] = useState(false);
+  const [avatarToBeChanged, setAvatarToBeChanged] = useState<File>(null);
 
   const avatarImgRef = useRef(null);
 
@@ -101,6 +102,39 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     updateUserInfoState();
     setIsEditNickClicked(false);
   };
+
+  const postAvatarChange = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/????`, "POST");
+    const body = {
+      /* body */
+    }
+    const res = await easyfetch.fetch(body);
+
+    if (!res.err_msg) {
+      return res;
+    } else {
+      alert(res.err_msg);
+      return null;
+    }
+  };
+
+  const handleChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files[0].size > 2097152) {
+      alert("파일이 너무 큽니다. 이미지 파일은 2MB 이하여야 합니다.");
+      return ;
+    }
+    await postAvatarChange();
+    setAvatarToBeChanged(e.target.files[0]);
+  };
+
+  useEffect(() => {
+    if (avatarToBeChanged) {
+      console.log("here! ", avatarToBeChanged);
+      /* string으로 돼있는데 그걸 어떻게 하지 그럼 시부럴탱 */
+      
+      // setMyInfo();
+    }
+  }, [avatarToBeChanged]);
 
   /*!
    * @author donglee
@@ -310,7 +344,11 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
                 onError={() => {avatarImgRef.current.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="}}
                 alt="프로필사진" />
             </label>
-            <input id="input-file" type="file" />
+            <input
+              id="input-file"
+              type="file"
+              onChange={(e) => handleChangeAvatar(e)}
+              accept="image/*" />
           </div>
           <div id="user-info">
             <div id="user-id">
