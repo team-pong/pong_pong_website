@@ -5,3 +5,9 @@ export class GameMapDto {
 	@IsNotEmpty()
 	map: string;
 }
+
+export class SpectateGameDto {
+	@IsString()
+	@IsNotEmpty()
+	nick: string;
+}

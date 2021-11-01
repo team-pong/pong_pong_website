@@ -11,12 +11,11 @@ interface MatchInfo {
   rPlayerNickname: string,
   rPlayerAvatarUrl: string,
   rPlayerScore: number,
-  viewNumber: number,
-  myName: string,
+  viewNumber: number
 }
 
 const GameSpectateContent: FC<RouteComponentProps> = () => {
-  const [socket, setSocket] = useState(io(`${global.BE_HOST}/game`));
+  const [socket, setSocket] = useState(null);
   const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
   const [canvasWidth, setCanvasWidth] = useState(700);
@@ -30,6 +29,7 @@ const GameSpectateContent: FC<RouteComponentProps> = () => {
   const [ballY, setBallY] = useState(150);
   const [leftY, setLeftY] = useState(150);
   const [rightY, setRightY] = useState(150);
+  const [socketInit, setSocketInit] = useState(false);
   const [init, setInit] = useState(0);
   const [isExit, setIsExit] = useState(false);
 
@@ -50,8 +50,7 @@ const GameSpectateContent: FC<RouteComponentProps> = () => {
     rPlayerNickname: '',
     rPlayerAvatarUrl: '',
     rPlayerScore: 0,
-    viewNumber: 0,
-    myName: '',
+    viewNumber: 0
   });
 
   const query = new URLSearchParams(useLocation().search)
@@ -124,52 +123,59 @@ const GameSpectateContent: FC<RouteComponentProps> = () => {
    *        맨 처음 배경과 양쪽 바, 공을 그려준다
    */
   useEffect(() => {
-    console.log(query.get("nick"));
-    socket.emit("spectate");
-
-    socket.on("init", (data) => {
-      setMap(data.type);
-      setCanvas(initCanvas());
-      setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
-      setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
-      setBall(initBall(data.ball[0], data.ball[1]));
-      if (data?.type == 1) {
-        setObsRect00(initBar(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2], data.obstacle.obs00[3]));
-        setObsRect01(initBar(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2], data.obstacle.obs01[3]));
-        setObsRect02(initBar(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2], data.obstacle.obs02[3]));
-        setObsRect03(initBar(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2], data.obstacle.obs03[3]));
-      } else if (data?.type == 2) {
-        setObsCircle00(initCircle(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2]));
-        setObsCircle01(initCircle(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2]));
-        setObsCircle02(initCircle(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2]));
-        setObsCircle03(initCircle(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2]));
-      }
-      setInit(1);
-    })
-
-    socket.on("update", (data) => {
-      setLeftY(data.bar00[1]);
-      setRightY(data.bar01[1]);
-      setBallX(data.ball[0] - 10);
-      setBallY(data.ball[1] - 10);
-    })
-
-    socket.on("setMatchInfo", (data: MatchInfo) => {
-      setMatchInfo(data);
-    })
-
-    socket.on("startCount", () => {
-      setCountdownWindow(initCountdownWindow('3'));
-    })
-
-    socket.on("matchEnd", (data) => {
-      setResultWindow(initResultWindow(`YOU ${data}`));
-    })
+    setSocket(io(`${global.BE_HOST}/game`));
+    setSocketInit(true);
 
     return (() => {
       socket.disconnect();
     })
   }, []);
+
+  useEffect(() => {
+    if (socketInit) {
+      socket.emit("spectate", {nick: query.get("nick")});
+
+      socket.on("init", (data) => {
+        console.log("Init")
+        setMap(data.type);
+        setCanvas(initCanvas());
+        setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
+        setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
+        setBall(initBall(data.ball[0], data.ball[1]));
+        if (data?.type == 1) {
+          setObsRect00(initBar(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2], data.obstacle.obs00[3]));
+          setObsRect01(initBar(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2], data.obstacle.obs01[3]));
+          setObsRect02(initBar(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2], data.obstacle.obs02[3]));
+          setObsRect03(initBar(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2], data.obstacle.obs03[3]));
+        } else if (data?.type == 2) {
+          setObsCircle00(initCircle(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2]));
+          setObsCircle01(initCircle(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2]));
+          setObsCircle02(initCircle(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2]));
+          setObsCircle03(initCircle(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2]));
+        }
+        setInit(1);
+      })
+
+      socket.on("update", (data) => {
+        setLeftY(data.bar00[1]);
+        setRightY(data.bar01[1]);
+        setBallX(data.ball[0] - 10);
+        setBallY(data.ball[1] - 10);
+      })
+
+      socket.on("setMatchInfo", (data: MatchInfo) => {
+        setMatchInfo(data);
+      })
+
+      socket.on("startCount", () => {
+        setCountdownWindow(initCountdownWindow('3'));
+      })
+
+      socket.on("matchEnd", (data) => {
+        setResultWindow(initResultWindow(`YOU ${data}`));
+      })
+    }
+  }, [socketInit])
 
   useEffect(() => {
     if (canvas) {
