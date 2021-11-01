@@ -1,6 +1,8 @@
 import { FC, createContext, useState, SetStateAction, Dispatch } from "react";
 import Notice, { NoticeState } from "./component/notice/Notice";
 
+type setter<TYPE> = Dispatch<SetStateAction<TYPE>>;
+
 interface UserInfo {
   user_id: string;
   nick: string;
@@ -10,20 +12,28 @@ interface UserInfo {
   loss_games: number;
   ladder_level: number;
   status: string;
+  admin: boolean;
 }
 
-interface DmInfo {
+export interface Request {
+  from: string,
+  chatTitle: string,
+  channelId: number,  
+};
+
+export interface DmInfo {
+  request?: Request;  //대화방, 게임 초대의 경우 해당 객체에 정보가 set됨
   isDmOpen: boolean;
   target: string;
 }
 
-export const UserInfoContext = createContext(null);
-export const SetUserInfoContext = createContext(null);
+export const UserInfoContext = createContext<UserInfo>(null);
+export const SetUserInfoContext = createContext<setter<UserInfo>>(null);
 
-export const DmInfoContext = createContext(null);
-export const SetDmInfoContext = createContext(null);
+export const DmInfoContext = createContext<DmInfo>(null);
+export const SetDmInfoContext = createContext<setter<DmInfo>>(null);
 
-export const SetNoticeInfoContext = createContext<Dispatch<SetStateAction<NoticeState>>>(null);
+export const SetNoticeInfoContext = createContext<setter<NoticeState>>(null);
 
 const Global: FC = ({children}): JSX.Element => {
 
@@ -35,9 +45,12 @@ const Global: FC = ({children}): JSX.Element => {
     win_games: 0,
     loss_games: 0,
     ladder_level: 0,
-    status: ""
+    status: "",
+    admin: false
   });
+
   const [dmInfo, setDmInfo] = useState<DmInfo>({
+    request: null,
     isDmOpen: false,
     target: ""
   });

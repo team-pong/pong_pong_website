@@ -1,6 +1,7 @@
 import Modal, { ChatContent, RecordContent, GameContent } from '../modal/Modal';
 import { UserInfoContext, SetUserInfoContext, DmInfoContext, SetDmInfoContext } from '../../Context';
 import NavBar from './navbar/NavBar';
+import AdminView from './AdminView';
 import Dm from './dm/Dm';
 import { useContext, useEffect, useState } from "react";
 import "/src/scss/mainpage/MainPage.scss";
@@ -19,6 +20,7 @@ export interface UserInfo {
   total_games: number;
   user_id: string;
   win_games: number;
+  admin: boolean;
 }
 
 /*!
@@ -27,7 +29,7 @@ export interface UserInfo {
  */
 
 const MainPage = ({match}): JSX.Element => {
-  
+
   const [updateFriendList, setUpdateFriendList] = useState({state: "", user_id: ""});
   const [unReadMsg, setUnReadMsg] = useState(false);
 
@@ -39,7 +41,6 @@ const MainPage = ({match}): JSX.Element => {
   const getUserInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
     const res = await easyfetch.fetch();
-    
     return res;
   }
 
@@ -63,12 +64,22 @@ const MainPage = ({match}): JSX.Element => {
     });
   }, []);
 
+  /*!
+   * @author donglee
+   * @troubleShooting socket.on, socket.off 에서 같은 함수를 참조하기 위해 유명함수로 선언
+   */
+  const socketSenUnReadMsg = () => {
+    setUnReadMsg(true);
+  };
+
   useEffect(() => {
     if (!dmInfo.isDmOpen) {
-      global.socket.on("dm", () => setUnReadMsg(true));
+      global.socket.on("dm", socketSenUnReadMsg);
+      global.socket.on("chatInvite", socketSenUnReadMsg);
     } else if (dmInfo.isDmOpen) {
       setUnReadMsg(false);
-      global.socket.off("dm", () => setUnReadMsg(true));
+      global.socket.off("dm", socketSenUnReadMsg);
+      global.socket.off("chatInvite", socketSenUnReadMsg);
     }
   }, [dmInfo]);
 
@@ -81,40 +92,43 @@ const MainPage = ({match}): JSX.Element => {
         <Route path={`${match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route>
       </Switch>
       <main>
-        <div id="button-container">
-          <Link
-            to={`${match.url}/record`}
-            style={{textDecoration: "none"}}
-            className="buttons"
-            id="record">
-            전적
-            <span className="mp-explain-span">게임 전적을 보려면 누르세요!</span>
-          </Link>
-          <Link
-            to={`${match.url}/chat`}
-            style={{textDecoration: "none"}}
-            className="buttons"
-            id="chat">
-            채팅
-            <span className="mp-explain-span">친구와 채팅을 하려면 누르세요!</span>
-          </Link>
-          <Link
-            to={`${match.path}/game`}
-            style={{textDecoration: "none"}}
-            className="buttons"
-            id="game">
-              게임
-            <span className="mp-explain-span">게임을 하려면 누르세요!</span>
-          </Link>
-          <section id="dm-section">
-            {dmInfo.isDmOpen && <Dm />}
-            <button id="dm-controll-button" onClick={() => setDmInfo({isDmOpen: !dmInfo.isDmOpen, target: ""})}>
-              {unReadMsg && <div className="un-read-msg">!</div>}
-              {!dmInfo.isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
-              {dmInfo.isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
-            </button>
-          </section>
-        </div>
+        <Route path={`${match.path}`} exact>
+          <div id="button-container">
+            <Link
+              to={`${match.url}/record`}
+              style={{textDecoration: "none"}}
+              className="buttons"
+              id="record">
+              전적
+              <span className="mp-explain-span">게임 전적을 보려면 누르세요!</span>
+            </Link>
+            <Link
+              to={`${match.url}/chat`}
+              style={{textDecoration: "none"}}
+              className="buttons"
+              id="chat">
+              채팅
+              <span className="mp-explain-span">친구와 채팅을 하려면 누르세요!</span>
+            </Link>
+            <Link
+              to={`${match.path}/game`}
+              style={{textDecoration: "none"}}
+              className="buttons"
+              id="game">
+                게임
+              <span className="mp-explain-span">게임을 하려면 누르세요!</span>
+            </Link>
+          </div>
+        </Route>
+        {userInfo.admin && <Route path={`${match.path}/adminView`}><AdminView /></Route>}
+        <section id="dm-section">
+          {dmInfo.isDmOpen && <Dm />}
+          <button id="dm-controll-button" onClick={() => setDmInfo({isDmOpen: !dmInfo.isDmOpen, target: ""})}>
+            {unReadMsg && <div className="un-read-msg">!</div>}
+            {!dmInfo.isDmOpen && <img className="dm-img dm" src="/public/chat-reverse.svg" />}
+            {dmInfo.isDmOpen && <img className="dm-img closer" src="/public/DM-closer.svg" />}
+          </button>
+        </section>
       </main>
     </>
   );

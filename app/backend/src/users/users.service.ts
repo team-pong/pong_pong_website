@@ -59,6 +59,7 @@ export class UsersService {
     profile.loss_games = user.loss_games;
     profile.ladder_level = user.ladder_level;
     profile.status = user.status;
+    profile.admin = user.admin;
     return profile;
   }
 

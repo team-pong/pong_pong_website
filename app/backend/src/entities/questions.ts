@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn } from "typeorm";
 
 @Entity()
 export class Questions{
@@ -12,4 +12,10 @@ export class Questions{
 	email: string;
 	@Column()
 	content: string;
+	@Column()
+	answer: string;
+	@CreateDateColumn()
+	question_time: Date;
+	@CreateDateColumn()
+	answer_time: Date;
 }

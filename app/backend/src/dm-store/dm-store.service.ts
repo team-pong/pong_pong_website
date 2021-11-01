@@ -1,9 +1,10 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DmStoreDto2 } from 'src/dto/dm-store';
+import { ErrMsgDto } from 'src/dto/utility';
 import { DmStore } from 'src/entities/dm-store';
 import { Users } from 'src/entities/users';
-import { err0, err2 } from 'src/err';
+import { err0, err2, err30 } from 'src/err';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 
@@ -17,9 +18,11 @@ interface DM {
 }
 
 export interface DMLog {
+  id: number,
   time: string,
   msg: string,
   from: string,
+  type: string,
 }
 
 @Injectable()
@@ -40,6 +43,11 @@ export class DmStoreService {
     return err0;
   }
 
+  async createInvite(from: string, to: string, inviteMsg: any) {
+    console.log('invite dm saving...');
+    const ret = await this.dmStoreRepo.save({sender_id: from, receiver_id: to, content: JSON.stringify(inviteMsg), type: 'chat'})
+    console.log(ret);
+  }
 
   async readDmStore(user_id: string, other_id: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않은 유저 라면
@@ -54,9 +62,11 @@ export class DmStoreService {
     let dmList: DMLog[] = [];
     for (let dm of dms){
       dmList.push({
+        id: dm.id,
         time: dm.created_at,
         msg: dm.content,
-        from: dm.sender_id == user_id ? "me" : dm.sender_id,
+        from: dm.sender_id,
+        type: dm.type,
       });
     }
     return dmList;
@@ -87,7 +97,7 @@ export class DmStoreService {
           avatar_url: await this.usersService.getAvatarUrl(msg.sender_id),
           nick: msg.sender_id,
         },
-        lastMsg: msg.content,
+        lastMsg: msg.type == 'normal' ? msg.content : msg.type == 'chat' ? "채팅방 초대를 받았습니다." : "대전 신청을 받았습니다.",
         lastMsgTime: (msg.created_at),
       })
     }
@@ -106,7 +116,7 @@ export class DmStoreService {
           avatar_url: await this.usersService.getAvatarUrl(msg.receiver_id),
           nick: msg.receiver_id,
         },
-        lastMsg: msg.content,
+        lastMsg: msg.type == 'normal' ? msg.content : msg.type == 'chat' ? "채팅방 초대를 보냈습니다." : "대전 신청을 보냈습니다.",
         lastMsgTime: msg.created_at,
       })
     }
@@ -135,6 +145,13 @@ export class DmStoreService {
     });
 
     return filtered;
+  }
+
+  async deleteDmLog(id: number) {
+    if (await this.dmStoreRepo.count({id: id}) === 0)  // 존재하지 않은 로그 라면
+      return new ErrMsgDto(err30);
+    await this.dmStoreRepo.delete({id: id});
+    return new Boolean(true);
   }
 
   async deleteDmStore(user_id: string){

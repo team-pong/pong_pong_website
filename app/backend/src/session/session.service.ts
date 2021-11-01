@@ -13,6 +13,7 @@ import { SessionDto1 } from 'src/dto/session';
 import { Users } from 'src/entities/users';
 import * as nodemailer from 'nodemailer';
 import { AuthCode } from 'src/entities/auth-code';
+import { transportOption } from 'src/mail/mailer.option';
 
 const db = {
 	user: process.env.PG_PONG_ADMIN,
@@ -101,16 +102,7 @@ export class SessionService {
         await this.usersService.createUsers(data.login, data.login, data.image_url, data.email);
       } else if (user.two_factor_login) { // 2차인증이 켜져 있는 경우
         const random_code = this.getRandomAuthCode(4);
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: true,
-          auth: {
-            user: process.env.EMAIL_ID,
-            pass: process.env.EMAIL_PW,
-          },
-        });
+        const transporter = nodemailer.createTransport(transportOption);
         const info = await transporter.sendMail({
           from: `"ft_trancendence team" <${process.env.EMAIL_ID}>`,
           to: user.email,
@@ -216,10 +208,20 @@ export class SessionService {
     await this.usersRepo.update({user_id: user_id}, {two_factor_login: two_factor_login});
   }
 
+  // 해당 유저가 입력한 이메일 코드가 올바른지 확인 (2차 인증)
   async isValidCode(user_id: string, code: string) {
     const ret = await this.authCodeRepo.findOne({user_id: user_id, email_code: code});
     if (ret) {
       this.authCodeRepo.delete({user_id: user_id});
+      return true;
+    }
+    return false;
+  }
+
+  // 해당 유저가 admin인지 확인 (문의 답변 보내기 api 권한 확인)
+  async isAdmin(user_id: string) {
+    const ret = await this.usersRepo.count({user_id: user_id, admin: true})
+    if (ret) {
       return true;
     }
     return false;

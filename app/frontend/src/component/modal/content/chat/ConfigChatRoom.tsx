@@ -82,7 +82,7 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
       const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/channel`, "POST");
 
       const body = {
-        "channel_id": channelIdToBeSet,
+        "channel_id": +channelIdToBeSet,
         "title": title,
         "type": type,
         "passwd": password,
@@ -123,8 +123,9 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
               placeholder="대화방 이름을 입력하세요."
               required
               minLength={2}
-              maxLength={25}
+              maxLength={15}
               value={title}
+              autoComplete="off"
               onChange={(e) => setTitle(e.target.value)}/>
           </form>
         </div>
