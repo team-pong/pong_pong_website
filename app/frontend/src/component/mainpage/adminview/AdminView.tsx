@@ -1,10 +1,11 @@
 import { FC, useEffect, useState } from "react";
 import { Route, RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
-import EasyFetch from "../../utils/EasyFetch";
-import Modal from "../modal/Modal";
+import EasyFetch from "../../../utils/EasyFetch";
+import Modal from "../../modal/Modal";
 import QuestionContent from "./question/QuestionContent";
 import "/src/scss/adminview/AdminView.scss";
+import QuestionSelector from "./QuestionSelector";
 
 interface QuestionPrev {
   question_id: number;
@@ -12,21 +13,31 @@ interface QuestionPrev {
   nick: string;
 }
 
+type QuestionType = "answered" | "notAnswered";
+
 const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
 
+  const [questionType, setQuestionType] = useState<QuestionType>("notAnswered")
   const [questionList, setQuestionList] = useState<QuestionPrev[]>([]);
 
-  const getQuestionList = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/questions`, "GET");
+  const getNotAnsweredQuestionList = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/beforeAnswerQuestion`, "GET");
+    setQuestionList(await easyfetch.fetch());
+  }
+
+  const getAnsweredQuestionList = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/afterAnswerQuestionss`, "GET");
     setQuestionList(await easyfetch.fetch());
   }
 
   useEffect(() => {
-    getQuestionList();
-  }, []);
+    if (questionType === "notAnswered") getNotAnsweredQuestionList();
+    else if (questionType === "answered") getAnsweredQuestionList();
+  }, [questionType]);
 
   return (
     <div className="admin-view">
+      <QuestionSelector questionType={questionType} setQuestionType={setQuestionType} />
       <ul className="question-list">
         {questionList.map((question, idx) => {
           return (

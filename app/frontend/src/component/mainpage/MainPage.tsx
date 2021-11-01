@@ -1,7 +1,7 @@
 import Modal, { ChatContent, RecordContent, GameContent } from '../modal/Modal';
 import { UserInfoContext, SetUserInfoContext, DmInfoContext, SetDmInfoContext } from '../../Context';
 import NavBar from './navbar/NavBar';
-import AdminView from './AdminView';
+import AdminView from './adminview/AdminView';
 import Dm from './dm/Dm';
 import { useContext, useEffect, useState } from "react";
 import "/src/scss/mainpage/MainPage.scss";
@@ -9,7 +9,6 @@ import "/src/scss/mainpage/MainPage-media.scss";
 import "/src/scss/mainpage/MainPage-mobile.scss";
 import { Link, Route, Switch } from "react-router-dom";
 import EasyFetch from '../../utils/EasyFetch';
-import Loading from '../loading/Loading';
 
 export interface UserInfo {
   avatar_url: string;

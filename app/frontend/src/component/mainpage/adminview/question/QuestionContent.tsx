@@ -1,7 +1,7 @@
 import { FC, FormEvent, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import { SetNoticeInfoContext } from "../../../Context";
-import EasyFetch from "../../../utils/EasyFetch";
+import { SetNoticeInfoContext } from "../../../../Context";
+import EasyFetch from "../../../../utils/EasyFetch";
 import "/src/scss/content/QuestionContent.scss";
 
 interface Question {
