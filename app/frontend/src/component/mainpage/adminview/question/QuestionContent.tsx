@@ -1,4 +1,4 @@
-import { FC, FormEvent, useContext, useEffect, useState } from "react";
+import {Dispatch, FC, FormEvent, SetStateAction, useContext, useEffect, useState} from "react";
 import { useHistory } from "react-router";
 import { SetNoticeInfoContext } from "../../../../Context";
 import EasyFetch from "../../../../utils/EasyFetch";
@@ -15,7 +15,18 @@ interface Question {
   question_time: string;
 }
 
-const QuestionContent: FC = (): JSX.Element => {
+interface QuestionContentProps {
+  update: boolean;
+  setUpdate: Dispatch<SetStateAction<boolean>>;
+}
+
+/*!
+ * @author yochoi
+ * @brief 문의사항을 보여주는 함수
+ * @param[in] update 현재 update 와 반대로 setUpdate 하기 위한 변수
+ * @param[in] setUpdate 문의 답변 후 상위컴포넌트를 업데이트하기 위한 SetStateAction
+ */
+const QuestionContent: FC<QuestionContentProps> = ({update, setUpdate}): JSX.Element => {
 
   const [targetAvatar, setTargetAvatar] = useState("");
   const [questionInfo, setQuestionInfo] = useState<Question>({
@@ -53,8 +64,8 @@ const QuestionContent: FC = (): JSX.Element => {
   }, []);
 
   /*!
-   * @brief yochoi
-   * @details 답변완료로 설정하는 함수
+   * @author yochoi
+   * @brief 답변완료로 설정하는 함수
    */
   const setQuestionAsAnswered = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/answer`, "POST");
@@ -66,9 +77,9 @@ const QuestionContent: FC = (): JSX.Element => {
   }
 
   /*!
-   * @brief yochoi
-   * @details 문의자에게 답변을 보내는 함수
-   *          실패시 에러 문자열을 throw 함
+   * @author yochoi
+   * @brief 문의자에게 답변을 보내는 함수
+   *        실패시 에러 문자열을 throw 함
    */
   const sendReply = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/reply`, "POST");
@@ -80,18 +91,19 @@ const QuestionContent: FC = (): JSX.Element => {
   }
 
   /*!
-   * @brief yochoi
-   * @details onSubmit 이벤트 발생시 동작하는 함수
-   *          에러가 있을 시 Notice 를 띄움
+   * @author yochoi
+   * @brief onSubmit 이벤트 발생시 동작하는 함수
+   *        답변을 완료하고 AdminView component 를 업데이트 함
    */
   const onSubmitAnswer = async (e: FormEvent) => {
     e.preventDefault()
     try {
       await sendReply();
       await setQuestionAsAnswered();
-      setNoticeInfo({seconds: 3, isOpen: true, content: "답변 작성을 완료했습니다.", backgroundColor: "#62C375"})
+      setNoticeInfo({seconds: 3, isOpen: true, content: "답변 작성을 완료했습니다.", backgroundColor: "#62C375"});
+      setUpdate(!update);
     } catch (e) {
-      setNoticeInfo({seconds: 3, isOpen: true, content: e.err_msg, backgroundColor: "#CE4D36"})
+      setNoticeInfo({seconds: 3, isOpen: true, content: e.err_msg, backgroundColor: "#CE4D36"});
     }
   }
 

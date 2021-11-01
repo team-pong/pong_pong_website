@@ -22,6 +22,13 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   const [questionType, setQuestionType] = useState<QuestionType>("notAnswered")
   const [questionList, setQuestionList] = useState<QuestionPrev[]>([]);
 
+  /*!
+   * @author yochoi
+   * @brief 하위 Component 인 QuestionContent 에서 답변 보내기를 한 후에
+   *        AdminView 를 업데이트 하기 위한 State 로, true 냐 false 냐는 전혀 무관함
+   */
+  const [update, setUpdate] = useState(false);
+
   const getNotAnsweredQuestionList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/beforeAnswerQuestion`, "GET");
     setQuestionList(await easyfetch.fetch());
@@ -36,6 +43,11 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
     if (questionType === "notAnswered") getNotAnsweredQuestionList();
     else if (questionType === "answered") getAnsweredQuestionList();
   }, [questionType]);
+
+  useEffect(() => {
+    if (questionType === "notAnswered") getNotAnsweredQuestionList();
+    else if (questionType === "answered") getAnsweredQuestionList();
+  }, [update])
 
   return (
     <div className="admin-view">
@@ -54,7 +66,9 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
           );
         })}
       </ul>
-      <Route path={`${path}/:question_id`}><Modal id={Date.now()} content={<QuestionContent />}/></Route>
+      <Route path={`${path}/:question_id`}>
+        <Modal id={Date.now()} content={<QuestionContent update={update} setUpdate={setUpdate}/>}/>
+      </Route>
     </div>
   )
 }
