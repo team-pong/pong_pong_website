@@ -1,8 +1,9 @@
 import { fabric } from "fabric";
-import { FC, useState, useEffect, useRef } from "react";
+import { FC, useState, useEffect, useRef, useContext } from "react";
 import { RouteComponentProps, withRouter, useHistory, Redirect } from "react-router-dom";
 import "/src/scss/content/game/GameRoomContent.scss";
 import { io } from "socket.io-client";
+import { UserInfoContext } from "../../../../Context";
 
 interface MatchInfo {
   lPlayerNickname: string,
@@ -16,6 +17,7 @@ interface MatchInfo {
 }
 
 const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
+  const myInfo = useContext(UserInfoContext);
   const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
   const [canvasWidth, setCanvasWidth] = useState(700);
@@ -208,7 +210,13 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     })
 
     socket.on("matchEnd", (data) => {
-      setResultWindow(initResultWindow(`YOU ${data}`));
+      if (data.winner == myInfo.user_id) {
+        setResultWindow(initResultWindow(`YOU WIN`));
+      } else if (data.loser == myInfo.user_id) {
+        setResultWindow(initResultWindow(`YOU LOSE`));
+      } else {
+        setResultWindow(initResultWindow(`MATCH END`));
+      }
     })
 
     addEventListener("keydown", keyDownEvent);

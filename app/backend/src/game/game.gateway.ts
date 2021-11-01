@@ -124,8 +124,7 @@ export class GameGateway {
 		const winner = position == 'l' ? playerRight : playerLeft;
 		const loser = position == 'l' ? playerLeft : playerRight;
 		this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
-		loser.socket.emit('matchEnd', 'LOSE');
-		winner.socket.emit('matchEnd', 'WIN');
+		this.server.to(room_id).emit('matchEnd', {winner: winner.id, loser: loser.id});
 		this.clearGame(playerLeft, playerRight, room_id, gameLogic);
 	}
 
@@ -145,8 +144,7 @@ export class GameGateway {
 		if (userInfo.lPlayerScore == 3 || userInfo.rPlayerScore == 3 || (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
 				const winner = userInfo.lPlayerScore == 3 ? playerLeft : playerRight;
 				const loser = userInfo.lPlayerScore == 3 ? playerRight : playerLeft;
-				winner.socket.emit('matchEnd', 'WIN');
-				loser.socket.emit('matchEnd', 'LOSE');
+				this.server.to(room_id).emit('matchEnd', {winner: winner.id, loser: loser.id});
 				this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
 				this.clearGame(playerLeft, playerRight, room_id, gameLogic);
 			} else {
@@ -197,7 +195,7 @@ export class GameGateway {
 		const loser = position == 'l' ? left_player : right_player;
 
 		this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
-		winner.socket.emit('matchEnd', 'WIN');
+		this.server.to(room_id).emit('matchEnd', {winner: winner.id, loser: loser.id});
 		this.clearGame(left_player, right_player, room_id, gameLogic);
 	}
 

@@ -1,7 +1,8 @@
 import { fabric } from "fabric";
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, useContext } from "react";
 import { RouteComponentProps, withRouter, Redirect, useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
+import { UserInfoContext } from "../../../../Context";
 // import "/src/scss/content/game/GameCanvasContent.scss";
 
 interface MatchInfo {
@@ -15,6 +16,7 @@ interface MatchInfo {
 }
 
 const GameSpectateContent: FC<RouteComponentProps> = () => {
+  const myInfo = useContext(UserInfoContext);
   const [socket, setSocket] = useState(null);
   const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
@@ -172,7 +174,13 @@ const GameSpectateContent: FC<RouteComponentProps> = () => {
       })
 
       socket.on("matchEnd", (data) => {
-        setResultWindow(initResultWindow(`YOU ${data}`));
+        if (data.winner == myInfo.user_id) {
+          setResultWindow(initResultWindow(`YOU WIN`));
+        } else if (data.loser == myInfo.user_id) {
+          setResultWindow(initResultWindow(`YOU LOSE`));
+        } else {
+          setResultWindow(initResultWindow(`MATCH END`));
+        }
       })
     }
   }, [socketInit])
