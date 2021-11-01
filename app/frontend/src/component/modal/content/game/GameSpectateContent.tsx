@@ -1,5 +1,5 @@
 import { fabric } from "fabric";
-import { FC, useState, useEffect, useContext } from "react";
+import { FC, useState, useEffect, useContext, useRef } from "react";
 import { RouteComponentProps, withRouter, Redirect, useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
 import { UserInfoContext } from "../../../../Context";
@@ -17,7 +17,12 @@ interface MatchInfo {
 
 const GameSpectateContent: FC<RouteComponentProps> = () => {
   const myInfo = useContext(UserInfoContext);
-  const [socket, setSocket] = useState(null);
+  const [socket, _setSocket] = useState(null);
+  const socketRef = useRef(socket);
+  const setSocket = (data) => {
+    socketRef.current = data;
+    _setSocket(data);
+  }
   const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
   const [canvasWidth, setCanvasWidth] = useState(700);
@@ -129,7 +134,7 @@ const GameSpectateContent: FC<RouteComponentProps> = () => {
     setSocketInit(true);
 
     return (() => {
-      socket.disconnect();
+      socketRef.current.disconnect();
     })
   }, []);
 

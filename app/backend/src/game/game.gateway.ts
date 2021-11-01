@@ -282,7 +282,7 @@ export class GameGateway {
 					map: 0,
 				}
 				this.socket_infos[playerLeft.socket.id].match = userInfo;
-				this.socket_infos[playerRight.socket.id].match = userInfo;
+				this.socket_infos[playerRight.socket.id].match = this.socket_infos[playerLeft.socket.id].match;
 	
 				this.server.to(room_id).emit("init", gameLogic.getInitJson(), userInfo);
 				this.server.to(room_id).emit("setMatchInfo", userInfo);				
@@ -368,7 +368,7 @@ export class GameGateway {
 					map: 0,
 				}
 				this.socket_infos[playerLeft.socket.id].match = userInfo;
-				this.socket_infos[playerRight.socket.id].match = userInfo;
+				this.socket_infos[playerRight.socket.id].match = this.socket_infos[playerLeft.socket.id].match;
 	
 				this.server.to(room_id).emit("init", gameLogic.getInitJson(), userInfo);
 	
@@ -419,6 +419,12 @@ export class GameGateway {
 			console.log("Spectate |", body.nick);
 			const target_info = await this.usersService.getUserInfoWithNick(body.nick);
 			const socket_info = this.getSocketInfo(target_info.user_id);
+
+			// 1-1. 내 소켓 정보 저장 (rid: 나갈때 방이름 필요, match: 나갈 때 관전자 수 감소)
+			this.socket_infos[socket.id] = {socket: socket, sid: null, uid: null, rid: socket_info.rid, match: socket_info.match, logic: null};
+
+			// 1-2. 관전자 수 갱신
+			this.socket_infos[socket.id].match.viewNumber += 1;
 	
 			// 2. 초기화
 			console.log('관전하기 |', socket_info.logic.getInitJson(), socket_info.match);
@@ -427,12 +433,11 @@ export class GameGateway {
 			
 			// 3. 같은 소켓 room에 접속시키기 (게임 인터벌에서 해당 룸으로 메세지를 쏴준다)
 			socket.join(socket_info.rid);
+			this.server.to(socket_info.rid).emit('setMatchInfo', socket_info.match);
 		} catch (err) {
 			console.log(err);
 			return (err);
 		}
-
-		
 	}
 
 	afterInit(server: Server): any {
@@ -459,7 +464,16 @@ export class GameGateway {
 			this.deleteFromNormalQueue(user_id);
 			this.deleteFromLadderQueue(user_id);
 
-			// socket.leave(this.socket_infos)
+			// 2. 관전자 처리 (관전자 수 수정해서 보냄)
+			const socket_info = this.socket_infos[socket.id];
+			if (socket_info.sid == null) {
+				socket_info.match.viewNumber -= 1;
+				this.server.to(socket_info.rid).emit('setMatchInfo', socket_info.match);
+			}
+
+			// 3. socket_info에서 제거
+			socket.leave(socket_info.rid);
+			delete this.socket_infos[socket.id];
 		} catch (err) {
 			console.error(err);
 		}
