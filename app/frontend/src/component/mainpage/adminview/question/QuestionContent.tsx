@@ -3,6 +3,7 @@ import { useHistory } from "react-router";
 import { SetNoticeInfoContext } from "../../../../Context";
 import EasyFetch from "../../../../utils/EasyFetch";
 import "/src/scss/content/QuestionContent.scss";
+import Time from "../../../../utils/Time";
 
 interface Question {
   question_id: number;
@@ -25,7 +26,7 @@ const QuestionContent: FC = (): JSX.Element => {
     content: "",
     answer: "",
     question_time: ""
-  })
+  });
   const [answerEmail, setAnswerEmail] = useState("");
   const [answerBody, setAnswerBody] = useState("");
 
@@ -48,7 +49,7 @@ const QuestionContent: FC = (): JSX.Element => {
   }
 
   useEffect(() => {
-    getQuestionInfo();
+    getQuestionInfo().then();
   }, []);
 
   /*!
@@ -110,6 +111,7 @@ const QuestionContent: FC = (): JSX.Element => {
           <img src={targetAvatar} alt="avatar" className="question-info-avatar" />
           <div className="question-info-from">{questionInfo.nick}</div>
           <div className="question-info-email">{questionInfo.email}</div>
+          <div className="question-info-time">{questionInfo.question_time !== "" && new Time(questionInfo.question_time).getWholeTime()}</div>
         </div>
         <div className="question-info-content">{questionInfo.content}</div>
       </section>

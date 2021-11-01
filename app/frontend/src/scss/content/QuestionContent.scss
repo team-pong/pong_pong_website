@@ -35,10 +35,12 @@ div.question-content {
       display: grid;
       margin: 5px;
       margin-bottom: 10px;
+      row-gap: 5px;
       column-gap: 5px;
       grid-template-areas:
         "img from from from"
-        "img email email email";
+        "img email email email"
+        "time time time time";
       grid-template-columns: 52px auto auto auto;
       img.question-info-avatar {
         width: 50px;
@@ -54,6 +56,9 @@ div.question-content {
       div.question-info-email {
         grid-area: email;
         align-self: center;
+      }
+      div.question-info-time {
+        grid-area: time;
       }
     }
     div.question-info-content {

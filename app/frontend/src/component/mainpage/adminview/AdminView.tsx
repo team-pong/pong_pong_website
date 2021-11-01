@@ -6,11 +6,13 @@ import Modal from "../../modal/Modal";
 import QuestionContent from "./question/QuestionContent";
 import "/src/scss/adminview/AdminView.scss";
 import QuestionSelector from "./QuestionSelector";
+import Time from "../../../utils/Time";
 
 interface QuestionPrev {
   question_id: number;
   title: string;
   nick: string;
+  question_time: string;
 }
 
 type QuestionType = "answered" | "notAnswered";
@@ -46,7 +48,8 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
               className="question"
               key={idx}>
               <span>제목: {question.title}</span><br/>
-              <span>작성자: {question.nick}</span>
+              <span>작성자: {question.nick}</span><br/>
+              <span>작성시점: {new Time(question.question_time).getWholeTime()}</span>
             </Link>
           );
         })}
