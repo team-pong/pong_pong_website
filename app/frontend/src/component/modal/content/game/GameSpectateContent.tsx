@@ -1,7 +1,8 @@
 import { fabric } from "fabric";
 import { FC, useState, useEffect } from "react";
-import { RouteComponentProps, withRouter, Redirect } from "react-router-dom";
-import "/src/scss/content/game/GameCanvasContent.scss";
+import { RouteComponentProps, withRouter, Redirect, useLocation } from "react-router-dom";
+import { io } from "socket.io-client";
+// import "/src/scss/content/game/GameCanvasContent.scss";
 
 interface MatchInfo {
   lPlayerNickname: string,
@@ -14,7 +15,8 @@ interface MatchInfo {
   myName: string,
 }
 
-const GameSpectateContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
+const GameSpectateContent: FC<RouteComponentProps> = () => {
+  const [socket, setSocket] = useState(io(`${global.BE_HOST}/game`));
   const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
   const [canvasWidth, setCanvasWidth] = useState(700);
@@ -51,6 +53,8 @@ const GameSpectateContent: FC<{socket: any} & RouteComponentProps> = ({socket, m
     viewNumber: 0,
     myName: '',
   });
+
+  const query = new URLSearchParams(useLocation().search)
 
   const onClickExit = () => {
     socket.disconnect();
@@ -120,6 +124,9 @@ const GameSpectateContent: FC<{socket: any} & RouteComponentProps> = ({socket, m
    *        맨 처음 배경과 양쪽 바, 공을 그려준다
    */
   useEffect(() => {
+    console.log(query.get("nick"));
+    socket.emit("spectate");
+
     socket.on("init", (data) => {
       setMap(data.type);
       setCanvas(initCanvas());
