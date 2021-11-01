@@ -1,8 +1,7 @@
 import { fabric } from "fabric";
-import { FC, useState, useEffect, useRef } from "react";
-import { RouteComponentProps, withRouter, useHistory, Redirect } from "react-router-dom";
+import { FC, useState, useEffect } from "react";
+import { RouteComponentProps, withRouter, Redirect } from "react-router-dom";
 import "/src/scss/content/game/GameCanvasContent.scss";
-import { io } from "socket.io-client";
 
 interface MatchInfo {
   lPlayerNickname: string,
