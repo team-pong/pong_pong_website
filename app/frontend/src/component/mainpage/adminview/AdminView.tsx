@@ -5,6 +5,8 @@ import EasyFetch from "../../../utils/EasyFetch";
 import Modal from "../../modal/Modal";
 import QuestionContent from "./question/QuestionContent";
 import "/src/scss/adminview/AdminView.scss";
+import "/src/scss/adminview/AdminView-media.scss";
+import "/src/scss/adminview/AdminView-mobile.scss";
 import QuestionSelector from "./QuestionSelector";
 import Time from "../../../utils/Time";
 
