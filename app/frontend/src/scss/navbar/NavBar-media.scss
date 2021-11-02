@@ -168,6 +168,9 @@
     }
     ul.nav-ul {
       border-bottom: .1px solid rgba(255, 255, 255, 0.1);
+      div.end-of-list {
+        display: none;
+      }
     }
   }
 }
