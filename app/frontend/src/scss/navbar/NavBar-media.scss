@@ -39,8 +39,8 @@
       }
     }
 
-    ul {
-      #friend-list-container {
+    ul.nav-ul {
+      div#friend-list-container {
         position: fixed;
         left: 80px;
         width: 240px;
@@ -55,22 +55,22 @@
           padding: 6px 12px;
         }
       }
-      li {
-        height: 90px/1.5;
-        position: relative;
-        margin-top: 25px;
+      .nav-list-button {
+        width: 90px;
+        height: 50px;
         padding: 0.8em;
+        box-sizing: border-box;
 
-        img {
-          top: 0%;
-          left: 37%;
+        img.nav-list-img {
+          position: relative;
+          left: 25%;
         }
 
         #icon-plus {
           display: none;
         }
 
-        span {
+        span.nav-list-span {
           opacity: 0;
           position: absolute;
           background: rgba(0, 0, 0, 0.5);
