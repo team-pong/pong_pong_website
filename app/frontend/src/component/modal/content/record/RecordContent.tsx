@@ -118,7 +118,7 @@ const RecordOpen: FC<{
           <img className="record-pro-img" src={avatar_url} alt={`${nick}'s img`}/>
           <span className="record-profile-nick">{nick}   </span>
         </span>
-        <CircleChart width={100} height={100} percentage={Math.floor((win_games / total_games) * 100)} />
+        <CircleChart width={100} height={100} percentage={total_games == 0 ? 0 : Math.floor((win_games / total_games) * 100)} />
         <span className="record-stat-span">{total_games}전 {win_games}승 {loss_games}패 {ladder_level}점</span>
       </div>
       <ul id="record-selector">
@@ -222,7 +222,7 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
         total_games: res.total_games,
         win_games: res.win_games,
         loss_games: res.loss_games,
-        winning_rate: (res.win_games / res.total_games) * 100,
+        winning_rate: res.total_games == 0 ? 0 : (res.win_games / res.total_games) * 100,
         ladder_level: res.ladder_level
       });
       setIsRecordOpen(recordState.open);
