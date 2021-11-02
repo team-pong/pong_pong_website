@@ -42,6 +42,9 @@
           }
         }
       }
+      div.end-of-list {
+        display: none;
+      }
       #context-menu {
         width: auto;
         max-width: none;
@@ -51,8 +54,9 @@
           font-size: 50px;
         }
       }
-      li.nav-list-button {
+      .nav-list-button {
         height: auto;
+        width: auto;
         margin-top: 25px;
         padding: 0.8em;
         img.nav-list-img {
