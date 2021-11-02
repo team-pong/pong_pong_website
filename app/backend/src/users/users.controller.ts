@@ -86,7 +86,11 @@ export class UsersController {
   @ApiBody({ type: UsersDto2, description: '변경할 유저 아이디, 유저 닉네임, 아바타 이미지 url' })
   @Get('avatar/:imgpath')
   seeUploadedFile(@Param('imgpath') image: string, @Res() res: Response) {
-    return res.sendFile(image, { root: './avatars' });
+    try {
+      return res.sendFile(image, { root: './avatars' });
+    } catch (err) {
+      return err;
+    }
   }
   
 
@@ -101,16 +105,15 @@ export class UsersController {
     }),
   }))
   async uploadAvatar(@Req() req: Request, @UploadedFile() file: Express.Multer.File){
-    console.log(file);
-    // const user_info = await this.usersService.getUserInfo(req.session.userid);
-    // const response = {
-    //   originalname: file.originalname,
-    //   filename: file.filename,
-    //   path: file.path
-    // }
-    return await this.usersService.updateUserAvatar(req.session.userid, `${file.filename}`)
+    try {
+      const avatar_url = `${process.env.BACKEND_SERVER_URL}/users/avatar/${file.filename}`;
+      await this.usersService.updateUserAvatar(req.session.userid, avatar_url);
+      return {avatar_url: avatar_url};
+    } catch (err) {
+      console.error(err);
+      return (err);
+    }
   }
-
   @ApiOperation({ summary: '유저 제거'})
   @ApiResponse({ type: ErrMsgDto, description: '유저 제거 실패시 실패 이유' })
   @Delete()
