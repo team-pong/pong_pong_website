@@ -30,12 +30,12 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   const [update, setUpdate] = useState(false);
 
   const getNotAnsweredQuestionList = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/beforeAnswerQuestion`, "GET");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/beforeAnswerQuestions`, "GET");
     setQuestionList(await easyfetch.fetch());
   }
 
   const getAnsweredQuestionList = async () => {
-    const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/afterAnswerQuestionss`, "GET");
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/afterAnswerQuestions`, "GET");
     setQuestionList(await easyfetch.fetch());
   }
 
