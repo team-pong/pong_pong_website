@@ -80,6 +80,10 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog}) 
    * @brief 초대메세지와 normal 메세지를 나눠서 화면에 렌더링함
    */
   const printChatLog = (msg: DMLog, idx: number) => {
+    const timeParser = new Time(msg.time);
+    const timeFormat = timeParser.getTimeFormat();
+    const hour = timeParser.getHour();
+    const minute = timeParser.getMinuate();
     if (msg.type === "chat") {
       const parsedMsg = JSON.parse(msg.msg);
       
@@ -104,7 +108,7 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog}) 
               </div>
             </div>
           </div>
-          <span className="dm-request-time">{msg.time}</span>
+          <span className="dm-request-time">{`${timeFormat} ${hour}:${minute}`}</span>
         </div>
       );
     }
@@ -123,7 +127,7 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog}) 
               })
             }
           </span>
-          <span className="dm-log-time">{msg.time}</span>
+          <span className="dm-log-time">{`${timeFormat} ${hour}:${minute}`}</span>
         </li>
       </div>
     );
