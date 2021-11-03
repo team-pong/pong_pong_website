@@ -1,11 +1,22 @@
-import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ReadUserDto, ReadUserWithIdDto, UsersDto1, UsersDto2, UsersDto3, UsersDto4 } from 'src/dto/users';
+import { ReadUserDto, ReadUserWithIdDto, UpdateNickDto, UsersDto1, UsersDto2, UsersDto3, UsersDto4 } from 'src/dto/users';
 import { ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from './users.service';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { SessionService } from 'src/session/session.service';
 import { LoggedInGuard } from 'src/auth/logged-in.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { Param } from '@nestjs/common';
+
+export const randomFileName = (req, file, callback) => {
+  const name = file.originalname.split('.')[0];
+  const fileExtName = extname(file.originalname);
+  const randomName = Array(4).fill(null).map(() => Math.round(Math.random() * 16).toString(16)).join('');
+  callback(null, `${name}-${randomName}${fileExtName}`);
+};
 
 @ApiTags('Users')
 @Controller('users')
@@ -60,6 +71,49 @@ export class UsersController {
     return this.usersService.updateUsers(user_info.user_id, user_info.nick, user_info.avatar_url);
   }
 
+  @ApiOperation({ summary: '닉네임 변경'})
+  @ApiResponse({ type: ErrMsgDto, description: '닉네임 변경 실패시 실패 이유' })
+  @ApiBody({ type: UpdateNickDto, description: '변경할 닉네임' })
+  @Post('nick')
+  async updateNickname(@Req() req: Request, @Body() body: UpdateNickDto){
+    const user_info = await this.usersService.getUserInfo(req.session.userid);
+    // 닉네임 중복 검사는 아래 함수 안에서 진행한다.
+    return this.usersService.updateUsers(user_info.user_id, body.nick, user_info.avatar_url);
+  }
+
+  @ApiOperation({ summary: '아바타 사진 조회'})
+  @ApiResponse({ type: ErrMsgDto, description: '유저 정보 변경 실패시 실패 이유' })
+  @ApiBody({ type: UsersDto2, description: '변경할 유저 아이디, 유저 닉네임, 아바타 이미지 url' })
+  @Get('avatar/:imgpath')
+  seeUploadedFile(@Param('imgpath') image: string, @Res() res: Response) {
+    try {
+      return res.sendFile(image, { root: './avatars' });
+    } catch (err) {
+      return err;
+    }
+  }
+  
+
+  @ApiOperation({ summary: '아바타 사진 변경'})
+  @ApiResponse({ type: ErrMsgDto, description: '유저 정보 변경 실패시 실패 이유' })
+  @ApiBody({ type: UsersDto2, description: '변경할 유저 아이디, 유저 닉네임, 아바타 이미지 url' })
+  @Post('avatar')
+  @UseInterceptors(FileInterceptor('image', {
+    storage: diskStorage({
+      destination: './avatars',
+      filename: randomFileName,
+    }),
+  }))
+  async uploadAvatar(@Req() req: Request, @UploadedFile() file: Express.Multer.File){
+    try {
+      const avatar_url = `${process.env.BACKEND_SERVER_URL}/users/avatar/${file.filename}`;
+      await this.usersService.updateUserAvatar(req.session.userid, avatar_url);
+      return {avatar_url: avatar_url};
+    } catch (err) {
+      console.error(err);
+      return (err);
+    }
+  }
   @ApiOperation({ summary: '유저 제거'})
   @ApiResponse({ type: ErrMsgDto, description: '유저 제거 실패시 실패 이유' })
   @Delete()

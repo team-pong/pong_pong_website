@@ -1,4 +1,4 @@
-import React, { FormEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { FormEvent, FormEventHandler, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-router-dom";
 import "/src/scss/content/profile/ProfileContent.scss";
 import Modal from "../../Modal";
@@ -100,6 +100,46 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     }
     updateUserInfoState();
     setIsEditNickClicked(false);
+  };
+
+  /*!
+   * @author donglee
+   * @brief 이미지 파일을 POST하고 전역객체인 myInfo를 업데이트함
+   * @param[in] image: 사용자가 선택한 이미지 파일
+   */
+  const postAvatarChange = async (image: File) => {
+    const formData = new FormData();
+    formData.append("image", image);
+
+    const header = {
+      'Accept': 'application/json',
+    };
+    const res = await (await fetch(`${global.BE_HOST}/users/avatar`, {
+      method: 'POST',
+      headers: header,
+      body: formData,
+    })).json();
+
+    if (res.avatar_url) {
+      const updatedMyInfo = {...myInfo};
+      updatedMyInfo.avatar_url = res.avatar_url;
+      setMyInfo(updatedMyInfo);
+    } else {
+      alert("아바타 변경에 실패했습니다.");
+    }
+  };
+
+  /*!
+   * @author donglee
+   * @brief 아바타 변경 파일을 입력하면 null체크를 한 후 사이즈를 체크함
+   */
+  const handleChangeAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files.length === 0) return ;
+    if (e.target.files[0].size > 2097152) {
+      alert("파일이 너무 큽니다. 이미지 파일은 2MB 이하여야 합니다.");
+      return ;
+    }
+    postAvatarChange(e.target.files[0]);
   };
 
   /*!
@@ -303,11 +343,18 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
             </> : <></>}
           </div>
           <div id="avatar-container">
-            <img className="pr-avatar"
-              ref={avatarImgRef}
-              src={myInfo.avatar_url}
-              onError={() => {avatarImgRef.current.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="}}
-              alt="프로필사진" />
+            <label htmlFor="input-file">
+              <img className="pr-avatar"
+                ref={avatarImgRef}
+                src={myInfo.avatar_url}
+                onError={() => {avatarImgRef.current.src = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="}}
+                alt="프로필사진" />
+            </label>
+            <input
+              id="input-file"
+              type="file"
+              onChange={(e) => handleChangeAvatar(e)}
+              accept="image/*" />
           </div>
           <div id="user-info">
             <div id="user-id">
