@@ -39,7 +39,6 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
   const [isBlockedFriend, setIsBlockedFriend] = useState(false);
   const [isMyProfile, setIsMyProfile] = useState(false);
-  const [avatarToBeChanged, setAvatarToBeChanged] = useState<File>(null);
 
   const avatarImgRef = useRef(null);
 
@@ -103,53 +102,45 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     setIsEditNickClicked(false);
   };
 
+  /*!
+   * @author donglee
+   * @brief 이미지 파일을 POST하고 전역객체인 myInfo를 업데이트함
+   * @param[in] image: 사용자가 선택한 이미지 파일
+   */
   const postAvatarChange = async (image: File) => {
-    // const easyfetch = new EasyFetch(`${global.BE_HOST}/users/avatar`, "POST");
     const formData = new FormData();
     formData.append("image", image);
 
-    // const data = new URLSearchParams(formData);
-    // for (const pair of new FormData(image)) {
-    //   data.append(pair[0], pair[1]);
-    // }
-    // data.append(formData[0], formData[1]);
-    
     const header = {
       'Accept': 'application/json',
     };
-    const res = await fetch(`${global.BE_HOST}/users/avatar`, {
+    const res = await (await fetch(`${global.BE_HOST}/users/avatar`, {
       method: 'POST',
       headers: header,
       body: formData,
-    });
-    // const res = await easyfetch.fetch(body, header);
+    })).json();
 
-    console.log("res: ", res);
-    // if (!res.err_msg) {
-    //   return res;
-    // } else {
-    //   alert(res.err_msg);
-    //   return null;
-    // }
+    if (res.avatar_url) {
+      const updatedMyInfo = {...myInfo};
+      updatedMyInfo.avatar_url = res.avatar_url;
+      setMyInfo(updatedMyInfo);
+    } else {
+      alert("아바타 변경에 실패했습니다.");
+    }
   };
 
-  const handleChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  /*!
+   * @author donglee
+   * @brief 아바타 변경 파일을 입력하면 null체크를 한 후 사이즈를 체크함
+   */
+  const handleChangeAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files.length === 0) return ;
     if (e.target.files[0].size > 2097152) {
       alert("파일이 너무 큽니다. 이미지 파일은 2MB 이하여야 합니다.");
       return ;
     }
-    await postAvatarChange(e.target.files[0]);
-    // setAvatarToBeChanged(e.target.files[0]);
+    postAvatarChange(e.target.files[0]);
   };
-
-  useEffect(() => {
-    if (avatarToBeChanged) {
-      console.log("here! ", avatarToBeChanged);
-      /* string으로 돼있는데 그걸 어떻게 하지 그럼 시부럴탱 */
-      
-      // setMyInfo();
-    }
-  }, [avatarToBeChanged]);
 
   /*!
    * @author donglee
