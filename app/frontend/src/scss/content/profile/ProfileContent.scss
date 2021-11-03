@@ -56,19 +56,19 @@
       margin-left: 50px;
       label {
         cursor: pointer;
-        .pr-avatar {
-          border-style: solid;
-          border-width: 7px;
-          border-color: white;
-          opacity: 0.8;
-          margin-top: 10%;
-          width: 150px;
-          height: 150px;
-          border-radius: 50%;
-          box-shadow: 0 0 7px #fff;
-          transform: scale(1);
-          transition: 0.1s all ease-in-out;
-        }
+      }
+      .pr-avatar {
+        border-style: solid;
+        border-width: 7px;
+        border-color: white;
+        opacity: 0.8;
+        margin-top: 10%;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        box-shadow: 0 0 7px #fff;
+        transform: scale(1);
+        transition: 0.1s all ease-in-out;
       }
       input#input-file {
         display: none;
