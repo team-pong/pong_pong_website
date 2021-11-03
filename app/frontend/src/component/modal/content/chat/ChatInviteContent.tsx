@@ -205,6 +205,7 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
       alert("자기 자신을 초대할 수 없습니다.");
       return ;
     }
+    if (!search) return ;
 
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${search}`);
     const res = await easyfetch.fetch();
