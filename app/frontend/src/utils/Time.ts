@@ -100,4 +100,8 @@ export default class Time {
   public getSeconds() {
     return (this._seconds);
   }
+
+  public getWholeTime() {
+    return (`${this._year}년 ${this._month}월 ${this._date}일 ${this._hour}시 ${this._minuate}분`);
+  }
 }

@@ -1,0 +1,21 @@
+@import "../../colors.scss";
+
+form.question-selector {
+  display: flex;
+  justify-content: space-around;
+  padding: 1em;
+  div {
+    input[type="radio"] {
+      all: initial;
+    }
+    label {
+      color: #fff;
+      font-size: 2em;
+      cursor: pointer;
+    }
+    input[type="radio"]:checked + label {
+      color: $green;
+      border-bottom: 0.1em solid $green;
+    }
+  }
+}

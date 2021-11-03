@@ -1,0 +1,23 @@
+/*!
+ * @author yochoi
+ * @brief AdminView style
+          Screen: 400px ~ 900px
+ */
+
+@media screen and (max-width: 900px) and (min-width: 750px) {
+  div.admin-view {
+    margin-left: 90px;
+  }
+}
+
+/*!
+ * @author yochoi
+ * @brief AdminView style
+          Screen: 0px ~ 700px
+ */
+
+@media screen and (max-width: 750px) {
+  div.admin-view {
+    margin-left: 0;
+  }
+}

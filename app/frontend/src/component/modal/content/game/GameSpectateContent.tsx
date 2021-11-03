@@ -1,9 +1,9 @@
 import { fabric } from "fabric";
-import { FC, useState, useEffect, useRef, useContext } from "react";
-import { RouteComponentProps, withRouter, useHistory, Redirect } from "react-router-dom";
-import "/src/scss/content/game/GameRoomContent.scss";
+import { FC, useState, useEffect, useContext, useRef } from "react";
+import { RouteComponentProps, withRouter, Redirect, useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
 import { UserInfoContext } from "../../../../Context";
+// import "/src/scss/content/game/GameCanvasContent.scss";
 
 interface MatchInfo {
   lPlayerNickname: string,
@@ -12,12 +12,17 @@ interface MatchInfo {
   rPlayerNickname: string,
   rPlayerAvatarUrl: string,
   rPlayerScore: number,
-  viewNumber: number,
-  myName: string,
+  viewNumber: number
 }
 
-const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
+const GameSpectateContent: FC<RouteComponentProps> = () => {
   const myInfo = useContext(UserInfoContext);
+  const [socket, _setSocket] = useState(null);
+  const socketRef = useRef(socket);
+  const setSocket = (data) => {
+    socketRef.current = data;
+    _setSocket(data);
+  }
   const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
   const [canvasWidth, setCanvasWidth] = useState(700);
@@ -31,9 +36,9 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const [ballY, setBallY] = useState(150);
   const [leftY, setLeftY] = useState(150);
   const [rightY, setRightY] = useState(150);
+  const [socketInit, setSocketInit] = useState(false);
   const [init, setInit] = useState(0);
   const [isExit, setIsExit] = useState(false);
-  const [showExitButton, setShowExitButton] = useState(false);
 
   const [obsRect00, setObsRect00] = useState<fabric.Rect>();
   const [obsRect01, setObsRect01] = useState<fabric.Rect>();
@@ -52,34 +57,14 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     rPlayerNickname: '',
     rPlayerAvatarUrl: '',
     rPlayerScore: 0,
-    viewNumber: 0,
-    myName: '',
+    viewNumber: 0
   });
 
-  const onClickGiveUp = () => {
-    socket.emit("giveUp");
-  }
+  const query = new URLSearchParams(useLocation().search)
 
   const onClickExit = () => {
     socket.disconnect();
-    removeEventListener("keydown", keyDownEvent);
-    removeEventListener("keyup", keyUpEvent);
     setIsExit(true);
-  }
-
-  const [downKey, _setDownKey] = useState(0);
-  const downKeyRef = useRef(downKey)
-  const [upKey, _setUpKey] = useState(0);
-  const upKeyRef = useRef(upKey);
-
-  const setDownKey = (x) => {
-    downKeyRef.current = x;
-    _setDownKey(x);
-  }
-
-  const setUpKey = (x) => {
-    upKeyRef.current = x;
-    _setUpKey(x);
   }
 
   /*!
@@ -141,93 +126,69 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   }
   
   /*!
-   * @brief 키보드 이벤트
-   *        키의 눌림 상태를 변경한다.
-   *        여기서 서버로 상태를 전송
-   */
-  
-  const keyDownEvent = (e: KeyboardEvent) => {
-    
-    if (e.code === "ArrowDown" && downKeyRef.current == 0) {
-      socket.emit("keyEvent", {arrowUp: upKeyRef.current, arrowDown: true});
-      setDownKey(1);
-    }
-    else if (e.code === "ArrowUp" && upKeyRef.current == 0) {
-      socket.emit("keyEvent", {arrowUp: true, arrowDown: downKeyRef.current});
-      setUpKey(1);
-    }
-  };
-  
-  const keyUpEvent = (e: KeyboardEvent) => {
-    if (e.code === "ArrowDown") {
-      socket.emit("keyEvent", {arrowUp: upKeyRef.current, arrowDown: false});
-      setDownKey(0);
-    }
-    else if (e.code === "ArrowUp") {
-      socket.emit("keyEvent", {arrowUp: false, arrowDown: downKeyRef.current});
-      setUpKey(0);
-    }
-  };
-  
-  /*!
    * @brief 캔버스 초기화
    *        맨 처음 배경과 양쪽 바, 공을 그려준다
    */
   useEffect(() => {
-    socket.on("init", (data) => {
-      setMap(data.type);
-      setCanvas(initCanvas());
-      setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
-      setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
-      setBall(initBall(data.ball[0], data.ball[1]));
-      if (data?.type == 1) {
-        setObsRect00(initBar(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2], data.obstacle.obs00[3]));
-        setObsRect01(initBar(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2], data.obstacle.obs01[3]));
-        setObsRect02(initBar(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2], data.obstacle.obs02[3]));
-        setObsRect03(initBar(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2], data.obstacle.obs03[3]));
-      } else if (data?.type == 2) {
-        setObsCircle00(initCircle(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2]));
-        setObsCircle01(initCircle(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2]));
-        setObsCircle02(initCircle(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2]));
-        setObsCircle03(initCircle(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2]));
-      }
-      setInit(1);
-    })
-
-    socket.on("update", (data) => {
-      setLeftY(data.bar00[1]);
-      setRightY(data.bar01[1]);
-      setBallX(data.ball[0] - 10);
-      setBallY(data.ball[1] - 10);
-    })
-
-    socket.on("setMatchInfo", (data: MatchInfo) => {
-      setMatchInfo(data);
-    })
-
-    socket.on("startCount", () => {
-      setCountdownWindow(initCountdownWindow('3'));
-    })
-
-    socket.on("matchEnd", (data) => {
-      if (data.winner == myInfo.user_id) {
-        setResultWindow(initResultWindow(`YOU WIN`));
-      } else if (data.loser == myInfo.user_id) {
-        setResultWindow(initResultWindow(`YOU LOSE`));
-      } else {
-        setResultWindow(initResultWindow(`MATCH END`));
-      }
-    })
-
-    addEventListener("keydown", keyDownEvent);
-    addEventListener("keyup", keyUpEvent)
+    setSocket(io(`${global.BE_HOST}/game`));
+    setSocketInit(true);
 
     return (() => {
-      socket.disconnect();
-      removeEventListener("keydown", keyDownEvent);
-      removeEventListener("keyup", keyUpEvent);
+      socketRef.current.disconnect();
     })
   }, []);
+
+  useEffect(() => {
+    if (socketInit) {
+      socket.emit("spectate", {nick: query.get("nick")});
+
+      socket.on("init", (data) => {
+        console.log("Init")
+        setMap(data.type);
+        setCanvas(initCanvas());
+        setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
+        setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
+        setBall(initBall(data.ball[0], data.ball[1]));
+        if (data?.type == 1) {
+          setObsRect00(initBar(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2], data.obstacle.obs00[3]));
+          setObsRect01(initBar(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2], data.obstacle.obs01[3]));
+          setObsRect02(initBar(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2], data.obstacle.obs02[3]));
+          setObsRect03(initBar(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2], data.obstacle.obs03[3]));
+        } else if (data?.type == 2) {
+          setObsCircle00(initCircle(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2]));
+          setObsCircle01(initCircle(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2]));
+          setObsCircle02(initCircle(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2]));
+          setObsCircle03(initCircle(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2]));
+        }
+        setInit(1);
+      })
+
+      socket.on("update", (data) => {
+        setLeftY(data.bar00[1]);
+        setRightY(data.bar01[1]);
+        setBallX(data.ball[0] - 10);
+        setBallY(data.ball[1] - 10);
+      })
+
+      socket.on("setMatchInfo", (data: MatchInfo) => {
+        setMatchInfo(data);
+      })
+
+      socket.on("startCount", () => {
+        setCountdownWindow(initCountdownWindow('3'));
+      })
+
+      socket.on("matchEnd", (data) => {
+        if (data.winner == myInfo.user_id) {
+          setResultWindow(initResultWindow(`YOU WIN`));
+        } else if (data.loser == myInfo.user_id) {
+          setResultWindow(initResultWindow(`YOU LOSE`));
+        } else {
+          setResultWindow(initResultWindow(`MATCH END`));
+        }
+      })
+    }
+  }, [socketInit])
 
   useEffect(() => {
     if (canvas) {
@@ -266,7 +227,6 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       });
       canvas.add(resultWindow);
       canvas.renderAll();
-      setShowExitButton(true);
     }
   }, [resultWindow])
 
@@ -317,10 +277,6 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     }
   }, [ballX, ballY]);
 
-  // useEffect(() => {
-    
-  // }, [matchInfo])
-
   return (
     <>
     <div className="ingame-match-info">
@@ -338,10 +294,9 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     </div>
     <div className="ingame-side-bar">
       <div className="view-number">view {matchInfo.viewNumber}</div>
-      <button className="give-up" onClick={onClickGiveUp}>기권</button>
     </div>
     <div className="ingame-footer">
-      {showExitButton ? <button className="exit" onClick={onClickExit}>나가기</button> : null}
+      <button className="exit" onClick={onClickExit}>나가기</button>
     </div>
     <canvas id="ping-pong"></canvas>
     {isExit && <Redirect to="/mainpage" />}
@@ -349,4 +304,4 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   );
 };
 
-export default withRouter(GameRoomContent);
+export default withRouter(GameSpectateContent);
