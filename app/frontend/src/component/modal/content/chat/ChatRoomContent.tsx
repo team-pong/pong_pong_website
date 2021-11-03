@@ -385,22 +385,24 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         target: "",
       });
     }
-    getChatRoomInfo()
-    .then(checkMax)
-    .then((res) => {
-        if (res.type === "protected") {
-          setIsProtected(true);
-        } else {
-          connectSocket().then((socket) => {
-            setSocket(socket)
-          }).catch((err) => {
-            alert(err);
-          });
-        }
-      }
-    ).catch((err) => {
-      alert(err);
-    });
+    if (myInfo.nick) {
+      getChatRoomInfo()
+        .then(checkMax)
+        .then((res) => {
+            if (res.type === "protected") {
+              setIsProtected(true);
+            } else {
+              connectSocket().then((socket) => {
+                setSocket(socket);
+              }).catch((err) => {
+                alert(err);
+              });
+            }
+          }
+        ).catch((err) => {
+        alert(err);
+      });
+    }
 
     return (() => {
       if (socketRef.current) {
@@ -408,7 +410,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
       }
       setIsMadeMyself(false);
     });
-  }, []);
+  }, [myInfo]);
 
   if (chatRoomInfo && isProtected) {
     return (

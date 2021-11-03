@@ -22,7 +22,7 @@ export interface Request {
 };
 
 export interface DmInfo {
-  request?: Request;  //대화방, 게임 초대의 경우 해당 객체에 정보가 set됨
+  request?: Request;
   isDmOpen: boolean;
   target: string;
 }
