@@ -7,7 +7,7 @@ import RecordContent from "../record/RecordContent";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 import Loading from "../../../loading/Loading";
-import { UserInfoContext, SetUserInfoContext } from "../../../../Context";
+import { UserInfoContext, SetUserInfoContext, SetDmInfoContext } from "../../../../Context";
 import TwoFactorOnOff from "./TwoFactorOnOff";
 
 /*!
@@ -32,6 +32,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 
   const myInfo = useContext(UserInfoContext);
   const setMyInfo = useContext(SetUserInfoContext);
+  const setDmInfo = useContext(SetDmInfoContext);
 
   const [otherUserInfo, setOtherUserInfo] = useState<UserInfo>();
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
@@ -221,8 +222,15 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     }
   };
 
+  /*!
+   * @author donglee
+   * @brief 친구에게 DM 보내기
+   */
   const sendMessage = () => {
-    console.log(`send message to ${nick}`);
+    setDmInfo({
+      isDmOpen: true,
+      target: nick,
+    })
   };
 
   const requestMatch = () => {
