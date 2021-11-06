@@ -7,7 +7,8 @@ import { Server, Socket } from 'socket.io';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
 import { GameMapDto, SpectateGameDto } from 'src/dto/game';
 import { WsExceptionFilter } from 'src/filter/ws.filter';
-import * as globalService_1 from 'src/global/global.service';
+import { GlobalGateway } from 'src/global/global.gateway';
+import { GlobalService } from 'src/global/global.service';
 import { MatchService } from 'src/match/match.service';
 import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
@@ -74,7 +75,7 @@ export class GameGateway {
 		private sessionService: SessionService, // readUserId 함수 쓰려고 가져옴
 		private usersService: UsersService,
 		private matchService: MatchService,
-		private globalService: globalService_1.GlobalService,
+		private globalService: GlobalService,
 	) {}
 
 	@WebSocketServer()public server: Server;
@@ -117,15 +118,6 @@ export class GameGateway {
 				game_logic.moveBar(false, position);
 			}
 		}
-	}
-
- GiveUpEventListener (playerLeft: User, playerRight: User, gameLogic: GameLogic, position: Position) {
-		const room_id = this.socket_infos[playerLeft.socket.id].rid;
-		const winner = position == 'l' ? playerRight : playerLeft;
-		const loser = position == 'l' ? playerLeft : playerRight;
-		this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
-		this.server.to(room_id).emit('matchEnd', {winner: winner.id, loser: loser.id});
-		this.clearGame(playerLeft, playerRight, room_id, gameLogic);
 	}
 
 	saveResult(winner: User, loser: User, winner_score: number, loser_score: number, room_id: string) {
@@ -172,6 +164,17 @@ export class GameGateway {
 		}
 	}
 
+	GiveUpEventListener (playerLeft: User, playerRight: User, gameLogic: GameLogic, position: Position) {
+		 const room_id = this.socket_infos[playerLeft.socket.id].rid;
+		 const winner = position == 'l' ? playerRight : playerLeft;
+		 const loser = position == 'l' ? playerLeft : playerRight;
+		 this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
+		 this.server.to(room_id).emit('matchEnd', {winner: winner.id, loser: loser.id});
+		 this.clearGame(playerLeft, playerRight, room_id, gameLogic);
+		 this.usersService.updateStatus(playerLeft.id, 'online');
+		 this.usersService.updateStatus(playerRight.id, 'online');
+	 }
+
 	/*
 	 * @brief 게임에 할당된 자원 제거
 	 * 1. 해당 게임에서 생성됐던 Interval, Timeout 제거
@@ -197,6 +200,8 @@ export class GameGateway {
 		this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
 		this.server.to(room_id).emit('matchEnd', {winner: winner.id, loser: loser.id});
 		this.clearGame(left_player, right_player, room_id, gameLogic);
+		this.usersService.updateStatus(left_player.id, 'online');
+		this.usersService.updateStatus(right_player.id, 'online');
 	}
 
 	deleteFromNormalQueue(user_id: string) {
@@ -264,6 +269,8 @@ export class GameGateway {
 				
 				playerLeft.socket.join(room_id);
 				playerRight.socket.join(room_id);
+				this.usersService.updateStatus(playerLeft.id, 'ongame');
+				this.usersService.updateStatus(playerRight.id, 'ongame');
 				playerLeft.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[1].id, position: 'left'});
 				playerRight.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[0].id, position: 'right'});
 				this.deleteFromNormalQueue(waiters[0].id);
@@ -350,6 +357,8 @@ export class GameGateway {
 				this.socket_infos[playerRight.socket.id].logic = gameLogic;
 				playerLeft.socket.join(room_id);
 				playerRight.socket.join(room_id);
+				this.usersService.updateStatus(playerLeft.id, 'ongame');
+				this.usersService.updateStatus(playerRight.id, 'ongame');
 				playerLeft.socket.emit('matched', {roomId: room_id, opponent: this.ladder_queue[1].id, position: 'left'});
 				playerRight.socket.emit('matched', {roomId: room_id, opponent: this.ladder_queue[0].id, position: 'right'});
 				this.deleteFromLadderQueue(waiters[0].id);
@@ -474,6 +483,7 @@ export class GameGateway {
 			// 3. socket_info에서 제거
 			socket.leave(socket_info.rid);
 			delete this.socket_infos[socket.id];
+			this.usersService.updateStatus(user_id, 'online');
 		} catch (err) {
 			console.error(err);
 		}
