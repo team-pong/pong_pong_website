@@ -22,6 +22,7 @@ import { FriendModule } from 'src/friend/friend.module';
 import { MatchModule } from 'src/match/match.module';
 import { MuteModule } from 'src/mute/mute.module';
 import { SessionModule } from 'src/session/session.module';
+import { GlobalModule } from 'src/global/global.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { SessionModule } from 'src/session/session.module';
     forwardRef(() => MatchModule),
     forwardRef(() => MuteModule),
     forwardRef(() => SessionModule),
+    forwardRef(() => GlobalModule)
   ],
   controllers: [UsersController],
   providers: [UsersService],

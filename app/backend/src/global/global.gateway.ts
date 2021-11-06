@@ -1,33 +1,20 @@
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect } from '@nestjs/websockets';
 import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import axios from 'axios';
 import { SessionService } from 'src/session/session.service';
-import { FriendService } from 'src/friend/friend.service';
-import { UsersDto3 } from 'src/dto/users';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Users } from 'src/entities/users';
 import { Friend } from 'src/entities/friend';
-import { GlobalService } from './global.service';
-import { IoAdapter } from '@nestjs/platform-socket.io';
-import { DmStoreService } from 'src/dm-store/dm-store.service';
-import { string } from 'joi';
-import { UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Block } from 'src/entities/block';
-import { UsersService } from 'src/users/users.service';
 import { DmStore } from 'src/entities/dm-store';
 import { WsExceptionFilter } from 'src/filter/ws.filter';
 import { GlobalSendDmDto } from 'src/dto/global';
+import { err21 } from 'src/err';
 
 // key: user id / value: socket id
-const socketMap = {};
-
-interface DMSendMsg {
-  to: string,
-  msg: string,
-}
+export const socketMap = {};
 
 interface InviteDto {
   from: string, // nick
@@ -58,16 +45,12 @@ export class GlobalGateway {
     @InjectRepository(Friend) private friendRepo: Repository<Friend>,
     @InjectRepository(Block) private blockRepo: Repository<Block>,
     @InjectRepository(DmStore) private dmRepo: Repository<DmStore>,
-    private sessionService: SessionService, // readUserId 함수 쓰려고 가져옴
-    private friendService: FriendService,
-    private globalService: GlobalService,
-    private dmService: DmStoreService,
-    private userService: UsersService,
+    private sessionService: SessionService
   ) {}
 
   @WebSocketServer() public server: Server;
 
-  afterInit(server: any): any {
+  afterInit(server: Server): any {
     console.log('Global WebSocket Server Init');
   }
 
@@ -76,7 +59,13 @@ export class GlobalGateway {
   // 해결: 소켓 연결시 소켓 맵에 저장
   async handleConnection(@ConnectedSocket() socket: Socket) {
     try {
-      const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+      const cookie = socket.request.headers.cookie;
+      let sid;
+      if (cookie) {
+        sid = cookie.split('.')[1].substring(8);
+      } else {
+        throw {err_msg: 'empty cookie'};
+      }
       const userid = await this.sessionService.readUserId(sid);
 
       // 1. online 상태로 업데이트
@@ -110,7 +99,10 @@ export class GlobalGateway {
   async inviteChat(@ConnectedSocket() socket: Socket, @MessageBody() body: InviteDto) {
     const user_id = findUIDwithSID(socket.id);
     // 1. 초대 받은사람 정보 가져오기
-    const target_info = await this.userService.getUserInfoWithNick(body.target);
+    const target_info = await this.usersRepo.findOne({nick: body.target});
+    if (!target_info) {
+      return err21;
+    }
 
     // 2. 초대 받은사람 소켓 아이디 가져오기 (온라인 상태가 아니라면 global 소켓 id가 없음)
     const target_sid = socketMap[target_info.user_id]
@@ -119,7 +111,12 @@ export class GlobalGateway {
       return ;
     }
 
-    await this.dmService.createInvite(user_id, target_info.user_id, {chatTitle: body.chatTitle, channelId: body.channelId})
+    await this.dmRepo.save({
+      sender_id: user_id, 
+      receiver_id: target_info.user_id, 
+      content: JSON.stringify({chatTitle: body.chatTitle, channelId: body.channelId}), 
+      type: 'chat'
+    });
     const dm = await this.dmRepo.findOne({sender_id: user_id, receiver_id: target_info.user_id}, {order: {id: "DESC"}});
     console.log("backend dm에는 뭐가있지?? ", dm);
     // 3. 초대 받을 사람에게 메세지 전달
@@ -147,7 +144,7 @@ export class GlobalGateway {
       // 1-1. 차단당했으면 dm 요청시 아무 동작도 안함
     } else {
       // 2. dm 메세지 저장
-      this.dmService.createDmStore(user_id, target_id, body.msg);
+      await this.dmRepo.save({sender_id: user_id, receiver_id: target_id, content: body.msg});
       // 3. 해당 유저가 소켓맵에 있다면 메세지 전송 (소켓맵에 있다는건 online 상태라는 의미)
       const target_sid = socketMap[target_id]
       if (target_sid) {
