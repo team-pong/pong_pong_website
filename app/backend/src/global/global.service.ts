@@ -27,17 +27,13 @@ export class GlobalService {
   }
 
   async emitStatusToOnlineFriends(status: string, user_id: string) {
-    console.log('가져온 소켓맵', socketMap);
     // 1. 나를 친구 추가한 사람들 중에서 online인 유저 ID 리스트 가져오기
     const friend_list = await this.friendRepo.query(
       `select (friend.user_id) from friend JOIN users ON friend."user_id"=users."user_id" WHERE (friend_id='${user_id}' and status='online')`
     );
 
-    console.log('친구 리스트', friend_list)
-
     // 2. 소켓 메세지 전송
     for (let idx in friend_list) {
-      console.log('해당 소켓에 전송',socketMap[friend_list[idx].user_id])
       this.globalGateway.server.to(socketMap[friend_list[idx].user_id]).emit(status, {user_id: user_id});
     }
   }
