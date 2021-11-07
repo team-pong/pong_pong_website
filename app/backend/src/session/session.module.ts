@@ -33,8 +33,7 @@ import { AuthCode } from 'src/entities/auth-code';
       Mute,
       session,
       AuthCode
-    ]),
-    forwardRef(() => UsersModule)
+    ])
   ],
   controllers: [SessionController],
   providers: [SessionService],

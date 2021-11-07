@@ -29,7 +29,6 @@ const client = new Client(db);
 @Injectable()
 export class SessionService {
   constructor(
-    private usersService: UsersService,
     @InjectRepository(session) private sessionRepo: Repository<session>,
     @InjectRepository(Users) private usersRepo: Repository<Users>,
     @InjectRepository(AuthCode) private authCodeRepo: Repository<AuthCode>,
@@ -99,7 +98,13 @@ export class SessionService {
       const { data } = await this.getUserInfoFrom42Api(access_token)
       const user = await this.usersRepo.findOne({user_id: data.login});
       if (!user) { // 회원가입이 필요한 경우
-        await this.usersService.createUsers(data.login, data.login, data.image_url, data.email);
+        await this.usersRepo.save({
+          user_id: data.login, 
+          nick: data.login, 
+          avatar_url: data.image_url,
+          two_factor_login: false, 
+          email: data.email
+        });
       } else if (user.two_factor_login) { // 2차인증이 켜져 있는 경우
         const random_code = this.getRandomAuthCode(4);
         const transporter = nodemailer.createTransport(transportOption);

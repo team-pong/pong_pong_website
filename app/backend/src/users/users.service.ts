@@ -13,6 +13,7 @@ import { MatchService } from 'src/match/match.service';
 import { MuteService } from 'src/mute/mute.service';
 import { err0, err2, err21, err22, err23 } from 'src/err';
 import { ErrMsgDto } from 'src/dto/utility';
+import { GlobalService } from 'src/global/global.service';
 
 @Injectable()
 export class UsersService {
@@ -26,6 +27,7 @@ export class UsersService {
     private friendService: FriendService,
     private matchService: MatchService,
     private muteService: MuteService,
+    private globalService: GlobalService,
     ){}
 
   async createUsers(user_id: string, nick: string, avatar_url: string, email: string){
@@ -75,8 +77,9 @@ export class UsersService {
   async updateStatus(user_id: string, status: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않는 유저 이면
       return new ErrMsgDto(err2);
-    if (status != 'on' && status != 'off' && status != 'game')  // 잘못된 유저 상태 라면
+    if (status != 'online' && status != 'offline' && status != 'ongame')  // 잘못된 유저 상태 라면
       return new ErrMsgDto(err23);
+    await this.globalService.emitStatusToOnlineFriends(status, user_id);
     await this.usersRepo.save({user_id: user_id, status: status});
     return new ErrMsgDto(err0);
   }
