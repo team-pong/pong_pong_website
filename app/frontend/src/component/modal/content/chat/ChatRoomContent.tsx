@@ -35,7 +35,7 @@ function submitMessage(e: any, myInfo: UserInfo,
       time: new Date().getTime(),
       message: message
     }, ...chatLog]);
-    socket.emit("message", {msg: message});
+    socket.emit("message", message);
     setMessage("");
   }
 };
