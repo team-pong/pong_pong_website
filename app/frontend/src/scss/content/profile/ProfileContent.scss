@@ -69,15 +69,15 @@
         box-shadow: 0 0 7px #fff;
         transform: scale(1);
         transition: 0.1s all ease-in-out;
+        &:hover {
+          transform: scale(1.1);
+          transition: 0.2s all ease-in-out;
+          opacity: 1;
+          cursor: pointer;
+        }
       }
       input#input-file {
         display: none;
-      }
-      &:hover {
-        transform: scale(1.1);
-        transition: 0.2s all ease-in-out;
-        opacity: 1;
-        cursor: pointer;
       }
     }
 
