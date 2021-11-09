@@ -14,6 +14,13 @@
   overflow: hidden;
   background-color: rgba(15, 17, 16, 0.75);
   .content {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .content::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+  }
+  .content {
     position: relative;
     width: 800px;
     height: 600px;
