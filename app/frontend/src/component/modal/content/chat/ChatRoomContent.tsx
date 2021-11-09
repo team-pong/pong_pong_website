@@ -184,6 +184,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   const socketRef = useRef(socket);
   const [myState, setMyState] = useState("");
   const [myPosition, setMyPosition] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const myInfo = useContext(UserInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
@@ -377,6 +378,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
    *        - 채팅방 정보를 받아온 후 비공개방일 경우에는 state를 바꿔서 Password 컴포넌트 렌더링 하도록 함
    *        - protected 가 아닌 대화방의 경우는 바로 소켓 연결함
    *        - clean-up : 내가 만든 방을 최초 1회만 적용하기 위해서 false로 값을 바꿔줌
+   *        - 방이 private이면 state를 set해서 span을 렌더링함
    */
   useEffect(() => {
     if (location.state) {
@@ -397,6 +399,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
               }).catch((err) => {
                 alert(err);
               });
+            }
+            if (res.type === "private") {
+              setIsPrivate(true);
             }
           }
         ).catch((err) => {
@@ -423,6 +428,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   } else if (chatRoomInfo && !isProtected) {
     return (
       <div id="chat-room">
+        {isPrivate && <span className="chat-room-private">이 방은 비밀방입니다</span>}
         <div id="chat-room-header">
           <img
             src="/public/arrow.svg"

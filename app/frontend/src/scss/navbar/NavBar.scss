@@ -24,6 +24,14 @@
 }
 
 .menu {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.menu::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}
+
+.menu {
   background: $black;
   color: #fff;
   height: 100vh;
@@ -71,7 +79,15 @@
     margin: 0;
 
     #friend-list-container {
-      max-height: 350px;
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+    #friend-list-container::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera*/
+    }
+
+    #friend-list-container {
+      max-height: 205px;
       overflow-y: scroll;
 
       .friend {
@@ -106,8 +122,8 @@
     .nav-list-button {
       all: initial;
       display: block;
-      width: 240px;
-      padding: 1em;
+      // width: 210px;
+      padding: 0.7em;
       font-size: 0.95em;
       transition: all 0.15s linear;
       cursor: pointer;
@@ -217,6 +233,7 @@
 
     /* 문의하기, 관리자 모드 등 NavBar의 맨 밑에 들어갈 버튼들 */
     div.end-of-list {
+      width: 100%;
       position: absolute;
       bottom: 0;
     }

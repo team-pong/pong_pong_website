@@ -14,6 +14,13 @@
   overflow: hidden;
   background-color: rgba(15, 17, 16, 0.75);
   .content {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .content::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+  }
+  .content {
     position: relative;
     width: 800px;
     height: 600px;
@@ -27,7 +34,6 @@
     box-shadow: 0 12px 25px 0 rgba(199, 175, 189, 0.25);
     overflow: hidden auto;
     .modal-closer {
-      z-index: 1;
       position: relative;
       float: right;
       width: 30px;

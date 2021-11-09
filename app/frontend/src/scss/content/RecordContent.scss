@@ -94,6 +94,13 @@
     display: grid;
     justify-items: center;
     #ladder-rank {
+      -ms-overflow-style: none; /* IE and Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+    #ladder-rank::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera*/
+    }
+    #ladder-rank {
       width: 90%;
       height: calc(100% - 38px);
       margin: auto;
@@ -119,6 +126,7 @@
         span.record-ladder-text {
           width: 55px;
           margin-top: 12px;
+          margin-left: 10px;
         }
         .bar-chart-svg {
           width: 100px;
