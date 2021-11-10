@@ -142,15 +142,19 @@ const RecordOpen: FC<{
 
 const RecordClose: FC = (): JSX.Element => {
 
+  let mounted = false;
+
   const [ladderRanking, setLadderRanking] = useState<any>([]);
 
   const getLadderRanking = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/match/ranking`);
-    setLadderRanking(await easyfetch.fetch());
+    if (mounted) setLadderRanking(await easyfetch.fetch());
   }
 
   useEffect(() => {
+    mounted = true;
     getLadderRanking();
+    return (() => {mounted = false})
   }, []);
 
   return (
