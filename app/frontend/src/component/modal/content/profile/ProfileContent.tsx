@@ -322,13 +322,15 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
    *         이미 친구인지, 차단한 친구인지 정보를 받아온다
    */
   useEffect(() => {
-    setIsMyProfile(nick === myInfo.nick);
-    if (nick !== myInfo.nick) {
-      getOtherUserInfo();
-      getIsAlreadyFriend();
-      getIsBlockedFriend();
+    if (myInfo) {
+      setIsMyProfile(nick === myInfo.nick);
+      if (nick !== myInfo.nick) {
+        getOtherUserInfo();
+        getIsAlreadyFriend();
+        getIsBlockedFriend();
+      }
     }
-  }, []);
+  }, [myInfo]);
 
   if (isMyProfile) {
     return (
