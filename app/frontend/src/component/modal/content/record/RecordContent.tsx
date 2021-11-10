@@ -207,6 +207,8 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
     ladder_level: 0
   });
 
+  let mounted = false;
+
   const search = async (nick?: string) => {
     if (nickNameToFind || nick) {
       let easyfetch = null;
@@ -217,7 +219,7 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
       }
       const res = await easyfetch.fetch()
       if (res.err_msg) {
-        setIsRecordOpen(recordState.noResult);
+        if (mounted) setIsRecordOpen(recordState.noResult);
         return ;
       }
       setStats({
@@ -229,9 +231,9 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
         winning_rate: res.total_games == 0 ? 0 : (res.win_games / res.total_games) * 100,
         ladder_level: res.ladder_level
       });
-      setIsRecordOpen(recordState.open);
+      if (mounted) setIsRecordOpen(recordState.open);
     } else {
-      setIsRecordOpen(recordState.close);
+      if (mounted) setIsRecordOpen(recordState.close);
     }
   }
 
@@ -240,10 +242,12 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
    * @brief props로 nick이 있으면 프로필에서 열람 한 것이므로 바로 검색을 실행한다
    */
   useEffect(() => {
+    mounted = true;
     if (nick) {
       setNickNameToFind(nick);
       search(nick);
     }
+    return (() => {mounted = false});
   }, []);
 
   return (
