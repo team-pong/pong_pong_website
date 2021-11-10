@@ -8,7 +8,7 @@ import { ChatUsersService } from 'src/chat-users/chat-users.service';
 import { UsersService } from 'src/users/users.service';
 import { ChatService } from './chat.service';
 import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
-import { DeleteChatAdminDto, DeleteChatMuteDto, JoinChatDto, SetChatAdminDto, SetChatBanDto, SetChatMuteDto, SetChatRoomInfoDto } from 'src/dto/chat';
+import { DeleteChatAdminDto, DeleteChatMuteDto, JoinChatDto, SendChatMessageDto, SetChatAdminDto, SetChatBanDto, SetChatMuteDto, SetChatRoomInfoDto } from 'src/dto/chat';
 import { AdminService } from 'src/admin/admin.service';
 import { err0 } from 'src/err';
 import { BanService } from 'src/ban/ban.service';
@@ -305,7 +305,7 @@ export class ChatGateway {
   }
 
   @SubscribeMessage('message')
-  async sendMessage(@ConnectedSocket() socket: Socket, @MessageBody() msg: string) {
+  async sendMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: SendChatMessageDto) {
     const room_id = this.socket_map[socket.id].room_id;
     const user_id = this.socket_map[socket.id].user_id;
     const user_info = await this.usersService.getUserInfo(user_id);
@@ -315,9 +315,9 @@ export class ChatGateway {
       position: await this.chatUsersService.getUserPosition(user_id, room_id),
       avatar_url: user_info.avatar_url,
       time: Date.now(),
-      message: msg,
+      message: body.msg,
     })
-    console.log(`Message Arrive user: ${this.socket_map[socket.id].user_id}, chat: ${msg}`);
+    console.log(`Message Arrive user: ${this.socket_map[socket.id].user_id}, chat: ${body.msg}`);
   }
 
   /*
