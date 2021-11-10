@@ -7,8 +7,9 @@ import RecordContent from "../record/RecordContent";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 import Loading from "../../../loading/Loading";
-import { UserInfoContext, SetUserInfoContext, SetDmInfoContext } from "../../../../Context";
+import { UserInfoContext, SetUserInfoContext, SetDmInfoContext, SetNoticeInfoContext } from "../../../../Context";
 import TwoFactorOnOff from "./TwoFactorOnOff";
+import { NOTICE_GREEN, NOTICE_RED } from "../../../mainpage/navbar/addFriend/AddFriend";
 
 /*!
  * @author donglee
@@ -33,6 +34,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
   const myInfo = useContext(UserInfoContext);
   const setMyInfo = useContext(SetUserInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
 
   const [otherUserInfo, setOtherUserInfo] = useState<UserInfo>();
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
@@ -95,7 +97,12 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     const res = await easyfetch.fetch(body);
     
     if (res.err_msg !== "에러가 없습니다.") {
-      alert(`"${nickToEdit}" 은(는) 이미 존재하는 닉네임입니다.`);
+      setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: `"${nickToEdit}" 은(는) 이미 존재하는 닉네임입니다.`,
+				backgroundColor: NOTICE_RED,
+			});
       setNickToEdit(myInfo.nick);
       return ;
     }
@@ -126,7 +133,12 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
       updatedMyInfo.avatar_url = res.avatar_url;
       setMyInfo(updatedMyInfo);
     } else {
-      alert("아바타 변경에 실패했습니다.");
+      setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "아바타 변경에 실패했습니다.",
+				backgroundColor: NOTICE_RED,
+			});
     }
   };
 
@@ -137,7 +149,12 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
   const handleChangeAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files.length === 0) return ;
     if (e.target.files[0].size > 2097152) {
-      alert("파일이 너무 큽니다. 이미지 파일은 2MB 이하여야 합니다.");
+      setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "파일이 너무 큽니다. 이미지 파일은 2MB 이하여야 합니다.",
+				backgroundColor: NOTICE_RED,
+			});
       return ;
     }
     postAvatarChange(e.target.files[0]);
@@ -201,8 +218,19 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 		const res = await easyfetch.fetch(body);
 
 		if (res.err_msg !== "에러가 없습니다.") {
-			alert(res.err_msg);
+      setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: res.err_msg,
+				backgroundColor: NOTICE_RED,
+			});
 		} else {
+      setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "친구로 추가했습니다.",
+				backgroundColor: NOTICE_GREEN,
+			});
       setIsAlreadyFriend(true);
     }
   };
@@ -216,8 +244,19 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 		const res = await easyfetch.fetch()
 
 		if (res.err_msg !== "에러가 없습니다.") {
-			alert(res.err_msg);
+      setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: res.err_msg,
+				backgroundColor: NOTICE_RED,
+			});
 		} else {
+      setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "친구를 삭제했습니다.",
+				backgroundColor: NOTICE_GREEN,
+			});
       setIsAlreadyFriend(false);
     }
   };
@@ -249,8 +288,19 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 		const res = await easyfetch.fetch(body);
 
 		if (res.err_msg !== "에러가 없습니다.") {
-			alert("사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.");
+      setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.",
+				backgroundColor: NOTICE_RED,
+			});
 		} else {
+      setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "사용자를 차단했습니다.",
+				backgroundColor: NOTICE_GREEN,
+			});
       setIsBlockedFriend(true);
       setIsAlreadyFriend(false);
 		}
@@ -265,8 +315,19 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 		const res = await easyfetch.fetch()
 
 		if (res.err_msg !== "에러가 없습니다.") {
-			alert("사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.");
+      setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.",
+				backgroundColor: NOTICE_RED,
+			});
 		} else {
+      setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "사용자를 차단 해제했습니다.",
+				backgroundColor: NOTICE_GREEN,
+			});
       setIsBlockedFriend(false);
 		}
   };

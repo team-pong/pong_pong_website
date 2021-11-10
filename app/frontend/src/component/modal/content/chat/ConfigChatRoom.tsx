@@ -1,9 +1,11 @@
-import { Dispatch, FC, SetStateAction, useState } from "react";
+import { Dispatch, FC, SetStateAction, useContext, useState } from "react";
 import "/src/scss/content/chat/ConfigChatRoom.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { Redirect } from "react-router-dom";
 import { ChatRoom } from "./ChatRoomContent";
 import { Socket } from "socket.io-client";
+import { SetNoticeInfoContext } from "../../../../Context";
+import { NOTICE_RED } from "../../../mainpage/navbar/addFriend/AddFriend";
 
 interface ConfigChatRoomProps {
   chatRoomInfo?: ChatRoom;
@@ -32,17 +34,29 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
   const [max, setMax] = useState(chatRoomInfo ? chatRoomInfo.max_people : 2);
   const [channelId, setChannelId] = useState("");
 
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
+
   /*!
    * @author donglee
    * @brief 대화방 이름과 비밀번호의 글자수가 유효한지 검사
    */
   const checkFormat = () => {
     if (title.length < 2) {
-      alert("대화방 이름은 두 자 이상이어야 합니다.");
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: "대화방 이름은 두 자 이상이어야 합니다.",
+        backgroundColor: NOTICE_RED,
+      });
       return false;
     }
     if (type === "protected" && password.length < 4) {
-      alert("비밀번호는 4자 이상이어야 합니다.");
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: "비밀번호는 4자 이상이어야 합니다.",
+        backgroundColor: NOTICE_RED,
+      });
       return false;
     }
     return true;
@@ -68,7 +82,12 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
         setChannelId(res.chatRoom.channel_id);
         if (type === "protected") setIsMadeMyself(true);
       } else {
-        alert(res.err_msg);
+        setNoticeInfo({
+          isOpen: true,
+          seconds: 3,
+          content: res.err_msg,
+          backgroundColor: NOTICE_RED,
+        });
       }
     }
   };
@@ -103,7 +122,12 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
         socket.emit("setRoomInfo", newRoomInfo);
         history.back();
       } else {
-        alert(res.err_msg);
+        setNoticeInfo({
+          isOpen: true,
+          seconds: 3,
+          content: res.err_msg,
+          backgroundColor: NOTICE_RED,
+        });
       }
     }
   };

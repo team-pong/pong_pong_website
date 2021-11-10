@@ -8,9 +8,10 @@ import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
 import ConfigChatRoom from "./ConfigChatRoom";
 import { io, Socket } from "socket.io-client";
-import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
+import { SetDmInfoContext, SetNoticeInfoContext, UserInfoContext } from "../../../../Context";
 import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
+import { NOTICE_RED } from "../../../mainpage/navbar/addFriend/AddFriend";
 
 /*!
  * @author donglee
@@ -64,6 +65,7 @@ const Password: FC<{
   = ({setIsProtected, isMadeMyself, channelId, setPasswordPassed}): JSX.Element => {
 
   const [password, setPassword] = useState("");
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
 
   /*!
    * @author donglee
@@ -78,7 +80,12 @@ const Password: FC<{
       setIsProtected(false);
       setPasswordPassed(true);
     } else {
-      alert("비밀번호가 틀렸습니다.");
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: "비밀번호가 틀렸습니다.",
+        backgroundColor: NOTICE_RED,
+      });
     }
   };
 
@@ -188,6 +195,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
 
   const myInfo = useContext(UserInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
 
 
   /*!
@@ -271,7 +279,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
     if (myState === "ban") {
       history.back();
       socket.disconnect();
-      alert("강제 퇴장 당했습니다.");
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: "강제 퇴장 당했습니다.",
+        backgroundColor: NOTICE_RED,
+      });
     }
   }, [myState]);
 
@@ -351,7 +364,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
       connectSocket().then((socket) => {
         setSocket(socket)
       }).catch((err) => {
-        alert(err);
+        setNoticeInfo({
+          isOpen: true,
+          seconds: 3,
+          content: err,
+          backgroundColor: NOTICE_RED,
+        });
       });
     }
   }, [passwordPassed]);
@@ -365,7 +383,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
       connectSocket().then((socket) => {
         setSocket(socket)
       }).catch((err) => {
-        alert(err);
+        setNoticeInfo({
+          isOpen: true,
+          seconds: 3,
+          content: err,
+          backgroundColor: NOTICE_RED,
+        });
       });
     }
   }, [isMadeMyself]);
@@ -397,7 +420,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
               connectSocket().then((socket) => {
                 setSocket(socket);
               }).catch((err) => {
-                alert(err);
+                setNoticeInfo({
+                  isOpen: true,
+                  seconds: 3,
+                  content: err,
+                  backgroundColor: NOTICE_RED,
+                });
               });
             }
             if (res.type === "private") {
@@ -405,7 +433,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
             }
           }
         ).catch((err) => {
-        alert(err);
+          setNoticeInfo({
+            isOpen: true,
+            seconds: 3,
+            content: err,
+            backgroundColor: NOTICE_RED,
+          });
       });
     }
 

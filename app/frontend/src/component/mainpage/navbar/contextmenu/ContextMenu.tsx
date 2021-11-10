@@ -1,7 +1,8 @@
 import { Dispatch, FC, SetStateAction, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { SetDmInfoContext } from '../../../../Context';
+import { SetDmInfoContext, SetNoticeInfoContext } from '../../../../Context';
 import EasyFetch from '../../../../utils/EasyFetch';
+import { NOTICE_GREEN, NOTICE_RED } from '../addFriend/AddFriend';
 
 /*!
 * @author yochoi
@@ -37,6 +38,7 @@ const ContextMenu: FC<contextMenuProps> =
   ({target, x, y, friendList, setFriendList, setContextMenuInfo}): JSX.Element => {
 
   const setDmInfo = useContext(SetDmInfoContext);
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
   
   /*!
   * @author donglee
@@ -48,7 +50,12 @@ const ContextMenu: FC<contextMenuProps> =
     
     if (res.err_msg === "에러가 없습니다.") {
       const updatedList = friendList.filter((friend) => friend.nick !== target);
-      
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: "친구를 삭제했습니다.",
+        backgroundColor: NOTICE_GREEN,
+      });
       setFriendList(updatedList);
       setContextMenuInfo({
         isOpen: false,
@@ -57,7 +64,12 @@ const ContextMenu: FC<contextMenuProps> =
         yPos: 0
       });
     } else {
-      alert(res.err_msg);
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: res.err_msg,
+        backgroundColor: NOTICE_RED,
+      });
     }
   };
 
@@ -73,8 +85,19 @@ const ContextMenu: FC<contextMenuProps> =
     const res = await easyfetch.fetch(body);
 
     if (res.err_msg !== "에러가 없습니다.") {
-      alert("사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.");
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: "사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.",
+        backgroundColor: NOTICE_RED,
+      });
     } else {
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: "친구를 차단했습니다.",
+        backgroundColor: NOTICE_GREEN,
+      });
       const updatedList = friendList.filter((friend) => friend.nick !== target);
 
       setFriendList(updatedList);
