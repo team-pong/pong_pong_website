@@ -39,6 +39,15 @@ export class SessionService {
 	 */
 	public async tester_login(req: Request, user_id: string, nickname: string, avatar_url: string) {
 		try {
+      if (true) { // 중복 로그인을 시도하는 경우
+        const sessions = await this.sessionRepo.query("SELECT * FROM session;"); // return list
+        for (let session of sessions) {
+          let parsed_id = JSON.parse(session.sess).userid;
+          if (parsed_id == user_id) {
+            this.sessionRepo.delete({sid: session.sid});
+          }
+        }
+      }
       req.session.userid = user_id;
       req.session.token = 'test_token';
       req.session.loggedIn = true;
