@@ -29,6 +29,8 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
 
   const [matchList, setMatchList] = useState<matchLog[]>([]);
 
+  let mounted = false;
+
   const getRecord = async () => {
     let apiAddress: string = "";
     switch (type) {
@@ -44,11 +46,13 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
     };
     const easyfetch = new EasyFetch(apiAddress);
     const res = await easyfetch.fetch()
-    setMatchList(res.matchList);
+    if (mounted) setMatchList(res.matchList);
   };
 
   useEffect(() => {
+    mounted = true;
     getRecord();
+    return (() => {mounted = false});
   }, [target, type]);
 
   return (
