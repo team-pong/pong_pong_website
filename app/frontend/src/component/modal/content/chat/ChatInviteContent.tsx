@@ -1,12 +1,13 @@
 import "../../../../scss/content/chat/ChatInviteContent.scss";
 import { Dispatch, FC, SetStateAction, useContext, useEffect, useState } from "react";
-import { DmInfo, SetDmInfoContext, UserInfoContext } from "../../../../Context";
+import { DmInfo, SetDmInfoContext, SetNoticeInfoContext, UserInfoContext } from "../../../../Context";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
 import { Friend } from "../profile/ManageFriendContent";
 import NoResult from "../../../noresult/NoResult";
 import { UserInfo } from "../../../mainpage/MainPage";
 import { ChatUser } from "./ChatRoomContent";
+import { NOTICE_RED } from "../../../mainpage/navbar/addFriend/AddFriend";
 
 /*!
  * @author donglee
@@ -29,6 +30,7 @@ interface ResultProps {
 const Result: FC<ResultProps> = (
   {result, setDmInfo, chatTitle, channelId, myInfo, chatUsers}): JSX.Element => {
 
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
   /*!
    * @author donglee
    * @brief 대화방 내부에 초대할 사람이 이미 있는지 검사해서 여부를 boolean으로 반환
@@ -45,7 +47,12 @@ const Result: FC<ResultProps> = (
    */
   const sendInvite = (to: string) => {
     if (isAlreadyHere(to)) {
-      alert(`${to} 님은 이미 대화방에 참여중입니다.`);
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: `${to} 님은 이미 대화방에 참여중입니다.`,
+        backgroundColor: NOTICE_RED,
+      });
       return ;
     }
     setDmInfo({
@@ -107,6 +114,7 @@ interface FriendListProps {
 const FriendList: FC<FriendListProps> = (
   {friendList, setDmInfo, chatTitle, channelId, myInfo, chatUsers}): JSX.Element => {
 
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
   /*!
    * @author donglee
    * @brief 대화방 내부에 초대할 사람이 이미 있는지 검사해서 여부를 boolean으로 반환
@@ -123,7 +131,12 @@ const FriendList: FC<FriendListProps> = (
    */
   const sendInvite = (to: string) => {
     if (isAlreadyHere(to)) {
-      alert(`${to} 님은 이미 대화방에 참여중입니다.`);
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: `${to} 님은 이미 대화방에 참여중입니다.`,
+        backgroundColor: NOTICE_RED,
+      });
       return ;
     }
     setDmInfo({
@@ -195,6 +208,7 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
   const [result, setResult] = useState<UserInfo>(null);
 
   const myInfo = useContext(UserInfoContext);
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
 
   /*!
    * @author donglee
@@ -202,7 +216,12 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
    */
   const getUserToFind = async () => {
     if (search === myInfo.nick) {
-      alert("자기 자신을 초대할 수 없습니다.");
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: "자기 자신을 초대할 수 없습니다.",
+        backgroundColor: NOTICE_RED,
+      });
       return ;
     }
     if (!search) return ;
@@ -213,7 +232,12 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
     if (!res.err_msg) {
       setResult(res);
     } else {
-      alert(res.err_msg);
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: res.err_msg,
+        backgroundColor: NOTICE_RED,
+      });
     }
   };
 
