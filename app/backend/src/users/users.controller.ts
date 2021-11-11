@@ -118,6 +118,7 @@ export class UsersController {
   @ApiResponse({ type: ErrMsgDto, description: '유저 제거 실패시 실패 이유' })
   @Delete()
   async deleteUsers(@Req() req: Request){
+    await this.sessionService.deleteSession(req.sessionID);
     return await this.usersService.deleteUsers(req.session.userid);
   }
 

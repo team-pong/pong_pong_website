@@ -14,6 +14,7 @@ import { Users } from 'src/entities/users';
 import * as nodemailer from 'nodemailer';
 import { AuthCode } from 'src/entities/auth-code';
 import { transportOption } from 'src/mail/mailer.option';
+import { ErrMsgDto } from 'src/dto/utility';
 
 const db = {
 	user: process.env.PG_PONG_ADMIN,
@@ -230,5 +231,11 @@ export class SessionService {
       return true;
     }
     return false;
+  }
+
+  async deleteSession(sid: string) {
+    if (await this.sessionRepo.count({sid: sid}) === 0)  // 존재하지 않은 세션 아이디 이면
+      return new ErrMsgDto(err25);
+    await this.sessionRepo.delete({sid: sid});
   }
 }
