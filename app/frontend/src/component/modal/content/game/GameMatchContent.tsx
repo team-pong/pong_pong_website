@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import "/src/scss/content/game/GameMatchContent.scss";
 
 interface gameMatchContentProps extends RouteComponentProps<{matchType: string}> {
-  setIsMatched: Dispatch<SetStateAction<{
+  setIsMatched?: Dispatch<SetStateAction<{
     isMatched: boolean;
     roomId: string;
     opponent: string;
@@ -20,19 +20,23 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setI
     const url_params = url.split('/');
     const map = url_params.pop();
     let isMatched = false;
-    
-    setIsMatched({isMatched: false, roomId: '', opponent: '', position: '', socket: null});
-    const socket = io(`${global.BE_HOST}/game`);
-    socket.emit(params.matchType, {map: map});
-    socket.on("matched", ({roomId, opponent, position}) => {
-      isMatched = true;
-      setIsMatched({isMatched: true, roomId, opponent, position, socket});
-    });
-    return (() => {
-      if (isMatched === false) {
-        socket.disconnect();
-      }
-    })
+
+    // setIsMatched가 prop으로 넘어오면 그건 게임 찾기로 진행된 것이다.
+    if (setIsMatched) {
+      setIsMatched({isMatched: false, roomId: '', opponent: '', position: '', socket: null});
+      const socket = io(`${global.BE_HOST}/game`);
+      socket.emit(params.matchType, {map: map});
+      socket.on("matched", ({roomId, opponent, position}) => {
+        isMatched = true;
+        setIsMatched({isMatched: true, roomId, opponent, position, socket});
+      });
+      
+      return (() => {
+        if (isMatched === false) {
+          socket.disconnect();
+        }
+      })
+    }
   }, []);
 
   return (

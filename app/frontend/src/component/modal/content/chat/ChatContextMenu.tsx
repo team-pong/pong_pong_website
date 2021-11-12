@@ -133,7 +133,10 @@ const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
             <li className="chat-context-li" onClick={() => setDmInfo({isDmOpen: true, target: target})}>
               DM 보내기
             </li>
-            <li className="chat-context-li">대전 신청</li>
+            {/* 대전신청을 누르면 게임옵션 컨텐츠로 라우팅한다 대화방을 나가지 않은 상태에서 */}
+            <Link to={`${match.url}/gameoption`} style={{color: "inherit", textDecoration: "none"}}>
+              <li className="chat-context-li">대전 신청</li>
+            </Link>
             <ConditionalContextMenu
               socket={socket}
               myPosition={myPosition}

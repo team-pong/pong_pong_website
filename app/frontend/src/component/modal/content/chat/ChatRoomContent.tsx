@@ -12,6 +12,7 @@ import { SetDmInfoContext, SetNoticeInfoContext, UserInfoContext } from "../../.
 import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
 import { NOTICE_RED } from "../../../mainpage/navbar/addFriend/AddFriend";
+import GameOptionContent from "../game/GameOptionContent";
 
 /*!
  * @author donglee
@@ -576,6 +577,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         </Route>
         <Route path={`${match.url}/profile/:nick`}>
           <Modal id={Date.now()} smallModal content={<ProfileContent readonly/>}/>
+        </Route>
+        <Route path={`${match.url}/gameoption`}>
+          <Modal id={Date.now()} content={<GameOptionContent />}/>
         </Route>
       </div>
     );

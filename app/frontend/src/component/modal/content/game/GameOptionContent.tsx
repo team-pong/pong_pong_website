@@ -23,7 +23,7 @@ function getMapImg(mapType: MAP): string {
 }
 
 interface GameOptionContent extends RouteComponentProps {
-  setIsMatched: Dispatch<SetStateAction<{
+  setIsMatched?: Dispatch<SetStateAction<{
     isMatched: boolean;
     roomId: string;
     opponent: string;
@@ -39,7 +39,7 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatc
   return (
     <div id="game-option-content">
       <img
-        className="game-option-closer" 
+        className="game-option-closer"
         src="/public/arrow.svg"
         onClick={() => history.goBack()} />
       <img
@@ -51,7 +51,11 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatc
           <button className="map-btn-01" onClick={(e) => {e.preventDefault();setMapSelector(1)}}>막대기</button>
           <button className="map-btn-02" onClick={(e) => {e.preventDefault();setMapSelector(2)}}>거품</button>
         </div>
-        <Link to={`${url}/${mapSelector}`} className="start" >게임 찾기</Link>
+        {/* setIsMatched가 없으면 대전신청으로 보이게 한다 */}
+        {/* mapSelector 가 왜 안 없지? 확인해보자
+        계획: 여기서 게임 찾는중까지 잘 가도록 하고 거기서부터는 새로운 socket에서 구현해야 한다
+        emit 하고 상대방이 승낙하면 on 해서 게임화면으로 아예 redirect해서 진행 대화방은 나가도 된다 그 때는 */}
+        <Link to={`${url}/${mapSelector}`} className="start" >{setIsMatched ? '게임 찾기' : '대전 신청'}</Link>
       </form>
       <Route path={`${path}/:map`}>
         <Modal id={Date.now()} smallModal content={<GameMatchContent setIsMatched={setIsMatched}/>}/>
