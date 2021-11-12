@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useContext, useState } from "react";
+import {Dispatch, FC, SetStateAction, useContext, useEffect, useState} from "react";
 import "/src/scss/content/chat/ConfigChatRoom.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { Redirect } from "react-router-dom";
@@ -35,6 +35,8 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
   const [channelId, setChannelId] = useState("");
 
   const setNoticeInfo = useContext(SetNoticeInfoContext);
+
+  let mounted = false;
 
   /*!
    * @author donglee
@@ -120,7 +122,7 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
         };
         setChatRoomInfo(newRoomInfo);
         socket.emit("setRoomInfo", newRoomInfo);
-        history.back();
+        if (mounted) setChannelId(channelIdToBeSet);
       } else {
         setNoticeInfo({
           isOpen: true,
@@ -131,6 +133,11 @@ const ConfigChatRoom: FC<ConfigChatRoomProps> = (
       }
     }
   };
+
+  useEffect(() => {
+    mounted = true;
+    return (() => {mounted = false});
+  }, []);
 
   if (channelId) {
     return <Redirect to={`/mainpage/chat/${channelId}`}></Redirect>
