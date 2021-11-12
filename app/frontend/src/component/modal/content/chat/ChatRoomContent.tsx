@@ -73,6 +73,8 @@ const Password: FC<{
   const [password, setPassword] = useState("");
   const setNoticeInfo = useContext(SetNoticeInfoContext);
 
+  let mounted = false;
+
   /*!
    * @author donglee
    * @brief 비밀번호를 입력하면 백엔드 검증 요청 후 대화방을 보여주거나 입장을 거절함
@@ -83,8 +85,10 @@ const Password: FC<{
     const res = await easyfetch.fetch();
 
     if (res) {
-      setIsProtected(false);
-      setPasswordPassed(true);
+      if (mounted) {
+        setIsProtected(false);
+        setPasswordPassed(true);
+      }
     } else {
       setNoticeInfo({
         isOpen: true,
@@ -111,10 +115,12 @@ const Password: FC<{
    *        - 자동으로 input에 focus함.
    */
   useEffect(() => {
+    mounted = true;
     if (isMadeMyself) {
       setIsProtected(false);
     }
     inputFocus();
+    return (() => {mounted = false});
   }, []);
 
   return (
