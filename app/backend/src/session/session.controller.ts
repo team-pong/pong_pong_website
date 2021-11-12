@@ -68,7 +68,7 @@ export class SessionController {
 	async login(@Req() req: Request, @Res() res: Response) {
 		console.log("GET /login id:", req.session.userid, "| loggedIn:", req.session.loggedIn)
 		if (req.session.loggedIn == true && isNotTestUser(req.session.userid)) { // 이미 로그인 되어있는 유저라면
-			// 바로 로그인
+			// 바로 로그인 (쿠키에 남아있는 세션이 이미 검증되었으면 다시 로그인 검사를 할 필요가 없으니까)
 			return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
 		} else {
 			// 42api로 리디렉트
