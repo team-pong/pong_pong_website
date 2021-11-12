@@ -8,9 +8,10 @@ import NoResult from "../../../noresult/NoResult";
 import Loading from "../../../loading/Loading";
 import ConfigChatRoom from "./ConfigChatRoom";
 import { io, Socket } from "socket.io-client";
-import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
+import { SetDmInfoContext, SetNoticeInfoContext, UserInfoContext } from "../../../../Context";
 import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
+import { NOTICE_RED } from "../../../mainpage/navbar/addFriend/AddFriend";
 
 /*!
  * @author donglee
@@ -20,12 +21,18 @@ function submitMessage(e: any, myInfo: UserInfo,
                           message: string, setMessage: Dispatch<SetStateAction<string>>,
                           chatLog: (ChatLog | ChatLogSystem)[],
                           setChatLog: Dispatch<SetStateAction<any>>,
-                          socket: Socket, myPosition: string, myState: string) {
+                          socket: Socket, myPosition: string, myState: string,
+                          setNoticeInfo: Dispatch<SetStateAction<any>>) {
   if ((e.key === "Enter" && !e.shiftKey) || e.type === "click") {
     e.preventDefault();
     if (message === "") return ;
     if (myState === "mute") {
-      alert("관리자가 당신을 차단했습니다.");
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: "관리자가 당신을 차단했습니다.",
+        backgroundColor: NOTICE_RED,
+      });
       return ;
     }
     setChatLog([{
@@ -64,6 +71,7 @@ const Password: FC<{
   = ({setIsProtected, isMadeMyself, channelId, setPasswordPassed}): JSX.Element => {
 
   const [password, setPassword] = useState("");
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
 
   /*!
    * @author donglee
@@ -78,7 +86,12 @@ const Password: FC<{
       setIsProtected(false);
       setPasswordPassed(true);
     } else {
-      alert("비밀번호가 틀렸습니다.");
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: "비밀번호가 틀렸습니다.",
+        backgroundColor: NOTICE_RED,
+      });
     }
   };
 
@@ -188,6 +201,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
 
   const myInfo = useContext(UserInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
 
 
   /*!
@@ -271,7 +285,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
     if (myState === "ban") {
       history.back();
       socket.disconnect();
-      alert("강제 퇴장 당했습니다.");
+      setNoticeInfo({
+        isOpen: true,
+        seconds: 3,
+        content: "강제 퇴장 당했습니다.",
+        backgroundColor: NOTICE_RED,
+      });
     }
   }, [myState]);
 
@@ -351,7 +370,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
       connectSocket().then((socket) => {
         setSocket(socket)
       }).catch((err) => {
-        alert(err);
+        setNoticeInfo({
+          isOpen: true,
+          seconds: 3,
+          content: err,
+          backgroundColor: NOTICE_RED,
+        });
       });
     }
   }, [passwordPassed]);
@@ -365,7 +389,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
       connectSocket().then((socket) => {
         setSocket(socket)
       }).catch((err) => {
-        alert(err);
+        setNoticeInfo({
+          isOpen: true,
+          seconds: 3,
+          content: err,
+          backgroundColor: NOTICE_RED,
+        });
       });
     }
   }, [isMadeMyself]);
@@ -397,7 +426,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
               connectSocket().then((socket) => {
                 setSocket(socket);
               }).catch((err) => {
-                alert(err);
+                setNoticeInfo({
+                  isOpen: true,
+                  seconds: 3,
+                  content: err,
+                  backgroundColor: NOTICE_RED,
+                });
               });
             }
             if (res.type === "private") {
@@ -405,7 +439,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
             }
           }
         ).catch((err) => {
-        alert(err);
+          setNoticeInfo({
+            isOpen: true,
+            seconds: 3,
+            content: err,
+            backgroundColor: NOTICE_RED,
+          });
       });
     }
 
@@ -503,9 +542,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
             rows={4}
             cols={50}
             value={message}
-            onKeyPress={(e) => submitMessage(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition, myState)}
+            onKeyPress={(e) => submitMessage(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition, myState, setNoticeInfo)}
             onChange={({target: {value}}) => setMessage(value)}/>
-          <button className="chat-msg-btn" onClick={(e) => submitMessage(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition, myState)}>전송</button>
+          <button className="chat-msg-btn" onClick={(e) => submitMessage(e, myInfo, message, setMessage, chatLog, setChatLog, socket, myPosition, myState, setNoticeInfo)}>전송</button>
         </form>
         {contextMenu.isOpen && <ChatContextMenu
                                   x={contextMenu.x}

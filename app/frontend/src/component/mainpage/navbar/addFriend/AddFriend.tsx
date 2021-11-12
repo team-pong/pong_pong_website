@@ -1,7 +1,9 @@
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import { SetNoticeInfoContext } from "../../../../Context";
 import EasyFetch from "../../../../utils/EasyFetch";
-import Notice from "../../../notice/Notice";
+
+export const NOTICE_RED = "#CE4D36";
+export const NOTICE_GREEN = "#62C375";
 
 /*!
 * @author donglee
@@ -48,8 +50,6 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
       const updatedList = JSON.parse(JSON.stringify(props.friendList));
       updatedList.push(res);
       props.setFriendList(updatedList);
-    } else {
-      alert("에러! 다시 시도하십시오.");
     }
   };
 
@@ -71,15 +71,15 @@ const AddFriend: React.FC<AddFriendProps> = (props): JSX.Element => {
         isOpen: true,
         seconds: 3,
         content: res.err_msg,
-        backgroundColor: "#CE4D36" //red
+        backgroundColor: NOTICE_RED,
       });
     } else {
       updateState();
       setNoticeInfo({
         isOpen: true,
         seconds: 3,
-        content: "친구 추가에 성공했습니다.",
-        backgroundColor: "#62C375" //green
+        content: "친구로 추가했습니다.",
+        backgroundColor: NOTICE_GREEN,
       });
     }
   };

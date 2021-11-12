@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import EasyFetch from "../../../../utils/EasyFetch";
 import "/src/scss/content/profile/ManageFriendContent.scss";
 import { setAchievementStr, setAchievementImg } from "../../../../utils/setAchievement";
 import Loading from "../../../loading/Loading";
 import NoResult from "../../../noresult/NoResult";
+import { SetNoticeInfoContext } from "../../../../Context";
+import { NOTICE_GREEN, NOTICE_RED } from "../../../mainpage/navbar/addFriend/AddFriend";
 
 export interface Friend {
 	user_id: string;
@@ -21,6 +23,7 @@ const FriendList: React.FC = () => {
 	const [friendList, setFriendList] = useState<Friend[]>();
 	const [noResult, setNoResult] = useState(false);
 
+	const setNoticeInfo = useContext(SetNoticeInfoContext);
 	/*!
    * @author donglee
    * @brief 친구목록이 수정될 때 리스트가 없으면 결과없음을 보여주기 위해 검사함
@@ -40,8 +43,19 @@ const FriendList: React.FC = () => {
 		const res = await easyfetch.fetch()
 
 		if (res.err_msg !== "에러가 없습니다.") {
-			alert(res.err_msg);
+			setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: res.err_msg,
+				backgroundColor: NOTICE_RED,
+			});
 		} else {
+			setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "친구를 삭제했습니다.",
+				backgroundColor: NOTICE_GREEN,
+			});
 			const updatedList = friendList.filter((friend) => friend.nick !== nick);
 			setFriendList(updatedList);
 			checkListLength(updatedList);
@@ -60,8 +74,19 @@ const FriendList: React.FC = () => {
 		const res = await (await easyfetch.fetch(body)).json();
 
 		if (res.err_msg !== "에러가 없습니다.") {
-			alert("사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.");
+			setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.",
+				backgroundColor: NOTICE_RED,
+			});
 		} else {
+			setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "친구를 차단했습니다.",
+				backgroundColor: NOTICE_GREEN,
+			});
 			const updatedList = friendList.filter((friend) => friend.nick !== nick);
 			setFriendList(updatedList);
 			checkListLength(updatedList);
@@ -128,14 +153,26 @@ const BlockedList: React.FC = () => {
 	
 	const [blockedList, setBlockedList] = useState<Friend[]>();
 	const [noResult, setNoResult] = useState(false);
+	const setNoticeInfo = useContext(SetNoticeInfoContext);
 
 	const unblockFriend = async (nick: string) => {
 		const easyfetch = new EasyFetch(`${global.BE_HOST}/block?block_nick=${nick}`, "DELETE");
 		const res = await easyfetch.fetch()
 		
 		if (res.err_msg !== "에러가 없습니다.") {
-			alert("사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.");
+			setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.",
+				backgroundColor: NOTICE_RED,
+			});
 		} else {
+			setNoticeInfo({
+				isOpen: true,
+				seconds: 3,
+				content: "사용자를 차단 해제했습니다.",
+				backgroundColor: NOTICE_GREEN,
+			});
 			const updatedList = blockedList.filter((friend) => friend.nick !== nick);
 			setBlockedList(updatedList);
 			if (updatedList.length === 0) {

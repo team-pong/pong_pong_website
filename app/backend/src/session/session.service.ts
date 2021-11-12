@@ -15,6 +15,7 @@ import * as nodemailer from 'nodemailer';
 import { AuthCode } from 'src/entities/auth-code';
 import { transportOption } from 'src/mail/mailer.option';
 import { ErrMsgDto } from 'src/dto/utility';
+import * as qs from 'querystring';
 
 const db = {
 	user: process.env.PG_PONG_ADMIN,
@@ -23,9 +24,6 @@ const db = {
 	password: process.env.PG_PONG_PW,
 	port: +process.env.PG_PORT,
 };
-
-const qs = require('querystring');
-const client = new Client(db);
 
 @Injectable()
 export class SessionService {
@@ -42,6 +40,15 @@ export class SessionService {
 	 */
 	public async tester_login(req: Request, user_id: string, nickname: string, avatar_url: string) {
 		try {
+      if (true) { // 중복 로그인을 시도하는 경우
+        const sessions = await this.sessionRepo.query("SELECT * FROM session;"); // return list
+        for (let session of sessions) {
+          let parsed_id = JSON.parse(session.sess).userid;
+          if (parsed_id == user_id) {
+            this.sessionRepo.delete({sid: session.sid});
+          }
+        }
+      }
       req.session.userid = user_id;
       req.session.token = 'test_token';
       req.session.loggedIn = true;
@@ -80,6 +87,10 @@ export class SessionService {
     });
   }
 
+  // async isDuplicatedLogin(user_id: string) {
+  //   await this.sessionRepo.find()
+  // }
+
   /*!
    * @author hna
    * @param[in] loginCodeDto Body로 들어온 code
@@ -96,8 +107,18 @@ export class SessionService {
     try {
       const result = await this.getToken(loginCodeDto)
       const { access_token } = result.data;
-      const { data } = await this.getUserInfoFrom42Api(access_token)
+      const { data } = await this.getUserInfoFrom42Api(access_token);
       const user = await this.usersRepo.findOne({user_id: data.login});
+      if (true) { // 중복 로그인을 시도하는 경우 (일단 모든 로그인에 대해서 검사, status가 online인 유저만 검사해도 되나?)
+        // 유저가 하나의 세션만 가질 수 있도록 기존 session 테이블에서 해당 유저의 session 제거
+        const sessions = await this.sessionRepo.query("SELECT * FROM session;"); // return list
+        for (let session of sessions) {
+          let user_id = JSON.parse(session.sess).userid;
+          if (data.login == user_id) {
+            this.sessionRepo.delete({sid: session.sid});
+          }
+        }
+      }
       if (!user) { // 회원가입이 필요한 경우
         await this.usersRepo.save({
           user_id: data.login, 
@@ -106,7 +127,8 @@ export class SessionService {
           two_factor_login: false, 
           email: data.email
         });
-      } else if (user.two_factor_login) { // 2차인증이 켜져 있는 경우
+      }
+      if (user.two_factor_login) { // 2차인증이 켜져 있는 경우
         const random_code = this.getRandomAuthCode(4);
         const transporter = nodemailer.createTransport(transportOption);
         const info = await transporter.sendMail({
@@ -121,7 +143,7 @@ export class SessionService {
         req.session.save();
         await this.authCodeRepo.save({user_id: data.login, email_code: random_code});
         return res.redirect(`${process.env.BACKEND_SERVER_URL}?twoFactor=email`);
-      }
+      } 
       req.session.userid = data.login;
       req.session.token = access_token;
       req.session.loggedIn = true;
