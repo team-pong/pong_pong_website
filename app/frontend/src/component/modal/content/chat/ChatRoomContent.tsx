@@ -52,7 +52,8 @@ function openContextMenu( e: React.MouseEvent,
                           setContextMenu: Dispatch<SetStateAction<any>>,
                           target: string,
                           targetPosition: string,
-                          targetState: string) {
+                          targetState: string,
+                          targetAvatar: string) {
   document.getElementById("chat-room-users").style.overflowY = "hidden";
   setContextMenu({
     isOpen: true,
@@ -61,6 +62,7 @@ function openContextMenu( e: React.MouseEvent,
     target,
     targetPosition,
     targetState,
+    targetAvatar,
   });
 };
 
@@ -186,7 +188,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
     target: string,
     targetPosition: string,
     targetState: string,
-  }>({isOpen: false, x: 0, y: 0, target: "", targetPosition: "", targetState: ""});
+    targetAvatar: string,
+  }>({isOpen: false, x: 0, y: 0, target: "", targetPosition: "", targetState: "", targetAvatar: ""});
   const [noResult, setNoReult] = useState(false);
 
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
@@ -516,7 +519,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
               return (
                 <div key={idx}
                       className={"chat-user" + (value.nick === myInfo.nick ? " chat-user-me" : "")}
-                      onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position, value.state)}>
+                      onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position, value.state, value.avatar_url)}>
                   <img className="chat-room-user-img" src={value.avatar_url} alt={value.nick} />
                   <span className="chat-room-user-nick">{value.nick}</span>
                   {value.position === "owner" && <img className="position" src={"/public/crown.png"} alt="owner"/>}
@@ -555,7 +558,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
                                   targetState={contextMenu.targetState}
                                   closer={setContextMenu}
                                   target={contextMenu.target}
-                                  socket={socket}/>}
+                                  socket={socket}
+                                  targetAvatar={contextMenu.targetAvatar}/>}
         <Route path={`${match.url}/config`}>
           <Modal id={Date.now()} smallModal content={
             <ConfigChatRoom 
@@ -578,7 +582,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         <Route path={`${match.url}/profile/:nick`}>
           <Modal id={Date.now()} smallModal content={<ProfileContent readonly/>}/>
         </Route>
-        <Route path={`${match.url}/gameoption`}>
+        <Route path={`${match.url}/match/:matchType`}>
           <Modal id={Date.now()} content={<GameOptionContent />}/>
         </Route>
       </div>

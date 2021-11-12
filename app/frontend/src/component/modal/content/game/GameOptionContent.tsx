@@ -1,6 +1,6 @@
 import { FC, useState, Dispatch, SetStateAction } from "react";
 import { Route, RouteComponentProps, useHistory, withRouter } from "react-router";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Modal from "../../Modal";
 import GameMatchContent from "./GameMatchContent";
 import "/src/scss/content/game/GameOptionContent.scss";
@@ -32,9 +32,16 @@ interface GameOptionContent extends RouteComponentProps {
   }>>;
 }
 
+export interface StateType {
+  target: string,
+  targetAvatar: string,
+}
+
 const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatched}) => {
   const [mapSelector, setMapSelector] = useState(0);
   const history = useHistory();
+
+  const {state} = useLocation<StateType>();
 
   return (
     <div id="game-option-content">
@@ -52,13 +59,10 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatc
           <button className="map-btn-02" onClick={(e) => {e.preventDefault();setMapSelector(2)}}>거품</button>
         </div>
         {/* setIsMatched가 없으면 대전신청으로 보이게 한다 */}
-        {/* mapSelector 가 왜 안 없지? 확인해보자
-        계획: 여기서 게임 찾는중까지 잘 가도록 하고 거기서부터는 새로운 socket에서 구현해야 한다
-        emit 하고 상대방이 승낙하면 on 해서 게임화면으로 아예 redirect해서 진행 대화방은 나가도 된다 그 때는 */}
-        <Link to={`${url}/${mapSelector}`} className="start" >{setIsMatched ? '게임 찾기' : '대전 신청'}</Link>
+        <Link to={{pathname:`${url}/${mapSelector}`, state:state}} className="start" >{setIsMatched ? '게임 찾기' : '대전 신청'}</Link>
       </form>
       <Route path={`${path}/:map`}>
-        <Modal id={Date.now()} smallModal content={<GameMatchContent setIsMatched={setIsMatched}/>}/>
+        <Modal id={Date.now()} smallModal content={<GameMatchContent setIsMatched={setIsMatched} />}/>
       </Route>
     </div>
   );

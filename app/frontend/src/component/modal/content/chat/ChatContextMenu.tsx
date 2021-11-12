@@ -16,9 +16,11 @@ interface chatContextMenuProps {
     x: number,
     y: number,
     target: string,
-    targetPosition: string
+    targetPosition: string,
+    targetAvatar: string,
   }>>
   socket: Socket,
+  targetAvatar: string,
 }
 
 const ConditionalContextMenu: FC<{
@@ -109,7 +111,7 @@ const ConditionalContextMenu: FC<{
 }
 
 const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
-  {socket, match, x, y, myPosition, targetPosition, targetState, target, closer}): JSX.Element => {
+  {socket, match, x, y, myPosition, targetPosition, targetState, target, closer, targetAvatar}): JSX.Element => {
   const myInfo = useContext(UserInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
 
@@ -121,7 +123,8 @@ const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
         x: 0,
         y: 0,
         target: "",
-        targetPosition: ""
+        targetPosition: "",
+        targetAvatar: "",
       })
     }}>
       <ul id="context-menu" style={{ top: y, left: x, }}>
@@ -134,7 +137,10 @@ const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
               DM 보내기
             </li>
             {/* 대전신청을 누르면 게임옵션 컨텐츠로 라우팅한다 대화방을 나가지 않은 상태에서 */}
-            <Link to={`${match.url}/gameoption`} style={{color: "inherit", textDecoration: "none"}}>
+            {/* 여기서 target, avatar 보내줘서 화면에 띄워주자 */}
+            <Link 
+              to={{pathname:`${match.url}/match/invite`, state: {target: target, targetAvatar: targetAvatar}}}
+              style={{color: "inherit", textDecoration: "none"}}>
               <li className="chat-context-li">대전 신청</li>
             </Link>
             <ConditionalContextMenu
