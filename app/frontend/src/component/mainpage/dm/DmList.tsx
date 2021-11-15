@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, Dispatch, SetStateAction, useContext } from "react";
+import { FC, useState, useEffect, useContext } from "react";
 import "../../../scss/dm/DmList.scss";
 import { SetDmInfoContext } from "../../../Context";
 import EasyFetch from "../../../utils/EasyFetch";
@@ -29,7 +29,10 @@ function msgFormatter(msg: string): string {
 const DmList: FC = (): JSX.Element => {
 
   const [dmList, setDmList] = useState<DM[]>([]);
+
   const setDmInfo = useContext(SetDmInfoContext);
+
+  let mounted = false;
 
   const getDmList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/list`);
@@ -44,7 +47,7 @@ const DmList: FC = (): JSX.Element => {
       val.lastMsgTime = new Time(val.lastMsgTime).getRelativeTime();
       return (val);
     });
-    setDmList(parsedRes);
+    if (mounted) setDmList(parsedRes);
   }
 
   /*!
@@ -52,6 +55,7 @@ const DmList: FC = (): JSX.Element => {
   * @brief DM 리스트를 가져오는 useEffect
   */
   useEffect(() => {
+    mounted = true;
     getDmList();
 
     /*!
@@ -65,6 +69,7 @@ const DmList: FC = (): JSX.Element => {
     global.socket.on("dm", socketGetDmList);
     global.socket.on("chatInvite", socketGetDmList);
     return (() => {
+      mounted = false;
       global.socket.off("dm", socketGetDmList);
       global.socket.off("chatInvite", socketGetDmList);
     });

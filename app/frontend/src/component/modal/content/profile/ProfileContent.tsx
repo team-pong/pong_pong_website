@@ -471,7 +471,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
         </div>
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={myInfo.nick}/>} /></Route>
         <Route path={`${props.match.path}/twofactor`}><Modal id={Date.now()} content={<TwoFactorOnOff />} smallModal/></Route>
-        <Route path={`${props.match.path}/manageFriend`}><Modal id={Date.now()} smallModal content={<ManageFriendContent nick={myInfo.nick}/>} /></Route>
+        <Route path={`${props.match.path}/manageFriend`}><Modal id={Date.now()} smallModal content={<ManageFriendContent />} /></Route>
       </div>
     );
   }
