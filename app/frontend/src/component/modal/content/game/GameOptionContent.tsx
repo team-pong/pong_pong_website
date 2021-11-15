@@ -1,6 +1,7 @@
-import { FC, useState, Dispatch, SetStateAction } from "react";
+import { FC, useState, Dispatch, SetStateAction, useContext } from "react";
 import { Route, RouteComponentProps, useHistory, withRouter } from "react-router";
 import { Link, useLocation } from "react-router-dom";
+import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
 import Modal from "../../Modal";
 import { GameInviteType } from "./GameContent";
 import GameMatchContent from "./GameMatchContent";
@@ -23,6 +24,17 @@ function getMapImg(mapType: MAP): string {
   }
 }
 
+function getMapTitle(mapSelector: number): string {
+  switch (mapSelector) {
+    case 0:
+      return "일반";
+    case 1:
+      return "막대기";
+    case 2:
+      return "거품";
+  }
+}
+
 interface GameOptionContent extends RouteComponentProps {
   setIsMatched?: Dispatch<SetStateAction<{
     isMatched: boolean;
@@ -35,7 +47,21 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatc
   const [mapSelector, setMapSelector] = useState(0);
   const history = useHistory();
 
+  const setDmInfo = useContext(SetDmInfoContext);
+  const myInfo = useContext(UserInfoContext);
   const {state} = useLocation<GameInviteType>();
+
+  const sendDmRequest = () => {
+    // setDmInfo({
+    //   isDmOpen: true,
+    //   target: state.target,
+    //   gameRequest: {
+    //     from: myInfo.nick,
+    //     gameRoomId: myInfo.nick + state.target,
+    //     gameMap: getMapTitle(mapSelector),
+    //   },
+    // });
+  };
 
   return (
     <div id="game-option-content">
@@ -53,7 +79,7 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatc
           <button className="map-btn-02" onClick={(e) => {e.preventDefault();setMapSelector(2)}}>거품</button>
         </div>
         {/* 대전신청의 경우 state에 값이 전달된다 */}
-        <Link to={{pathname:`${url}/${mapSelector}`, state:state}} className="start" >{!state ? '게임 찾기' : '대전 신청'}</Link>
+        <Link to={{pathname:`${url}/${mapSelector}`, state:state}} className="start" onClick={sendDmRequest}>{!state ? '게임 찾기' : '대전 신청'}</Link>
       </form>
       <Route path={`${path}/:map`}>
         <Modal id={Date.now()} smallModal content={<GameMatchContent setIsMatched={setIsMatched} />}/>

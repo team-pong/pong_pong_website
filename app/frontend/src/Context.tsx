@@ -58,6 +58,7 @@ const Global: FC = ({children}): JSX.Element => {
 
   const [dmInfo, setDmInfo] = useState<DmInfo>({
     chatRequest: null,
+    gameRequest: null,
     isDmOpen: false,
     target: ""
   });
