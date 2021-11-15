@@ -1,4 +1,4 @@
-import React, { FormEvent, FormEventHandler, MouseEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { FormEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-router-dom";
 import "/src/scss/content/profile/ProfileContent.scss";
 import Modal from "../../Modal";
@@ -45,6 +45,8 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 
   const avatarImgRef = useRef(null);
 
+  let mounted = false;
+
   //url parameter로 넘어오는 nick 문자열 저장
   const { nick } = useParams<{nick: string}>();
 
@@ -54,7 +56,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
    */
   const autoHighlightText = () => {
     const editInput : HTMLInputElement = document.getElementsByClassName("mf-edit-nick")[0] as HTMLInputElement;
-    
+
     setTimeout(() => {
       editInput.focus();
       editInput.select();
@@ -95,19 +97,19 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
       "avatar_url": myInfo.avatar_url
     }
     const res = await easyfetch.fetch(body);
-    
+
     if (res.err_msg !== "에러가 없습니다.") {
       setNoticeInfo({
-				isOpen: true,
-				seconds: 3,
-				content: `"${nickToEdit}" 은(는) 이미 존재하는 닉네임입니다.`,
-				backgroundColor: NOTICE_RED,
-			});
-      setNickToEdit(myInfo.nick);
+        isOpen: true,
+        seconds: 3,
+        content: `"${nickToEdit}" 은(는) 이미 존재하는 닉네임입니다.`,
+        backgroundColor: NOTICE_RED,
+      });
+      if (mounted) setNickToEdit(myInfo.nick);
       return ;
     }
     updateUserInfoState();
-    setIsEditNickClicked(false);
+    if (mounted) setIsEditNickClicked(false);
   };
 
   /*!
@@ -129,16 +131,14 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     })).json();
 
     if (res.avatar_url) {
-      const updatedMyInfo = {...myInfo};
-      updatedMyInfo.avatar_url = res.avatar_url;
-      setMyInfo(updatedMyInfo);
+      setMyInfo({...myInfo, avatar_url: res.avatar_url});
     } else {
       setNoticeInfo({
-				isOpen: true,
-				seconds: 3,
-				content: "아바타 변경에 실패했습니다.",
-				backgroundColor: NOTICE_RED,
-			});
+        isOpen: true,
+        seconds: 3,
+        content: "아바타 변경에 실패했습니다.",
+        backgroundColor: NOTICE_RED,
+      });
     }
   };
 
@@ -150,11 +150,11 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     if (e.target.files.length === 0) return ;
     if (e.target.files[0].size > 2097152) {
       setNoticeInfo({
-				isOpen: true,
-				seconds: 3,
-				content: "파일이 너무 큽니다. 이미지 파일은 2MB 이하여야 합니다.",
-				backgroundColor: NOTICE_RED,
-			});
+        isOpen: true,
+        seconds: 3,
+        content: "파일이 너무 큽니다. 이미지 파일은 2MB 이하여야 합니다.",
+        backgroundColor: NOTICE_RED,
+      });
       return ;
     }
     postAvatarChange(e.target.files[0]);
@@ -168,7 +168,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nick}`);
     const res = await easyfetch.fetch()
 
-    setOtherUserInfo(res);
+    if (mounted) setOtherUserInfo(res);
     return res;
   };
 
@@ -212,26 +212,26 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
    */
   const addFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend`, "POST");
-		const body = {
-			"friend_nick": nick
-		};
-		const res = await easyfetch.fetch(body);
+    const body = {
+      "friend_nick": nick
+    };
+    const res = await easyfetch.fetch(body);
 
-		if (res.err_msg !== "에러가 없습니다.") {
+    if (res.err_msg !== "에러가 없습니다.") {
       setNoticeInfo({
-				isOpen: true,
-				seconds: 3,
-				content: res.err_msg,
-				backgroundColor: NOTICE_RED,
-			});
-		} else {
+        isOpen: true,
+        seconds: 3,
+        content: res.err_msg,
+        backgroundColor: NOTICE_RED,
+      });
+    } else {
       setNoticeInfo({
-				isOpen: true,
-				seconds: 3,
-				content: "친구로 추가했습니다.",
-				backgroundColor: NOTICE_GREEN,
-			});
-      setIsAlreadyFriend(true);
+        isOpen: true,
+        seconds: 3,
+        content: "친구로 추가했습니다.",
+        backgroundColor: NOTICE_GREEN,
+      });
+      if (mounted) setIsAlreadyFriend(true);
     }
   };
 
@@ -241,23 +241,23 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
    */
   const deleteFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`, "DELETE");
-		const res = await easyfetch.fetch()
+    const res = await easyfetch.fetch()
 
-		if (res.err_msg !== "에러가 없습니다.") {
+    if (res.err_msg !== "에러가 없습니다.") {
       setNoticeInfo({
-				isOpen: true,
-				seconds: 3,
-				content: res.err_msg,
-				backgroundColor: NOTICE_RED,
-			});
-		} else {
+        isOpen: true,
+        seconds: 3,
+        content: res.err_msg,
+        backgroundColor: NOTICE_RED,
+      });
+    } else {
       setNoticeInfo({
-				isOpen: true,
-				seconds: 3,
-				content: "친구를 삭제했습니다.",
-				backgroundColor: NOTICE_GREEN,
-			});
-      setIsAlreadyFriend(false);
+        isOpen: true,
+        seconds: 3,
+        content: "친구를 삭제했습니다.",
+        backgroundColor: NOTICE_GREEN,
+      });
+      if (mounted) setIsAlreadyFriend(false);
     }
   };
 
@@ -282,28 +282,28 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
    */
   const blockFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/block`, "POST");
-		const body = {
-			"block_nick": nick,
-		};
-		const res = await easyfetch.fetch(body);
+    const body = {
+      "block_nick": nick,
+    };
+    const res = await easyfetch.fetch(body);
 
-		if (res.err_msg !== "에러가 없습니다.") {
+    if (res.err_msg !== "에러가 없습니다.") {
       setNoticeInfo({
-				isOpen: true,
-				seconds: 3,
-				content: "사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.",
-				backgroundColor: NOTICE_RED,
-			});
-		} else {
+        isOpen: true,
+        seconds: 3,
+        content: "사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.",
+        backgroundColor: NOTICE_RED,
+      });
+    } else {
       setNoticeInfo({
-				isOpen: true,
-				seconds: 3,
-				content: "사용자를 차단했습니다.",
-				backgroundColor: NOTICE_GREEN,
-			});
-      setIsBlockedFriend(true);
-      setIsAlreadyFriend(false);
-		}
+        isOpen: true,
+        seconds: 3,
+        content: "사용자를 차단했습니다.",
+        backgroundColor: NOTICE_GREEN,
+      });
+      if (mounted) setIsBlockedFriend(true);
+      if (mounted) setIsAlreadyFriend(false);
+    }
   }
 
   /*!
@@ -312,24 +312,24 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
    */
   const unblockFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/block?block_nick=${nick}`, "DELETE");
-		const res = await easyfetch.fetch()
+    const res = await easyfetch.fetch()
 
-		if (res.err_msg !== "에러가 없습니다.") {
+    if (res.err_msg !== "에러가 없습니다.") {
       setNoticeInfo({
-				isOpen: true,
-				seconds: 3,
-				content: "사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.",
-				backgroundColor: NOTICE_RED,
-			});
-		} else {
+        isOpen: true,
+        seconds: 3,
+        content: "사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.",
+        backgroundColor: NOTICE_RED,
+      });
+    } else {
       setNoticeInfo({
-				isOpen: true,
-				seconds: 3,
-				content: "사용자를 차단 해제했습니다.",
-				backgroundColor: NOTICE_GREEN,
-			});
-      setIsBlockedFriend(false);
-		}
+        isOpen: true,
+        seconds: 3,
+        content: "사용자를 차단 해제했습니다.",
+        backgroundColor: NOTICE_GREEN,
+      });
+      if (mounted) setIsBlockedFriend(false);
+    }
   };
 
   /*!
@@ -338,13 +338,9 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
    */
   const getIsAlreadyFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`);
-		const res = await easyfetch.fetch()
+    const res = await easyfetch.fetch()
 
-    if (res.bool) {
-      setIsAlreadyFriend(true);
-    } else {
-      setIsAlreadyFriend(false);
-    }
+    if (mounted) setIsAlreadyFriend(!!res.bool);
   };
 
   /*!
@@ -353,13 +349,9 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
    */
   const getIsBlockedFriend = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/block/isBlock?block_nick=${nick}`);
-		const res = await easyfetch.fetch()
+    const res = await easyfetch.fetch()
 
-    if (res.bool) {
-      setIsBlockedFriend(true);
-    } else {
-      setIsBlockedFriend(false);
-    }
+    if (mounted) setIsBlockedFriend(!!res.bool);
   };
 
  /*!
@@ -368,7 +360,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
   *         닉네임 수정을 취소하거나 완료하면 이벤트리스너를 제거한다.
   */
   let handlerToBeRemoved = null; //이벤트 핸들러 remove를 하기 위해 참조함
- 
+
   useEffect(() => {
     if (isEditNickClicked) {
       window.addEventListener("click", handlerToBeRemoved = function(e) {cancelEditNickMouse(e, nickToEdit)});
@@ -393,6 +385,11 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     }
   }, [myInfo]);
 
+  useEffect(() => {
+    mounted = true;
+    return (() => {mounted = false});
+  }, []);
+
   if (isMyProfile) {
     return (
       <div id="pr-profile">
@@ -403,7 +400,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
                 상세전적보기
               </button>
             </Link>
-            {!props.readonly ? 
+            {!props.readonly ?
             <>
               <Link to={`${props.match.url}/twofactor`}>
                 <button className="pr-btn">2단계 인증</button>
@@ -441,7 +438,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
                   onKeyDown={(e) => cancelEditNickKey(e)} />
               </form>
               <span className={"mf-nick" + (isEditNickClicked ? " mf-nick-clicked" : "")}>{myInfo.nick}</span>
-              {!props.readonly ? 
+              {!props.readonly ?
               <img
                 id="mf-edit-img"
                 src={isEditNickClicked ? "/public/check.png" : "/public/pencil.png"}
@@ -463,7 +460,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
         </div>
         <div id="lower-part">
           <div id="blank"></div>
-          {!props.readonly ? 
+          {!props.readonly ?
           <div id="delete-user">
             <div id="delete-icon">
               <img className="pr-trash-btn" src="/public/delete.png" alt="회원탈퇴" />
@@ -474,7 +471,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
         </div>
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={myInfo.nick}/>} /></Route>
         <Route path={`${props.match.path}/twofactor`}><Modal id={Date.now()} content={<TwoFactorOnOff />} smallModal/></Route>
-        <Route path={`${props.match.path}/manageFriend`}><Modal id={Date.now()} smallModal content={<ManageFriendContent nick={myInfo.nick}/>} /></Route>
+        <Route path={`${props.match.path}/manageFriend`}><Modal id={Date.now()} smallModal content={<ManageFriendContent />} /></Route>
       </div>
     );
   }
@@ -528,7 +525,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
       </div>
     );
   }
-  
+
   return (
     <Loading color="grey" style={{width: "100px", height: "100px", position: "absolute", left: "38%", top: "40%"}} />
   );

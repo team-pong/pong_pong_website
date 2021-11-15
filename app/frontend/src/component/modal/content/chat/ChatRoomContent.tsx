@@ -73,6 +73,8 @@ const Password: FC<{
   const [password, setPassword] = useState("");
   const setNoticeInfo = useContext(SetNoticeInfoContext);
 
+  let mounted = false;
+
   /*!
    * @author donglee
    * @brief 비밀번호를 입력하면 백엔드 검증 요청 후 대화방을 보여주거나 입장을 거절함
@@ -83,8 +85,10 @@ const Password: FC<{
     const res = await easyfetch.fetch();
 
     if (res) {
-      setIsProtected(false);
-      setPasswordPassed(true);
+      if (mounted) {
+        setIsProtected(false);
+        setPasswordPassed(true);
+      }
     } else {
       setNoticeInfo({
         isOpen: true,
@@ -111,10 +115,12 @@ const Password: FC<{
    *        - 자동으로 input에 focus함.
    */
   useEffect(() => {
+    mounted = true;
     if (isMadeMyself) {
       setIsProtected(false);
     }
     inputFocus();
+    return (() => {mounted = false});
   }, []);
 
   return (
@@ -203,6 +209,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   const setDmInfo = useContext(SetDmInfoContext);
   const setNoticeInfo = useContext(SetNoticeInfoContext);
 
+  let mounted = false;
 
   /*!
    * @author donglee
@@ -231,7 +238,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
     const res = await easyfetch.fetch();
     
     if (!res.err_msg) {
-      setChatRoomInfo({
+      if (mounted) setChatRoomInfo({
         title: res.title,
         type: res.type,
         current_people: res.current_people,
@@ -240,7 +247,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         channel_id: res.channel_id,
       });
     } else {
-      setNoReult(true);
+      if (mounted) setNoReult(true);
     }
     return res;
   };
@@ -252,7 +259,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   const connectSocket = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/ban?channel_id=${channel_id}&nick=${myInfo.nick}`);
     const res = await easyfetch.fetch()
-    
+
     if (res.bool) {
       history.back();
       throw ("현재 대화방에서 강제퇴장 당해 입장할 수 없습니다. 잠시 후에 다시 시도하십시오.");
@@ -276,6 +283,11 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
     } 
     return res;
   };
+
+  useEffect(() => {
+    mounted = true;
+    return (() => {mounted = false});
+  }, [])
 
   /*!
    * @author donglee
@@ -421,10 +433,10 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         .then(checkMax)
         .then((res) => {
             if (res.type === "protected") {
-              setIsProtected(true);
+              if (mounted) setIsProtected(true);
             } else {
               connectSocket().then((socket) => {
-                setSocket(socket);
+                if (mounted) setSocket(socket);
               }).catch((err) => {
                 setNoticeInfo({
                   isOpen: true,
@@ -435,7 +447,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
               });
             }
             if (res.type === "private") {
-              setIsPrivate(true);
+              if (mounted) setIsPrivate(true);
             }
           }
         ).catch((err) => {

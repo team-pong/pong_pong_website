@@ -14,7 +14,6 @@ const ContactUs: FC = (): JSX.Element => {
   /*!
    * @breif yochoi
    * @details 문의하기 버튼을 눌렀을 때 실행할 동작
-   * @todo 문의 API가 완성되면 연동해야함
    */
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();

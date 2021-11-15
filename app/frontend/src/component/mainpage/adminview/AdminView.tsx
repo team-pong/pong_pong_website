@@ -24,6 +24,8 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   const [questionType, setQuestionType] = useState<QuestionType>("notAnswered")
   const [questionList, setQuestionList] = useState<QuestionPrev[]>([]);
 
+  let mounted = false;
+
   /*!
    * @author yochoi
    * @brief 하위 Component 인 QuestionContent 에서 답변 보내기를 한 후에
@@ -33,12 +35,14 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
 
   const getNotAnsweredQuestionList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/beforeAnswerQuestions`, "GET");
-    setQuestionList(await easyfetch.fetch());
+    const res = await easyfetch.fetch();
+    if (mounted) setQuestionList(res);
   }
 
   const getAnsweredQuestionList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/afterAnswerQuestions`, "GET");
-    setQuestionList(await easyfetch.fetch());
+    const res = await easyfetch.fetch();
+    if (mounted) setQuestionList(res);
   }
 
   useEffect(() => {
@@ -49,7 +53,12 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   useEffect(() => {
     if (questionType === "notAnswered") getNotAnsweredQuestionList();
     else if (questionType === "answered") getAnsweredQuestionList();
-  }, [update])
+  }, [update]);
+
+  useEffect(() => {
+    mounted = true;
+    return (() => {mounted = false});
+  }, []);
 
   return (
     <div className="admin-view">

@@ -27,6 +27,8 @@ const ChatRoomList: FC<ChatRoomListProps> = ({ search, type }): JSX.Element => {
   const [protectedChatRoom, setProtectedChatRoom] = useState<ChatRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  let mounted = false;
+
   /*!
    * @author donglee, yochoi
    * @brief map 함수 안에서 대화방 목록 정보를 li에 담아서 return 하는 함수
@@ -71,8 +73,10 @@ const ChatRoomList: FC<ChatRoomListProps> = ({ search, type }): JSX.Element => {
           break ;
       }
     });
-    setPublicChatRoom(sortedPublicList);
-    setProtectedChatRoom(sortedProtectedList);
+    if (mounted) {
+      setPublicChatRoom(sortedPublicList);
+      setProtectedChatRoom(sortedProtectedList);
+    }
   }
 
   const getChatRoomList = async (): Promise<ChatRoom[]> => {
@@ -89,9 +93,14 @@ const ChatRoomList: FC<ChatRoomListProps> = ({ search, type }): JSX.Element => {
   }
 
   useEffect(() => {
+    mounted = true;
+    return (() => {mounted = false});
+  }, []);
+
+  useEffect(() => {
     getChatRoomList()
     .then(sortChatRoomList)
-    .then(() => setIsLoading(false));
+    .then(() => {if (mounted) setIsLoading(false)});
   }, [search]);
 
   if (isLoading) {

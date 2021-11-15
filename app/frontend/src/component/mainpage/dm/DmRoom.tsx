@@ -157,6 +157,8 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
 
   const myInfo = useContext(UserInfoContext);
 
+  let mounted = false;
+
   /*! 
    * @author yochoi
    * @brief 전송 버튼을 눌렀을 때 dmLog 를 갱신함
@@ -197,10 +199,11 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?receiver_nick=${dmInfo.target}`);
     const res = await easyfetch.fetch();
 
-    setDmLog(res);
+    if (mounted) setDmLog(res);
   };
 
   useEffect(() => {
+    mounted = true;
     getDmLog();
 
     if (dmInfo.request) {
@@ -218,6 +221,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     global.socket.on("dm", dmOn);
     global.socket.on("chatInvite", chatInviteOn);
     return (() => {
+      mounted = false;
       global.socket.off("dm", dmOn);
       global.socket.off("chatInvite", chatInviteOn);
     });
