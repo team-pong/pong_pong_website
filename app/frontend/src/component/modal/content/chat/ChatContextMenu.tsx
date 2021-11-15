@@ -136,10 +136,9 @@ const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
             <li className="chat-context-li" onClick={() => setDmInfo({isDmOpen: true, target: target})}>
               DM 보내기
             </li>
-            {/* 대전신청을 누르면 게임옵션 컨텐츠로 라우팅한다 대화방을 나가지 않은 상태에서 */}
-            {/* 여기서 target, avatar 보내줘서 화면에 띄워주자 */}
+            {/* 대전신청을 누르면 GameContent로 라우팅한다 대화방을 나가지 않은 상태에서 */}
             <Link 
-              to={{pathname:`${match.url}/match/invite`, state: {target: target, targetAvatar: targetAvatar}}}
+              to={{pathname:`${match.url}/game`, state: {target: target, targetAvatar: targetAvatar}}}
               style={{color: "inherit", textDecoration: "none"}}>
               <li className="chat-context-li">대전 신청</li>
             </Link>

@@ -1,6 +1,6 @@
 import React, { FC, Dispatch, SetStateAction, useState, useEffect, useContext, useRef } from "react";
 import { Link, Route, RouteComponentProps, useParams, withRouter } from "react-router-dom";
-import Modal from "../../Modal";
+import Modal, { GameContent } from "../../Modal";
 import ChatInviteContent from "./ChatInviteContent";
 import ChatContextMenu from "./ChatContextMenu";
 import EasyFetch from "../../../../utils/EasyFetch";
@@ -12,7 +12,6 @@ import { SetDmInfoContext, SetNoticeInfoContext, UserInfoContext } from "../../.
 import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
 import { NOTICE_RED } from "../../../mainpage/navbar/addFriend/AddFriend";
-import GameOptionContent from "../game/GameOptionContent";
 
 /*!
  * @author donglee
@@ -233,7 +232,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   const getChatRoomInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${channel_id}`);
     const res = await easyfetch.fetch();
-    
+    /* 대전신청 하고 난 후 새로고침 하면 여기서 에러가 난다
+       chnnel_id 를 찍어보면 :channel_id 이런 식으로 나옴 */
     if (!res.err_msg) {
       setChatRoomInfo({
         title: res.title,
@@ -582,8 +582,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         <Route path={`${match.url}/profile/:nick`}>
           <Modal id={Date.now()} smallModal content={<ProfileContent readonly/>}/>
         </Route>
-        <Route path={`${match.url}/match/:matchType`}>
-          <Modal id={Date.now()} content={<GameOptionContent />}/>
+        <Route path={`${match.path}/game`}>
+          <Modal id={Date.now()} content={<GameContent/>} />
         </Route>
       </div>
     );

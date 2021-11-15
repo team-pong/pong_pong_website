@@ -3,48 +3,51 @@ import { RouteComponentProps, useLocation, withRouter } from 'react-router-dom';
 import Loading from "../../../loading/Loading";
 import { io } from "socket.io-client";
 import "/src/scss/content/game/GameMatchContent.scss";
-import { StateType } from './GameOptionContent';
+import { GameInviteType } from './GameContent';
 
 interface gameMatchContentProps extends RouteComponentProps<{matchType: string}> {
   setIsMatched?: Dispatch<SetStateAction<{
     isMatched: boolean;
     roomId: string;
-    opponent: string;
-    position: string;
     socket: any;
   }>>;
 }
 
 const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setIsMatched}): JSX.Element => {
  
-  const {state} = useLocation<StateType>();
-  /* TODO: state를 location으로 받아와서 invite의 경우에는 avatar target을 보여준다 
-    이제 여기서 emit 하고 그런거 전부 다 구현해야 한다. 
-    이 화면을 종료하면 emit으로 신청 취소를 보내고
-    그러면 DM으로 상대방에게 취소됐다고 알려줘야 한다.
-  */
+  const {state} = useLocation<GameInviteType>();
 
   useEffect(() => {
     const url_params = url.split('/');
     const map = url_params.pop();
     let isMatched = false;
 
-    // setIsMatched가 prop으로 넘어오면 그건 게임 찾기로 진행된 것이다.
-    if (setIsMatched) {
-      setIsMatched({isMatched: false, roomId: '', opponent: '', position: '', socket: null});
-      const socket = io(`${global.BE_HOST}/game`);
+    setIsMatched({isMatched: false, roomId: '', socket: null});
+    const socket = io(`${global.BE_HOST}/game`);
+
+    /* state가 없으면 게임 찾기로 들어온 것이니 map 정보만 보내는데,
+       state가 있으면 대전 신청이니 target로 함께 백엔드로 보낸다 */
+    if (!state) {
       socket.emit(params.matchType, {map: map});
-      socket.on("matched", ({roomId, opponent, position}) => {
-        isMatched = true;
-        setIsMatched({isMatched: true, roomId, opponent, position, socket});
-      });
-      
-      return (() => {
-        if (isMatched === false) {
-          socket.disconnect();
-        }
-      })
+    } else {
+      socket.emit(params.matchType, {map: map/*, target: state.target*/});
     }
+
+    /* matched 이후로는 같은 값을 가지고 (여기서 opponent는 대전신청인 경우 target이 돼야 함)
+       진행되니까 게임을 진행시킨다.
+       그런데 여기서 matched가 되는 경우는 상대방이 DM 으로 온 초대를 승낙할 경우여야 한다
+       Caution! 여기서 새로고침을 하면 그래도 문제가 없어보이네?
+       Error! 근데 여기서 왜인지 모르겠는데 대전신청에선 새로고침하면 option까지만 다시 렌더된다. */
+    socket.on("matched", ({roomId}) => {
+      isMatched = true;
+      setIsMatched({isMatched: true, roomId, socket});
+    });
+    
+    return (() => {
+      if (isMatched === false) {
+        socket.disconnect();
+      }
+    });
   }, []);
 
   if (state) {

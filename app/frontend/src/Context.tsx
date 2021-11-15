@@ -13,19 +13,26 @@ interface UserInfo {
   ladder_level: number;
   status: string;
   admin: boolean;
-}
+};
 
-export interface Request {
+export interface ChatRequest {
   from: string,
   chatTitle: string,
-  channelId: number,  
+  channelId: number,
+};
+
+export interface GameRequest {
+  from: string,
+  gameRoomId: string,
+  gameMap: string,
 };
 
 export interface DmInfo {
-  request?: Request;
+  chatRequest?: ChatRequest;
+  gameRequest?: GameRequest;
   isDmOpen: boolean;
   target: string;
-}
+};
 
 export const UserInfoContext = createContext<UserInfo>(null);
 export const SetUserInfoContext = createContext<setter<UserInfo>>(null);
@@ -50,7 +57,7 @@ const Global: FC = ({children}): JSX.Element => {
   });
 
   const [dmInfo, setDmInfo] = useState<DmInfo>({
-    request: null,
+    chatRequest: null,
     isDmOpen: false,
     target: ""
   });

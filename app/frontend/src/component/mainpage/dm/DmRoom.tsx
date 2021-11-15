@@ -112,6 +112,7 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog}) 
         </div>
       );
     }
+    /* 여기에 game에 대한 msg.type이 올 것이고 parsedMsg를 적절하게 받아온다 */
 
     return (
       <div key={idx}>
@@ -154,6 +155,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   };
   const [textAreaMsg, setTextAreaMsg] = useState("");
   const [channelId, setChannelId] = useState(0);
+  /* gameRoomId state 있어야 한다 redirect를 위해 */
 
   const myInfo = useContext(UserInfoContext);
 
@@ -175,12 +177,20 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
    *        소켓으로 데이터를 전달하여 target 에게 DM이 가도록 함
    */
   const sendRequest = () => {
-    global.socket.emit("chatInvite", {
-      from: dmInfo.request.from,
-      target: dmInfo.target,
-      chatTitle: dmInfo.request.chatTitle,
-      channelId: dmInfo.request.channelId,
-    });
+    if (dmInfo.chatRequest) {
+      global.socket.emit("chatInvite", {
+        from: dmInfo.chatRequest.from,
+        target: dmInfo.target,
+        chatTitle: dmInfo.chatRequest.chatTitle,
+        channelId: dmInfo.chatRequest.channelId,
+      });
+    } else if (dmInfo.gameRequest) {
+      // global.socket.emit("gameInvite", {
+      //   from: dmInfo.gameRequest.from,
+      //   target: dmInfo.target,
+      //   gameRoomId: dmInfo.gameRequest.gameRoomId,
+      // });
+    }
     getDmLog();
   };
 
@@ -203,7 +213,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   useEffect(() => {
     getDmLog();
 
-    if (dmInfo.request) {
+    if (dmInfo.chatRequest || dmInfo.gameRequest) {
       sendRequest();
     }
 
@@ -217,6 +227,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
 
     global.socket.on("dm", dmOn);
     global.socket.on("chatInvite", chatInviteOn);
+    /* game 초대에 대한 적절한 리스너가 있어야 한다 */
     return (() => {
       global.socket.off("dm", dmOn);
       global.socket.off("chatInvite", chatInviteOn);
@@ -231,6 +242,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   }
   return (
     <div className="dm-room">
+      {console.log(dmLog)}
       <DmLogList dmLog={dmLog} myInfo={myInfo} setChannelId={setChannelId} setDmLog={setDmLog}/>
       <form className="dm-form">
         <textarea
