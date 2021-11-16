@@ -29,6 +29,8 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
 
   const [matchList, setMatchList] = useState<matchLog[]>([]);
 
+  let mounted = false;
+
   const getRecord = async () => {
     let apiAddress: string = "";
     switch (type) {
@@ -44,11 +46,13 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
     };
     const easyfetch = new EasyFetch(apiAddress);
     const res = await easyfetch.fetch()
-    setMatchList(res.matchList);
+    if (mounted) setMatchList(res.matchList);
   };
 
   useEffect(() => {
+    mounted = true;
     getRecord();
+    return (() => {mounted = false});
   }, [target, type]);
 
   return (
@@ -142,15 +146,19 @@ const RecordOpen: FC<{
 
 const RecordClose: FC = (): JSX.Element => {
 
+  let mounted = false;
+
   const [ladderRanking, setLadderRanking] = useState<any>([]);
 
   const getLadderRanking = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/match/ranking`);
-    setLadderRanking(await easyfetch.fetch());
+    if (mounted) setLadderRanking(await easyfetch.fetch());
   }
 
   useEffect(() => {
+    mounted = true;
     getLadderRanking();
+    return (() => {mounted = false})
   }, []);
 
   return (
@@ -203,6 +211,8 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
     ladder_level: 0
   });
 
+  let mounted = false;
+
   const search = async (nick?: string) => {
     if (nickNameToFind || nick) {
       let easyfetch = null;
@@ -213,7 +223,7 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
       }
       const res = await easyfetch.fetch()
       if (res.err_msg) {
-        setIsRecordOpen(recordState.noResult);
+        if (mounted) setIsRecordOpen(recordState.noResult);
         return ;
       }
       setStats({
@@ -225,9 +235,9 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
         winning_rate: res.total_games == 0 ? 0 : (res.win_games / res.total_games) * 100,
         ladder_level: res.ladder_level
       });
-      setIsRecordOpen(recordState.open);
+      if (mounted) setIsRecordOpen(recordState.open);
     } else {
-      setIsRecordOpen(recordState.close);
+      if (mounted) setIsRecordOpen(recordState.close);
     }
   }
 
@@ -236,10 +246,12 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
    * @brief props로 nick이 있으면 프로필에서 열람 한 것이므로 바로 검색을 실행한다
    */
   useEffect(() => {
+    mounted = true;
     if (nick) {
       setNickNameToFind(nick);
       search(nick);
     }
+    return (() => {mounted = false});
   }, []);
 
   return (

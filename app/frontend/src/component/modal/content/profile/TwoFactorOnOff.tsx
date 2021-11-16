@@ -10,22 +10,26 @@ const TwoFactorOnOff: FC = (): JSX.Element => {
   const sliderRef = useRef<HTMLSpanElement>(null);
   const sliderInsideRef = useRef<HTMLDivElement>(null);
 
+  let mounted = false;
+
   const getOnOff = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/session/twoFactor`, "GET");
     const res = await easyfetch.fetch();
     if (res.email === true) {
-      setOnOff(true);
+      if (mounted) setOnOff(true);
       sliderInsideRef.current.style.transform = "translateX(26px)"
       sliderRef.current.style.backgroundColor = "#2196F3";
     } else {
-      setOnOff(false);
+      if (mounted) setOnOff(false);
       sliderInsideRef.current.style.transform = "";
       sliderRef.current.style.backgroundColor = "#ccc";
     }
   }
 
   useEffect(() => {
+    mounted = true;
     getOnOff();
+    return (() => {mounted = false});
   }, []);
 
   useEffect(() => {
