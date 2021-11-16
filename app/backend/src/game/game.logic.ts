@@ -56,6 +56,7 @@ export class GameLogic {
     _rightBarMovement : NodeJS.Timeout;
     _type : number;
     _gameInfo : GameInfo;
+    _speed_multiply : number = 1.07;
 
     constructor(
         width : number,
@@ -186,6 +187,7 @@ export class GameLogic {
 
     initGame() {
         console.log("init game");
+        this._speed = 3;
         this._ball[0] = this._rightWall / 2 // ballX
         this._ball[1] = this._bottomWall / 2 // ballY
 
@@ -243,6 +245,7 @@ export class GameLogic {
                 this._direction[1] *= -1;
                 // console.log("collision circle");
                 this._iscollision = true;
+                this._speed *= this._speed_multiply;
             }
             return true;
         } else {
@@ -285,6 +288,7 @@ export class GameLogic {
         if (distance <= radius) {
             if (this._iscollision == false) {
                 this._iscollision = true;
+                this._speed *= this._speed_multiply;
                 if (horizonEdge != Edge.NONE) this._direction[0] *= -1;
                 if (verticalEdge != Edge.NONE) {
                     if (verticalEdge == Edge.TOP && this._direction[1] < 0) {
