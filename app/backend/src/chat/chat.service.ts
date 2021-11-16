@@ -34,9 +34,10 @@ export class ChatService {
       return new ErrMsgDto(err10);
     if (20 < max_people)  // 채널 최대 인원의 최대값 보다 크면
       return new ErrMsgDto(err15);
-    // if (await this.chatUsersRepo.count({user_id: owner_id}))
-    //   return new ErrMsgDto(err9);
-    const hashed_password = crypto.createHash('sha256').update(passwd).digest('base64');
+    let hashed_password = '';
+    if (passwd) {
+      hashed_password = crypto.createHash('sha256').update(passwd).digest('base64');
+    }
     const newChat = await this.chatRepo.save({owner_id: owner_id, title: title, type: type, passwd: hashed_password, max_people: max_people, current_people: 1});
     await this.chatUsersRepo.save({channel_id: newChat.channel_id, user_id: owner_id})  // 새로만든 채널에 owner 추가
 
