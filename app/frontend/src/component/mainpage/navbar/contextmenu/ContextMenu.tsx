@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useContext } from 'react';
+import {Dispatch, FC, SetStateAction, useContext} from 'react';
 import { Link } from 'react-router-dom';
 import { SetDmInfoContext } from '../../../../Context';
 import EasyFetch from '../../../../utils/EasyFetch';
@@ -95,11 +95,14 @@ const ContextMenu: FC<contextMenuProps> =
         style={{textDecoration: "none"}}>
         <li className="cm-list">프로필 보기</li>
       </Link>
-      <Link
-        to={`mainpage/spectate?nick=${target}`}
-        style={{textDecoration: "none"}}>
-        <li className="cm-list">관전하기</li>
-      </Link>
+      {/* target 이 ongame 인 상태면 관전하기 버튼을 보여줌 */}
+      {friendList.find((el) => el.nick === target)?.status === "ongame" &&
+        <Link
+          to={`mainpage/spectate?nick=${target}`}
+          style={{textDecoration: "none"}}>
+          <li className="cm-list">관전하기</li>
+        </Link>
+      }
       <li className="cm-list" onClick={() => setDmInfo({isDmOpen: true, target: target})}>메세지 보내기</li>
       <li className="cm-list" onClick={deleteFriend}>친구 삭제</li>
       <li className="cm-list" onClick={blockFriend}>친구 차단</li>
