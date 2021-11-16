@@ -93,7 +93,7 @@ const MainPage = ({match}): JSX.Element => {
         <Route path={`${match.path}/spectate`}><Modal id={Date.now()} content={<GameSpectateContent />} /></Route>
       </Switch>
       <main>
-        <Route path={`${match.path}`} exact>
+        <Route path={`${match.path}`}>
           <div id="button-container">
             <Link
               to={`${match.url}/record`}
