@@ -4,6 +4,7 @@ import { RouteComponentProps, withRouter, useHistory, Redirect } from "react-rou
 import "/src/scss/content/game/GameRoomContent.scss";
 import { io } from "socket.io-client";
 import { UserInfoContext } from "../../../../Context";
+import NoResult from "../../../noresult/NoResult";
 
 interface MatchInfo {
   lPlayerNickname: string,
@@ -174,6 +175,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    *        맨 처음 배경과 양쪽 바, 공을 그려준다
    */
   useEffect(() => {
+    if (socket === null) return;
     socket.on("init", (data) => {
       setMap(data.type);
       setCanvas(initCanvas());
@@ -192,7 +194,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
         setObsCircle03(initCircle(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2]));
       }
       setInit(1);
-    })
+    });
 
     socket.on("update", (data) => {
       setLeftY(data.bar00[1]);
@@ -317,34 +319,40 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     }
   }, [ballX, ballY]);
 
-  // useEffect(() => {
-    
-  // }, [matchInfo])
+  if (socket === null) return (
+    <NoResult
+      style={{
+        width: "50%",
+        height: "50%",
+        fontSize: "200%"
+      }}
+      text={"잘못된 접근입니다."}/>
+  );
 
   return (
     <>
-    <div className="ingame-match-info">
-      <div className="left-player">
-        <div className="left-player-profile"><img src={matchInfo.lPlayerAvatarUrl}/></div>
-        <div className="left-player-nickname">{matchInfo.lPlayerNickname}</div>
-        <div className="left-player-score">{matchInfo.lPlayerScore}</div>
+      <div className="ingame-match-info">
+        <div className="left-player">
+          <div className="left-player-profile"><img src={matchInfo.lPlayerAvatarUrl}/></div>
+          <div className="left-player-nickname">{matchInfo.lPlayerNickname}</div>
+          <div className="left-player-score">{matchInfo.lPlayerScore}</div>
+        </div>
+        vs
+        <div className="right-player">
+          <div className="right-player-score">{matchInfo.rPlayerScore}</div>
+          <div className="right-player-nickname">{matchInfo.rPlayerNickname}</div>
+          <div className="right-player-profile"><img src={matchInfo.rPlayerAvatarUrl}/></div>
+        </div>
       </div>
-      vs
-      <div className="right-player">
-        <div className="right-player-score">{matchInfo.rPlayerScore}</div>
-        <div className="right-player-nickname">{matchInfo.rPlayerNickname}</div>
-        <div className="right-player-profile"><img src={matchInfo.rPlayerAvatarUrl}/></div>
+      <div className="ingame-side-bar">
+        <div className="view-number">view {matchInfo.viewNumber}</div>
+        <button className="give-up" onClick={onClickGiveUp}>기권</button>
       </div>
-    </div>
-    <div className="ingame-side-bar">
-      <div className="view-number">view {matchInfo.viewNumber}</div>
-      <button className="give-up" onClick={onClickGiveUp}>기권</button>
-    </div>
-    <div className="ingame-footer">
-      {showExitButton ? <button className="exit" onClick={onClickExit}>나가기</button> : null}
-    </div>
-    <canvas id="ping-pong"></canvas>
-    {isExit && <Redirect to="/mainpage" />}
+      <div className="ingame-footer">
+        {showExitButton ? <button className="exit" onClick={onClickExit}>나가기</button> : null}
+      </div>
+      <canvas id="ping-pong"></canvas>
+      {isExit && <Redirect to="/mainpage" />}
     </>
   );
 };
