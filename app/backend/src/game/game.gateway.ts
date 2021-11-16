@@ -324,7 +324,7 @@ export class GameGateway {
 	@SubscribeMessage('ladder')
 	async handdleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: GameMapDto) {
 		try {
-			const map_type = Number(map);
+			const map_type = Number(map.map);
 			const game_type = 'ranked';
 			// 쿠키에서 sid 파싱
 			const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
@@ -345,7 +345,7 @@ export class GameGateway {
 			// 같은 맵을 선택하고 기다리는중인 사람들 리스트
 			const waiters = this.ladder_queue.filter((element) => element.map == map_type);
 			if (waiters.length >= 2) {
-				const gameLogic = new GameLogic(700, 450, Number(map), this.server);
+				const gameLogic = new GameLogic(700, 450, map_type, this.server);
 				const playerLeft = waiters[0];
 				const playerRight = waiters[1];
 	
