@@ -1,5 +1,5 @@
 import "../../../../scss/content/chat/ChatInviteContent.scss";
-import { Dispatch, FC, SetStateAction, useContext, useEffect, useState } from "react";
+import {Dispatch, FC, SetStateAction, useContext, useEffect, useRef, useState} from "react";
 import { DmInfo, SetDmInfoContext, SetNoticeInfoContext, UserInfoContext } from "../../../../Context";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
@@ -210,7 +210,7 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
   const myInfo = useContext(UserInfoContext);
   const setNoticeInfo = useContext(SetNoticeInfoContext);
 
-  let mounted = false;
+  const mounted = useRef(false);
 
   /*!
    * @author donglee
@@ -232,7 +232,7 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
     const res = await easyfetch.fetch();
 
     if (!res.err_msg) {
-      if (mounted) setResult(res);
+      if (mounted.current) setResult(res);
     } else {
       setNoticeInfo({
         isOpen: true,
@@ -251,13 +251,13 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
     const res = await easyfetch.fetch();
 
-    if (mounted) setFriendList(res.friendList);
+    if (mounted.current) setFriendList(res.friendList);
   };
 
   useEffect(() => {
-    mounted = true;
+    mounted.current = true;
     getFriendList();
-    return (() => {mounted = false});
+    return (() => {mounted.current = false});
   }, []);
 
   return (
