@@ -73,7 +73,7 @@ const Password: FC<{
   const [password, setPassword] = useState("");
   const setNoticeInfo = useContext(SetNoticeInfoContext);
 
-  let mounted = false;
+  const mounted = useRef(false);
 
   /*!
    * @author donglee
@@ -85,7 +85,7 @@ const Password: FC<{
     const res = await easyfetch.fetch();
 
     if (res) {
-      if (mounted) {
+      if (mounted.current) {
         setIsProtected(false);
         setPasswordPassed(true);
       }
@@ -115,12 +115,12 @@ const Password: FC<{
    *        - 자동으로 input에 focus함.
    */
   useEffect(() => {
-    mounted = true;
+    mounted.current = true;
     if (isMadeMyself) {
       setIsProtected(false);
     }
     inputFocus();
-    return (() => {mounted = false});
+    return (() => {mounted.current = false});
   }, []);
 
   return (
