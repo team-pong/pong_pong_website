@@ -12,7 +12,7 @@ declare global {
   }
 }
 
-global.BE_HOST = "http://127.0.0.1";
+global.BE_HOST = window.location.origin;
 global.socket = io(`${global.BE_HOST}/global`);
 
 const element =

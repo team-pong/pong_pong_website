@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import {FC, useEffect, useRef, useState} from "react";
 import { Route, RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
 import EasyFetch from "../../../utils/EasyFetch";
@@ -24,6 +24,8 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   const [questionType, setQuestionType] = useState<QuestionType>("notAnswered")
   const [questionList, setQuestionList] = useState<QuestionPrev[]>([]);
 
+  const mounted = useRef(false);
+
   /*!
    * @author yochoi
    * @brief 하위 Component 인 QuestionContent 에서 답변 보내기를 한 후에
@@ -33,12 +35,14 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
 
   const getNotAnsweredQuestionList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/beforeAnswerQuestions`, "GET");
-    setQuestionList(await easyfetch.fetch());
+    const res = await easyfetch.fetch();
+    if (mounted.current) setQuestionList(res);
   }
 
   const getAnsweredQuestionList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/afterAnswerQuestions`, "GET");
-    setQuestionList(await easyfetch.fetch());
+    const res = await easyfetch.fetch();
+    if (mounted.current) setQuestionList(res);
   }
 
   useEffect(() => {
@@ -49,7 +53,12 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   useEffect(() => {
     if (questionType === "notAnswered") getNotAnsweredQuestionList();
     else if (questionType === "answered") getAnsweredQuestionList();
-  }, [update])
+  }, [update]);
+
+  useEffect(() => {
+    mounted.current = true;
+    return (() => {mounted.current = false});
+  }, []);
 
   return (
     <div className="admin-view">

@@ -1,5 +1,5 @@
 import "../../../../scss/content/chat/ChatInviteContent.scss";
-import { Dispatch, FC, SetStateAction, useContext, useEffect, useState } from "react";
+import {Dispatch, FC, SetStateAction, useContext, useEffect, useRef, useState} from "react";
 import { DmInfo, SetDmInfoContext, SetNoticeInfoContext, UserInfoContext } from "../../../../Context";
 import EasyFetch from "../../../../utils/EasyFetch";
 import { setAchievementImg, setAchievementStr } from "../../../../utils/setAchievement";
@@ -110,7 +110,7 @@ interface FriendListProps {
   myInfo: UserInfo,
   chatUsers: ChatUser[],
 };
-         
+
 const FriendList: FC<FriendListProps> = (
   {friendList, setDmInfo, chatTitle, channelId, myInfo, chatUsers}): JSX.Element => {
 
@@ -210,6 +210,8 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
   const myInfo = useContext(UserInfoContext);
   const setNoticeInfo = useContext(SetNoticeInfoContext);
 
+  const mounted = useRef(false);
+
   /*!
    * @author donglee
    * @brief 검색하는 search를 통해서 enter나 검색버튼을 클릭할시 API요청을 보냄
@@ -230,7 +232,7 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
     const res = await easyfetch.fetch();
 
     if (!res.err_msg) {
-      setResult(res);
+      if (mounted.current) setResult(res);
     } else {
       setNoticeInfo({
         isOpen: true,
@@ -245,15 +247,17 @@ const ChatInviteContent: FC<ChatinviteContentProps> = ({chatTitle, channelId, ch
    * @author donglee
    * @brief 초대하기에서 친구들 목록을 처음에 보여주기 위해 API로 받아옴
    */
-	const getFriendList = async () => {
-		const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
-		const res = await easyfetch.fetch();
+  const getFriendList = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
+    const res = await easyfetch.fetch();
 
-		setFriendList(res.friendList);
+    if (mounted.current) setFriendList(res.friendList);
   };
 
   useEffect(() => {
+    mounted.current = true;
     getFriendList();
+    return (() => {mounted.current = false});
   }, []);
 
   return (

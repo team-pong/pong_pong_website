@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import {Dispatch, FC, SetStateAction, useEffect, useRef, useState} from "react";
 import NoResult from "../../../noresult/NoResult";
 import CircleChart from "../../../chart/CircleChart";
 import BarChart from "../../../chart/BarChart";
@@ -29,6 +29,8 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
 
   const [matchList, setMatchList] = useState<matchLog[]>([]);
 
+  let mounted = false;
+
   const getRecord = async () => {
     let apiAddress: string = "";
     switch (type) {
@@ -44,11 +46,13 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
     };
     const easyfetch = new EasyFetch(apiAddress);
     const res = await easyfetch.fetch()
-    setMatchList(res.matchList);
+    if (mounted) setMatchList(res.matchList);
   };
 
   useEffect(() => {
+    mounted = true;
     getRecord();
+    return (() => {mounted = false});
   }, [target, type]);
 
   return (
@@ -61,7 +65,7 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
               {' '}
               {log.user_nick}
               {' '}
-              <img src={`/public/number/${log.other_score}.svg`} alt={`${log.user_score}`} style={{borderRadius: "0"}}/>
+              <img src={`/public/number/${log.user_score}.svg`} alt={`${log.user_score}`} style={{borderRadius: "0"}}/>
             </span>
             <img className="record-list-vs" src="/public/vs.svg"/>
             <span className="player">
@@ -142,15 +146,20 @@ const RecordOpen: FC<{
 
 const RecordClose: FC = (): JSX.Element => {
 
+  let mounted = false;
+
   const [ladderRanking, setLadderRanking] = useState<any>([]);
 
   const getLadderRanking = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/match/ranking`);
-    setLadderRanking(await easyfetch.fetch());
+    const res = await easyfetch.fetch();
+    if (mounted) setLadderRanking(res);
   }
 
   useEffect(() => {
+    mounted = true;
     getLadderRanking();
+    return (() => {mounted = false})
   }, []);
 
   return (
@@ -203,32 +212,34 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
     ladder_level: 0
   });
 
+  const mounted = useRef(false);
+
   const search = async (nick?: string) => {
-    if (nickNameToFind || nick) {
-      let easyfetch = null;
-      if (nick) {
-        easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nick}`);  
-      } else {
-        easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nickNameToFind}`);
-      }
-      const res = await easyfetch.fetch()
-      if (res.err_msg) {
-        setIsRecordOpen(recordState.noResult);
-        return ;
-      }
-      setStats({
-        nick: res.nick,
-        avatar_url: res.avatar_url,
-        total_games: res.total_games,
-        win_games: res.win_games,
-        loss_games: res.loss_games,
-        winning_rate: res.total_games == 0 ? 0 : (res.win_games / res.total_games) * 100,
-        ladder_level: res.ladder_level
-      });
-      setIsRecordOpen(recordState.open);
-    } else {
-      setIsRecordOpen(recordState.close);
+    if (!nickNameToFind && !nick) {
+      if (mounted) setIsRecordOpen(recordState.close)
+      return ;
     }
+    let easyfetch = null;
+    if (nick) {
+      easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nick}`);
+    } else {
+      easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nickNameToFind}`);
+    }
+    const res = await easyfetch.fetch()
+    if (res.err_msg) {
+      if (mounted.current) setIsRecordOpen(recordState.noResult);
+      return ;
+    }
+    if (mounted.current) setStats({
+      nick: res.nick,
+      avatar_url: res.avatar_url,
+      total_games: res.total_games,
+      win_games: res.win_games,
+      loss_games: res.loss_games,
+      winning_rate: res.total_games == 0 ? 0 : (res.win_games / res.total_games) * 100,
+      ladder_level: res.ladder_level
+    });
+    if (mounted.current) setIsRecordOpen(recordState.open);
   }
 
   /*!
@@ -236,10 +247,12 @@ const RecordContent: FC<{nick?: string}> = ({nick}): JSX.Element => {
    * @brief props로 nick이 있으면 프로필에서 열람 한 것이므로 바로 검색을 실행한다
    */
   useEffect(() => {
+    mounted.current = true;
     if (nick) {
       setNickNameToFind(nick);
       search(nick);
     }
+    return (() => {mounted.current = false});
   }, []);
 
   return (

@@ -168,6 +168,8 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
 
   const myInfo = useContext(UserInfoContext);
 
+  const mounted = useRef(false);
+
   /*! 
    * @author yochoi
    * @brief 전송 버튼을 눌렀을 때 dmLog 를 갱신함
@@ -217,10 +219,11 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?receiver_nick=${dmInfo.target}`);
     const res = await easyfetch.fetch();
 
-    setDmLog(res);
+    if (mounted.current) setDmLog(res);
   };
 
   useEffect(() => {
+    mounted.current = true;
     getDmLog();
 
     if (dmInfo.chatRequest || dmInfo.gameRequest) {
@@ -244,6 +247,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     // global.socket.on("gameInvite", gameInviteOn);
     /* game 초대에 대한 적절한 리스너가 있어야 한다 */
     return (() => {
+      mounted.current = false;
       global.socket.off("dm", dmOn);
       global.socket.off("chatInvite", chatInviteOn);
       // global.socket.off("gameInvite", gameInviteOn);
