@@ -21,9 +21,6 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-
-
 
 <!-- PROJECT LOGO -->
 <br />
@@ -32,13 +29,10 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">project_title</h3>
+<h3 align="center">ping_pong_website</h3>
 
   <p align="center">
-    project_description
-    <br />
-    <a href="https://github.com/AMATEURTOSS/ping_pong_website"><strong>Explore the docs »</strong></a>
-    <br />
+    Cool Ping Pong Game Site
     <br />
     <a href="https://github.com/AMATEURTOSS/ping_pong_website">View Demo</a>
     ·
@@ -83,7 +77,7 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `AMATEURTOSS`, `ping_pong_website`, `twitter_handle`, `linkedin_username`, `amateur.toss`, `gmail`, `project_title`, `project_description`
+Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `AMATEURTOSS`, `ping_pong_website`, `twitter_handle`, `linkedin_username`, `amateur.toss`, `gmail`, `ping_pong_website`, `Cool Ping Pong Game Site`
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
