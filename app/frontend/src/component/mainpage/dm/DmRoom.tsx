@@ -28,10 +28,22 @@ interface DmLogListProps {
   myInfo: UserInfo,
   setChannelId: Dispatch<SetStateAction<number>>,
   setDmLog: Dispatch<SetStateAction<DMLog[]>>,
-  setGameRoomId: Dispatch<SetStateAction<string>>,
+  setGameMapId: Dispatch<SetStateAction<number>>,
+  setGameInviteTarget: Dispatch<SetStateAction<string>>,
 }
 
-const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, setGameRoomId}) => {
+function getMapTitle(mapSelector: number): string {
+  switch (mapSelector) {
+    case 0:
+      return "일반";
+    case 1:
+      return "막대기";
+    case 2:
+      return "거품";
+  }
+}
+
+const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, setGameMapId, setGameInviteTarget}) => {
 
   /*!
    * @author donglee
@@ -49,16 +61,18 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
    * @brief - 대화방 초대를 승낙하면 해당 channelId를 이용해 redirect 함
    *        - DB 에서 해당 로그를 삭제하고 DmLog 를 업데이트함
    */
-  const approveInvite = async (channelId: any, logId: number, type: string) => {
+  const approveInvite = async (channelId: any, logId: number, type: string, from?: string) => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/oneLog?dm_log_id=${logId}`, "DELETE");
     const res = await easyfetch.fetch();
 
     if (!res.err_msg) {
       updateDmLog(logId);
-      if (type === "chat")
+      if (type === "chat") {
         setChannelId(channelId);
-      // else
-      //   setGameRoomId(channelId);
+      } else {
+        setGameInviteTarget(from);
+        setGameMapId(channelId);
+      }
     } else {
       alert(res.err_msg);
     }
@@ -105,7 +119,7 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
                   className="dm-reply-img"
                   src="/public/green-check.png"
                   alt="승낙"
-                  onClick={() => approveInvite(parsedMsg.channelId, msg.id, msg.type)} />
+                  onClick={() => approveInvite(parsedMsg.channelId, msg.id, msg.type, msg.from)} />
               </div>
               <div className="dm-request-reject">
                 <img
@@ -120,7 +134,6 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
         </div>
       );
     }
-    /* 여기에 game에 대한 msg.type이 올 것이고 parsedMsg를 적절하게 받아온다 */
 
     return (
       <div key={idx}>
@@ -163,8 +176,8 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   };
   const [textAreaMsg, setTextAreaMsg] = useState("");
   const [channelId, setChannelId] = useState(0);
-  const [gameRoomId, setGameRoomId] = useState("");
-  /* gameRoomId state 있어야 한다 redirect를 위해 */
+  const [gameMapId, setGameMapId] = useState(3);
+  const [gameInviteTarget, setGameInviteTarget] = useState("");
 
   const myInfo = useContext(UserInfoContext);
 
@@ -196,12 +209,11 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
         channelId: dmInfo.chatRequest.channelId,
       });
     } else if (dmInfo.gameRequest) {
-      // global.socket.emit("gameInvite", {
-      //   from: dmInfo.gameRequest.from,
-      //   target: dmInfo.target,
-      //   gameRoomId: dmInfo.gameRequest.gameRoomId,
-      //   gameMap: dmInfo.gameRequest.from + dmInfo.target,
-      // });
+      global.socket.emit("gameInvite", {
+        from: dmInfo.gameRequest.from,
+        target: dmInfo.target,
+        gameMap: getMapTitle(dmInfo.gameRequest.gameMap),
+      });
     }
     getDmLog();
   };
@@ -238,19 +250,18 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
       setDmLog([{...request}, ...dmLogRef.current]);
     };
 
-    // const gameInviteOn = (request) => {
-    //   setDmLog([{...request}, ...dmLogRef.current]);
-    // }
+    const gameInviteOn = (request) => {
+      setDmLog([{...request}, ...dmLogRef.current]);
+    }
 
     global.socket.on("dm", dmOn);
     global.socket.on("chatInvite", chatInviteOn);
-    // global.socket.on("gameInvite", gameInviteOn);
-    /* game 초대에 대한 적절한 리스너가 있어야 한다 */
+    global.socket.on("gameInvite", gameInviteOn);
     return (() => {
       mounted.current = false;
       global.socket.off("dm", dmOn);
       global.socket.off("chatInvite", chatInviteOn);
-      // global.socket.off("gameInvite", gameInviteOn);
+      global.socket.off("gameInvite", gameInviteOn);
     });
   }, []);
 
@@ -260,17 +271,23 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
       state: {isInvited: true},
     }} />);
   }
-  // if (gameRoomId) {
-  //   return ( 
-  //     <Redirect push to={{
-  //       pathname: `/mainpage/game/game/${gameRoomId}`,
-  //       state: {isInvited: true},
-  //     }} />
-  //   );
-  // }
+  if (gameMapId < 3) {
+    return ( 
+      <Redirect push to={{
+        pathname: `/mainpage/game`,
+        state: {target: gameInviteTarget, mapId: gameMapId},
+      }} />
+    );
+  }
   return (
     <div className="dm-room">
-      <DmLogList dmLog={dmLog} myInfo={myInfo} setChannelId={setChannelId} setDmLog={setDmLog} setGameRoomId={setGameRoomId}/>
+      <DmLogList
+        dmLog={dmLog}
+        myInfo={myInfo}
+        setChannelId={setChannelId}
+        setDmLog={setDmLog}
+        setGameMapId={setGameMapId}
+        setGameInviteTarget={setGameInviteTarget}/>
       <form className="dm-form">
         <textarea
           className="dm-msg-textarea"
