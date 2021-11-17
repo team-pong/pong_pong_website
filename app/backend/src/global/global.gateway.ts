@@ -107,7 +107,7 @@ export class GlobalGateway {
     await this.dmRepo.save({
       sender_id: user_id,
       receiver_id: target_info.user_id,
-      content: JSON.stringify({gameRoomId: body.gameRoomId, gameMap: body.gameMap}),
+      content: JSON.stringify({gameMap: body.gameMap}),
       type: 'game'
     });
     
