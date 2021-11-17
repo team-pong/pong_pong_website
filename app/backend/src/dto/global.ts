@@ -31,8 +31,5 @@ export class InviteGameDto {
 	target: string;
 
 	@IsString()
-	gameRoomId: string;
-
-	@IsString()
 	gameMap: string;
 }
