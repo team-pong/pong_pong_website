@@ -21,7 +21,8 @@ export class MatchService {
       return new ErrMsgDto(err2);
     if (type != 'general' && type != 'ranked')  // 게임 타입이 일반게임 혹은 랭크게임이 아니면
       return new ErrMsgDto(err18);
-    if (map != 1 && map != 2 && map != 3)  // 맵은 1, 2, 3 중에 하나 이어야함
+    console.log('map:', map);
+    if (map !== 0 && map !== 1 && map !== 2)  // 맵은 0, 1, 2 중에 하나 이어야함
       return new ErrMsgDto(err19);
     await this.matchRepo.save({winner_id: winner_id, loser_id: loser_id, winner_score: winner_score, loser_score: loser_score, type: type, map: map});
     const winner = await this.usersRepo.findOne({user_id: winner_id});

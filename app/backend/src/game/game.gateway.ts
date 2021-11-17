@@ -20,7 +20,7 @@ interface User {
 	map: Number,
 }
 
-type MatchType = 'normal' | 'ladder';
+type MatchType = 'general' | 'ranked';
 
 interface MatchInfo {
   lPlayerNickname: string,
@@ -120,33 +120,31 @@ export class GameGateway {
 		}
 	}
 
-	saveResult(winner: User, loser: User, winner_score: number, loser_score: number, room_id: string) {
-		this.matchService.createMatch(winner.id, loser.id, winner_score, loser_score, this.games[room_id].type, this.games[room_id].map);
-		if (this.games[room_id].type == 'ladder') {
-			this.matchService.updateLadderScore(winner.id, 100);
-			this.matchService.updateLadderScore(loser.id, -100);
-		}
+	async saveResult(winner: User, loser: User, winner_score: number = 0, loser_score: number = 0, room_id: string) {
+		const res = await this.matchService.createMatch(winner.id, loser.id, winner_score, loser_score, this.games[room_id].type, this.games[room_id].map);
+		console.log(res);
 	}
 
-	prepareNextRound(userInfo: MatchInfo, playerLeft: User, playerRight: User, gameLogic: GameLogic) {
+	async prepareNextRound(userInfo: MatchInfo, playerLeft: User, playerRight: User, gameLogic: GameLogic) {
 		gameLogic.initGame();
 		const room_id = this.socket_infos[playerLeft.socket.id].rid;
 		this.server.to(room_id).emit('setMatchInfo', userInfo);
 		clearInterval(this.games[room_id].interval);
 		if (userInfo.lPlayerScore == 3 || userInfo.rPlayerScore == 3 || (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
-				const winner = userInfo.lPlayerScore == 3 ? playerLeft : playerRight;
-				const loser = userInfo.lPlayerScore == 3 ? playerRight : playerLeft;
-				this.server.to(room_id).emit('matchEnd', {winner: winner.id, loser: loser.id});
-				this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
-				this.clearGame(playerLeft, playerRight, room_id, gameLogic);
-			} else {
-				this.server.to(room_id).emit("startCount");
-				this.games[room_id].timeout = setTimeout(() => {
-					this.games[room_id].interval = setInterval(() => {
-						this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
-					}, 20)
-				}, 3000)
-			}
+			const winner = userInfo.lPlayerScore == 3 ? {user: playerLeft, score: userInfo.lPlayerScore} : {user: playerRight, score: userInfo.rPlayerScore};
+			const loser = userInfo.lPlayerScore == 3 ? {user: playerRight, score: userInfo.rPlayerScore} : {user: playerLeft, score: userInfo.lPlayerScore};
+			this.server.to(room_id).emit('matchEnd', {winner: winner.user.id, loser: loser.user.id});
+			console.log('score', gameLogic._score);
+			await this.saveResult(winner.user, loser.user, winner.score, loser.score, room_id);
+			this.clearGame(playerLeft, playerRight, room_id, gameLogic);
+		} else {
+			this.server.to(room_id).emit("startCount");
+			this.games[room_id].timeout = setTimeout(() => {
+				this.games[room_id].interval = setInterval(() => {
+					this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
+				}, 20)
+			}, 3000)
+		}
 	}
 
 	gameInterval = (userInfo: MatchInfo, playerLeft: User, playerRight: User, gameLogic: GameLogic) => {
@@ -164,12 +162,13 @@ export class GameGateway {
 		}
 	}
 
-	GiveUpEventListener (playerLeft: User, playerRight: User, gameLogic: GameLogic, position: Position) {
+	async GiveUpEventListener (playerLeft: User, playerRight: User, gameLogic: GameLogic, position: Position, userInfo: MatchInfo) {
 		 const room_id = this.socket_infos[playerLeft.socket.id].rid;
-		 const winner = position == 'l' ? playerRight : playerLeft;
-		 const loser = position == 'l' ? playerLeft : playerRight;
-		 this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
-		 this.server.to(room_id).emit('matchEnd', {winner: winner.id, loser: loser.id});
+		 const winner = position == 'l' ? {user: playerRight, score: userInfo.rPlayerScore} : {user: playerLeft, score: userInfo.lPlayerScore};
+		 const loser = position == 'l' ? {user: playerLeft, score: userInfo.lPlayerScore} : {user: playerRight, score: userInfo.rPlayerScore};
+		 
+		 await this.saveResult(winner.user, loser.user, winner.score, loser.score, room_id);
+		 this.server.to(room_id).emit('matchEnd', {winner: winner.user.id, loser: loser.user.id});
 		 this.clearGame(playerLeft, playerRight, room_id, gameLogic);
 		 this.usersService.updateStatus(playerLeft.id, 'online');
 		 this.usersService.updateStatus(playerRight.id, 'online');
@@ -192,13 +191,13 @@ export class GameGateway {
 		right_player.socket.disconnect();
 	}
 
-	disconnectEvent(position: Position, left_player: User, right_player: User, gameLogic: GameLogic) {
+	async disconnectEvent(left_player: User, right_player: User, gameLogic: GameLogic, position: Position, userInfo: MatchInfo) {
 		const room_id = this.socket_infos[left_player.socket.id].rid;
-		const winner = position == 'l' ? right_player : left_player;
-		const loser = position == 'l' ? left_player : right_player;
+		const winner = position == 'l' ? {user: right_player, score: userInfo.rPlayerScore} : {user: left_player, score: userInfo.lPlayerScore};
+		const loser = position == 'l' ? {user: left_player, score: userInfo.lPlayerScore} : {user: right_player, score: userInfo.rPlayerScore};
 
-		this.saveResult(winner, loser, gameLogic._score[1], gameLogic._score[0], room_id);
-		this.server.to(room_id).emit('matchEnd', {winner: winner.id, loser: loser.id});
+		await this.saveResult(winner.user, loser.user, winner.score, loser.score, room_id);
+		this.server.to(room_id).emit('matchEnd', {winner: winner.user.id, loser: loser.user.id});
 		this.clearGame(left_player, right_player, room_id, gameLogic);
 		this.usersService.updateStatus(left_player.id, 'online');
 		this.usersService.updateStatus(right_player.id, 'online');
@@ -233,7 +232,7 @@ export class GameGateway {
   async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: GameMapDto) {
 		try {
 			const map_type = Number(map.map);
-			const game_type = 'normal';
+			const game_type = 'general';
 			// 1. 소켓 유저 정보 가져오기
 			// 쿠키에서 sid 파싱
 			const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
@@ -286,7 +285,7 @@ export class GameGateway {
 					rPlayerScore: 0,
 					viewNumber: 0,
 					type: game_type,
-					map: 0,
+					map: map_type,
 				}
 				this.socket_infos[playerLeft.socket.id].match = userInfo;
 				this.socket_infos[playerRight.socket.id].match = this.socket_infos[playerLeft.socket.id].match;
@@ -300,8 +299,8 @@ export class GameGateway {
 				 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
 				*/
 				
-				playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l'));
-				playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r'));
+				playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l', userInfo));
+				playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r', userInfo));
 	
 				this.games[room_id] = {timeout: null, interval: null, type: game_type, map: map_type};
 				this.server.to(room_id).emit("startCount");
@@ -314,8 +313,8 @@ export class GameGateway {
 				/*
 				 * 게임 중 연결 끊은 경우
 				 */
-				playerLeft.socket.on("disconnect", () => this.disconnectEvent('l', playerLeft, playerRight, gameLogic));
-				playerRight.socket.on("disconnect", () => this.disconnectEvent('r', playerLeft, playerRight, gameLogic));
+				playerLeft.socket.on("disconnect", () => this.disconnectEvent(playerLeft, playerRight, gameLogic, 'l', userInfo));
+				playerRight.socket.on("disconnect", () => this.disconnectEvent(playerLeft, playerRight, gameLogic, 'r', userInfo));
 			}
 		} catch (err) {
 			console.error(err);
@@ -326,7 +325,7 @@ export class GameGateway {
 	async handdleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: GameMapDto) {
 		try {
 			const map_type = Number(map.map);
-			const game_type = 'ladder';
+			const game_type = 'ranked';
 			// 쿠키에서 sid 파싱
 			const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
 			// sid로 유저 아이디 찾기
@@ -373,8 +372,8 @@ export class GameGateway {
 					rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
 					rPlayerScore: 0,
 					viewNumber: 0,
-					type: 'ladder',
-					map: 0,
+					type: game_type,
+					map: map_type,
 				}
 				this.socket_infos[playerLeft.socket.id].match = userInfo;
 				this.socket_infos[playerRight.socket.id].match = this.socket_infos[playerLeft.socket.id].match;
@@ -390,8 +389,8 @@ export class GameGateway {
 				 * @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
 				*/
 				
-				playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l'));
-				playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r'));
+				playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l', userInfo));
+				playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r', userInfo));
 	
 				this.games[room_id] = {timeout: null, interval: null, type: game_type, map: map_type};
 				this.server.to(room_id).emit("startCount");
@@ -404,8 +403,8 @@ export class GameGateway {
 				/*
 				 * 게임 중 연결 끊은 경우
 				 */
-				playerLeft.socket.on("disconnect", () => this.disconnectEvent('l', playerLeft, playerRight, gameLogic));
-				playerRight.socket.on("disconnect", () => this.disconnectEvent('r', playerLeft, playerRight, gameLogic));
+				playerLeft.socket.on("disconnect", () => this.disconnectEvent(playerLeft, playerRight, gameLogic, 'l', userInfo));
+				playerRight.socket.on("disconnect", () => this.disconnectEvent(playerLeft, playerRight, gameLogic, 'r', userInfo));
 			}
 		} catch (err) {
 			console.error(err);
