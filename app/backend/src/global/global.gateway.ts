@@ -107,7 +107,10 @@ export class GlobalGateway {
     await this.dmRepo.save({
       sender_id: user_id,
       receiver_id: target_info.user_id,
-      content: JSON.stringify({gameMap: body.gameMap}),
+      content: JSON.stringify({
+        channelId: body.gameMap == '일반' ? 0 : (body.gameMap == '막대기' ? 1 : 2),
+        gameMap: body.gameMap
+      }),
       type: 'game'
     });
     
