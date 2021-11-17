@@ -57,7 +57,7 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#start">Installation</a></li>
+        <li><a href="#start">Start</a></li>
       </ul>
     </li>
     <li><a href="#license">License</a></li>
