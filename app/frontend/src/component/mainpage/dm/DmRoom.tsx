@@ -157,7 +157,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
 
   const myInfo = useContext(UserInfoContext);
 
-  let mounted = false;
+  const mounted = useRef(false);
 
   /*! 
    * @author yochoi
@@ -199,11 +199,11 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store?receiver_nick=${dmInfo.target}`);
     const res = await easyfetch.fetch();
 
-    if (mounted) setDmLog(res);
+    if (mounted.current) setDmLog(res);
   };
 
   useEffect(() => {
-    mounted = true;
+    mounted.current = true;
     getDmLog();
 
     if (dmInfo.request) {
@@ -221,7 +221,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     global.socket.on("dm", dmOn);
     global.socket.on("chatInvite", chatInviteOn);
     return (() => {
-      mounted = false;
+      mounted.current = false;
       global.socket.off("dm", dmOn);
       global.socket.off("chatInvite", chatInviteOn);
     });
