@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class GlobalSendDmDto {
 	@IsString()
@@ -7,4 +7,32 @@ export class GlobalSendDmDto {
 
 	@IsString()
 	msg: string;
+}
+
+export class InviteChatDto {
+	@IsString()
+	from: string;
+
+	@IsString()
+	target: string;
+
+	@IsString()
+	chatTitle: string;
+
+	@IsNumber()
+	channelId: number;
+}
+
+export class InviteGameDto {
+	@IsString()
+	from: string;
+
+	@IsString()
+	target: string;
+
+	@IsString()
+	gameRoomId: string;
+
+	@IsString()
+	gameMap: string;
 }
