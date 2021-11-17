@@ -21,6 +21,7 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 
 <!-- PROJECT LOGO -->
 <br />
@@ -34,8 +35,6 @@
   <p align="center">
     Cool Ping Pong Game Site
     <br />
-    <a href="https://github.com/AMATEURTOSS/ping_pong_website">View Demo</a>
-    ·
     <a href="https://github.com/AMATEURTOSS/ping_pong_website/issues">Report Bug</a>
     ·
     <a href="https://github.com/AMATEURTOSS/ping_pong_website/issues">Request Feature</a>
@@ -75,9 +74,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `AMATEURTOSS`, `ping_pong_website`, `twitter_handle`, `linkedin_username`, `amateur.toss`, `gmail`, `ping_pong_website`, `Cool Ping Pong Game Site`
+<img src="images/mainpageScreenShot.png"/>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -85,14 +82,9 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 
 ### Built With
 
-* [Next.js](https://nextjs.org/)
 * [React.js](https://reactjs.org/)
-* [Vue.js](https://vuejs.org/)
-* [Angular](https://angular.io/)
-* [Svelte](https://svelte.dev/)
-* [Laravel](https://laravel.com)
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
+* [NestJs](https://nestjs.com/)
+* [TypeScript](https://www.typescriptlang.org/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
