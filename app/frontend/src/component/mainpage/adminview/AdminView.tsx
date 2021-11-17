@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import {FC, useEffect, useRef, useState} from "react";
 import { Route, RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
 import EasyFetch from "../../../utils/EasyFetch";
@@ -24,7 +24,7 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   const [questionType, setQuestionType] = useState<QuestionType>("notAnswered")
   const [questionList, setQuestionList] = useState<QuestionPrev[]>([]);
 
-  let mounted = false;
+  const mounted = useRef(false);
 
   /*!
    * @author yochoi
@@ -36,13 +36,13 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   const getNotAnsweredQuestionList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/beforeAnswerQuestions`, "GET");
     const res = await easyfetch.fetch();
-    if (mounted) setQuestionList(res);
+    if (mounted.current) setQuestionList(res);
   }
 
   const getAnsweredQuestionList = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/questions/afterAnswerQuestions`, "GET");
     const res = await easyfetch.fetch();
-    if (mounted) setQuestionList(res);
+    if (mounted.current) setQuestionList(res);
   }
 
   useEffect(() => {
@@ -56,8 +56,8 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   }, [update]);
 
   useEffect(() => {
-    mounted = true;
-    return (() => {mounted = false});
+    mounted.current = true;
+    return (() => {mounted.current = false});
   }, []);
 
   return (
