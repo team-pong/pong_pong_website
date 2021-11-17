@@ -65,7 +65,7 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
               {' '}
               {log.user_nick}
               {' '}
-              <img src={`/public/number/${log.other_score}.svg`} alt={`${log.user_score}`} style={{borderRadius: "0"}}/>
+              <img src={`/public/number/${log.user_score}.svg`} alt={`${log.user_score}`} style={{borderRadius: "0"}}/>
             </span>
             <img className="record-list-vs" src="/public/vs.svg"/>
             <span className="player">
