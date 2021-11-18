@@ -4,6 +4,7 @@ import CircleChart from "../../../chart/CircleChart";
 import BarChart from "../../../chart/BarChart";
 import "/src/scss/content/RecordContent.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
+import Time from "../../../../utils/Time";
 
 interface matchLog {
   user_score: number,
@@ -76,7 +77,7 @@ const RecordList: FC<{target: string, type: string}> = ({ target, type }): JSX.E
               <img  className="record-player-img" src={log.other_url} alt={`${log.other_nick}'s img`}/>
             </span>
             <span id="game-info">
-              <div className="game-info-div">15분전</div>
+              <div className="game-info-div">{new Time(log.createdAt).getRelativeTime()}</div>
               <div className="game-info-div">{log.type === "general" ? <>일반</> : <>레더</>}</div>
               <div className="game-info-div">{`맵${log.map}`}</div>
             </span>
