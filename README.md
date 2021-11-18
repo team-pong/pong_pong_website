@@ -29,6 +29,7 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
+        <li><a href="#contributors">Contributors</a></li>
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
@@ -49,7 +50,13 @@
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+### Contributors
 
+<a href="https://github.com/AMATEURTOSS/ping_pong_website/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=AMATEURTOSS/ping_pong_website" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
 
 ### Built With
 
