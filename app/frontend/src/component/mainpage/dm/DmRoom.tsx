@@ -1,10 +1,11 @@
 import React, { FC, useEffect, useState, useRef, useContext, Dispatch, SetStateAction } from "react";
 import { Redirect } from "react-router-dom";
-import { DmInfo, UserInfoContext } from "../../../Context";
+import { DmInfo, SetNoticeInfoContext, UserInfoContext } from "../../../Context";
 import "../../../scss/dm/DmRoom.scss";
 import EasyFetch from "../../../utils/EasyFetch";
 import Time from "../../../utils/Time";
 import { UserInfo } from "../MainPage";
+import { NOTICE_RED } from "../navbar/addFriend/AddFriend";
 
 interface DMLog {
   time: string, /* e.g.) "2021-07-31T05:41:48.342Z" */
@@ -45,6 +46,8 @@ function getMapTitle(mapSelector: number): string {
 
 const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, setGameMapId, setGameInviteTarget}) => {
 
+  const setNoticeInfo = useContext(SetNoticeInfoContext);
+
   /*!
    * @author donglee
    * @brief 승낙, 거절을 누르면 DmLoom 에서 초대장을 제거하고 새로 보여주기 위함
@@ -74,7 +77,12 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
         setGameMapId(channelId);
       }
     } else {
-      alert(res.err_msg);
+      setNoticeInfo({
+        seconds: 3,
+        content: res.err_msg,
+        backgroundColor: NOTICE_RED,
+        isOpen: true
+      });
     }
   };
 
@@ -87,7 +95,12 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
     const res = await easyfetch.fetch();
 
     if (res.err_msg) {
-      alert(res.err_msg);
+      setNoticeInfo({
+        seconds: 3,
+        content: res.err_msg,
+        backgroundColor: NOTICE_RED,
+        isOpen: true
+      });
       return ;
     }
     /* game초대를 거절했을 때 상대방이 알아야 할까? */

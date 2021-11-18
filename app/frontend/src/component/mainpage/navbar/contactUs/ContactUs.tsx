@@ -1,6 +1,7 @@
 import { FC, FormEvent, useContext, useState } from "react";
 import { SetNoticeInfoContext } from "../../../../Context";
 import EasyFetch from "../../../../utils/EasyFetch";
+import { NOTICE_RED } from "../addFriend/AddFriend";
 import "/src/scss/content/contactus/ContactUs.scss";
 
 const ContactUs: FC = (): JSX.Element => {
@@ -17,10 +18,13 @@ const ContactUs: FC = (): JSX.Element => {
    */
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (head === "") alert("제목을 입력해주세요");
-    else if (email === "") alert("이메일을 입력해주세요");
-    else if (content === "") alert("본문을 입력해주세요");
-    else {
+    if (head === "" || email === "" || content === "") {
+      setNoticeInfo({
+      seconds: 3,
+      content: "제목, 이메일, 본문을 입력해주세요",
+      backgroundColor: NOTICE_RED,
+      isOpen: true
+    })} else {
       const easyfetch = new EasyFetch(`${global.BE_HOST}/questions`, "POST");
       const res = await easyfetch.fetch({
         title: head,
