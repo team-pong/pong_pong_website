@@ -45,7 +45,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 
   const avatarImgRef = useRef(null);
 
-  let mounted = false;
+  const mounted = useRef(false);
 
   //url parameter로 넘어오는 nick 문자열 저장
   const { nick } = useParams<{nick: string}>();
@@ -105,11 +105,11 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
         content: `"${nickToEdit}" 은(는) 이미 존재하는 닉네임입니다.`,
         backgroundColor: NOTICE_RED,
       });
-      if (mounted) setNickToEdit(myInfo.nick);
+      if (mounted.current) setNickToEdit(myInfo.nick);
       return ;
     }
     updateUserInfoState();
-    if (mounted) setIsEditNickClicked(false);
+    if (mounted.current) setIsEditNickClicked(false);
   };
 
   /*!
@@ -168,7 +168,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     const easyfetch = new EasyFetch(`${global.BE_HOST}/users?nick=${nick}`);
     const res = await easyfetch.fetch()
 
-    if (mounted) setOtherUserInfo(res);
+    if (mounted.current) setOtherUserInfo(res);
     return res;
   };
 
@@ -231,7 +231,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
         content: "친구로 추가했습니다.",
         backgroundColor: NOTICE_GREEN,
       });
-      if (mounted) setIsAlreadyFriend(true);
+      if (mounted.current) setIsAlreadyFriend(true);
     }
   };
 
@@ -257,7 +257,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
         content: "친구를 삭제했습니다.",
         backgroundColor: NOTICE_GREEN,
       });
-      if (mounted) setIsAlreadyFriend(false);
+      if (mounted.current) setIsAlreadyFriend(false);
     }
   };
 
@@ -301,8 +301,8 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
         content: "사용자를 차단했습니다.",
         backgroundColor: NOTICE_GREEN,
       });
-      if (mounted) setIsBlockedFriend(true);
-      if (mounted) setIsAlreadyFriend(false);
+      if (mounted.current) setIsBlockedFriend(true);
+      if (mounted.current) setIsAlreadyFriend(false);
     }
   }
 
@@ -328,7 +328,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
         content: "사용자를 차단 해제했습니다.",
         backgroundColor: NOTICE_GREEN,
       });
-      if (mounted) setIsBlockedFriend(false);
+      if (mounted.current) setIsBlockedFriend(false);
     }
   };
 
@@ -340,7 +340,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend?friend_nick=${nick}`);
     const res = await easyfetch.fetch()
 
-    if (mounted) setIsAlreadyFriend(!!res.bool);
+    if (mounted.current) setIsAlreadyFriend(!!res.bool);
   };
 
   /*!
@@ -351,7 +351,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     const easyfetch = new EasyFetch(`${global.BE_HOST}/block/isBlock?block_nick=${nick}`);
     const res = await easyfetch.fetch()
 
-    if (mounted) setIsBlockedFriend(!!res.bool);
+    if (mounted.current) setIsBlockedFriend(!!res.bool);
   };
 
  /*!
@@ -386,8 +386,8 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
   }, [myInfo]);
 
   useEffect(() => {
-    mounted = true;
-    return (() => {mounted = false});
+    mounted.current = true;
+    return (() => {mounted.current = false});
   }, []);
 
   if (isMyProfile) {
