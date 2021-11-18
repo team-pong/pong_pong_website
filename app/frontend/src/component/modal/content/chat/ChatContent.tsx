@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import "/src/scss/content/chat/ChatContent.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import ChatRoomContent from "./ChatRoomContent";
@@ -27,7 +27,7 @@ const ChatRoomList: FC<ChatRoomListProps> = ({ search, type }): JSX.Element => {
   const [protectedChatRoom, setProtectedChatRoom] = useState<ChatRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  let mounted = false;
+  const mounted = useRef(false);
 
   /*!
    * @author donglee, yochoi
@@ -73,7 +73,7 @@ const ChatRoomList: FC<ChatRoomListProps> = ({ search, type }): JSX.Element => {
           break ;
       }
     });
-    if (mounted) {
+    if (mounted.current) {
       setPublicChatRoom(sortedPublicList);
       setProtectedChatRoom(sortedProtectedList);
     }
@@ -93,14 +93,14 @@ const ChatRoomList: FC<ChatRoomListProps> = ({ search, type }): JSX.Element => {
   }
 
   useEffect(() => {
-    mounted = true;
-    return (() => {mounted = false});
+    mounted.current = true;
+    return (() => {mounted.current = false});
   }, []);
 
   useEffect(() => {
     getChatRoomList()
     .then(sortChatRoomList)
-    .then(() => {if (mounted) setIsLoading(false)});
+    .then(() => {if (mounted.current) setIsLoading(false)});
   }, [search]);
 
   if (isLoading) {
