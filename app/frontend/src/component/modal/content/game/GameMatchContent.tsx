@@ -16,10 +16,8 @@ interface gameMatchContentProps extends RouteComponentProps<{matchType: string}>
 const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setIsMatched}): JSX.Element => {
  
   const {state} = useLocation<GameInviteType>();
-  console.log("MatchFC state test: ", state);
 
   useEffect(() => {
-    console.log("Match useEffect@");
     const url_params = url.split('/');
     const map = url_params.pop();
     let isMatched = false;
@@ -41,6 +39,7 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setI
        Caution! 여기서 새로고침을 하면 그래도 문제가 없어보이네?
        Error! 근데 여기서 왜인지 모르겠는데 대전신청에선 새로고침하면 option까지만 다시 렌더된다. */
     socket.on("matched", ({roomId}) => {
+      console.log("socket on test: ", roomId);
       isMatched = true;
       setIsMatched({isMatched: true, roomId, socket});
     });
