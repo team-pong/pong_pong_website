@@ -318,8 +318,8 @@ export class GameGateway {
 					playerRight.socket.join(room_id);
 					this.usersService.updateStatus(playerLeft.id, 'ongame');
 					this.usersService.updateStatus(playerRight.id, 'ongame');
-					playerLeft.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[1].id, position: 'left'});
-					playerRight.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[0].id, position: 'right'});
+					playerLeft.socket.emit('matched', {roomId: room_id, opponent: playerLeft.id, position: 'left'});
+					playerRight.socket.emit('matched', {roomId: room_id, opponent: playerRight.id, position: 'right'});
 					// invite queue 에서 제거
 					this.deleteFromQueue(playerLeft.id, this.invite_queue);
 					this.deleteFromQueue(playerRight.id, this.invite_queue);
