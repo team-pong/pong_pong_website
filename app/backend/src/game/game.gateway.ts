@@ -161,8 +161,13 @@ export class GameGateway {
 		} else {
 			// frontㅇㅔ서 준비 완료되면 시작(3, 2, 1, Start 메시지)
 			gameLogic.update();
-			const room_id = this.socket_infos[playerLeft.socket.id].rid;
-			this.server.to(room_id).emit("update", gameLogic.getJson());
+			if (this.socket_infos[playerLeft.socket.id]) {
+				// 인터벌이 돌면서 socket_infos를 참조하는데, 사용자가 연결을 끊어서 disconnect 이벤트가 발생하면 이 socket_infos에 정보가 삭제되고 인터벌이 제거된다.
+				// 인터벌 내부 함수가 돌고있는 중에 소켓 정보가 제거되면 참조하지 못해서 에러가 생긴다.
+				// 이를 막기 위해서 if로 한번 체크하고 실행하도록 수정함
+				const room_id = this.socket_infos[playerLeft.socket.id].rid;
+				this.server.to(room_id).emit("update", gameLogic.getJson());
+			}
 		}
 	}
 
@@ -231,15 +236,15 @@ export class GameGateway {
 		}
 	}
 
-	deleteFromQueue(user_id: string, queue: any[]) {
-		const idx = queue.findIndex((element) => {
+	deleteFromInviteQueue(user_id: string) {
+		const idx = this.invite_queue.findIndex((element) => {
 			if (element.id = user_id) {
 				return true;
 			}
 			return false;
 		})
 		if (idx != -1) {
-			queue.splice(idx, 1);
+			this.invite_queue.splice(idx, 1);
 		}
 	}
 
@@ -286,7 +291,7 @@ export class GameGateway {
 
 			// 2. 소켓 관련 정보들 저장 (소켓, 세션id, 유저id)
 			this.socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null, logic: null};
-			console.log('소켓저장됨.', userid);
+			// console.log('소켓저장됨.', userid);
 
 			// 3. 초대 대기열에 넣기
 			this.pushUserIntoQueue(userid, socket, map_type, this.invite_queue, target.user_id);
@@ -311,10 +316,10 @@ export class GameGateway {
 				
 					// 6. 소켓 정보 저장
 					const room_id: string = playerLeft.id + playerRight.id;
-					console.log('left', this.socket_infos[playerLeft.socket.id]);
+					// console.log('left', this.socket_infos[playerLeft.socket.id]);
 					this.socket_infos[playerLeft.socket.id].rid = room_id;
 					this.socket_infos[playerLeft.socket.id].logic = gameLogic;
-					console.log('right', this.socket_infos[playerRight.socket.id])
+					// console.log('right', this.socket_infos[playerRight.socket.id])
 					this.socket_infos[playerRight.socket.id].rid = room_id;
 					this.socket_infos[playerRight.socket.id].logic = gameLogic;
 					
@@ -326,8 +331,8 @@ export class GameGateway {
 					playerLeft.socket.emit('matched', {roomId: room_id, opponent: playerLeft.id, position: 'left'});
 					playerRight.socket.emit('matched', {roomId: room_id, opponent: playerRight.id, position: 'right'});
 					// invite queue 에서 제거
-					this.deleteFromQueue(playerLeft.id, this.invite_queue);
-					this.deleteFromQueue(playerRight.id, this.invite_queue);
+					this.deleteFromInviteQueue(playerLeft.id);
+					this.deleteFromInviteQueue(playerRight.id);
 
 					const userInfo: MatchInfo = {
 						lPlayerNickname: playerLeft.id,
