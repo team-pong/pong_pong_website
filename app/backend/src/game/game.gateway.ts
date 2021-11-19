@@ -295,7 +295,6 @@ export class GameGateway {
 
 			for (let waiter of waiters) {
 				if (waiter.target_id == userid) { // 상대의 타겟이 내가 맞는지 확인
-					
 					// 5. 게임 로직 객체 생성
 					const gameLogic = new GameLogic(700, 450, map_type, this.server);
 					const playerLeft = {
@@ -308,14 +307,10 @@ export class GameGateway {
 						socket: socket,
 						map: map_type,
 					};
-					console.log('waiters', waiters);
-					console.log('me', playerRight)
 
 					const room_id: string = playerLeft.id + playerRight.id;
-					console.log('left', this.socket_infos[playerLeft.socket.id]);
 					this.socket_infos[playerLeft.socket.id].rid = room_id;
 					this.socket_infos[playerLeft.socket.id].logic = gameLogic;
-					console.log('right', this.socket_infos[playerRight.socket.id])
 					this.socket_infos[playerRight.socket.id].rid = room_id;
 					this.socket_infos[playerRight.socket.id].logic = gameLogic;
 					
