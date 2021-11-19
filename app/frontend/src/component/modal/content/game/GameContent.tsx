@@ -13,10 +13,11 @@ interface isMatched {
 
 export interface GameInviteType {
   target: string,
-  targetAvatar: string,
+  targetAvatar?: string,
+  mapId?: string,
 }
 
-const GameContent: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
+const GameContent: FC<RouteComponentProps> = ({match: {path, url}}): JSX.Element => {
 
   const [isMatched, setIsMatched] = useState<isMatched>({
     isMatched: false,
@@ -52,7 +53,7 @@ const GameContent: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
       {isMatched.isMatched && <Redirect to={`${path}/game/${isMatched.roomId}`} />}
       {/* 대전신청을 하면 이 컴포넌트로 오자마자 state값이 있으니
        GameOptionContent로 리디렉트 */}
-      {state && <Redirect to={{pathname: `${path}/match/normal`, state: state}} />}
+      {state && <Redirect to={{pathname: `${url}/match/normal`, state: state}} />}
     </div>
   );
 }

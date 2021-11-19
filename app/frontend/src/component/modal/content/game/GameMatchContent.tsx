@@ -16,8 +16,10 @@ interface gameMatchContentProps extends RouteComponentProps<{matchType: string}>
 const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setIsMatched}): JSX.Element => {
  
   const {state} = useLocation<GameInviteType>();
+  console.log("MatchFC state test: ", state);
 
   useEffect(() => {
+    console.log("Match useEffect@");
     const url_params = url.split('/');
     const map = url_params.pop();
     let isMatched = false;
@@ -30,7 +32,7 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setI
     if (!state) {
       socket.emit(params.matchType, {map: map});
     } else {
-      socket.emit(params.matchType, {map: map/*, target: state.target*/});
+      socket.emit("invite", {map: map, target: state.target});
     }
 
     /* matched 이후로는 같은 값을 가지고 (여기서 opponent는 대전신청인 경우 target이 돼야 함)

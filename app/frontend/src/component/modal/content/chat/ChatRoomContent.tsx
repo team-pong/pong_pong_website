@@ -75,7 +75,7 @@ const Password: FC<{
   const [password, setPassword] = useState("");
   const setNoticeInfo = useContext(SetNoticeInfoContext);
 
-  let mounted = false;
+  const mounted = useRef(false);
 
   /*!
    * @author donglee
@@ -87,7 +87,7 @@ const Password: FC<{
     const res = await easyfetch.fetch();
 
     if (res) {
-      if (mounted) {
+      if (mounted.current) {
         setIsProtected(false);
         setPasswordPassed(true);
       }
@@ -117,12 +117,12 @@ const Password: FC<{
    *        - 자동으로 input에 focus함.
    */
   useEffect(() => {
-    mounted = true;
+    mounted.current = true;
     if (isMadeMyself) {
       setIsProtected(false);
     }
     inputFocus();
-    return (() => {mounted = false});
+    return (() => {mounted.current = false});
   }, []);
 
   return (
@@ -212,7 +212,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   const setDmInfo = useContext(SetDmInfoContext);
   const setNoticeInfo = useContext(SetNoticeInfoContext);
 
-  let mounted = false;
+  const mounted = useRef(false);
 
   /*!
    * @author donglee
@@ -242,7 +242,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
     /* 대전신청 하고 난 후 새로고침 하면 여기서 에러가 난다
        chnnel_id 를 찍어보면 :channel_id 이런 식으로 나옴 */
     if (!res.err_msg) {
-      if (mounted) setChatRoomInfo({
+      if (mounted.current) setChatRoomInfo({
         title: res.title,
         type: res.type,
         current_people: res.current_people,
@@ -251,7 +251,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         channel_id: res.channel_id,
       });
     } else {
-      if (mounted) setNoReult(true);
+      if (mounted.current) setNoReult(true);
     }
     return res;
   };
@@ -289,8 +289,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   };
 
   useEffect(() => {
-    mounted = true;
-    return (() => {mounted = false});
+    mounted.current = true;
+    return (() => {mounted.current = false});
   }, [])
 
   /*!
@@ -437,10 +437,10 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         .then(checkMax)
         .then((res) => {
             if (res.type === "protected") {
-              if (mounted) setIsProtected(true);
+              if (mounted.current) setIsProtected(true);
             } else {
               connectSocket().then((socket) => {
-                if (mounted) setSocket(socket);
+                if (mounted.current) setSocket(socket);
               }).catch((err) => {
                 setNoticeInfo({
                   isOpen: true,
@@ -451,7 +451,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
               });
             }
             if (res.type === "private") {
-              if (mounted) setIsPrivate(true);
+              if (mounted.current) setIsPrivate(true);
             }
           }
         ).catch((err) => {
@@ -480,7 +480,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         channelId={channel_id}
         setPasswordPassed={setPasswordPassed}/>
     );
-  } else if (chatRoomInfo && !isProtected) {
+  }
+  if (chatRoomInfo && !isProtected) {
     return (
       <div id="chat-room">
         {isPrivate && <span className="chat-room-private">이 방은 비밀방입니다</span>}
@@ -594,7 +595,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         <Route path={`${match.url}/profile/:nick`}>
           <Modal id={Date.now()} smallModal content={<ProfileContent readonly/>}/>
         </Route>
-        <Route path={`${match.path}/game`}>
+        <Route path={`${match.url}/game`}>
           <Modal id={Date.now()} content={<GameContent/>} />
         </Route>
       </div>

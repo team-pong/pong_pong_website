@@ -23,8 +23,7 @@ export interface ChatRequest {
 
 export interface GameRequest {
   from: string,
-  gameRoomId: string,
-  gameMap: string,
+  gameMap: number,
 };
 
 export interface DmInfo {

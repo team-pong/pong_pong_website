@@ -1,6 +1,6 @@
 import { FC, useState, Dispatch, SetStateAction, useContext } from "react";
 import { Route, RouteComponentProps, useHistory, withRouter } from "react-router";
-import { Link, useLocation } from "react-router-dom";
+import { Link, Redirect, useLocation } from "react-router-dom";
 import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
 import Modal from "../../Modal";
 import { GameInviteType } from "./GameContent";
@@ -24,17 +24,6 @@ function getMapImg(mapType: MAP): string {
   }
 }
 
-function getMapTitle(mapSelector: number): string {
-  switch (mapSelector) {
-    case 0:
-      return "일반";
-    case 1:
-      return "막대기";
-    case 2:
-      return "거품";
-  }
-}
-
 interface GameOptionContent extends RouteComponentProps {
   setIsMatched?: Dispatch<SetStateAction<{
     isMatched: boolean;
@@ -52,15 +41,16 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatc
   const {state} = useLocation<GameInviteType>();
 
   const sendDmRequest = () => {
-    // setDmInfo({
-    //   isDmOpen: true,
-    //   target: state.target,
-    //   gameRequest: {
-    //     from: myInfo.nick,
-    //     gameRoomId: myInfo.nick + state.target,
-    //     gameMap: getMapTitle(mapSelector),
-    //   },
-    // });
+    if (state && state.targetAvatar) {
+      setDmInfo({
+        isDmOpen: true,
+        target: state.target,
+        gameRequest: {
+          from: myInfo.nick,
+          gameMap: mapSelector,
+        },
+      });
+    }
   };
 
   return (
@@ -81,9 +71,10 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatc
         {/* 대전신청의 경우 state에 값이 전달된다 */}
         <Link to={{pathname:`${url}/${mapSelector}`, state:state}} className="start" onClick={sendDmRequest}>{!state ? '게임 찾기' : '대전 신청'}</Link>
       </form>
-      <Route path={`${path}/:map`}>
+      <Route path={`${url}/:map`}>
         <Modal id={Date.now()} smallModal content={<GameMatchContent setIsMatched={setIsMatched} />}/>
       </Route>
+      {state && state.mapId && <Redirect to={{pathname: `${url}/${state.mapId}`, state: state}} /> }
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import EasyFetch from "../../../../utils/EasyFetch";
 import "/src/scss/content/profile/ManageFriendContent.scss";
 import { setAchievementStr, setAchievementImg } from "../../../../utils/setAchievement";
@@ -25,7 +25,7 @@ const FriendList: React.FC = () => {
 
   const setNoticeInfo = useContext(SetNoticeInfoContext);
 
-  let mounted = false;
+  const mounted = useRef(false);
 
   /*!
    * @author donglee
@@ -60,7 +60,7 @@ const FriendList: React.FC = () => {
         backgroundColor: NOTICE_GREEN,
       });
       const updatedList = friendList.filter((friend) => friend.nick !== nick);
-      if (mounted) setFriendList(updatedList);
+      if (mounted.current) setFriendList(updatedList);
       checkListLength(updatedList);
     }
   };
@@ -74,7 +74,7 @@ const FriendList: React.FC = () => {
     const body = {
       "block_nick": nick,
     };
-    const res = await (await easyfetch.fetch(body)).json();
+    const res = await easyfetch.fetch(body);
 
     if (res.err_msg !== "에러가 없습니다.") {
       setNoticeInfo({
@@ -91,7 +91,7 @@ const FriendList: React.FC = () => {
         backgroundColor: NOTICE_GREEN,
       });
       const updatedList = friendList.filter((friend) => friend.nick !== nick);
-      if (mounted) setFriendList(updatedList);
+      if (mounted.current) setFriendList(updatedList);
       checkListLength(updatedList);
     }
   };
@@ -100,15 +100,15 @@ const FriendList: React.FC = () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/friend/list`);
     const res = await easyfetch.fetch();
 
-    if (res.friendList.length === 0 && mounted) {
+    if (res.friendList.length === 0 && mounted.current) {
       setNoResult(true);
-    } else if (mounted) setFriendList(res.friendList);
+    } else if (mounted.current) setFriendList(res.friendList);
   }
 
   useEffect(() => {
-    mounted = true;
+    mounted.current = true;
     getFriendList();
-    return (() => {mounted = false});
+    return (() => {mounted.current = false});
   },[]);
 
   if (noResult) {
@@ -158,7 +158,7 @@ const BlockedList: React.FC = () => {
   const [noResult, setNoResult] = useState(false);
   const setNoticeInfo = useContext(SetNoticeInfoContext);
 
-  let mounted = false;
+  const mounted = useRef(false);
 
   const unblockFriend = async (nick: string) => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/block?block_nick=${nick}`, "DELETE");
@@ -179,9 +179,9 @@ const BlockedList: React.FC = () => {
         backgroundColor: NOTICE_GREEN,
       });
       const updatedList = blockedList.filter((friend) => friend.nick !== nick);
-      if (mounted) setBlockedList(updatedList);
+      if (mounted.current) setBlockedList(updatedList);
       if (updatedList.length === 0) {
-        if (mounted) setNoResult(true);
+        if (mounted.current) setNoResult(true);
       }
     }
   };
@@ -190,15 +190,15 @@ const BlockedList: React.FC = () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/block`);
     const res = await easyfetch.fetch()
 
-    if (res.blockList.length === 0 && mounted) {
+    if (res.blockList.length === 0 && mounted.current) {
       setNoResult(true);
-    } else if (mounted) setBlockedList(res.blockList);
+    } else if (mounted.current) setBlockedList(res.blockList);
   };
 
   useEffect(() => {
-    mounted = true;
+    mounted.current = true;
     getBlockedList();
-    return (() => {mounted = false});
+    return (() => {mounted.current = false});
   },[]);
 
   if (noResult) {
