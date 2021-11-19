@@ -288,7 +288,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
     return ( 
       <Redirect push to={{
         pathname: `/mainpage/game`,
-        state: {target: gameInviteTarget, mapId: gameMapId},
+        state: {target: gameInviteTarget, mapId: String(gameMapId)},
       }} />
     );
   }
