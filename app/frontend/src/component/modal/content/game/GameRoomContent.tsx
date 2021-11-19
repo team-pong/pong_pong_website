@@ -3,7 +3,7 @@ import { FC, useState, useEffect, useRef, useContext } from "react";
 import { RouteComponentProps, withRouter, useHistory, Redirect } from "react-router-dom";
 import "/src/scss/content/game/GameRoomContent.scss";
 import { io } from "socket.io-client";
-import { UserInfoContext } from "../../../../Context";
+import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
 import NoResult from "../../../noresult/NoResult";
 
 interface MatchInfo {
@@ -19,6 +19,7 @@ interface MatchInfo {
 
 const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
   const myInfo = useContext(UserInfoContext);
+  const setDmInfo = useContext(SetDmInfoContext);
   const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
   const [canvasWidth, setCanvasWidth] = useState(700);
@@ -318,6 +319,17 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       canvas.renderAll();
     }
   }, [ballX, ballY]);
+
+  /*!
+   * @author donglee
+   * @brief 게임 진행이 되면 디엠이 켜져있을 경우 닫기
+   */
+  useEffect(() => {
+    setDmInfo({
+      isDmOpen: false,
+      target: "",
+    });
+  }, []);
 
   if (socket === null) return (
     <NoResult

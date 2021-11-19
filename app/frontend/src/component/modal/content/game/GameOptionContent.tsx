@@ -39,7 +39,7 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatc
   const setDmInfo = useContext(SetDmInfoContext);
   const myInfo = useContext(UserInfoContext);
   const {state} = useLocation<GameInviteType>();
-  console.log("option: ", state);
+  console.log("option state: ", state);
 
   const sendDmRequest = () => {
     if (state && state.targetAvatar) {

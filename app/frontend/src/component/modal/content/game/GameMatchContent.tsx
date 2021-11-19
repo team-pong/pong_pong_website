@@ -16,6 +16,7 @@ interface gameMatchContentProps extends RouteComponentProps<{matchType: string}>
 const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setIsMatched}): JSX.Element => {
  
   const {state} = useLocation<GameInviteType>();
+  console.log("Match: state", state);
 
   useEffect(() => {
     const url_params = url.split('/');
