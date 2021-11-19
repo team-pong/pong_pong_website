@@ -101,8 +101,7 @@ const NavBar: FC<NavBarProps> = (props): JSX.Element => {
           {userInfo.admin === true && history.location.pathname === "/mainpage" &&
             <Link
               to={`${props.match.url}/adminView`}
-              className="nav-list-button"
-              onClick={() => {document.getElementById("button-container").style.display = "none"}}>
+              className="nav-list-button">
               <img className="nav-list-img" src="/public/tools.svg"/>
               <span className="nav-list-span">관리자 모드</span>
             </Link>
@@ -111,8 +110,7 @@ const NavBar: FC<NavBarProps> = (props): JSX.Element => {
           {userInfo.admin === true && history.location.pathname === "/mainpage/adminView" &&
             <Link
               to={`${props.match.url}`}
-              className="nav-list-button"
-              onClick={() => {document.getElementById("button-container").style.display = "grid"}}>
+              className="nav-list-button">
               <img className="nav-list-img" src="/public/tools.svg"/>
               <span className="nav-list-span">유저 모드</span>
             </Link>
