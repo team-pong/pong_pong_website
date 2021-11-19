@@ -161,8 +161,13 @@ export class GameGateway {
 		} else {
 			// frontㅇㅔ서 준비 완료되면 시작(3, 2, 1, Start 메시지)
 			gameLogic.update();
-			const room_id = this.socket_infos[playerLeft.socket.id].rid;
-			this.server.to(room_id).emit("update", gameLogic.getJson());
+			if (this.socket_infos[playerLeft.socket.id]) {
+				// 인터벌이 돌면서 socket_infos를 참조하는데, 사용자가 연결을 끊어서 disconnect 이벤트가 발생하면 이 socket_infos에 정보가 삭제되고 인터벌이 제거된다.
+				// 인터벌 내부 함수가 돌고있는 중에 소켓 정보가 제거되면 참조하지 못해서 에러가 생긴다.
+				// 이를 막기 위해서 if로 한번 체크하고 실행하도록 수정함
+				const room_id = this.socket_infos[playerLeft.socket.id].rid;
+				this.server.to(room_id).emit("update", gameLogic.getJson());
+			}
 		}
 	}
 
