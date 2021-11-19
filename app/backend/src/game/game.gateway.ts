@@ -286,6 +286,7 @@ export class GameGateway {
 
 			// 2. 소켓 관련 정보들 저장 (소켓, 세션id, 유저id)
 			this.socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null, logic: null};
+			console.log('소켓저장됨.', userid);
 
 			// 3. 초대 대기열에 넣기
 			this.pushUserIntoQueue(userid, socket, map_type, this.invite_queue, target.user_id);
@@ -307,13 +308,17 @@ export class GameGateway {
 						socket: socket,
 						map: map_type,
 					};
-
+				
+					// 6. 소켓 정보 저장
 					const room_id: string = playerLeft.id + playerRight.id;
+					console.log('left', this.socket_infos[playerLeft.socket.id]);
 					this.socket_infos[playerLeft.socket.id].rid = room_id;
 					this.socket_infos[playerLeft.socket.id].logic = gameLogic;
+					console.log('right', this.socket_infos[playerRight.socket.id])
 					this.socket_infos[playerRight.socket.id].rid = room_id;
 					this.socket_infos[playerRight.socket.id].logic = gameLogic;
 					
+					// 7. 게임 room 접속
 					playerLeft.socket.join(room_id);
 					playerRight.socket.join(room_id);
 					this.usersService.updateStatus(playerLeft.id, 'ongame');
