@@ -56,6 +56,11 @@ const AdminView: FC<RouteComponentProps> = ({match: {path}}): JSX.Element => {
   }, [update]);
 
   useEffect(() => {
+    document.getElementById("button-container").style.display = "none";
+    return (() => {document.getElementById("button-container").style.display = "grid"});
+  }, []);
+
+  useEffect(() => {
     mounted.current = true;
     return (() => {mounted.current = false});
   }, []);
