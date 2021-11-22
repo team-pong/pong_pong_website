@@ -108,7 +108,8 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
       });
       return ;
     }
-    /* game초대를 거절했을 때 상대방이 알아야 할까? */
+    /* dm global socket에다가 거절했다고 알린 다음에 거기서 game socket으로
+    emit 하면 되지 않을까? */
     updateDmLog(logId);
   }
 
