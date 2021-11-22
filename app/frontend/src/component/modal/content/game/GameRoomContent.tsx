@@ -1,8 +1,7 @@
 import { fabric } from "fabric";
 import { FC, useState, useEffect, useRef, useContext } from "react";
-import { RouteComponentProps, withRouter, useHistory, Redirect } from "react-router-dom";
+import { RouteComponentProps, withRouter, Redirect } from "react-router-dom";
 import "/src/scss/content/game/GameRoomContent.scss";
-import { io } from "socket.io-client";
 import { UserInfoContext } from "../../../../Context";
 import NoResult from "../../../noresult/NoResult";
 
@@ -17,7 +16,7 @@ interface MatchInfo {
   myName: string,
 }
 
-const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
+const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket}) => {
   const myInfo = useContext(UserInfoContext);
   const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
