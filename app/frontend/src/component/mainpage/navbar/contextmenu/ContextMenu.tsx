@@ -88,7 +88,7 @@ const ContextMenu: FC<contextMenuProps> =
       setNoticeInfo({
         isOpen: true,
         seconds: 3,
-        content: "사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.",
+        content: res.err_msg,
         backgroundColor: NOTICE_RED,
       });
     } else {
