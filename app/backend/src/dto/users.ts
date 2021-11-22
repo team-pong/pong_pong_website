@@ -167,9 +167,32 @@ export class ReadUserWithIdDto {
 	public user_id: string;
 }
 
+export class UpdateUserInfoDto {
+	@ApiProperty({
+		example: 'tester01',
+		description: '유저 아이디',
+	})
+	@IsString()
+	public user_id: string;
+
+	@ApiProperty({
+		example: 'tester',
+		description: '유저 닉네임',
+	})
+	@IsString()
+	public nick: string;
+
+	@ApiProperty({
+		example: 'https://gravatar.com/avatar/d93441b990173e7ec67159e63c4f926?s=400&d=robohash&r=x',
+		description: '아바타 url',
+	})
+	@IsString()
+	public avatar_url: string;
+}
+
 export class UpdateNickDto {
 	@ApiProperty({
-		example: 'asdfsf',
+		example: 'changed_nickname',
 		description: '변경 할 닉네임',
 	})
 	@IsString()

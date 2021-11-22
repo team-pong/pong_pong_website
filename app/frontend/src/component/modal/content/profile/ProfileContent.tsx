@@ -38,7 +38,10 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 
   const [otherUserInfo, setOtherUserInfo] = useState<UserInfo>();
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
-  const [nickToEdit, setNickToEdit] = useState("");
+  
+  const { nick } = useParams<{nick: string}>();
+
+  const [nickToEdit, setNickToEdit] = useState(nick);
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
   const [isBlockedFriend, setIsBlockedFriend] = useState(false);
   const [isMyProfile, setIsMyProfile] = useState(false);
@@ -47,8 +50,6 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 
   const mounted = useRef(false);
 
-  //url parameter로 넘어오는 nick 문자열 저장
-  const { nick } = useParams<{nick: string}>();
 
   /*!
    * @author donglee
@@ -376,8 +377,8 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
    */
   useEffect(() => {
     if (myInfo) {
-      setIsMyProfile(nick === myInfo.nick);
-      if (nick !== myInfo.nick) {
+      setIsMyProfile(nickToEdit === myInfo.nick);
+      if (nickToEdit !== myInfo.nick) {
         getOtherUserInfo();
         getIsAlreadyFriend();
         getIsBlockedFriend();
