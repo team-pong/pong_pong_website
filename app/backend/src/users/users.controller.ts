@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, forwardRef, Get, Inject, Post, Query, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ReadUserDto, ReadUserWithIdDto, UpdateNickDto, UsersDto1, UsersDto2, UsersDto3, UsersDto4 } from 'src/dto/users';
+import { ReadUserDto, ReadUserWithIdDto, UpdateNickDto, UpdateUserInfoDto, UsersDto1, UsersDto2, UsersDto3, UsersDto4 } from 'src/dto/users';
 import { ErrMsgDto } from 'src/dto/utility';
 import { UsersService } from './users.service';
 import { Request, Response } from 'express';
@@ -66,9 +66,9 @@ export class UsersController {
   @ApiResponse({ type: ErrMsgDto, description: '유저 정보 변경 실패시 실패 이유' })
   @ApiBody({ type: UsersDto2, description: '변경할 유저 아이디, 유저 닉네임, 아바타 이미지 url' })
   @Post('info')
-  async updateUsers(@Req() req: Request){
+  async updateUsers(@Req() req: Request, @Body() body: UpdateUserInfoDto){
     const user_info = await this.usersService.getUserInfo(req.session.userid);
-    return this.usersService.updateUsers(user_info.user_id, user_info.nick, user_info.avatar_url);
+    return this.usersService.updateUsers(user_info.user_id, body.nick, body.avatar_url);
   }
 
   @ApiOperation({ summary: '닉네임 변경'})

@@ -68,8 +68,10 @@ export class UsersService {
   async updateUsers(user_id: string, nick: string, avatar_url: string){
     if (await this.usersRepo.count({user_id: user_id}) === 0)  // 존재하지 않는 유저 이면
       return new ErrMsgDto(err2);
-    if (await this.usersRepo.count({nick: nick}))  // 중복된 닉네임 이면
+    if (await this.usersRepo.count({nick: nick})) {
+      console.log(await this.usersRepo.find({nick: nick}));
       return new ErrMsgDto(err22);
+    }
     await this.usersRepo.save({user_id: user_id, nick: nick, avatar_url: avatar_url});
     return new ErrMsgDto(err0);
   }
