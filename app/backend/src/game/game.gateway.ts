@@ -300,6 +300,7 @@ export class GameGateway {
 			const waiters = this.invite_queue.filter((element) => element.id == target.user_id);
 
 			for (let waiter of waiters) {
+				// console.log('waiters', waiters);
 				if (waiter.target_id == userid) { // 상대의 타겟이 내가 맞는지 확인
 					// 5. 게임 로직 객체 생성
 					const gameLogic = new GameLogic(700, 450, map_type, this.server);
@@ -616,6 +617,7 @@ export class GameGateway {
 			// 1. 대기열에 있다면 대기열에서 제거
 			this.deleteFromNormalQueue(user_id);
 			this.deleteFromLadderQueue(user_id);
+			this.deleteFromInviteQueue(user_id);
 
 			// 2. 관전자 처리 (관전자 수 수정해서 보냄)
 			const socket_info = this.socket_infos[socket.id];
