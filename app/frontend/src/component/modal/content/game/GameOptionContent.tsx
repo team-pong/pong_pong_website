@@ -32,15 +32,18 @@ interface GameOptionContent extends RouteComponentProps {
   }>>;
 }
 
-const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatched}) => {
+const GameOptionContent: FC<GameOptionContent> = ({match: {url}, setIsMatched}) => {
   const [mapSelector, setMapSelector] = useState(0);
   const history = useHistory();
 
   const setDmInfo = useContext(SetDmInfoContext);
   const myInfo = useContext(UserInfoContext);
   const {state} = useLocation<GameInviteType>();
-  console.log("option state: ", state);
 
+  /*!
+   * @author donglee
+   * @brief state의 값이 있는 경우 대전신청을 눌렀을 때 DM으로 초대를 보냄
+   */
   const sendDmRequest = () => {
     if (state && state.targetAvatar) {
       setDmInfo({

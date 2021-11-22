@@ -16,7 +16,6 @@ interface gameMatchContentProps extends RouteComponentProps<{matchType: string}>
 const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setIsMatched}): JSX.Element => {
  
   const {state} = useLocation<GameInviteType>();
-  console.log("Match: state", state);
 
   useEffect(() => {
     const url_params = url.split('/');
@@ -26,19 +25,17 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setI
     setIsMatched({isMatched: false, roomId: '', socket: null});
     const socket = io(`${global.BE_HOST}/game`);
 
-    /* state가 없으면 게임 찾기로 들어온 것이니 map 정보만 보내는데,
-       state가 있으면 대전 신청이니 target로 함께 백엔드로 보낸다 */
+    /*!
+     * @author donglee
+     * @brief state에 값이 있으면 대전신청 혹은 대전신청을 수락한 경우이므로
+     *        target이 정해져있음. 백엔드에 target을 정해서 socket으로 보냄
+     */
     if (!state) {
       socket.emit(params.matchType, {map: map});
     } else {
       socket.emit("invite", {map: map, target: state.target});
     }
 
-    /* matched 이후로는 같은 값을 가지고 (여기서 opponent는 대전신청인 경우 target이 돼야 함)
-       진행되니까 게임을 진행시킨다.
-       그런데 여기서 matched가 되는 경우는 상대방이 DM 으로 온 초대를 승낙할 경우여야 한다
-       Caution! 여기서 새로고침을 하면 그래도 문제가 없어보이네?
-       Error! 근데 여기서 왜인지 모르겠는데 대전신청에선 새로고침하면 option까지만 다시 렌더된다. */
     socket.on("matched", ({roomId}) => {
       isMatched = true;
       setIsMatched({isMatched: true, roomId, socket});
