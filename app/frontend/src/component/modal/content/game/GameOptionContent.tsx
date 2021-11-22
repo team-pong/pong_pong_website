@@ -32,7 +32,7 @@ interface GameOptionContent extends RouteComponentProps {
   }>>;
 }
 
-const GameOptionContent: FC<GameOptionContent> = ({match: {url}, setIsMatched}) => {
+const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatched}) => {
   const [mapSelector, setMapSelector] = useState(0);
   const history = useHistory();
 
@@ -75,7 +75,7 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url}, setIsMatched}) 
         {/* 대전신청의 경우 state에 값이 전달된다 */}
         <Link to={{pathname:`${url}/${mapSelector}`, state:state}} className="start" onClick={sendDmRequest}>{!state ? '게임 찾기' : '대전 신청'}</Link>
       </form>
-      <Route path={`${url}/:map`}>
+      <Route path={`${path}/:map`}>
         <Modal id={Date.now()} smallModal content={<GameMatchContent setIsMatched={setIsMatched} />}/>
       </Route>
       {state && state.mapId && <Redirect to={{pathname: `${url}/${state.mapId}`, state: state}} /> }

@@ -16,8 +16,7 @@ interface gameMatchContentProps extends RouteComponentProps<{matchType: string}>
 const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setIsMatched}): JSX.Element => {
  
   const {state} = useLocation<GameInviteType>();
-  console.log("params: ", params);
-  // const [isRejected, setIsRejected] = useState(true);
+  const [isRejected, setIsRejected] = useState(false);
 
   useEffect(() => {
     const url_params = url.split('/');
@@ -38,9 +37,9 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setI
       socket.emit("invite", {map: map, target: state.target});
     }
 
-    // socket.on("rejected", () => {
-    //   setIsRejected(true);
-    // });
+    socket.on("rejected", () => {
+      setIsRejected(true);
+    });
 
     socket.on("matched", ({roomId}) => {
       isMatched = true;
@@ -54,13 +53,13 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setI
     });
   }, []);
 
-  // if (isRejected) {
-  //   return ( 
-  //     <div id="game-match-content">
-  //       <span className="gm-reject-msg">{`${state.target} 님이 대전 신청을 거절했습니다.`}</span>
-  //     </div>
-  //   );
-  // }
+  if (isRejected) {
+    return ( 
+      <div id="game-match-content">
+        <span className="gm-reject-msg">상대가 대전 신청을 거절했습니다</span>
+      </div>
+    );
+  }
   if (state) {
     return (
       <div id="game-match-content">
