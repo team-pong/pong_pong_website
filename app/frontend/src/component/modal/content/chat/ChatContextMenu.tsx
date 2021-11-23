@@ -133,6 +133,19 @@ const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
         </Link>
         {myInfo.nick !== target ? 
           <>
+      {/* {friendList.find((el) => el.nick === target)?.status === "ongame" &&
+            <Link
+              to={`mainpage/spectate?nick=${target}`}
+              style={{textDecoration: "none"}}>
+              <li className="cm-list">관전하기</li>
+            </Link>
+          } */}
+            {}
+            <Link
+              to={`${match.url}/spectate?nick=${target}`}
+              style={{color: "inherit", textDecoration: "none"}}>
+              <li className="chat-context-li">관전하기</li>
+            </Link>
             <li className="chat-context-li" onClick={() => setDmInfo({isDmOpen: true, target: target})}>
               DM 보내기
             </li>
