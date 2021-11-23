@@ -109,7 +109,11 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
       return ;
     }
     if (from) {
-      global.socket.emit("gameRejected", {from: from});
+      const easyfetch = new EasyFetch(`${global.BE_HOST}/game/reject`, "POST");
+      const body = {
+        from: from,
+      };
+      await easyfetch.fetch(body);
     }
     updateDmLog(logId);
   }
