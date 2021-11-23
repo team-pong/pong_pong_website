@@ -76,10 +76,12 @@ const MainPage = ({match}): JSX.Element => {
     if (!dmInfo.isDmOpen) {
       global.socket.on("dm", socketSenUnReadMsg);
       global.socket.on("chatInvite", socketSenUnReadMsg);
+      global.socket.on("gameInvite", socketSenUnReadMsg);
     } else if (dmInfo.isDmOpen) {
       setUnReadMsg(false);
       global.socket.off("dm", socketSenUnReadMsg);
       global.socket.off("chatInvite", socketSenUnReadMsg);
+      global.socket.off("gameInvite", socketSenUnReadMsg);
     }
   }, [dmInfo]);
 

@@ -40,6 +40,10 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatc
   const myInfo = useContext(UserInfoContext);
   const {state} = useLocation<GameInviteType>();
 
+  /*!
+   * @author donglee
+   * @brief state의 값이 있는 경우 대전신청을 눌렀을 때 DM으로 초대를 보냄
+   */
   const sendDmRequest = () => {
     if (state && state.targetAvatar) {
       setDmInfo({
@@ -71,7 +75,7 @@ const GameOptionContent: FC<GameOptionContent> = ({match: {url, path}, setIsMatc
         {/* 대전신청의 경우 state에 값이 전달된다 */}
         <Link to={{pathname:`${url}/${mapSelector}`, state:state}} className="start" onClick={sendDmRequest}>{!state ? '게임 찾기' : '대전 신청'}</Link>
       </form>
-      <Route path={`${url}/:map`}>
+      <Route path={`${path}/:map`}>
         <Modal id={Date.now()} smallModal content={<GameMatchContent setIsMatched={setIsMatched} />}/>
       </Route>
       {state && state.mapId && <Redirect to={{pathname: `${url}/${state.mapId}`, state: state}} /> }

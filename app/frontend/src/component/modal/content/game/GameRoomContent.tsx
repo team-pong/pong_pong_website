@@ -1,9 +1,8 @@
 import { fabric } from "fabric";
 import { FC, useState, useEffect, useRef, useContext } from "react";
-import { RouteComponentProps, withRouter, useHistory, Redirect } from "react-router-dom";
+import { RouteComponentProps, withRouter, Redirect } from "react-router-dom";
 import "/src/scss/content/game/GameRoomContent.scss";
-import { io } from "socket.io-client";
-import { UserInfoContext } from "../../../../Context";
+import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
 import NoResult from "../../../noresult/NoResult";
 
 interface MatchInfo {
@@ -17,12 +16,15 @@ interface MatchInfo {
   myName: string,
 }
 
-const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match: {params}}) => {
+const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket}) => {
+
+  const canvasWidth = 700;
+  const canvasHeight = 450;
+
   const myInfo = useContext(UserInfoContext);
+  const setDmInfo = useContext(SetDmInfoContext);
   const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
-  const [canvasWidth, setCanvasWidth] = useState(700);
-  const [canvasHeight, setCanvasHeight] = useState(450);
   const [leftBar, setLeftBar] = useState<fabric.Rect>();
   const [rightBar, setRightBar] = useState<fabric.Rect>();
   const [countdownWindow, setCountdownWindow] = useState<fabric.Text>();
@@ -36,15 +38,19 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   const [isExit, setIsExit] = useState(false);
   const [showExitButton, setShowExitButton] = useState(false);
 
-  const [obsRect00, setObsRect00] = useState<fabric.Rect>();
-  const [obsRect01, setObsRect01] = useState<fabric.Rect>();
-  const [obsRect02, setObsRect02] = useState<fabric.Rect>();
-  const [obsRect03, setObsRect03] = useState<fabric.Rect>();
-  
-  const [obsCircle00, setObsCircle00] = useState<fabric.Circle>();
-  const [obsCircle01, setObsCircle01] = useState<fabric.Circle>();
-  const [obsCircle02, setObsCircle02] = useState<fabric.Circle>();
-  const [obsCircle03, setObsCircle03] = useState<fabric.Circle>();
+  const [obsRect, setObsRect] = useState<{
+    obsRect00: fabric.Rect,
+    obsRect01: fabric.Rect,
+    obsRect02: fabric.Rect,
+    obsRect03: fabric.Rect
+  }>(null);
+
+  const [obsCircle, setObsCircle] = useState<{
+    obsCircle00: fabric.Circle,
+    obsCircle01: fabric.Circle,
+    obsCircle02: fabric.Circle,
+    obsCircle03: fabric.Circle,
+  }>(null)
 
   const [matchInfo, setMatchInfo] = useState<MatchInfo>({
     lPlayerNickname: '',
@@ -111,7 +117,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
   }
 
   
-  const initBar = (x, y, width, height) => {
+  const initRect = ([x, y, width, height]) => {
     width = width - x;
     height = height - y;
     return new fabric.Rect({
@@ -132,7 +138,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     })
   }
 
-  const initCircle = (x, y, r) => {
+  const initCircle = ([x, y, r]) => {
     return new fabric.Circle({
       left: x - r,
       top: y - r,
@@ -148,7 +154,6 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
    */
   
   const keyDownEvent = (e: KeyboardEvent) => {
-    
     if (e.code === "ArrowDown" && downKeyRef.current == 0) {
       socket.emit("keyEvent", {arrowUp: upKeyRef.current, arrowDown: true});
       setDownKey(1);
@@ -179,19 +184,19 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
     socket.on("init", (data) => {
       setMap(data.type);
       setCanvas(initCanvas());
-      setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));
-      setRightBar(initBar(data.bar01[0], data.bar01[1], data.bar01[2], data.bar01[3]));
+      setLeftBar(initRect(data.bar00));
+      setRightBar(initRect(data.bar01));
       setBall(initBall(data.ball[0], data.ball[1]));
       if (data?.type == 1) {
-        setObsRect00(initBar(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2], data.obstacle.obs00[3]));
-        setObsRect01(initBar(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2], data.obstacle.obs01[3]));
-        setObsRect02(initBar(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2], data.obstacle.obs02[3]));
-        setObsRect03(initBar(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2], data.obstacle.obs03[3]));
+        setObsRect((prev) => ({...prev, obsRect00: initRect(data.obstacle.obs00)}));
+        setObsRect((prev) => ({...prev, obsRect01: initRect(data.obstacle.obs01)}));
+        setObsRect((prev) => ({...prev, obsRect02: initRect(data.obstacle.obs02)}));
+        setObsRect((prev) => ({...prev, obsRect03: initRect(data.obstacle.obs03)}));
       } else if (data?.type == 2) {
-        setObsCircle00(initCircle(data.obstacle.obs00[0], data.obstacle.obs00[1], data.obstacle.obs00[2]));
-        setObsCircle01(initCircle(data.obstacle.obs01[0], data.obstacle.obs01[1], data.obstacle.obs01[2]));
-        setObsCircle02(initCircle(data.obstacle.obs02[0], data.obstacle.obs02[1], data.obstacle.obs02[2]));
-        setObsCircle03(initCircle(data.obstacle.obs03[0], data.obstacle.obs03[1], data.obstacle.obs03[2]));
+        setObsCircle((prev) => ({...prev, obsCircle00: initCircle(data.obstacle.obs00)}));
+        setObsCircle((prev) => ({...prev, obsCircle01: initCircle(data.obstacle.obs01)}));
+        setObsCircle((prev) => ({...prev, obsCircle02: initCircle(data.obstacle.obs02)}));
+        setObsCircle((prev) => ({...prev, obsCircle03: initCircle(data.obstacle.obs03)}));
       }
       setInit(1);
     });
@@ -278,16 +283,16 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       canvas.add(leftBar);
       canvas.add(rightBar);
       if (map == 2) {
-        canvas.add(obsCircle00);
-        canvas.add(obsCircle01);
-        canvas.add(obsCircle02);
-        canvas.add(obsCircle03);
+        canvas.add(obsCircle.obsCircle00);
+        canvas.add(obsCircle.obsCircle01);
+        canvas.add(obsCircle.obsCircle02);
+        canvas.add(obsCircle.obsCircle03);
       }
       else if (map == 1) {
-        canvas.add(obsRect00);
-        canvas.add(obsRect01);
-        canvas.add(obsRect02);
-        canvas.add(obsRect03);
+        canvas.add(obsRect.obsRect00);
+        canvas.add(obsRect.obsRect01);
+        canvas.add(obsRect.obsRect02);
+        canvas.add(obsRect.obsRect03);
       }
     }
   }, [init])
@@ -318,6 +323,17 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket, match
       canvas.renderAll();
     }
   }, [ballX, ballY]);
+
+  /*!
+   * @author donglee
+   * @brief 게임 진행이 되면 디엠이 켜져있을 경우 닫기
+   */
+  useEffect(() => {
+    setDmInfo({
+      isDmOpen: false,
+      target: "",
+    });
+  }, []);
 
   if (socket === null) return (
     <NoResult

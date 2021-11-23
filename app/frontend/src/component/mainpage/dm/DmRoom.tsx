@@ -33,6 +33,10 @@ interface DmLogListProps {
   setGameInviteTarget: Dispatch<SetStateAction<string>>,
 }
 
+/*!
+ * @author donglee
+ * @brief map의 number 를 매개변수로 받아와 맵 이름을 string으로 반한홤
+ */
 function getMapTitle(mapSelector: number): string {
   switch (mapSelector) {
     case 0:
@@ -62,9 +66,10 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
   /*!
    * @author donglee
    * @brief - 대화방 초대를 승낙하면 해당 channelId를 이용해 redirect 함
+   *        - 대전 초대를 승낙하면 GameContent로 redirect함
    *        - DB 에서 해당 로그를 삭제하고 DmLog 를 업데이트함
    */
-  const approveInvite = async (channelId: any, logId: number, type: string, from?: string) => {
+  const approveInvite = async (channelId: any, logId: number, type: string, from: string) => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/oneLog?dm_log_id=${logId}`, "DELETE");
     const res = await easyfetch.fetch();
 
@@ -103,7 +108,8 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
       });
       return ;
     }
-    /* game초대를 거절했을 때 상대방이 알아야 할까? */
+    /* dm global socket에다가 거절했다고 알린 다음에 거기서 game socket으로
+    emit 하면 되지 않을까? */
     updateDmLog(logId);
   }
 
@@ -284,11 +290,16 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
       state: {isInvited: true},
     }} />);
   }
+  /*!
+   * @author donglee
+   * @brief gameMapId가 0,1,2 중에 하나라면 대전신청을 승낙하는 경우이므로
+   *        GameContent로 redirect하면서 state에 target, mapId 정보를 넘겨줌
+   */
   if (gameMapId < 3) {
     return ( 
       <Redirect push to={{
         pathname: `/mainpage/game`,
-        state: {target: gameInviteTarget, mapId: gameMapId},
+        state: {target: gameInviteTarget, mapId: String(gameMapId)},
       }} />
     );
   }
