@@ -95,7 +95,7 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
    * @author donglee
    * @brief DB 에서 해당 로그를 삭제하고 현재 화면에서 DmLog 를 update 함
    */
-  const rejectInvite = async (logId: number) => {
+  const rejectInvite = async (logId: number, from?: string) => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/oneLog?dm_log_id=${logId}`, "DELETE");
     const res = await easyfetch.fetch();
 
@@ -108,8 +108,9 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
       });
       return ;
     }
-    /* dm global socket에다가 거절했다고 알린 다음에 거기서 game socket으로
-    emit 하면 되지 않을까? */
+    if (from) {
+      global.socket.emit("gameRejected", {from: from});
+    }
     updateDmLog(logId);
   }
 
@@ -145,7 +146,7 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
                   className="dm-reply-img"
                   src="/public/red-x.png" 
                   alt="거절"
-                  onClick={() => rejectInvite(msg.id)} />
+                  onClick={msg.type === "chat" ? () => rejectInvite(msg.id) : () => rejectInvite(msg.id, msg.from)} />
               </div>
             </div>
           </div>
