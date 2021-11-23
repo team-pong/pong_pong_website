@@ -1,14 +1,8 @@
 FROM node:lts-alpine3.13
 
-COPY ./app/frontend/ /frontend
-COPY ./app/backend/ /backend
-
-WORKDIR /frontend
-RUN npm install && npm build
+COPY ./app/backend /backend
+COPY ./app/frontend/dist /backend/client
 
 WORKDIR /backend
-RUN cp -r /frontend/dist /backend/client
-RUN npm install && \
-    && npm run schema:sync \
-    && npm run build
-CMD ["sh"]
+RUN npm install
+EXPOSE 3001
