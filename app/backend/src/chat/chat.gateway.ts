@@ -14,6 +14,10 @@ import { err0 } from 'src/err';
 import { BanService } from 'src/ban/ban.service';
 import { MuteService } from 'src/mute/mute.service';
 import { WsExceptionFilter } from 'src/filter/ws.filter';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Block } from 'src/entities/block';
+import { Repository } from 'typeorm';
+import { ChatUsers } from 'src/entities/chat-users';
 
 interface SocketInfo {
   room_id: string,
@@ -63,7 +67,11 @@ export class ChatGateway {
     @Inject(forwardRef(() => BanService))
     private banService: BanService,
     @Inject(forwardRef(() => MuteService))
-    private muteService: MuteService
+    private muteService: MuteService,
+    @InjectRepository(Block) 
+    private blockRepo: Repository<Block>,
+    @InjectRepository(ChatUsers)
+    private chatUsersRepo: Repository<ChatUsers>,
   ) {}
 
   @WebSocketServer() public server: Server;
@@ -72,6 +80,15 @@ export class ChatGateway {
 
   afterInit(server: any): any {
     console.log('Chat Server Init');
+  }
+
+  async isBlockedUserFrom(target: string, from: string) {
+    if (await this.blockRepo.count({user_id: from, block_id: target})) {
+      console.log(`${target} is blocked by ${from}`);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   async isChannelFull(room_id: string) {
@@ -309,7 +326,15 @@ export class ChatGateway {
     const room_id = this.socket_map[socket.id].room_id;
     const user_id = this.socket_map[socket.id].user_id;
     const user_info = await this.usersService.getUserInfo(user_id);
-    
+
+    // 1. 채팅방 모든 유저 받아오기
+    // 2. 자기 자신과 얘를 차단핸 유저 빼기
+    // 3. 남은 유저들에게 채팅 보내기
+    const user_list = await this.chatUsersService.getUserListInRoom(room_id);
+    for (let user of user_list) {
+      
+    }
+
     socket.to(this.socket_map[socket.id].room_id).emit('message', {
       nick: user_info.nick,
       position: await this.chatUsersService.getUserPosition(user_id, room_id),
@@ -317,7 +342,6 @@ export class ChatGateway {
       time: Date.now(),
       message: body.msg,
     })
-    console.log(`Message Arrive user: ${this.socket_map[socket.id].user_id}, chat: ${body.msg}`);
   }
 
   /*
