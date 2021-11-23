@@ -68,10 +68,12 @@ const DmList: FC = (): JSX.Element => {
 
     global.socket.on("dm", socketGetDmList);
     global.socket.on("chatInvite", socketGetDmList);
+    global.socket.on("gameInvite", socketGetDmList);
     return (() => {
       mounted = false;
       global.socket.off("dm", socketGetDmList);
       global.socket.off("chatInvite", socketGetDmList);
+      global.socket.off("gameInvite", socketGetDmList);
     });
   }, []);
 

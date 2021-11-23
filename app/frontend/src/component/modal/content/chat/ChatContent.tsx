@@ -2,7 +2,7 @@ import { FC, useEffect, useRef, useState } from "react";
 import "/src/scss/content/chat/ChatContent.scss";
 import EasyFetch from "../../../../utils/EasyFetch";
 import ChatRoomContent from "./ChatRoomContent";
-import { Link, Route } from "react-router-dom";
+import { Link, Route, useLocation } from "react-router-dom";
 import Modal from "../../Modal";
 import ConfigChatRoom from "./ConfigChatRoom";
 import Loading from "../../../loading/Loading";

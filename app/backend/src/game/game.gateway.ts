@@ -1,20 +1,23 @@
-import { Query, Req, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { IoAdapter } from '@nestjs/platform-socket.io';
-import { ConnectedSocket, MessageBody, OnGatewayDisconnect } from '@nestjs/websockets';
-import { WebSocketServer, OnGatewayConnection, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
-import { Request } from 'express';
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ConnectedSocket, MessageBody } from '@nestjs/websockets';
+import { WebSocketServer, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { LoggedInWsGuard } from 'src/auth/logged-in-ws.guard';
-import { GameMapDto, SpectateGameDto } from 'src/dto/game';
+import { NormalGameDto, LadderGameDto, SpectateGameDto, InviteGameDto } from 'src/dto/game';
 import { WsExceptionFilter } from 'src/filter/ws.filter';
-import { GlobalGateway } from 'src/global/global.gateway';
-import { GlobalService } from 'src/global/global.service';
 import { MatchService } from 'src/match/match.service';
 import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
+import { getSessionIDFromCookie } from 'src/utils';
 import { Scored, GameLogic } from './game.logic';
 
 interface User {
+	id: string,
+	socket: Socket,
+	map: Number,
+}
+
+interface InviteUser {
+	target_id: string,
 	id: string,
 	socket: Socket,
 	map: Number,
@@ -75,13 +78,13 @@ export class GameGateway {
 		private sessionService: SessionService, // readUserId 함수 쓰려고 가져옴
 		private usersService: UsersService,
 		private matchService: MatchService,
-		private globalService: GlobalService,
 	) {}
 
 	@WebSocketServer()public server: Server;
 
 	private normal_queue: User[] = [];
 	private ladder_queue: User[] = [];
+	private invite_queue: InviteUser[] = [];
 	private socket_infos: {[key: string]: socketInfo} = {};
 	private games: {[key: string]: Game} = {};
 
@@ -157,8 +160,13 @@ export class GameGateway {
 		} else {
 			// frontㅇㅔ서 준비 완료되면 시작(3, 2, 1, Start 메시지)
 			gameLogic.update();
-			const room_id = this.socket_infos[playerLeft.socket.id].rid;
-			this.server.to(room_id).emit("update", gameLogic.getJson());
+			if (this.socket_infos[playerLeft.socket.id]) {
+				// 인터벌이 돌면서 socket_infos를 참조하는데, 사용자가 연결을 끊어서 disconnect 이벤트가 발생하면 이 socket_infos에 정보가 삭제되고 인터벌이 제거된다.
+				// 인터벌 내부 함수가 돌고있는 중에 소켓 정보가 제거되면 참조하지 못해서 에러가 생긴다.
+				// 이를 막기 위해서 if로 한번 체크하고 실행하도록 수정함
+				const room_id = this.socket_infos[playerLeft.socket.id].rid;
+				this.server.to(room_id).emit("update", gameLogic.getJson());
+			}
 		}
 	}
 
@@ -227,36 +235,174 @@ export class GameGateway {
 		}
 	}
 
-	
+	deleteFromInviteQueue(user_id: string) {
+		const idx = this.invite_queue.findIndex((element) => {
+			if (element.id = user_id) {
+				return true;
+			}
+			return false;
+		})
+		if (idx != -1) {
+			this.invite_queue.splice(idx, 1);
+		}
+	}
+
+	pushUserIntoQueue(userid: string, socket: Socket, map_type: number, queue: any[], target_id: string = null) {
+		if (queue.find((element) => {
+			if (element.id == userid) {
+				return true;
+			}
+			return false;
+		})) {				
+		} else {
+			queue.push({id: userid, socket: socket, map: map_type, target_id: target_id});
+		}
+	}
+
+	// 1-1) 수락을 기다리는 도중에 취소
+	// 1. game socket disconnect
+	// 2. invite_queue에서 제거
+	// 3. global socket을 통해서 상대에게 매치가 취소되었음을 알림
+
+	// 1-2) 상대방이 거절
+	// 1. 
+
+	// 1-3) 상대방이 수락
+	// 1. game socket 접속//
+	// 2. socket.emit('invite', {map: , target: b의 닉네임})
+  // 3. socket.emit('invite', {map: , target: a의 닉네임})
+	// 4. 게임 시작
+
+	@SubscribeMessage('invite')
+	async inviteGameMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: InviteGameDto) {
+		try { // 대전 신청 게임인 경우
+			// 1. 대전을 신청하고 게임 소켓에 접속해 수락을 기다린다.
+			// 1-1. 기다리는 도중에 취소한다 (소켓 연결 해제) -> 상대방에게 대전 신청 취소 메세지를 보내고 연결 종료
+			// 1-2. 상대방이 거절한다 -> 신청한 사람에게 대전 신청 거절 메세지를 보내고 소켓 연결 해제
+			// 1-3. 상대방이 수락한다 -> 게임 시작
+			const map_type = Number(body.map);
+			const game_type = 'general';
+			// 1. 소켓 id로 유저 정보 가져오기
+			const sid = getSessionIDFromCookie(socket.request.headers.cookie);
+			const userid = await this.sessionService.readUserId(sid);
+
+			const target = await this.usersService.getUserInfoWithNick(body.target);
+
+			// 2. 소켓 관련 정보들 저장 (소켓, 세션id, 유저id)
+			this.socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null, logic: null};
+			// console.log('소켓저장됨.', userid);
+
+			// 3. 초대 대기열에 넣기
+			this.pushUserIntoQueue(userid, socket, map_type, this.invite_queue, target.user_id);
+
+			// 4. 나의 타겟 상대 찾기
+			const waiters = this.invite_queue.filter((element) => element.id == target.user_id);
+
+			for (let waiter of waiters) {
+				// console.log('waiters', waiters);
+				if (waiter.target_id == userid) { // 상대의 타겟이 내가 맞는지 확인
+					// 5. 게임 로직 객체 생성
+					const gameLogic = new GameLogic(700, 450, map_type, this.server);
+					const playerLeft = {
+						id: waiter.id,
+						socket: waiter.socket,
+						map: waiter.map,
+					};
+					const playerRight = {
+						id: userid,
+						socket: socket,
+						map: map_type,
+					};
+				
+					// 6. 소켓 정보 저장
+					const room_id: string = playerLeft.id + playerRight.id;
+					// console.log('left', this.socket_infos[playerLeft.socket.id]);
+					this.socket_infos[playerLeft.socket.id].rid = room_id;
+					this.socket_infos[playerLeft.socket.id].logic = gameLogic;
+					// console.log('right', this.socket_infos[playerRight.socket.id])
+					this.socket_infos[playerRight.socket.id].rid = room_id;
+					this.socket_infos[playerRight.socket.id].logic = gameLogic;
+					
+					// 7. 게임 room 접속
+					playerLeft.socket.join(room_id);
+					playerRight.socket.join(room_id);
+					this.usersService.updateStatus(playerLeft.id, 'ongame');
+					this.usersService.updateStatus(playerRight.id, 'ongame');
+					playerLeft.socket.emit('matched', {roomId: room_id, opponent: playerLeft.id, position: 'left'});
+					playerRight.socket.emit('matched', {roomId: room_id, opponent: playerRight.id, position: 'right'});
+					// invite queue 에서 제거
+					this.deleteFromInviteQueue(playerLeft.id);
+					this.deleteFromInviteQueue(playerRight.id);
+
+					const userInfo: MatchInfo = {
+						lPlayerNickname: playerLeft.id,
+						lPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerLeft.id),
+						lPlayerScore: 0,
+						rPlayerNickname: playerRight.id,
+						rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
+						rPlayerScore: 0,
+						viewNumber: 0,
+						type: game_type,
+						map: map_type,
+					}
+					this.socket_infos[playerLeft.socket.id].match = userInfo;
+					this.socket_infos[playerRight.socket.id].match = this.socket_infos[playerLeft.socket.id].match;
+
+					this.server.to(room_id).emit("init", gameLogic.getInitJson(), userInfo);
+					this.server.to(room_id).emit("setMatchInfo", userInfo);				
+					playerLeft.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'l'));
+					playerRight.socket.on('keyEvent', (e) => this.BarMovementEventListner(e, gameLogic, 'r'));
+
+					/*
+					* @brief 기권 버튼 클릭시 결과 전송 후 게임 종료
+					*/
+					
+					playerLeft.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'l', userInfo));
+					playerRight.socket.on("giveUp", () => this.GiveUpEventListener(playerLeft, playerRight, gameLogic, 'r', userInfo));
+
+					this.games[room_id] = {timeout: null, interval: null, type: game_type, map: map_type};
+					this.server.to(room_id).emit("startCount");
+					this.games[room_id].timeout = setTimeout(() => {
+						this.games[room_id].interval = setInterval(() => {
+							this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
+						}, 20)
+					}, 3000)
+					
+					/*
+					* 게임 중 연결 끊은 경우
+					*/
+					playerLeft.socket.on("disconnect", () => this.disconnectEvent(playerLeft, playerRight, gameLogic, 'l', userInfo));
+					playerRight.socket.on("disconnect", () => this.disconnectEvent(playerLeft, playerRight, gameLogic, 'r', userInfo));
+				}
+			} // for문 종료
+		} catch (err) {
+			console.error(err);
+			return err;
+		}
+	}
+
   @SubscribeMessage('normal')
-  async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: GameMapDto) {
+  async handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: NormalGameDto) {
 		try {
-			const map_type = Number(map.map);
+			const map_type = Number(body.map);
 			const game_type = 'general';
 			// 1. 소켓 유저 정보 가져오기
 			// 쿠키에서 sid 파싱
-			const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			const sid: string = getSessionIDFromCookie(socket.request.headers.cookie);
 			// sid로 유저 아이디 찾기
 			const userid = await this.sessionService.readUserId(sid);
 	
 			// 2. 소켓 관련 정보들 저장 (소켓, 세션id, 유저id)
 			this.socket_infos[socket.id] = {socket: socket, sid: sid, uid: userid, rid: null, match: null, logic: null};
+
 			// 3. 대기열에 넣기 (이미 큐에 있다면 넣지 않음)
-			if (this.normal_queue.find((element) => {
-				if (element.id == userid) {
-					return true;
-				}
-				return false;
-			})) {
-			} else {
-				this.normal_queue.push({id: userid, socket: socket, map: map_type})
-			}
+			this.pushUserIntoQueue(userid, socket, map_type, this.normal_queue);
 			// 4. 같은 맵을 선택하고 기다리는중인 사람들 리스트 가져오기
 			const waiters = this.normal_queue.filter((element) => element.map == map_type);
 			if (waiters.length >= 2) {
 				
 				// 5. 게임 로직 객체 생성
-				const gameLogic = new GameLogic(700, 450, Number(map.map), this.server);
+				const gameLogic = new GameLogic(700, 450, map_type, this.server);
 				const playerLeft = waiters[0];
 				const playerRight = waiters[1];
 	
@@ -272,10 +418,9 @@ export class GameGateway {
 				this.usersService.updateStatus(playerRight.id, 'ongame');
 				playerLeft.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[1].id, position: 'left'});
 				playerRight.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[0].id, position: 'right'});
-				this.deleteFromNormalQueue(waiters[0].id);
-				this.deleteFromNormalQueue(waiters[1].id);
+				this.deleteFromNormalQueue(playerLeft.id);
+				this.deleteFromNormalQueue(playerRight.id);
 	
-				const ret = gameLogic.getJson();
 				const userInfo: MatchInfo = {
 					lPlayerNickname: playerLeft.id,
 					lPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerLeft.id),
@@ -322,12 +467,12 @@ export class GameGateway {
   }
 
 	@SubscribeMessage('ladder')
-	async handdleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: GameMapDto) {
+	async handdleMessage(@ConnectedSocket() socket: Socket, @MessageBody() map: LadderGameDto) {
 		try {
 			const map_type = Number(map.map);
 			const game_type = 'ranked';
 			// 쿠키에서 sid 파싱
-			const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			const sid: string = getSessionIDFromCookie(socket.request.headers.cookie);
 			// sid로 유저 아이디 찾기
 			const userid = await this.sessionService.readUserId(sid);
 	
@@ -448,13 +593,18 @@ export class GameGateway {
 		}
 	}
 
+	async rejectGame(user_id: string) {
+		const target_socket = this.getSocketInfo(user_id);
+		this.server.to(target_socket.socket.id).emit('rejected');
+	}
+
 	afterInit(server: Server): any {
 		console.log('Game Socket Server Init');
 	}
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
 		try {
-			const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			const sid = getSessionIDFromCookie(socket.request.headers.cookie);
 			const user_id = await this.sessionService.readUserId(sid);
 			console.log('Game 웹소켓 연결됨', user_id);
 		} catch (err) {
@@ -464,13 +614,14 @@ export class GameGateway {
 
 	async handleDisconnect(@ConnectedSocket() socket: Socket) {
 		try {
-			const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			const sid = getSessionIDFromCookie(socket.request.headers.cookie);
 			const user_id = await this.sessionService.readUserId(sid);
 	
 			console.log('Game 웹소켓 연결해제', user_id);
 			// 1. 대기열에 있다면 대기열에서 제거
 			this.deleteFromNormalQueue(user_id);
 			this.deleteFromLadderQueue(user_id);
+			this.deleteFromInviteQueue(user_id);
 
 			// 2. 관전자 처리 (관전자 수 수정해서 보냄)
 			const socket_info = this.socket_infos[socket.id];
