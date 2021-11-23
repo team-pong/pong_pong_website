@@ -80,6 +80,13 @@ export class SessionController {
 		}
 	}
 
+	@ApiOperation({ summary: '세션 쿠키를 지우고 로그인 화면으로 리디렉트'})
+	@Get("/logout")
+	async logout(@Res() res: Response) {
+		res.clearCookie('connect.sid');
+		res.redirect(`${process.env.BACKEND_SERVER_URL}/`);
+	}
+
   @ApiOperation({ summary: '42로그인 페이지에서 이 주소로 코드를 전송'})
   @Get("/oauth")
   async loginRedirectFor42Api(@Query() loginCodeDto: LoginCodeDto, @Req() request: Request ,@Res({ passthrough: true }) response: Response) {
