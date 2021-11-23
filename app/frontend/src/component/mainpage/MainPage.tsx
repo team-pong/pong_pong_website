@@ -8,7 +8,7 @@ import { useContext, useEffect, useState } from "react";
 import "/src/scss/mainpage/MainPage.scss";
 import "/src/scss/mainpage/MainPage-media.scss";
 import "/src/scss/mainpage/MainPage-mobile.scss";
-import { Link, Route, Switch } from "react-router-dom";
+import { Link, Redirect, Route, Switch } from "react-router-dom";
 import EasyFetch from '../../utils/EasyFetch';
 
 export interface UserInfo {
@@ -32,6 +32,7 @@ const MainPage = ({match}): JSX.Element => {
 
   const [updateFriendList, setUpdateFriendList] = useState({state: "", user_id: ""});
   const [unReadMsg, setUnReadMsg] = useState(false);
+  const [firstLogin, setFirstLogin] = useState(false);
 
   const userInfo = useContext<UserInfo>(UserInfoContext);
   const setUserInfo = useContext(SetUserInfoContext);
@@ -51,7 +52,10 @@ const MainPage = ({match}): JSX.Element => {
    */
   useEffect(() => {
     getUserInfo()
-    .then((res) => setUserInfo({...res}));
+    .then((res) => {
+      setUserInfo({...res})
+      if (window.location.search.substr(1) === "firstLogin=true") setFirstLogin(true);
+    });
 
     global.socket.on("online", ({user_id}) => {
       setUpdateFriendList({state: "online", user_id: user_id});
@@ -133,6 +137,8 @@ const MainPage = ({match}): JSX.Element => {
           </button>
         </section>
       </main>
+      {/* {firstLogin && <Redirect to={`/mainpage/profile/${userInfo.nick}`} push/>} */}
+      {firstLogin && <Redirect push to={{pathname: `/mainpage/profile/${userInfo.nick}`, state: {firstLogin: true}}}/>}
     </>
   );
 }

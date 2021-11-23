@@ -1,5 +1,5 @@
 import React, { FormEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
-import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-router-dom";
+import { withRouter, RouteComponentProps, Link, Route, useParams, useLocation } from "react-router-dom";
 import "/src/scss/content/profile/ProfileContent.scss";
 import Modal from "../../Modal";
 import ManageFriendContent from "./ManageFriendContent";
@@ -40,6 +40,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
   
   const { nick } = useParams<{nick: string}>();
+  const {state} = useLocation<{firstLogin: boolean}>();
 
   const [nickToEdit, setNickToEdit] = useState(nick);
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
@@ -388,6 +389,10 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 
   useEffect(() => {
     mounted.current = true;
+    if (state) {
+      alert("환영합니다! 아바타 이미지를 클릭해서 아바타를 바꿔보세요!\n현재는 42 이미지가 기본으로 설정돼있습니다. \n"+
+      "닉네임도 연필 모양을 눌러서 등록하세요!\n현재는 42 인트라 아이디로 기본 설정돼있습니다.")
+    }
     return (() => {mounted.current = false});
   }, []);
 
