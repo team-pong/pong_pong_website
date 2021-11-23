@@ -38,7 +38,10 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 
   const [otherUserInfo, setOtherUserInfo] = useState<UserInfo>();
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
-  const [nickToEdit, setNickToEdit] = useState("");
+  
+  const { nick } = useParams<{nick: string}>();
+
+  const [nickToEdit, setNickToEdit] = useState(nick);
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
   const [isBlockedFriend, setIsBlockedFriend] = useState(false);
   const [isMyProfile, setIsMyProfile] = useState(false);
@@ -47,8 +50,6 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 
   const mounted = useRef(false);
 
-  //url parameter로 넘어오는 nick 문자열 저장
-  const { nick } = useParams<{nick: string}>();
 
   /*!
    * @author donglee
@@ -376,8 +377,8 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
    */
   useEffect(() => {
     if (myInfo) {
-      setIsMyProfile(nick === myInfo.nick);
-      if (nick !== myInfo.nick) {
+      setIsMyProfile(nickToEdit === myInfo.nick);
+      if (nickToEdit !== myInfo.nick) {
         getOtherUserInfo();
         getIsAlreadyFriend();
         getIsBlockedFriend();
@@ -461,11 +462,11 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
         <div id="lower-part">
           <div id="blank"></div>
           {!props.readonly ?
-          <div id="delete-user">
+          <div id="delete-user" onClick={() => window.location.href = `${global.BE_HOST}/session/logout`}>
             <div id="delete-icon">
-              <img className="pr-trash-btn" src="/public/delete.png" alt="회원탈퇴" />
+              <img className="pr-trash-btn" src="/public/delete.png" alt="로그아웃" />
             </div>
-            <span className="pr-explain">클릭하면 회원님의 모든 데이터가 서버에서 삭제됩니다</span>
+            <span className="pr-explain">로그아웃</span>
           </div>
           : <></>}
         </div>
