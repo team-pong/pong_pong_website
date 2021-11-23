@@ -462,11 +462,11 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
         <div id="lower-part">
           <div id="blank"></div>
           {!props.readonly ?
-          <div id="delete-user">
+          <div id="delete-user" onClick={() => window.location.href = `${global.BE_HOST}/session/logout`}>
             <div id="delete-icon">
-              <img className="pr-trash-btn" src="/public/delete.png" alt="회원탈퇴" />
+              <img className="pr-trash-btn" src="/public/delete.png" alt="로그아웃" />
             </div>
-            <span className="pr-explain">클릭하면 회원님의 모든 데이터가 서버에서 삭제됩니다</span>
+            <span className="pr-explain">로그아웃</span>
           </div>
           : <></>}
         </div>
