@@ -239,8 +239,6 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   const getChatRoomInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${channel_id}`);
     const res = await easyfetch.fetch();
-    /* 대전신청 하고 난 후 새로고침 하면 여기서 에러가 난다
-       chnnel_id 를 찍어보면 :channel_id 이런 식으로 나옴 */
     if (!res.err_msg) {
       if (mounted.current) setChatRoomInfo({
         title: res.title,
