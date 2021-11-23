@@ -201,7 +201,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
   };
   const [textAreaMsg, setTextAreaMsg] = useState("");
   const [channelId, setChannelId] = useState(0);
-  const [gameMapId, setGameMapId] = useState(3);
+  const [gameMapId, setGameMapId] = useState(-1);
   const [gameInviteTarget, setGameInviteTarget] = useState("");
 
   const myInfo = useContext(UserInfoContext);
@@ -301,7 +301,7 @@ const DmRoom: FC<DmRoomProps> = ({dmInfo}): JSX.Element => {
    * @brief gameMapId가 0,1,2 중에 하나라면 대전신청을 승낙하는 경우이므로
    *        GameContent로 redirect하면서 state에 target, mapId 정보를 넘겨줌
    */
-  if (gameMapId < 3) {
+  if (gameMapId < 3 && gameMapId >= 0) {
     return ( 
       <Redirect push to={{
         pathname: `/mainpage/game`,
