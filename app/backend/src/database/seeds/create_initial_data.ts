@@ -90,7 +90,6 @@ export class createInitialData implements Seeder {
 				{user_id: 'donglee', nick: 'donglee', avatar_url: 'https://gravatar.com/avatar/d93441b990172e7ec67159e63c4f992?s=400&d=robohash&r=x', total_games:30, win_games:20, loss_games:10, ladder_level:1500}, 
 				{user_id: 'jinwkim', nick: 'jinwkim', avatar_url: 'https://gravatar.com/avatar/d93441b991723e7ec67159e63c4f995?s=400&d=robohash&r=x'}, 
 				{user_id: 'hjung', nick: 'hjung', avatar_url: 'https://gravatar.com/avatar/d93441b990173e7ec67159e63c4f996?s=400&d=robohash&r=x'},
-				{user_id: 'yochoi', nick: 'yochoi', avatar_url: 'https://gravatar.com/avatar/d93441b990173e7ec67159e63c4f916?s=400&d=robohash&r=x'},
 				{user_id: 'hna', nick: 'hna', avatar_url: 'https://gravatar.com/avatar/d93441b990173e7ec67159e63c4f926?s=400&d=robohash&r=x'},
 				{user_id: 'juhlee', nick: 'juhlee', avatar_url: 'https://gravatar.com/avatar/d93441b991723e7ec67159e63c4f997?s=400&d=robohash&r=x'},
 				{user_id: 'hyeonkim', nick: 'hyeonkim', avatar_url: 'https://gravatar.com/avatar/d9341b9901723e7ec67159e63c4f998?s=400&d=robohash&r=x'},
