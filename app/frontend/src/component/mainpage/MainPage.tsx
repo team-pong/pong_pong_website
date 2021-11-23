@@ -137,7 +137,6 @@ const MainPage = ({match}): JSX.Element => {
           </button>
         </section>
       </main>
-      {/* {firstLogin && <Redirect to={`/mainpage/profile/${userInfo.nick}`} push/>} */}
       {firstLogin && <Redirect push to={{pathname: `/mainpage/profile/${userInfo.nick}`, state: {firstLogin: true}}}/>}
     </>
   );

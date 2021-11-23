@@ -155,7 +155,8 @@ export class ChatUsersService {
         nick: user_info.nick,
         avatar_url: user_info.avatar_url,
         position: await this.getUserPosition(user.user_id, room_id),
-        state: await this.getUserState(user.user_id, Number(room_id))
+        state: await this.getUserState(user.user_id, Number(room_id)),
+        status: user_info.status,
       })
     }
     return ret;
