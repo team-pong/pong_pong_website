@@ -41,10 +41,9 @@
 
       .pr-deactivated {
         opacity: 0.4;
+        transform: scale(1.1);
         user-select: none;
-        &:hover {
-          transform: scale(1.0);
-        }
+        cursor: initial;
       }
 
       .pr-btn:hover {
