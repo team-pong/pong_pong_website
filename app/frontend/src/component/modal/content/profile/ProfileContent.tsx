@@ -1,7 +1,7 @@
 import React, { FormEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
 import { withRouter, RouteComponentProps, Link, Route, useParams, useLocation } from "react-router-dom";
 import "/src/scss/content/profile/ProfileContent.scss";
-import Modal from "../../Modal";
+import Modal, { GameContent } from "../../Modal";
 import ManageFriendContent from "./ManageFriendContent";
 import RecordContent from "../record/RecordContent";
 import EasyFetch from "../../../../utils/EasyFetch";
@@ -274,10 +274,6 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     })
   };
 
-  const requestMatch = () => {
-    console.log(`request match to ${nick}`);
-  }
-
   /*!
    * @author donglee
    * @brief 친구 차단 후 state 설정(차단하면 친구에서 삭제되므로 isAlreadyFriend state도 설정함)
@@ -491,7 +487,12 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
               { !isAlreadyFriend ? "친구 추가" : "친구 삭제" }
             </button>
             <button className="pr-btn" onClick={sendMessage}>메세지 보내기</button>
-            <button className="pr-btn" onClick={requestMatch}>대전 신청</button>
+            {otherUserInfo.status === "online" ?
+            <Link 
+              to={{pathname:`mainpage/game`, state: {target: otherUserInfo.nick, targetAvatar: otherUserInfo.avatar_url}}}
+              style={{color: "inherit", textDecoration: "none"}}>
+              <button className="pr-btn">대전 신청</button>
+            </Link> : <button className="pr-btn pr-deactivated">대전 신청</button>}
           </div>
           <div id="avatar-container">
             <img className="pr-avatar" src={otherUserInfo.avatar_url} alt="프로필사진" />
@@ -528,6 +529,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
           </div>
         </div>
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={nick}/>} /></Route>
+        <Route path={`${props.match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route>
       </div>
     );
   }
