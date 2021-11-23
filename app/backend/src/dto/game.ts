@@ -19,3 +19,8 @@ export class SpectateGameDto {
 	@IsNotEmpty()
 	nick: string;
 }
+
+export class RejectGameDto {
+	@IsString()
+	from: string;
+}

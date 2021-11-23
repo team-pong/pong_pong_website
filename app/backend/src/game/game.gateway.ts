@@ -4,10 +4,10 @@ import { WebSocketServer, SubscribeMessage, WebSocketGateway } from '@nestjs/web
 import { Server, Socket } from 'socket.io';
 import { NormalGameDto, LadderGameDto, SpectateGameDto, InviteGameDto } from 'src/dto/game';
 import { WsExceptionFilter } from 'src/filter/ws.filter';
-import { GlobalService } from 'src/global/global.service';
 import { MatchService } from 'src/match/match.service';
 import { SessionService } from 'src/session/session.service';
 import { UsersService } from 'src/users/users.service';
+import { getSessionIDFromCookie } from 'src/utils';
 import { Scored, GameLogic } from './game.logic';
 
 interface User {
@@ -78,7 +78,6 @@ export class GameGateway {
 		private sessionService: SessionService, // readUserId 함수 쓰려고 가져옴
 		private usersService: UsersService,
 		private matchService: MatchService,
-		private globalService: GlobalService,
 	) {}
 
 	@WebSocketServer()public server: Server;
@@ -284,7 +283,7 @@ export class GameGateway {
 			const map_type = Number(body.map);
 			const game_type = 'general';
 			// 1. 소켓 id로 유저 정보 가져오기
-			const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			const sid = getSessionIDFromCookie(socket.request.headers.cookie);
 			const userid = await this.sessionService.readUserId(sid);
 
 			const target = await this.usersService.getUserInfoWithNick(body.target);
@@ -389,7 +388,7 @@ export class GameGateway {
 			const game_type = 'general';
 			// 1. 소켓 유저 정보 가져오기
 			// 쿠키에서 sid 파싱
-			const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			const sid: string = getSessionIDFromCookie(socket.request.headers.cookie);
 			// sid로 유저 아이디 찾기
 			const userid = await this.sessionService.readUserId(sid);
 	
@@ -473,7 +472,7 @@ export class GameGateway {
 			const map_type = Number(map.map);
 			const game_type = 'ranked';
 			// 쿠키에서 sid 파싱
-			const sid: string = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			const sid: string = getSessionIDFromCookie(socket.request.headers.cookie);
 			// sid로 유저 아이디 찾기
 			const userid = await this.sessionService.readUserId(sid);
 	
@@ -594,13 +593,18 @@ export class GameGateway {
 		}
 	}
 
+	async rejectGame(user_id: string) {
+		const target_socket = this.getSocketInfo(user_id);
+		this.server.to(target_socket.socket.id).emit('rejected');
+	}
+
 	afterInit(server: Server): any {
 		console.log('Game Socket Server Init');
 	}
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
 		try {
-			const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			const sid = getSessionIDFromCookie(socket.request.headers.cookie);
 			const user_id = await this.sessionService.readUserId(sid);
 			console.log('Game 웹소켓 연결됨', user_id);
 		} catch (err) {
@@ -610,7 +614,7 @@ export class GameGateway {
 
 	async handleDisconnect(@ConnectedSocket() socket: Socket) {
 		try {
-			const sid = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
+			const sid = getSessionIDFromCookie(socket.request.headers.cookie);
 			const user_id = await this.sessionService.readUserId(sid);
 	
 			console.log('Game 웹소켓 연결해제', user_id);
