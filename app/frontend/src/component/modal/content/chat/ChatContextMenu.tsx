@@ -21,6 +21,7 @@ interface chatContextMenuProps {
   }>>
   socket: Socket,
   targetAvatar: string,
+  targetStatus: string,
 }
 
 const ConditionalContextMenu: FC<{
@@ -111,7 +112,7 @@ const ConditionalContextMenu: FC<{
 }
 
 const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
-  {socket, match, x, y, myPosition, targetPosition, targetState, target, closer, targetAvatar}): JSX.Element => {
+  {socket, match, x, y, myPosition, targetPosition, targetState, target, closer, targetAvatar, targetStatus}): JSX.Element => {
   const myInfo = useContext(UserInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
 
@@ -133,22 +134,15 @@ const ChatContextMenu: FC<chatContextMenuProps & RouteComponentProps> = (
         </Link>
         {myInfo.nick !== target ? 
           <>
-      {/* {friendList.find((el) => el.nick === target)?.status === "ongame" &&
-            <Link
-              to={`mainpage/spectate?nick=${target}`}
-              style={{textDecoration: "none"}}>
-              <li className="cm-list">관전하기</li>
-            </Link>
-          } */}
-            {}
+            <li className="chat-context-li" onClick={() => setDmInfo({isDmOpen: true, target: target})}>
+              DM 보내기
+            </li>
+            {targetStatus === "ongame" && 
             <Link
               to={`${match.url}/spectate?nick=${target}`}
               style={{color: "inherit", textDecoration: "none"}}>
               <li className="chat-context-li">관전하기</li>
-            </Link>
-            <li className="chat-context-li" onClick={() => setDmInfo({isDmOpen: true, target: target})}>
-              DM 보내기
-            </li>
+            </Link>}
             {/* 대전신청을 누르면 GameContent로 라우팅한다 대화방을 나가지 않은 상태에서 */}
             <Link 
               to={{pathname:`${match.url}/game`, state: {target: target, targetAvatar: targetAvatar}}}

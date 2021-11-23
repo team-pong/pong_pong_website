@@ -12,6 +12,7 @@ import { SetDmInfoContext, SetNoticeInfoContext, UserInfoContext } from "../../.
 import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
 import { NOTICE_RED } from "../../../mainpage/navbar/addFriend/AddFriend";
+import GameSpectateContent from "../game/GameSpectateContent";
 
 /*!
  * @author donglee
@@ -52,7 +53,8 @@ function openContextMenu( e: React.MouseEvent,
                           target: string,
                           targetPosition: string,
                           targetState: string,
-                          targetAvatar: string) {
+                          targetAvatar: string,
+                          targetStatus: string) {
   document.getElementById("chat-room-users").style.overflowY = "hidden";
   setContextMenu({
     isOpen: true,
@@ -62,6 +64,7 @@ function openContextMenu( e: React.MouseEvent,
     targetPosition,
     targetState,
     targetAvatar,
+    targetStatus,
   });
 };
 
@@ -173,6 +176,7 @@ export interface ChatUser {
   avatar_url: string,
   position: string,
   state: string,
+  status: string,
 };
 
 interface ChatRoomContentProps {
@@ -194,7 +198,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
     targetPosition: string,
     targetState: string,
     targetAvatar: string,
-  }>({isOpen: false, x: 0, y: 0, target: "", targetPosition: "", targetState: "", targetAvatar: ""});
+    targetStatus: string,
+  }>({isOpen: false, x: 0, y: 0, target: "", targetPosition: "", targetState: "", targetAvatar: "", targetStatus: ""});
   const [noResult, setNoReult] = useState(false);
 
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
@@ -530,7 +535,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
               return (
                 <div key={idx}
                       className={"chat-user" + (value.nick === myInfo.nick ? " chat-user-me" : "")}
-                      onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position, value.state, value.avatar_url)}>
+                      onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position, value.state, value.avatar_url, value.status)}>
                   <img className="chat-room-user-img" src={value.avatar_url} alt={value.nick} />
                   <span className="chat-room-user-nick">{value.nick}</span>
                   {value.position === "owner" && <img className="position" src={"/public/crown.png"} alt="owner"/>}
@@ -570,7 +575,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
                                   closer={setContextMenu}
                                   target={contextMenu.target}
                                   socket={socket}
-                                  targetAvatar={contextMenu.targetAvatar}/>}
+                                  targetAvatar={contextMenu.targetAvatar}
+                                  targetStatus={contextMenu.targetStatus}/>}
         <Route path={`${match.url}/config`}>
           <Modal id={Date.now()} smallModal content={
             <ConfigChatRoom 
@@ -595,6 +601,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         </Route>
         <Route path={`${match.url}/game`}>
           <Modal id={Date.now()} content={<GameContent/>} />
+        </Route>
+        <Route path={`${match.path}/spectate`}>
+          <Modal id={Date.now()} content={<GameSpectateContent />} />
         </Route>
       </div>
     );
