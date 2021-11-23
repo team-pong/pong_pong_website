@@ -37,6 +37,10 @@ const GameMatchContent: FC<gameMatchContentProps> = ({match: {params, url}, setI
       socket.emit("invite", {map: map, target: state.target});
     }
 
+    /*!
+     * @author donglee
+     * @brief DM으로 게임 거절을 하면 백엔드에서 현재 소켓으로 알려줘서 렌더링을 바꿔서 사용자에게 거절당했음을 알려줌
+     */
     socket.on("rejected", () => {
       setIsRejected(true);
     });

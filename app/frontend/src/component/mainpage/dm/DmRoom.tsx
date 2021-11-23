@@ -94,6 +94,7 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
   /*!
    * @author donglee
    * @brief DB 에서 해당 로그를 삭제하고 현재 화면에서 DmLog 를 update 함
+   *        게임의 경우 from 매개변수가 오고 게임을 거절하면 POST 요청을 해서 상대방에게 socket으로 알림
    */
   const rejectInvite = async (logId: number, from?: string) => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/dm-store/oneLog?dm_log_id=${logId}`, "DELETE");
@@ -108,6 +109,7 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
       });
       return ;
     }
+    updateDmLog(logId);
     if (from) {
       const easyfetch = new EasyFetch(`${global.BE_HOST}/game/reject`, "POST");
       const body = {
@@ -115,7 +117,6 @@ const DmLogList: FC<DmLogListProps> = ({dmLog, myInfo, setChannelId, setDmLog, s
       };
       await easyfetch.fetch(body);
     }
-    updateDmLog(logId);
   }
 
   /*!
