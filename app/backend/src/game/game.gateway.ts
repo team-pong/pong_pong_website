@@ -197,6 +197,8 @@ export class GameGateway {
 		delete this.socket_infos[left_player.socket.id];
 		left_player.socket.disconnect();
 		right_player.socket.disconnect();
+		this.usersService.updateStatus(left_player.id, 'online');
+		this.usersService.updateStatus(right_player.id, 'online');
 	}
 
 	async disconnectEvent(left_player: User, right_player: User, gameLogic: GameLogic, position: Position, userInfo: MatchInfo) {
