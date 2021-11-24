@@ -8,25 +8,25 @@ services:
     working_dir: /frontend
     entrypoint: >
       sh -c "npm install
-      && npm start"
+      && npm start:dev"
 
   backend:
-    image: node:lts-alpine3.13
+    build:
+      context: ./
+      dockerfile: Dockerfile
     container_name: backend
     env_file: ./docker.env
     volumes:
       - ./app/backend:/backend
-      - ./app/frontend/dist:/backend/client
+      - ./app/frontend/dist:/backend/client    
     working_dir: /backend
     ports:
       - 80:3001
-    entrypoint: >
-      sh -c "npm install
-      && npm run schema:drop
+    entrypoint: > 
+      sh -c "npm run schema:drop
       && npm run schema:sync
       && npm run seed:run
-      && npm run build
-      && ./node_modules/@nestjs/cli/bin/nest.js start -w"
+      && npm run start:dev"
 
   db:
     image: postgres:13.3-alpine
