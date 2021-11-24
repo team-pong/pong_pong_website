@@ -135,7 +135,7 @@ export class ChatGateway {
       // 5. 시스템 메세지 전송
       this.server.to(room_id).emit('message', {
         user: 'system',
-        chat: `${user_id}님이 입장하셨습니다.`
+        chat: `${user_info.nick}님이 입장하셨습니다.`
       });
     } catch (err) {
       console.log(err);
@@ -338,6 +338,7 @@ export class ChatGateway {
         users2.push(user);
       }
     }
+    console.log('send users:', users2);
     
     // 3. 남은 유저들에게 채팅 보내기
     // 개선사항: socket.id와 user.id 를 묶어놓고 관리하면 getSocketIdFromUserId 함수를 매번 실행할 필요 없이 가능
@@ -380,25 +381,29 @@ export class ChatGateway {
       // 1-1. chat-users db에서 제거
       await this.chatUsersService.deleteUser(rid, uid); // 남은 유저가 없는 경우까지 이 메서드에서 처리
 
-      // 2. 변경된 방 정보 전송 (방 인원수 줄음)
-      const room_info = await this.chatService.getChannelInfo(Number(rid));
-      this.server.to(rid).emit('setRoomInfo', room_info);
-    
-      // 3. 유저 정보 리스트 전송 (빠진 인원 갱신)
-      const user_list = await this.chatUsersService.getUserListInRoom(rid)
-      this.server.to(rid).emit('setRoomUsers', user_list);
+      if (await this.chatUsersRepo.count({channel_id: Number(rid)})) { 
+        // 방에 남아있는 유저가 있다면
+        // 2. 변경된 방 정보 전송 (방 인원수 줄음)
+        const room_info = await this.chatService.getChannelInfo(Number(rid));
+        this.server.to(rid).emit('setRoomInfo', room_info);
+      
+        // 3. 유저 정보 리스트 전송 (빠진 인원 갱신)
+        const user_list = await this.chatUsersService.getUserListInRoom(rid)
+        this.server.to(rid).emit('setRoomUsers', user_list);
 
-      // 4. 시스템 메세지 전송
-      socket.to(rid).emit('message', {
-        user: 'system',
-        chat: `${uid} 님이 퇴장하셨습니다.`,
-      })
+        // 4. 시스템 메세지 전송
+        socket.to(rid).emit('message', {
+          user: 'system',
+          chat: `${(await this.usersService.getUserInfo(uid)).nick} 님이 퇴장하셨습니다.`,
+        })
+      }
 
       // 5. 해당소켓 leave
       socket.leave(rid);
 
       // 6. 해당 소켓 정보 제거
       delete this.socket_map[socket.id];
+      console.log('socketmap', this.socket_map);
     } catch (err) {
       console.error(err);
     }
