@@ -14,10 +14,11 @@ import { ChatUsersModule } from 'src/chat-users/chat-users.module';
 import { AdminModule } from 'src/admin/admin.module';
 import { BanModule } from 'src/ban/ban.module';
 import { MuteModule } from 'src/mute/mute.module';
+import { Block } from 'src/entities/block';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Users, Chat, ChatUsers, Admin]),
+    TypeOrmModule.forFeature([Users, Chat, ChatUsers, Admin, Block]),
     forwardRef(() => UsersModule),
     forwardRef(() => GlobalModule),
     forwardRef(() => SessionModule),

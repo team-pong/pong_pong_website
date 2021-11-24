@@ -3,7 +3,6 @@ import { FC, useState, useEffect, useContext, useRef } from "react";
 import { RouteComponentProps, withRouter, Redirect, useLocation } from "react-router-dom";
 import { io } from "socket.io-client";
 import { UserInfoContext } from "../../../../Context";
-// import "/src/scss/content/game/GameCanvasContent.scss";
 
 interface MatchInfo {
   lPlayerNickname: string,
@@ -143,7 +142,6 @@ const GameSpectateContent: FC<RouteComponentProps> = () => {
       socket.emit("spectate", {nick: query.get("nick")});
 
       socket.on("init", (data) => {
-        console.log("Init")
         setMap(data.type);
         setCanvas(initCanvas());
         setLeftBar(initBar(data.bar00[0], data.bar00[1], data.bar00[2], data.bar00[3]));

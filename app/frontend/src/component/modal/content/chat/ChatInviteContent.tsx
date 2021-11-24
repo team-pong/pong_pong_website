@@ -58,7 +58,7 @@ const Result: FC<ResultProps> = (
     setDmInfo({
       isDmOpen: true,
       target: to,
-      request: {
+      chatRequest: {
         from: myInfo.nick,
         chatTitle: chatTitle,
         channelId: channelId,
@@ -142,7 +142,7 @@ const FriendList: FC<FriendListProps> = (
     setDmInfo({
       isDmOpen: true,
       target: to,
-      request: {
+      chatRequest: {
         from: myInfo.nick,
         chatTitle: chatTitle,
         channelId: channelId,

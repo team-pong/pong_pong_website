@@ -36,6 +36,14 @@
         cursor: pointer;
         transform: scale(1);
         transition: 0.1s all ease-in-out;
+        outline: none;
+      }
+
+      .pr-deactivated {
+        opacity: 0.4;
+        transform: scale(1.1);
+        user-select: none;
+        cursor: initial;
       }
 
       .pr-btn:hover {

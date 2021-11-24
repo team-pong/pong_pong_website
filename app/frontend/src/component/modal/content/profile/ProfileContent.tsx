@@ -1,7 +1,7 @@
 import React, { FormEvent, MouseEvent, useContext, useEffect, useRef, useState } from "react";
-import { withRouter, RouteComponentProps, Link, Route, useParams } from "react-router-dom";
+import { withRouter, RouteComponentProps, Link, Route, useParams, useLocation } from "react-router-dom";
 import "/src/scss/content/profile/ProfileContent.scss";
-import Modal from "../../Modal";
+import Modal, { GameContent } from "../../Modal";
 import ManageFriendContent from "./ManageFriendContent";
 import RecordContent from "../record/RecordContent";
 import EasyFetch from "../../../../utils/EasyFetch";
@@ -38,7 +38,11 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 
   const [otherUserInfo, setOtherUserInfo] = useState<UserInfo>();
   const [isEditNickClicked, setIsEditNickClicked] = useState(false);
-  const [nickToEdit, setNickToEdit] = useState("");
+  
+  const { nick } = useParams<{nick: string}>();
+  const {state} = useLocation<{firstLogin: boolean}>();
+
+  const [nickToEdit, setNickToEdit] = useState(nick);
   const [isAlreadyFriend, setIsAlreadyFriend] = useState(false);
   const [isBlockedFriend, setIsBlockedFriend] = useState(false);
   const [isMyProfile, setIsMyProfile] = useState(false);
@@ -47,8 +51,6 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 
   const mounted = useRef(false);
 
-  //url parameter로 넘어오는 nick 문자열 저장
-  const { nick } = useParams<{nick: string}>();
 
   /*!
    * @author donglee
@@ -272,10 +274,6 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
     })
   };
 
-  const requestMatch = () => {
-    console.log(`request match to ${nick}`);
-  }
-
   /*!
    * @author donglee
    * @brief 친구 차단 후 state 설정(차단하면 친구에서 삭제되므로 isAlreadyFriend state도 설정함)
@@ -291,7 +289,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
       setNoticeInfo({
         isOpen: true,
         seconds: 3,
-        content: "사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.",
+        content: res.err_msg,
         backgroundColor: NOTICE_RED,
       });
     } else {
@@ -318,7 +316,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
       setNoticeInfo({
         isOpen: true,
         seconds: 3,
-        content: "사용자의 닉네임이 변경됐을 수 있습니다. 프로필을 끄고 다시 시도하십시오.",
+        content: res.err_msg,
         backgroundColor: NOTICE_RED,
       });
     } else {
@@ -376,8 +374,8 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
    */
   useEffect(() => {
     if (myInfo) {
-      setIsMyProfile(nick === myInfo.nick);
-      if (nick !== myInfo.nick) {
+      setIsMyProfile(nickToEdit === myInfo.nick);
+      if (nickToEdit !== myInfo.nick) {
         getOtherUserInfo();
         getIsAlreadyFriend();
         getIsBlockedFriend();
@@ -387,6 +385,10 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
 
   useEffect(() => {
     mounted.current = true;
+    if (state) {
+      alert("환영합니다! 아바타 이미지를 클릭해서 아바타를 바꿔보세요!\n현재는 42 이미지가 기본으로 설정돼있습니다. \n"+
+      "닉네임도 연필 모양을 눌러서 등록하세요!\n현재는 42 인트라 아이디로 기본 설정돼있습니다.")
+    }
     return (() => {mounted.current = false});
   }, []);
 
@@ -461,11 +463,11 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
         <div id="lower-part">
           <div id="blank"></div>
           {!props.readonly ?
-          <div id="delete-user">
+          <div id="delete-user" onClick={() => window.location.href = `${global.BE_HOST}/session/logout`}>
             <div id="delete-icon">
-              <img className="pr-trash-btn" src="/public/delete.png" alt="회원탈퇴" />
+              <img className="pr-trash-btn" src="/public/delete.png" alt="로그아웃" />
             </div>
-            <span className="pr-explain">클릭하면 회원님의 모든 데이터가 서버에서 삭제됩니다</span>
+            <span className="pr-explain">로그아웃</span>
           </div>
           : <></>}
         </div>
@@ -485,7 +487,12 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
               { !isAlreadyFriend ? "친구 추가" : "친구 삭제" }
             </button>
             <button className="pr-btn" onClick={sendMessage}>메세지 보내기</button>
-            <button className="pr-btn" onClick={requestMatch}>대전 신청</button>
+            {otherUserInfo.status === "online" ?
+            <Link 
+              to={{pathname:`mainpage/game`, state: {target: otherUserInfo.nick, targetAvatar: otherUserInfo.avatar_url}}}
+              style={{color: "inherit", textDecoration: "none"}}>
+              <button className="pr-btn">대전 신청</button>
+            </Link> : <button className="pr-btn pr-deactivated">대전 신청</button>}
           </div>
           <div id="avatar-container">
             <img className="pr-avatar" src={otherUserInfo.avatar_url} alt="프로필사진" />
@@ -522,6 +529,7 @@ const ProfileContent: React.FC<{readonly?: boolean} & RouteComponentProps> = (pr
           </div>
         </div>
         <Route path={`${props.match.path}/record`}><Modal id={Date.now()} content={<RecordContent nick={nick}/>} /></Route>
+        <Route path={`${props.match.path}/game`}><Modal id={Date.now()} content={<GameContent/>} /></Route>
       </div>
     );
   }

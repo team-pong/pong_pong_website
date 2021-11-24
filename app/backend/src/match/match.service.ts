@@ -30,7 +30,7 @@ export class MatchService {
     await this.usersRepo.save({user_id: winner_id, total_games: winner.total_games+1, win_games: winner.win_games+1});  // 총게임수 +1, 승자는 1승추가
     await this.usersRepo.save({user_id: loser_id, total_games: loser.total_games+1, loss_games: loser.loss_games+1});  // 총게임수 +1, 패자는 1패추가
     if (type == 'ranked'){  // 랭크게임 이면
-      const scoreChange = Math.abs(winner.ladder_level - loser.ladder_level)/10 + 10;
+      const scoreChange = Math.round(Math.abs(winner.ladder_level - loser.ladder_level)/10) + 10;
       await this.usersRepo.save({user_id: winner_id, ladder_level: winner.ladder_level+scoreChange});  // 승자는 +scoreChange점 
       await this.usersRepo.save({user_id: loser_id, ladder_level: loser.ladder_level-scoreChange});  // 패자는 -scoreChange점
     }

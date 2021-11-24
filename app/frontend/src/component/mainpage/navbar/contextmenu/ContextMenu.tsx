@@ -1,5 +1,5 @@
 import {Dispatch, FC, SetStateAction, useContext} from 'react';
-import { Link } from 'react-router-dom';
+import { Link, RouteComponentProps, useLocation, withRouter } from 'react-router-dom';
 import { SetDmInfoContext, SetNoticeInfoContext } from '../../../../Context';
 import EasyFetch from '../../../../utils/EasyFetch';
 import { NOTICE_GREEN, NOTICE_RED } from '../addFriend/AddFriend';
@@ -25,7 +25,7 @@ interface Friend {
   status: string;
 }
 
-interface contextMenuProps {
+interface contextMenuProps extends RouteComponentProps{
   target: string;
   x: number;
   y: number;
@@ -35,7 +35,7 @@ interface contextMenuProps {
 }
 
 const ContextMenu: FC<contextMenuProps> =
-  ({target, x, y, friendList, setFriendList, setContextMenuInfo}): JSX.Element => {
+  ({target, x, y, friendList, setFriendList, setContextMenuInfo, match}): JSX.Element => {
 
   const setDmInfo = useContext(SetDmInfoContext);
   const setNoticeInfo = useContext(SetNoticeInfoContext);
@@ -88,7 +88,7 @@ const ContextMenu: FC<contextMenuProps> =
       setNoticeInfo({
         isOpen: true,
         seconds: 3,
-        content: "사용자의 닉네임이 변경됐을 수 있습니다. 친구관리를 끄고 다시 시도하십시오.",
+        content: res.err_msg,
         backgroundColor: NOTICE_RED,
       });
     } else {
@@ -126,6 +126,13 @@ const ContextMenu: FC<contextMenuProps> =
           <li className="cm-list">관전하기</li>
         </Link>
       }
+      {friendList.find((el) => el.nick === target)?.status === "online" &&
+        <Link 
+        to={{pathname:`${match.url}/game`, state: {target: target, targetAvatar: friendList.find((el) => el.nick === target)?.avatar_url}}}
+        style={{color: "inherit", textDecoration: "none"}}>
+          <li className="cm-list">대전 신청</li>
+        </Link>
+      }
       <li className="cm-list" onClick={() => setDmInfo({isDmOpen: true, target: target})}>메세지 보내기</li>
       <li className="cm-list" onClick={deleteFriend}>친구 삭제</li>
       <li className="cm-list" onClick={blockFriend}>친구 차단</li>
@@ -133,4 +140,4 @@ const ContextMenu: FC<contextMenuProps> =
   );
 }
 
-export default ContextMenu;
+export default withRouter(ContextMenu);

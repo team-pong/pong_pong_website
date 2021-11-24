@@ -1,6 +1,6 @@
 import React, { FC, Dispatch, SetStateAction, useState, useEffect, useContext, useRef } from "react";
 import { Link, Route, RouteComponentProps, useParams, withRouter } from "react-router-dom";
-import Modal from "../../Modal";
+import Modal, { GameContent } from "../../Modal";
 import ChatInviteContent from "./ChatInviteContent";
 import ChatContextMenu from "./ChatContextMenu";
 import EasyFetch from "../../../../utils/EasyFetch";
@@ -12,6 +12,7 @@ import { SetDmInfoContext, SetNoticeInfoContext, UserInfoContext } from "../../.
 import { UserInfo } from "../../../mainpage/MainPage";
 import ProfileContent from "../profile/ProfileContent";
 import { NOTICE_RED } from "../../../mainpage/navbar/addFriend/AddFriend";
+import GameSpectateContent from "../game/GameSpectateContent";
 
 /*!
  * @author donglee
@@ -51,7 +52,9 @@ function openContextMenu( e: React.MouseEvent,
                           setContextMenu: Dispatch<SetStateAction<any>>,
                           target: string,
                           targetPosition: string,
-                          targetState: string) {
+                          targetState: string,
+                          targetAvatar: string,
+                          targetStatus: string) {
   document.getElementById("chat-room-users").style.overflowY = "hidden";
   setContextMenu({
     isOpen: true,
@@ -60,6 +63,8 @@ function openContextMenu( e: React.MouseEvent,
     target,
     targetPosition,
     targetState,
+    targetAvatar,
+    targetStatus,
   });
 };
 
@@ -171,6 +176,7 @@ export interface ChatUser {
   avatar_url: string,
   position: string,
   state: string,
+  status: string,
 };
 
 interface ChatRoomContentProps {
@@ -191,7 +197,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
     target: string,
     targetPosition: string,
     targetState: string,
-  }>({isOpen: false, x: 0, y: 0, target: "", targetPosition: "", targetState: ""});
+    targetAvatar: string,
+    targetStatus: string,
+  }>({isOpen: false, x: 0, y: 0, target: "", targetPosition: "", targetState: "", targetAvatar: "", targetStatus: ""});
   const [noResult, setNoReult] = useState(false);
 
   const [chatRoomInfo, setChatRoomInfo] = useState<ChatRoom>(null);
@@ -209,7 +217,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   const setDmInfo = useContext(SetDmInfoContext);
   const setNoticeInfo = useContext(SetNoticeInfoContext);
 
-  let mounted = false;
+  const mounted = useRef(false);
 
   /*!
    * @author donglee
@@ -236,9 +244,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   const getChatRoomInfo = async () => {
     const easyfetch = new EasyFetch(`${global.BE_HOST}/chat/oneChat?channel_id=${channel_id}`);
     const res = await easyfetch.fetch();
-    
     if (!res.err_msg) {
-      if (mounted) setChatRoomInfo({
+      if (mounted.current) setChatRoomInfo({
         title: res.title,
         type: res.type,
         current_people: res.current_people,
@@ -247,7 +254,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         channel_id: res.channel_id,
       });
     } else {
-      if (mounted) setNoReult(true);
+      if (mounted.current) setNoReult(true);
     }
     return res;
   };
@@ -285,8 +292,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
   };
 
   useEffect(() => {
-    mounted = true;
-    return (() => {mounted = false});
+    mounted.current = true;
+    return (() => {mounted.current = false});
   }, [])
 
   /*!
@@ -433,10 +440,10 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         .then(checkMax)
         .then((res) => {
             if (res.type === "protected") {
-              if (mounted) setIsProtected(true);
+              if (mounted.current) setIsProtected(true);
             } else {
               connectSocket().then((socket) => {
-                if (mounted) setSocket(socket);
+                if (mounted.current) setSocket(socket);
               }).catch((err) => {
                 setNoticeInfo({
                   isOpen: true,
@@ -447,7 +454,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
               });
             }
             if (res.type === "private") {
-              if (mounted) setIsPrivate(true);
+              if (mounted.current) setIsPrivate(true);
             }
           }
         ).catch((err) => {
@@ -476,7 +483,8 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         channelId={channel_id}
         setPasswordPassed={setPasswordPassed}/>
     );
-  } else if (chatRoomInfo && !isProtected) {
+  }
+  if (chatRoomInfo && !isProtected) {
     return (
       <div id="chat-room">
         {isPrivate && <span className="chat-room-private">이 방은 비밀방입니다</span>}
@@ -527,7 +535,7 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
               return (
                 <div key={idx}
                       className={"chat-user" + (value.nick === myInfo.nick ? " chat-user-me" : "")}
-                      onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position, value.state)}>
+                      onClick={(e) => openContextMenu(e, setContextMenu, value.nick, value.position, value.state, value.avatar_url, value.status)}>
                   <img className="chat-room-user-img" src={value.avatar_url} alt={value.nick} />
                   <span className="chat-room-user-nick">{value.nick}</span>
                   {value.position === "owner" && <img className="position" src={"/public/crown.png"} alt="owner"/>}
@@ -566,7 +574,9 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
                                   targetState={contextMenu.targetState}
                                   closer={setContextMenu}
                                   target={contextMenu.target}
-                                  socket={socket}/>}
+                                  socket={socket}
+                                  targetAvatar={contextMenu.targetAvatar}
+                                  targetStatus={contextMenu.targetStatus}/>}
         <Route path={`${match.url}/config`}>
           <Modal id={Date.now()} smallModal content={
             <ConfigChatRoom 
@@ -588,6 +598,12 @@ const ChatRoomContent: FC<ChatRoomContentProps & RouteComponentProps> = (
         </Route>
         <Route path={`${match.url}/profile/:nick`}>
           <Modal id={Date.now()} smallModal content={<ProfileContent readonly/>}/>
+        </Route>
+        <Route path={`${match.url}/game`}>
+          <Modal id={Date.now()} content={<GameContent/>} />
+        </Route>
+        <Route path={`${match.path}/spectate`}>
+          <Modal id={Date.now()} content={<GameSpectateContent />} />
         </Route>
       </div>
     );

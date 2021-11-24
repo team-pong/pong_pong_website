@@ -127,6 +127,12 @@ export class SessionService {
           two_factor_login: false, 
           email: data.email
         });
+        req.session.userid = data.login;
+        req.session.token = access_token;
+        req.session.loggedIn = true;
+        req.session.save();
+        await this.usersRepo.update(data.login, {status: 'online'});
+        return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage?firstLogin=true`);
       }
       if (user.two_factor_login) { // 2차인증이 켜져 있는 경우
         const random_code = this.getRandomAuthCode(4);
