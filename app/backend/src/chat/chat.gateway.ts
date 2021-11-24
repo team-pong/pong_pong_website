@@ -84,7 +84,6 @@ export class ChatGateway {
 
   async isBlockedUserFrom(target: string, from: string) {
     if (await this.blockRepo.count({user_id: from, block_id: target})) {
-      console.log(`${target} is blocked by ${from}`);
       return true;
     } else {
       return false;
@@ -328,20 +327,37 @@ export class ChatGateway {
     const user_info = await this.usersService.getUserInfo(user_id);
 
     // 1. 채팅방 모든 유저 받아오기
+    let users = await this.chatUsersRepo.find({
+      channel_id: Number(room_id)
+    });
     // 2. 자기 자신과 얘를 차단핸 유저 빼기
-    // 3. 남은 유저들에게 채팅 보내기
-    const user_list = await this.chatUsersService.getUserListInRoom(room_id);
-    for (let user of user_list) {
-      
+    const users1 = users.filter((element) => element.user_id !== user_id)
+    const users2 = [];
+    for (let user of users1) {
+      if (!await this.isBlockedUserFrom(user_id, user.user_id)) {
+        users2.push(user);
+      }
     }
+    
+    // 3. 남은 유저들에게 채팅 보내기
+    // 개선사항: socket.id와 user.id 를 묶어놓고 관리하면 getSocketIdFromUserId 함수를 매번 실행할 필요 없이 가능
+    for (let user of users2) {
+      this.server.to(this.getSocketIdFromUserId(user.user_id)).emit('message', {
+        nick: user_info.nick,
+        position: await this.chatUsersService.getUserPosition(user_id, room_id),
+        avatar_url: user_info.avatar_url,
+        time: Date.now(),
+        message: body.msg,
+      })
+    }
+  }
 
-    socket.to(this.socket_map[socket.id].room_id).emit('message', {
-      nick: user_info.nick,
-      position: await this.chatUsersService.getUserPosition(user_id, room_id),
-      avatar_url: user_info.avatar_url,
-      time: Date.now(),
-      message: body.msg,
-    })
+  getSocketIdFromUserId(user_id: string) {
+    for (let sock_id in this.socket_map) {
+      if (this.socket_map[sock_id].user_id == user_id) {
+        return sock_id;
+      }
+    }
   }
 
   /*
