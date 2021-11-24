@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack",
-    "start:dev": "webpack --watch"
+    "dev": "webpack --watch"
   },
   "keywords": [],
   "author": "donglee, hna, jinbkim, jinwkim, yochoi",
