@@ -102,22 +102,6 @@ const Login = (): JSX.Element => {
     window.location.href = `${global.BE_HOST}/session/login`;
   };
 
-  const loginTest1 = () => {
-    window.location.href = `${global.BE_HOST}/session/test_user01`;
-  }
-
-  const loginTest2 = () => {
-    window.location.href = `${global.BE_HOST}/session/test_user02`;
-  }
-
-  const loginTest3 = () => {
-    window.location.href = `${global.BE_HOST}/session/test_user03`;
-  }
-
-  const loginTest4 = () => {
-    window.location.href = `${global.BE_HOST}/session/test_user04`;
-  }
-
   useEffect(() => {
     const key = window.location.search.split("=")[0].substr(1);
     const value= window.location.search.split("=")[1];
@@ -138,10 +122,6 @@ const Login = (): JSX.Element => {
     <section id="loginSection">
       <BackGroundPingPongSVG />
       <button id="button" onClick={loginOnClick}>LOGIN</button>
-      <button onClick={loginTest1}>login with test account 01</button>
-      <button onClick={loginTest2}>login with test account 02</button>
-      <button onClick={loginTest3}>login with test account 03</button>
-      <button onClick={loginTest4}>login with test account 04</button>
     </section>
   );
 };
