@@ -26,8 +26,7 @@ services:
       sh -c "npm run schema:drop
       && npm run schema:sync
       && npm run seed:run
-      && npm run build
-      && ./node_modules/@nestjs/cli/bin/nest.js start -w"
+      && npm run start"
 
   db:
     image: postgres:13.3-alpine
