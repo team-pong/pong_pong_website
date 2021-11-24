@@ -338,7 +338,6 @@ export class ChatGateway {
         users2.push(user);
       }
     }
-    console.log('send users:', users2);
     
     // 3. 남은 유저들에게 채팅 보내기
     // 개선사항: socket.id와 user.id 를 묶어놓고 관리하면 getSocketIdFromUserId 함수를 매번 실행할 필요 없이 가능
@@ -403,7 +402,7 @@ export class ChatGateway {
 
       // 6. 해당 소켓 정보 제거
       delete this.socket_map[socket.id];
-      console.log('socketmap', this.socket_map);
+      // console.log('socketmap', this.socket_map);
     } catch (err) {
       console.error(err);
     }
