@@ -590,6 +590,7 @@ export class GameGateway {
 			socket.join(socket_info.rid);
 			this.server.to(socket_info.rid).emit('setMatchInfo', socket_info.match);
 		} catch (err) {
+			socket.emit("invalidMatch");
 			console.log(err);
 			return (err);
 		}
