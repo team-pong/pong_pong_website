@@ -16,5 +16,6 @@ export class GameController {
 	async rejectGame(@Req() req: Request, @Body() body: RejectGameDto) {
 		const target_info = await this.userService.getUserInfoWithNick(body.from);
 		this.gameGatway.rejectGame(target_info.user_id);
+		return {};
 	}
 }
