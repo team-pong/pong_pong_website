@@ -24,45 +24,45 @@ export class SessionController {
 	* @brief 소켓 통신용 테스트 유저로 로그인하는 api
 	* @todo production 환경에서 삭제되어야함
 	*/
-	@ApiOperation({ summary: '개발용 테스트유저1 로 로그인' })
-	@Get("/test_user01")
-	async tester_login01(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
-		await this.sessionService.tester_login(request, 'tester01', 'tester01', 'https://gravatar.com/avatar/sdfdw332?s=400&d=robohash&r=x');
-		return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
-	}
+	// @ApiOperation({ summary: '개발용 테스트유저1 로 로그인' })
+	// @Get("/test_user01")
+	// async tester_login01(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
+	// 	await this.sessionService.tester_login(request, 'tester01', 'tester01', 'https://gravatar.com/avatar/sdfdw332?s=400&d=robohash&r=x');
+	// 	return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
+	// }
 
 	/*!
 	 * @brief 소켓 통신용 테스트 유저로 로그인하는 api
 	 * @todo production 환경에서 삭제되어야함
 	 */
-	@ApiOperation({ summary: '개발용 테스트유저2 로 로그인' })
-	@Get("/test_user02")
-	async tester_login02(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
-		await this.sessionService.tester_login(request, 'tester02', 'tester02', 'https://gravatar.com/avatar/ppgw8831?s=400&d=robohash&r=x');
-		return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
-	}
+	// @ApiOperation({ summary: '개발용 테스트유저2 로 로그인' })
+	// @Get("/test_user02")
+	// async tester_login02(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
+	// 	await this.sessionService.tester_login(request, 'tester02', 'tester02', 'https://gravatar.com/avatar/ppgw8831?s=400&d=robohash&r=x');
+	// 	return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
+	// }
 
 	/*!
 	 * @brief 소켓 통신용 테스트 유저로 로그인하는 api
 	 * @todo production 환경에서 삭제되어야함
 	 */
-	@ApiOperation({ summary: '개발용 테스트유저2 로 로그인' })
-	@Get("/test_user03")
-	async tester_login03(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
-		await this.sessionService.tester_login(request, 'tester03', 'tester03', 'https://gravatar.com/avatar/ppgw8831?s=400&d=robohash&r=x');
-		return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
-	}
+	// @ApiOperation({ summary: '개발용 테스트유저2 로 로그인' })
+	// @Get("/test_user03")
+	// async tester_login03(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
+	// 	await this.sessionService.tester_login(request, 'tester03', 'tester03', 'https://gravatar.com/avatar/ppgw8831?s=400&d=robohash&r=x');
+	// 	return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
+	// }
 
 	/*!
 	 * @brief 소켓 통신용 테스트 유저로 로그인하는 api
 	 * @todo production 환경에서 삭제되어야함
 	 */
-	@ApiOperation({ summary: '개발용 테스트유저2 로 로그인' })
-	@Get("/test_user04")
-	async tester_login04(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
-		await this.sessionService.tester_login(request, 'tester04', 'tester04', 'https://gravatar.com/avatar/ppgw8831?s=400&d=robohash&r=x');
-		return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
-	}
+	// @ApiOperation({ summary: '개발용 테스트유저2 로 로그인' })
+	// @Get("/test_user04")
+	// async tester_login04(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
+	// 	await this.sessionService.tester_login(request, 'tester04', 'tester04', 'https://gravatar.com/avatar/ppgw8831?s=400&d=robohash&r=x');
+	// 	return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
+	// }
 
 	@Get("/login")
 	async login(@Req() req: Request, @Res() res: Response) {

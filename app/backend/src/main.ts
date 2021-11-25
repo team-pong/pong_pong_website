@@ -26,6 +26,7 @@ async function bootstrap() {
   // 웹소켓 서버 띄우기
 	app.useWebSocketAdapter(new SocketAdapter(app));
 
+  /*
   const config = new DocumentBuilder()
   .setTitle('ft_transcendence API')
   .setDescription('ft_transcendence API 문서')
@@ -35,6 +36,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   // 스웨거 설정
   SwaggerModule.setup('api', app, document);
+  */
 
   const conObject = {
     user: 'pong_admin',
