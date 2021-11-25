@@ -84,7 +84,7 @@ export class GameLogic {
         this._direction[0] = 1 / Math.SQRT2;
         this._direction[1] = 1 / Math.SQRT2;
 
-        // console.log("direction abs = " + (this._direction[0] * this._direction[0] + this._direction[1] * this._direction[1]));
+        //console.log("direction abs = " + (this._direction[0] * this._direction[0] + this._direction[1] * this._direction[1]));
         this._speed = 3;
         this._correction = 0.1;
         this._server = server;
@@ -122,7 +122,7 @@ export class GameLogic {
     // pos가 true라면 왼쪽(00), false면 오른쪽(01)
     moveBar(dir : boolean, pos : boolean) {
         if (pos) {
-            // console.log("bar00 pre setting");
+            //console.log("bar00 pre setting");
             this._bar00_pre = this._bar00[1];
         } else {
             this._bar01_pre = this._bar01[1];
@@ -162,7 +162,7 @@ export class GameLogic {
         const abs = Math.sqrt(this._direction[0] * this._direction[0] + this._direction[1] * this._direction[1]);
         this._direction[0] = this._direction[0] / abs;
         this._direction[1] = this._direction[1] / abs;
-        // console.log("rotate abs: " + (this._direction[0] * this._direction[0] + this._direction[1] * this._direction[1]));
+        //console.log("rotate abs: " + (this._direction[0] * this._direction[0] + this._direction[1] * this._direction[1]));
     }
 
     getJson() {
@@ -186,7 +186,7 @@ export class GameLogic {
     }
 
     initGame() {
-        console.log("init game");
+        //console.log("init game");
         this._speed = 3;
         this._ball[0] = this._rightWall / 2 // ballX
         this._ball[1] = this._bottomWall / 2 // ballY
@@ -243,7 +243,7 @@ export class GameLogic {
             if (this._iscollision == false) {
                 this._direction[0] *= -1;
                 this._direction[1] *= -1;
-                // console.log("collision circle");
+                //console.log("collision circle");
                 this._iscollision = true;
                 this._speed *= this._speed_multiply;
             }
@@ -292,15 +292,15 @@ export class GameLogic {
                 if (horizonEdge != Edge.NONE) this._direction[0] *= -1;
                 if (verticalEdge != Edge.NONE) {
                     if (verticalEdge == Edge.TOP && this._direction[1] < 0) {
-                        // console.log("문제 있는 그 부분");
+                        //console.log("문제 있는 그 부분");
                     } else if (verticalEdge == Edge.BOTTOM && this._direction[1] > 0) {
-                        // console.log("문제 있는 그 부분");
+                        //console.log("문제 있는 그 부분");
                     } else {
                         this._direction[1] *= -1;
                     }
                 }
                 this.rotate(movingValue * this._correction);
-                // console.log("collision bar: " + horizonEdge + " " + verticalEdge);
+                //console.log("collision bar: " + horizonEdge + " " + verticalEdge);
             }
             return true;
         } else {
@@ -353,19 +353,19 @@ export class GameLogic {
             // direction 전환
             this._direction[1] *= -1;
         } else if (this.isCollisionSC(this._ball, 10, this._bar00, this._bar00_pre - this._bar00[1])) {
-            // console.log("collision bar00");
+            //console.log("collision bar00");
             // bar의 움직임에 따라 방향 값 회전
-            // console.log("bar : " + this._bar00[1]);
-            // console.log('bar pre: ' + this._bar00_pre);
-            // console.log("bar movement: " + movingValue);
-            // console.log("rotate: " + (movingValue * this._correction));
+            //console.log("bar : " + this._bar00[1]);
+            //console.log('bar pre: ' + this._bar00_pre);
+            //console.log("bar movement: " + movingValue);
+            //console.log("rotate: " + (movingValue * this._correction));
         } else if (this.isCollisionSC(this._ball, 10, this._bar01, this._bar01_pre - this._bar01[1])) {
-            // console.log("collision bar01");
+            //console.log("collision bar01");
             // bar의 움직임에 따라 방향 값 회전
-            // console.log("bar movement: " + movingValue);
-            // console.log("rotate: " + (movingValue * this._correction));
+            //console.log("bar movement: " + movingValue);
+            //console.log("rotate: " + (movingValue * this._correction));
         } else if (this.checkCollisionType(this._type)) {
-            // console.log("collision brick");
+            //console.log("collision brick");
         } else {
             this._iscollision = false;
         }

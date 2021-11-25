@@ -66,7 +66,7 @@ export class SessionController {
 
 	@Get("/login")
 	async login(@Req() req: Request, @Res() res: Response) {
-		console.log("GET /login id:", req.session.userid, "| loggedIn:", req.session.loggedIn)
+		//console.log("GET /login id:", req.session.userid, "| loggedIn:", req.session.loggedIn)
 		if (req.session.loggedIn == true && isNotTestUser(req.session.userid)) { // 이미 로그인 되어있는 유저라면
 			// 바로 로그인 (쿠키에 남아있는 세션이 이미 검증되었으면 다시 로그인 검사를 할 필요가 없으니까)
 			return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
@@ -95,7 +95,7 @@ export class SessionController {
 				return await this.sessionService.login(loginCodeDto, request, response);
 			}
     } catch (err){
-      console.log("get42UserInfo Err: ", err);
+      //console.log("get42UserInfo Err: ", err);
     }
   }
 
@@ -120,7 +120,7 @@ export class SessionController {
 
 	@Get('/emailCode')
 	async loginWithEmailCode(@Req() req: Request, @Query() query: LoginWithEmailCodeDto, @Res() res: Response) {
-		console.log("GET emailCode", req.session.userid, query.code);
+		//console.log("GET emailCode", req.session.userid, query.code);
 		if (await this.sessionService.isValidCode(req.session.userid, query.code)) {
 			req.session.loggedIn = true;
 			return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`);

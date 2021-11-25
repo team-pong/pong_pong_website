@@ -48,13 +48,13 @@ export class AppService {
       await saveSession(req.session, data.login, access_token);
     } catch (err: any | AxiosError) {
       if (axios.isAxiosError(err)) {
-        console.log("42api error:", err.response.statusText);
+        //console.log("42api error:", err.response.statusText);
         res.statusCode = err.response.status;
         res.statusMessage = err.response.statusText;
         res.json(err.response.data);
       }
       else {
-        console.log("login error:", err);
+        //console.log("login error:", err);
       }
     }
   }
@@ -89,7 +89,7 @@ export class AppService {
       }
       await client.end();
     } catch(err) {
-      console.log("valid check error:", err);
+      //console.log("valid check error:", err);
     }
   }
 
@@ -104,12 +104,12 @@ export class AppService {
     client.connect();
     // 세션아이디로 세션 얻기
     client.query(`SELECT * FROM session WHERE sid='${sessionID}';`, (err1, res1) => {
-      console.log(res1.rows[0]);
+      //console.log(res1.rows[0]);
       // 세션안에 있는 user_id로 유저 객체 얻기
       client.query(`SELECT * FROM users WHERE user_id='${res1.rows[0].sess.userid}';`, (err2, res2) => {
         client.end();
-        console.log('=== fetchUser ===');
-        console.log(res2.rows[0]);
+        //console.log('=== fetchUser ===');
+        //console.log(res2.rows[0]);
         return res2.rows[0];
       });
     });
@@ -125,8 +125,8 @@ export class AppService {
   updateUser(userData) {
     const client = new Client(db);
     client.connect();
-    console.log('=== updateUser ===');
-    console.log(userData);
+    //console.log('=== updateUser ===');
+    //console.log(userData);
     // 인자로 받은 유저 객체로 유저 정보 수정
     client.query(`UPDATE users SET nick='${userData.nick}', avatar_url='${userData.avatar_url}' WHERE user_id='${userData.user_id}';`, (err, res) => {
       client.end();
@@ -151,8 +151,8 @@ export class AppService {
         // 유저 삭제
         client.query(`DELETE FROM users WHERE user_id='${res1.rows[0].sess.user_id}'`, (err3, res3) => {
           client.end();
-          console.log('=== deleteUser ===');
-          console.log(deletedUser);
+          //console.log('=== deleteUser ===');
+          //console.log(deletedUser);
           return deletedUser;
         });
       });
@@ -197,11 +197,11 @@ export async function saveInfo(id: string, avatar_url: string) {
       (err, res) => {
         client.end()
         if (err){
-          console.log("INSERT Query Error:", err.message);
+          //console.log("INSERT Query Error:", err.message);
         };
     })
   } catch (err) {
-    console.log('pg connect error:', err);
+    //console.log('pg connect error:', err);
   }
 }
 

@@ -21,7 +21,7 @@ export class MatchService {
       return new ErrMsgDto(err2);
     if (type != 'general' && type != 'ranked')  // 게임 타입이 일반게임 혹은 랭크게임이 아니면
       return new ErrMsgDto(err18);
-    console.log('map:', map);
+    //console.log('map:', map);
     if (map !== 0 && map !== 1 && map !== 2)  // 맵은 0, 1, 2 중에 하나 이어야함
       return new ErrMsgDto(err19);
     await this.matchRepo.save({winner_id: winner_id, loser_id: loser_id, winner_score: winner_score, loser_score: loser_score, type: type, map: map});
@@ -122,7 +122,7 @@ export class MatchService {
         await this.usersRepo.update({user_id: user_id}, {ladder_level: user.ladder_level + score_dist});
       }
     } else { // 해당 유저가 없는 경우 
-      console.log('해당 유저가 DB, users 테이블에 존재하지 않습니다', user_id);
+      //console.log('해당 유저가 DB, users 테이블에 존재하지 않습니다', user_id);
     }
   }
 }

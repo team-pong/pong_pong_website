@@ -128,19 +128,10 @@ export class GameGateway {
 
 	async saveResult(winner: User, loser: User, winner_score: number = 0, loser_score: number = 0, room_id: string) {
 		const res = await this.matchService.createMatch(winner.id, loser.id, winner_score, loser_score, this.games[room_id].type, this.games[room_id].map);
-		console.log(res);
+		//console.log(res);
 	}
 
 	async prepareNextRound(userInfo: MatchInfo, playerLeft: User, playerRight: User, gameLogic: GameLogic) {
-		console.log('all socket_infos')
-		for (let sock in this.socket_infos) {
-			console.log(`
-				-------------------------
-				user: ${this.socket_infos[sock].uid}
-				socket_id: ${this.socket_infos[sock].socket.id}
-				status: ${this.socket_infos[sock].status}
-			`);
-		}
 		gameLogic.initGame();
 		const room_id = this.socket_infos[playerLeft.socket.id].rid;
 		this.server.to(room_id).emit('setMatchInfo', userInfo);
@@ -149,7 +140,7 @@ export class GameGateway {
 			const winner = userInfo.lPlayerScore == 3 ? {user: playerLeft, score: userInfo.lPlayerScore} : {user: playerRight, score: userInfo.rPlayerScore};
 			const loser = userInfo.lPlayerScore == 3 ? {user: playerRight, score: userInfo.rPlayerScore} : {user: playerLeft, score: userInfo.lPlayerScore};
 			this.server.to(room_id).emit('matchEnd', {winner: winner.user.id, loser: loser.user.id});
-			console.log('score', gameLogic._score);
+			//console.log('score', gameLogic._score);
 			await this.saveResult(winner.user, loser.user, winner.score, loser.score, room_id);
 			this.clearGame(playerLeft, playerRight, room_id, gameLogic);
 		} else {
@@ -319,7 +310,7 @@ export class GameGateway {
 
 			// 2. 소켓 관련 정보들 저장 (소켓, 세션id, 유저id)
 			this.saveSocketInfo(socket, sid, userid, 'inqueue');
-			// console.log('소켓저장됨.', userid);
+			//console.log('소켓저장됨.', userid);
 
 			// 3. 초대 대기열에 넣기
 			this.pushUserIntoQueue(userid, socket, map_type, this.invite_queue, target.user_id);
@@ -328,7 +319,7 @@ export class GameGateway {
 			const waiters = this.invite_queue.filter((element) => element.id == target.user_id);
 
 			for (let waiter of waiters) {
-				// console.log('waiters', waiters);
+				//console.log('waiters', waiters);
 				if (waiter.target_id == userid) { // 상대의 타겟이 내가 맞는지 확인
 					// 5. 게임 로직 객체 생성
 					const gameLogic = new GameLogic(700, 450, map_type, this.server);
@@ -347,10 +338,10 @@ export class GameGateway {
 				
 					// 6. 소켓 정보 저장
 					const room_id: string = playerLeft.id + playerRight.id;
-					// console.log('left', this.socket_infos[playerLeft.socket.id]);
+					//console.log('left', this.socket_infos[playerLeft.socket.id]);
 					this.socket_infos[playerLeft.socket.id].rid = room_id;
 					this.socket_infos[playerLeft.socket.id].logic = gameLogic;
-					// console.log('right', this.socket_infos[playerRight.socket.id])
+					//console.log('right', this.socket_infos[playerRight.socket.id])
 					this.socket_infos[playerRight.socket.id].rid = room_id;
 					this.socket_infos[playerRight.socket.id].logic = gameLogic;
 					
@@ -430,7 +421,6 @@ export class GameGateway {
 			this.pushUserIntoQueue(userid, socket, map_type, this.normal_queue);
 			// 4. 같은 맵을 선택하고 기다리는중인 사람들 리스트 가져오기
 			const waiters = this.normal_queue.filter((element) => element.map == map_type);
-			console.log('대기열:', waiters);
 			if (waiters.length >= 2) {
 				
 				// 5. 게임 로직 객체 생성
@@ -597,7 +587,7 @@ export class GameGateway {
 	async spectateMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: SpectateGameDto) {
 		// 1. 관전 할 대상의 게임 room_id 확인
 		try {
-			console.log("Spectate |", body.nick);
+			//console.log("Spectate |", body.nick);
 			const target_info = await this.usersService.getUserInfoWithNick(body.nick);
 			const socket_info = this.getSocketInfo(target_info.user_id);
 
@@ -616,7 +606,7 @@ export class GameGateway {
 			this.socket_infos[socket.id].match.viewNumber += 1;
 	
 			// 2. 초기화
-			// console.log('관전하기 |', socket_info.logic.getInitJson(), socket_info.match);
+			//console.log('관전하기 |', socket_info.logic.getInitJson(), socket_info.match);
 			socket.emit("init", socket_info.logic.getInitJson(), socket_info.match);
 			socket.emit("setMatchInfo", socket_info.match);
 			
@@ -625,7 +615,7 @@ export class GameGateway {
 			this.server.to(socket_info.rid).emit('setMatchInfo', socket_info.match);
 		} catch (err) {
 			socket.emit("invalidMatch");
-			console.log(err);
+			//console.log(err);
 			return (err);
 		}
 	}
@@ -636,14 +626,14 @@ export class GameGateway {
 	}
 
 	afterInit(server: Server): any {
-		console.log('Game Socket Server Init');
+		//console.log('Game Socket Server Init');
 	}
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
 		try {
 			const sid = getSessionIDFromCookie(socket.request.headers.cookie);
 			const user_id = await this.sessionService.readUserId(sid);
-			console.log('Game 웹소켓 연결됨', user_id);
+			//console.log('Game 웹소켓 연결됨', user_id);
 		} catch (err) {
 			console.error(err);
 		}
@@ -655,7 +645,7 @@ export class GameGateway {
 			const user_id = await this.sessionService.readUserId(sid);
 			const socket_info = this.socket_infos[socket.id];
 	
-			console.log('Game 웹소켓 연결해제', user_id);
+			//console.log('Game 웹소켓 연결해제', user_id);
 			// 1. 대기열에 있다면 대기열에서 제거
 			this.deleteFromNormalQueue(user_id);
 			this.deleteFromLadderQueue(user_id);

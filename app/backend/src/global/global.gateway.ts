@@ -45,7 +45,7 @@ export class GlobalGateway {
   @WebSocketServer() public server: Server;
 
   afterInit(server: Server): any {
-    console.log('Global WebSocket Server Init');
+    //console.log('Global WebSocket Server Init');
   }
 
   // 1. 로그인 한 경우 자기를 친구추가한 사람 중 온라인인 사람에게 online status 전송
@@ -65,23 +65,23 @@ export class GlobalGateway {
       // 1. online 상태로 업데이트
       await this.usersRepo.update(userid, {status: 'online'});
       socketMap[userid] = socket.id;
-      console.log(`Global Socket Connected: ${userid}`);
+      //console.log(`Global Socket Connected: ${userid}`);
       // 2. 친구 목록을 불러와서 online인 사람에게 online 메세지 전송 (status가 초록불로 바뀌도록)
       const friend_list = await this.friendRepo.find({friend_id: userid});
       let friend_id: string = '';
       for (let i in friend_list) {
-        console.log(i, friend_list[i]);
+        //console.log(i, friend_list[i]);
         friend_id = friend_list[i].user_id;
         this.server.to(socketMap[friend_id]).emit('online', {user_id: friend_id})
       }
     } catch (err) {
-      console.log(err);
+      //console.log(err);
     }  
   }
 
   async isBlockedUserFrom(target: string, from: string) {
     if (await this.blockRepo.count({user_id: from, block_id: target})) {
-      console.log(`${target} is blocked by ${from}`);
+      //console.log(`${target} is blocked by ${from}`);
       return true;
     } else {
       return false;
@@ -119,7 +119,7 @@ export class GlobalGateway {
       id: dm.id,
       time: dm.created_at,
       msg: dm.content,
-      from: dm.sender_id,
+      from: (await this.usersRepo.findOne({user_id: dm.sender_id})).nick,
       type: dm.type
     });
   }
@@ -192,7 +192,7 @@ export class GlobalGateway {
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
     // 1. 소켓맵에서 내 소켓 찾기
     const user_id = findUIDwithSID(socket.id);
-    console.log(`Global Socket Disconnected: ${user_id}`);
+    //console.log(`Global Socket Disconnected: ${user_id}`);
 
     // 2. DB에서 내 상태를 offline으로 변경
     await this.usersRepo.update({user_id: user_id}, {status: 'offline'});

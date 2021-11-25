@@ -4,9 +4,9 @@
  * @details
  *          1. const date = new Time("2021-07-31T05:41:48.342Z");
  *              -> 시간 형식은 Date 객체가 허용하는 한 사용 가능함
- *          2. console.log(date.getMonth())
+ *          2. //console.log(date.getMonth())
  *              -> 출력 예상: 7
- *          3. console.log(date.getRelativeTime())
+ *          3. //console.log(date.getRelativeTime())
  *              -> 출력 예상: 3 달 전 (사용 시점에 따라 달라짐)
  * @warings
  *          getRelativeTime 메소드는 Time 클래스를 선언할 때 사용한 시간이 과거여만 함
