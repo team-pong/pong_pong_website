@@ -5,7 +5,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 const { SourceMapDevToolPlugin } = require("webpack");
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: './src/index.tsx',
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
