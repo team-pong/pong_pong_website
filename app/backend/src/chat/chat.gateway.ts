@@ -79,7 +79,7 @@ export class ChatGateway {
   private socket_map: {[key: string]: SocketInfo} = {};
 
   afterInit(server: any): any {
-    console.log('Chat Server Init');
+    //console.log('Chat Server Init');
   }
 
   async isBlockedUserFrom(target: string, from: string) {
@@ -127,7 +127,7 @@ export class ChatGateway {
       socket.join(room_id);
       // 2. chat-users에 유저 추가
       await this.chatUsersService.addUser(room_id, user_id);
-      console.log(`Join Message user: ${user_id}, channel: ${room_id}`);
+      //console.log(`Join Message user: ${user_id}, channel: ${room_id}`);
   
       // 3. 참여중인 모두에게 방 정보 전송 (참여 인원이 바뀌도록)
       const room_info = await this.chatService.getChannelInfo(Number(room_id));
@@ -143,7 +143,7 @@ export class ChatGateway {
         chat: `${user_info.nick}님이 입장하셨습니다.`
       });
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       return (err);
     }
   }
@@ -156,7 +156,7 @@ export class ChatGateway {
     // 1. chat db에 변경사항 업데이트
     // 2. 모두에게 방 정보 전송 (방 제목이나 타입 등이 바뀌도록)
     socket.to(room_id).emit('setRoomInfo', room_info);
-    console.log(`Receive setRoomInfo Message: ${this.socket_map[socket.id].user_id}, roomInfo: ${room_info}`);
+    //console.log(`Receive setRoomInfo Message: ${this.socket_map[socket.id].user_id}, roomInfo: ${room_info}`);
   }
 
   @SubscribeMessage('setAdmin')
@@ -186,7 +186,7 @@ export class ChatGateway {
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
       this.server.to(room_id).emit('setRoomUsers', user_list);
     } catch (err) {
-      console.log(`Chat Socket setAdmin error | ${err}`);
+      //console.log(`Chat Socket setAdmin error | ${err}`);
       return (err);
     }
   }
@@ -218,7 +218,7 @@ export class ChatGateway {
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
       this.server.to(room_id).emit('setRoomUsers', user_list);
     } catch (err) {
-      console.log(`Chat Socket deleteAdmin error | ${err}`);
+      //console.log(`Chat Socket deleteAdmin error | ${err}`);
       return (err);
     }
   }
@@ -259,7 +259,7 @@ export class ChatGateway {
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
       this.server.to(room_id).emit('setRoomUsers', user_list);
     } catch (err) {
-      console.log(`Chat Socket setBan error | ${err}`);
+      //console.log(`Chat Socket setBan error | ${err}`);
       return (err);
     }
   }
@@ -291,7 +291,7 @@ export class ChatGateway {
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
       this.server.to(room_id).emit('setRoomUsers', user_list);
     } catch (err) {
-      console.log(`Chat Socket setMute error | ${err}`);
+      //console.log(`Chat Socket setMute error | ${err}`);
       return (err);
     }
   }
@@ -320,7 +320,7 @@ export class ChatGateway {
       const user_list = await this.chatUsersService.getUserListInRoom(room_id)
       this.server.to(room_id).emit('setRoomUsers', user_list);
     } catch (err) {
-      console.log(`Chat Socket unMute error | ${err}`);
+      //console.log(`Chat Socket unMute error | ${err}`);
       return (err);
     }
   }
@@ -346,7 +346,7 @@ export class ChatGateway {
     
     // 3. 남은 유저들에게 채팅 보내기
     // 개선사항: socket.id와 user.id 를 묶어놓고 관리하면 getSocketIdFromUserId 함수를 매번 실행할 필요 없이 가능
-    // console.log('send message to', users2);
+    //console.log('send message to', users2);
 
 
     // socket.to(room_id).emit('message', {
@@ -356,10 +356,10 @@ export class ChatGateway {
     //   time: Date.now(),
     //   message: body.msg,
     // })
-    // console.log(`my socket: ${socket.id}`);
+    //console.log(`my socket: ${socket.id}`);
     for (let user of users2) {
       let socket_id = this.getSocketIdFromUserId(user.user_id);
-      // console.log(`${user} ${socket_id}`);
+      //console.log(`${user} ${socket_id}`);
       this.server.to(socket_id).emit('message', {
         nick: user_info.nick,
         position: await this.chatUsersService.getUserPosition(user_id, room_id),
@@ -386,7 +386,7 @@ export class ChatGateway {
     const session_id = this.globalService.getSessionIDFromCookie(socket.request.headers.cookie);
     const user_id = await this.sessionService.readUserId(session_id);
 
-    console.log('Chat Socket Connected:', user_id);
+    //console.log('Chat Socket Connected:', user_id);
   }
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
@@ -394,7 +394,7 @@ export class ChatGateway {
       const uid = this.socket_map[socket.id].user_id;
       const rid = this.socket_map[socket.id].room_id;
 
-      console.log('Chat Socket Disconnected:', uid);
+      //console.log('Chat Socket Disconnected:', uid);
       // 1-1. chat-users db에서 제거
       await this.chatUsersService.deleteUser(rid, uid); // 남은 유저가 없는 경우까지 이 메서드에서 처리
 
@@ -420,7 +420,7 @@ export class ChatGateway {
 
       // 6. 해당 소켓 정보 제거
       delete this.socket_map[socket.id];
-      // console.log('socketmap', this.socket_map);
+      //console.log('socketmap', this.socket_map);
     } catch (err) {
       console.error(err);
     }

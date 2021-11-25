@@ -16,22 +16,22 @@ export class LoggedInWsGuard implements CanActivate {
 
 			const req = context.switchToWs().getClient<Socket>();
 			const cookie = req.request.headers.cookie;
-			console.log('로그인 체크중');
+			//console.log('로그인 체크중');
 			if (cookie) {
-				console.log('쿠키 확인');
+				//console.log('쿠키 확인');
 				const session_id = cookie.split('.')[1].substring(8);
 				axios.get(`${process.env.BACKEND_SERVER_URL}/session/user_id?sid=${session_id}`).then((val) => {
-					console.log('axios 요청 완료: ', val);
+					//console.log('axios 요청 완료: ', val);
 					if (val) {
-						console.log('유저 아이디 확인');
+						//console.log('유저 아이디 확인');
 						return true;
 					}
 				}).catch((err) => {return false;});
 			}
-			console.log('return false');
+			//console.log('return false');
 			return false;
 		} catch (err) {
-			console.log('에러발생', err);
+			//console.log('에러발생', err);
 			return false;
 		}
 	}

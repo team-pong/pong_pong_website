@@ -106,7 +106,7 @@ const Login = (): JSX.Element => {
     const key = window.location.search.split("=")[0].substr(1);
     const value= window.location.search.split("=")[1];
     if (key === "twoFactor" && value === "email") {
-      console.log("twoFactor");
+      //console.log("twoFactor");
       setTwoFactor(true);
     }
   }, []);

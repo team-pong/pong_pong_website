@@ -54,7 +54,7 @@ export class SessionService {
       req.session.loggedIn = true;
       req.session.save();
 		} catch (err) {
-			console.log('tester user login error:', err);
+			//console.log('tester user login error:', err);
 		}
 	}
 
@@ -158,13 +158,13 @@ export class SessionService {
       return res.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`);
     } catch (err: any | AxiosError) {
       if (axios.isAxiosError(err)) { // 42 응답에러
-        console.log("42api error:", err.response.statusText);
+        //console.log("42api error:", err.response.statusText);
         res.statusCode = err.response.status;
         res.statusMessage = err.response.statusText;
         res.json(err.response.data);
       }
       else { // 내부 에러
-        console.log("login error:", err);
+        //console.log("login error:", err);
       }
     }
   }
@@ -207,7 +207,7 @@ export class SessionService {
       }
       await client.end();
     } catch (err) {
-      console.log("valid check error:", err);
+      //console.log("valid check error:", err);
     }
   }
 

@@ -29,7 +29,7 @@ export class achievementsController {
   @ApiQuery({ name: 'user_id', example:'jinbkim', description: '모든 칭호를 삭제할 유저아이디'})
   @Delete()
   deleteAllAchievements(@Query() q: DeleteAllAchievementsDto){
-    console.log(q);
+    //console.log(q);
     return this.achievementsService.deleteAllAchievements(q.user_id);
   }
 }
