@@ -15,6 +15,7 @@ interface MatchInfo {
 }
 
 const GameSpectateContent: FC<RouteComponentProps> = () => {
+  const [isInvalidMatch, setIsInvalidMatch] = useState(false);
   const myInfo = useContext(UserInfoContext);
   const [socket, _setSocket] = useState(null);
   const socketRef = useRef(socket);
@@ -141,6 +142,10 @@ const GameSpectateContent: FC<RouteComponentProps> = () => {
     if (socketInit) {
       socket.emit("spectate", {nick: query.get("nick")});
 
+      socket.on("invalidMatch", () => {
+        setIsInvalidMatch(true);
+      })
+      
       socket.on("init", (data) => {
         setMap(data.type);
         setCanvas(initCanvas());
@@ -275,7 +280,7 @@ const GameSpectateContent: FC<RouteComponentProps> = () => {
     }
   }, [ballX, ballY]);
 
-  return (
+  if (!isInvalidMatch) return (
     <>
     <div className="ingame-match-info">
       <div className="left-player">
@@ -300,6 +305,7 @@ const GameSpectateContent: FC<RouteComponentProps> = () => {
     {isExit && <Redirect to="/mainpage" />}
     </>
   );
+  return (<>잘못된 접근입니다.</>)
 };
 
 export default withRouter(GameSpectateContent);

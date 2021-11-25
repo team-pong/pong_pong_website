@@ -99,20 +99,6 @@ export class ChatUsersService {
     await this.chatUsersRepo.delete({ user_id: user_id, channel_id: rid }); // 목록에서 제거
     if (await this.adminRepo.count({user_id: user_id, channel_id: rid}))  // 나간 유저가 admin 이면
       await this.adminRepo.delete({user_id: user_id, channel_id: rid}); // 어드민 테이블에서 제거
-    if (await this.chatUsersRepo.count({channel_id: rid}) === 0) {// 해당 채널에 아무도 없다면
-      await this.chatRepo.delete({channel_id: rid}); // 채널 삭제
-      await this.muteRepo.delete({channel_id: rid}); // 뮤트정보 삭제
-      await this.adminRepo.delete({channel_id: rid}); // 어드민정보 삭제
-      await this.banRepo.delete({channel_id: rid}); // 밴 정보 삭제
-    } else{  // 채널에 누군가가 남아있다면
-      const channel = await this.chatRepo.findOne({channel_id: rid});
-      if (channel.owner_id == user_id){  // 나간 사람이 owner이라면
-        const newOwner = await this.chatUsersRepo.findOne({channel_id: rid});  // 채널에 남은 인원중 아무나 뽑기
-        await this.chatService.updateOwner(rid, newOwner.user_id);
-        await this.muteRepo.delete({channel_id: rid, user_id: newOwner.user_id});
-        // await axios.post(`${process.env.BACKEND_SERVER_URL}/chat/owner`, {channel_id: channel_id, owner_id: newOwner.user_id}) // owner변경
-      }
-    }
   }
 
   async getUserState(user_id: string, room_id: number) {

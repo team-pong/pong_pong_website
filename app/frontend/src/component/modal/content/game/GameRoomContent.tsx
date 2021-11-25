@@ -2,8 +2,9 @@ import { fabric } from "fabric";
 import { FC, useState, useEffect, useRef, useContext } from "react";
 import { RouteComponentProps, withRouter, Redirect } from "react-router-dom";
 import "/src/scss/content/game/GameRoomContent.scss";
-import { SetDmInfoContext, UserInfoContext } from "../../../../Context";
+import { SetDmInfoContext, SetUserInfoContext, UserInfoContext } from "../../../../Context";
 import NoResult from "../../../noresult/NoResult";
+import EasyFetch from "../../../../utils/EasyFetch";
 
 interface MatchInfo {
   lPlayerNickname: string,
@@ -22,6 +23,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket}) => {
   const canvasHeight = 450;
 
   const myInfo = useContext(UserInfoContext);
+  const setUserInfo = useContext(SetUserInfoContext);
   const setDmInfo = useContext(SetDmInfoContext);
   const [map, setMap] = useState(3);
   const [canvas, setCanvas] = useState<fabric.StaticCanvas>();
@@ -174,6 +176,12 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket}) => {
       setUpKey(0);
     }
   };
+
+  const getUserInfo = async () => {
+    const easyfetch = new EasyFetch(`${global.BE_HOST}/users/myself`);
+    const res = await easyfetch.fetch();
+    return res;
+  }
   
   /*!
    * @brief 캔버스 초기화
@@ -231,6 +239,7 @@ const GameRoomContent: FC<{socket: any} & RouteComponentProps> = ({socket}) => {
 
     return (() => {
       socket.disconnect();
+      getUserInfo().then((res) => {setUserInfo(res)});
       removeEventListener("keydown", keyDownEvent);
       removeEventListener("keyup", keyUpEvent);
     })

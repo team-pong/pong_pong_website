@@ -165,8 +165,11 @@ export class GlobalGateway {
   @SubscribeMessage('dm')
   async dmMessage(@ConnectedSocket() socket: Socket, @MessageBody() body: GlobalSendDmDto) {
     const user_id = findUIDwithSID(socket.id);
-    const target_id = body.to;
-    console.log(`MSG globalSocket ${body}`);
+    const ref_user = await this.usersRepo.findOne({user_id: user_id});
+    const target_nick = body.to;
+    const target = await this.usersRepo.findOne({nick: target_nick});
+    const target_id = target.user_id;
+
     // 1. 내가 dm을 보낸 대상에게 차단 당했는지 확인
     if (await this.isBlockedUserFrom(user_id, target_id)) {
       // 1-1. 차단당했으면 dm 요청시 아무 동작도 안함
@@ -177,7 +180,7 @@ export class GlobalGateway {
       const target_sid = socketMap[target_id]
       if (target_sid) {
         this.server.to(target_sid).emit('dm', {
-          from: user_id,
+          from: ref_user.nick,
           msg: body.msg,
           time: Date.now(),
         })
