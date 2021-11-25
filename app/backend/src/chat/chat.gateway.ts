@@ -341,15 +341,25 @@ export class ChatGateway {
     
     // 3. 남은 유저들에게 채팅 보내기
     // 개선사항: socket.id와 user.id 를 묶어놓고 관리하면 getSocketIdFromUserId 함수를 매번 실행할 필요 없이 가능
-    for (let user of users2) {
-      this.server.to(this.getSocketIdFromUserId(user.user_id)).emit('message', {
-        nick: user_info.nick,
-        position: await this.chatUsersService.getUserPosition(user_id, room_id),
-        avatar_url: user_info.avatar_url,
-        time: Date.now(),
-        message: body.msg,
-      })
-    }
+    console.log('send message to', users2);
+
+
+    socket.to(room_id).emit('message', {
+      nick: user_info.nick,
+      position: await this.chatUsersService.getUserPosition(user_id, room_id),
+      avatar_url: user_info.avatar_url,
+      time: Date.now(),
+      message: body.msg,
+    })
+    // for (let user of users2) {
+    //   this.server.to(this.getSocketIdFromUserId(user.user_id)).emit('message', {
+    //     nick: user_info.nick,
+    //     position: await this.chatUsersService.getUserPosition(user_id, room_id),
+    //     avatar_url: user_info.avatar_url,
+    //     time: Date.now(),
+    //     message: body.msg,
+    //   })
+    // }
   }
 
   getSocketIdFromUserId(user_id: string) {
