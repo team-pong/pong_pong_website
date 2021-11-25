@@ -391,35 +391,38 @@ export class ChatGateway {
 
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
     try {
-      const uid = this.socket_map[socket.id].user_id;
-      const rid = this.socket_map[socket.id].room_id;
-
-      //console.log('Chat Socket Disconnected:', uid);
-      // 1-1. chat-users db에서 제거
-      await this.chatUsersService.deleteUser(rid, uid); // 남은 유저가 없는 경우까지 이 메서드에서 처리
-
-      if (await this.chatUsersRepo.count({channel_id: Number(rid)})) { 
-        // 방에 남아있는 유저가 있다면
-        // 2. 변경된 방 정보 전송 (방 인원수 줄음)
-        const room_info = await this.chatService.getChannelInfo(Number(rid));
-        this.server.to(rid).emit('setRoomInfo', room_info);
-      
-        // 3. 유저 정보 리스트 전송 (빠진 인원 갱신)
-        const user_list = await this.chatUsersService.getUserListInRoom(rid)
-        this.server.to(rid).emit('setRoomUsers', user_list);
-
-        // 4. 시스템 메세지 전송
-        socket.to(rid).emit('message', {
-          user: 'system',
-          chat: `${(await this.usersService.getUserInfo(uid)).nick} 님이 퇴장하셨습니다.`,
-        })
+      const socket_info = this.socket_map[socket.id];
+      if (socket_info) {
+        const uid = this.socket_map[socket.id].user_id;
+        const rid = this.socket_map[socket.id].room_id;
+  
+        //console.log('Chat Socket Disconnected:', uid);
+        // 1-1. chat-users db에서 제거
+        await this.chatUsersService.deleteUser(rid, uid); // 남은 유저가 없는 경우까지 이 메서드에서 처리
+  
+        if (await this.chatUsersRepo.count({channel_id: Number(rid)})) { 
+          // 방에 남아있는 유저가 있다면
+          // 2. 변경된 방 정보 전송 (방 인원수 줄음)
+          const room_info = await this.chatService.getChannelInfo(Number(rid));
+          this.server.to(rid).emit('setRoomInfo', room_info);
+        
+          // 3. 유저 정보 리스트 전송 (빠진 인원 갱신)
+          const user_list = await this.chatUsersService.getUserListInRoom(rid)
+          this.server.to(rid).emit('setRoomUsers', user_list);
+  
+          // 4. 시스템 메세지 전송
+          socket.to(rid).emit('message', {
+            user: 'system',
+            chat: `${(await this.usersService.getUserInfo(uid)).nick} 님이 퇴장하셨습니다.`,
+          })
+        }
+  
+        // 5. 해당소켓 leave
+        socket.leave(rid);
+  
+        // 6. 해당 소켓 정보 제거
+        delete this.socket_map[socket.id];
       }
-
-      // 5. 해당소켓 leave
-      socket.leave(rid);
-
-      // 6. 해당 소켓 정보 제거
-      delete this.socket_map[socket.id];
       //console.log('socketmap', this.socket_map);
     } catch (err) {
       console.error(err);
