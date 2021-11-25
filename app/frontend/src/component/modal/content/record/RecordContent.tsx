@@ -168,13 +168,13 @@ const RecordClose: FC = (): JSX.Element => {
       <ul id="ladder-rank">
         {
           ladderRanking.rankList?.map((user, i) => {
-            let winPercentage = Math.floor(user.win_games / (user.win_games + user.loss_games)) * 100;
-            let lossPercentage = Math.floor(user.loss_games / (user.win_games + user.loss_games)) * 100;
+            let winPercentage = Math.floor((user.win_games / (user.win_games + user.loss_games)) * 100);
+            let lossPercentage = Math.floor((user.loss_games / (user.win_games + user.loss_games)) * 100);
             if (isNaN(winPercentage)) winPercentage = 0;
             if (isNaN(lossPercentage)) lossPercentage = 0;
             return (
               <li className="record-ladder-li" key={i}>
-                <span className="record-ladder-text">{i}등</span>
+                <span className="record-ladder-text">{i+1}등</span>
                 <img className="record-ladder-img" src={user.avatar_url}/>
                 <span className="record-ladder-text">{user.nick}</span>
                 <BarChart left={winPercentage} right={lossPercentage} />

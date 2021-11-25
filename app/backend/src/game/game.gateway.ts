@@ -337,10 +337,10 @@ export class GameGateway {
 					this.deleteFromInviteQueue(playerRight.id);
 
 					const userInfo: MatchInfo = {
-						lPlayerNickname: playerLeft.id,
+						lPlayerNickname: (await this.usersService.getUserInfo(playerLeft.id)).nick,
 						lPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerLeft.id),
 						lPlayerScore: 0,
-						rPlayerNickname: playerRight.id,
+						rPlayerNickname: (await this.usersService.getUserInfo(playerRight.id)).nick,
 						rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
 						rPlayerScore: 0,
 						viewNumber: 0,
@@ -422,12 +422,12 @@ export class GameGateway {
 				playerRight.socket.emit('matched', {roomId: room_id, opponent: this.normal_queue[0].id, position: 'right'});
 				this.deleteFromNormalQueue(playerLeft.id);
 				this.deleteFromNormalQueue(playerRight.id);
-	
+
 				const userInfo: MatchInfo = {
-					lPlayerNickname: playerLeft.id,
+					lPlayerNickname: (await this.usersService.getUserInfo(playerLeft.id)).nick,
 					lPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerLeft.id),
 					lPlayerScore: 0,
-					rPlayerNickname: playerRight.id,
+					rPlayerNickname: (await this.usersService.getUserInfo(playerRight.id)).nick,
 					rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
 					rPlayerScore: 0,
 					viewNumber: 0,
@@ -512,10 +512,10 @@ export class GameGateway {
 	
 				const ret = gameLogic.getJson();
 				const userInfo: MatchInfo = {
-					lPlayerNickname: playerLeft.id,
+					lPlayerNickname: (await this.usersService.getUserInfo(playerLeft.id)).nick,
 					lPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerLeft.id),
 					lPlayerScore: 0,
-					rPlayerNickname: playerRight.id,
+					rPlayerNickname: (await this.usersService.getUserInfo(playerRight.id)).nick,
 					rPlayerAvatarUrl: await this.usersService.getAvatarUrl(playerRight.id),
 					rPlayerScore: 0,
 					viewNumber: 0,
@@ -590,6 +590,7 @@ export class GameGateway {
 			socket.join(socket_info.rid);
 			this.server.to(socket_info.rid).emit('setMatchInfo', socket_info.match);
 		} catch (err) {
+			socket.emit("invalidMatch");
 			console.log(err);
 			return (err);
 		}
