@@ -205,20 +205,22 @@ export class GameGateway {
 	}
 
 	async disconnectEvent(left_player: User, right_player: User, gameLogic: GameLogic, position: Position, userInfo: MatchInfo) {
-		const room_id = this.socket_infos[left_player.socket.id].rid;
-		const winner = position == 'l' ? {user: right_player, score: userInfo.rPlayerScore} : {user: left_player, score: userInfo.lPlayerScore};
-		const loser = position == 'l' ? {user: left_player, score: userInfo.lPlayerScore} : {user: right_player, score: userInfo.rPlayerScore};
-
-		await this.saveResult(winner.user, loser.user, winner.score, loser.score, room_id);
-		this.server.to(room_id).emit('matchEnd', {winner: winner.user.id, loser: loser.user.id});
-		this.clearGame(left_player, right_player, room_id, gameLogic);
+		if (this.socket_infos[left_player.socket.id]) {
+			const room_id = this.socket_infos[left_player.socket.id].rid;
+			const winner = position == 'l' ? {user: right_player, score: userInfo.rPlayerScore} : {user: left_player, score: userInfo.lPlayerScore};
+			const loser = position == 'l' ? {user: left_player, score: userInfo.lPlayerScore} : {user: right_player, score: userInfo.rPlayerScore};
+	
+			await this.saveResult(winner.user, loser.user, winner.score, loser.score, room_id);
+			this.server.to(room_id).emit('matchEnd', {winner: winner.user.id, loser: loser.user.id});
+			this.clearGame(left_player, right_player, room_id, gameLogic);
+		}
 		this.usersService.updateStatus(left_player.id, 'online');
 		this.usersService.updateStatus(right_player.id, 'online');
 	}
 
 	deleteFromNormalQueue(user_id: string) {
 		const idx = this.normal_queue.findIndex((element) => {
-			if (element.id = user_id) {
+			if (element.id == user_id) {
 				return true;
 			}
 			return false;
@@ -230,7 +232,7 @@ export class GameGateway {
 
 	deleteFromLadderQueue(user_id: string) {
 		const idx = this.ladder_queue.findIndex((element) => {
-			if (element.id = user_id) {
+			if (element.id == user_id) {
 				return true;
 			}
 			return false;
@@ -242,7 +244,7 @@ export class GameGateway {
 
 	deleteFromInviteQueue(user_id: string) {
 		const idx = this.invite_queue.findIndex((element) => {
-			if (element.id = user_id) {
+			if (element.id == user_id) {
 				return true;
 			}
 			return false;
@@ -253,15 +255,23 @@ export class GameGateway {
 	}
 
 	pushUserIntoQueue(userid: string, socket: Socket, map_type: number, queue: any[], target_id: string = null) {
-		if (queue.find((element) => {
+		if (queue.find((element) => { // 만약 유저가 이미 다른 대기열에 등록되어 있었다면, 이전 대기열을 지우고 새로운거로 추가
 			if (element.id == userid) {
 				return true;
 			}
 			return false;
-		})) {				
-		} else {
-			queue.push({id: userid, socket: socket, map: map_type, target_id: target_id});
-		}
+		})) {
+			const idx = queue.findIndex((element) => {
+				if (element.id == userid) {
+					return true;
+				}
+				return false;
+			})
+			if (idx != -1) {
+				queue.splice(idx, 1);
+			}
+		} 
+		queue.push({id: userid, socket: socket, map: map_type, target_id: target_id});
 	}
 
 	// 1-1) 수락을 기다리는 도중에 취소
@@ -641,26 +651,27 @@ export class GameGateway {
 
 	async handleDisconnect(@ConnectedSocket() socket: Socket) {
 		try {
-			const sid = getSessionIDFromCookie(socket.request.headers.cookie);
-			const user_id = await this.sessionService.readUserId(sid);
 			const socket_info = this.socket_infos[socket.id];
+			if (socket_info) {
+				const user_id = socket_info.uid;
+		
+				//console.log('Game 웹소켓 연결해제', user_id);
+				// 1. 대기열에 있다면 대기열에서 제
+				this.deleteFromNormalQueue(user_id);
+				this.deleteFromLadderQueue(user_id);
+				this.deleteFromInviteQueue(user_id);
 	
-			//console.log('Game 웹소켓 연결해제', user_id);
-			// 1. 대기열에 있다면 대기열에서 제거
-			this.deleteFromNormalQueue(user_id);
-			this.deleteFromLadderQueue(user_id);
-			this.deleteFromInviteQueue(user_id);
-
-			// 2. 관전자 처리 (관전자 수 수정해서 보냄)
-			if (socket_info.status == 'spectate') {
-				socket_info.match.viewNumber -= 1;
-				this.server.to(socket_info.rid).emit('setMatchInfo', socket_info.match);
+				// 2. 관전자 처리 (관전자 수 수정해서 보냄)
+				if (socket_info.status == 'spectate') {
+					socket_info.match.viewNumber -= 1;
+					this.server.to(socket_info.rid).emit('setMatchInfo', socket_info.match);
+				}
+	
+				// 3. socket_info에서 제거
+				socket.leave(socket_info.rid);
+				delete this.socket_infos[socket.id];
+				this.usersService.updateStatus(user_id, 'online');
 			}
-
-			// 3. socket_info에서 제거
-			socket.leave(socket_info.rid);
-			delete this.socket_infos[socket.id];
-			this.usersService.updateStatus(user_id, 'online');
 		} catch (err) {
 			console.error(err);
 		}
