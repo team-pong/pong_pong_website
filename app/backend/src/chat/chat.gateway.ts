@@ -112,7 +112,12 @@ export class ChatGateway {
       const user_info = await this.usersService.getUserInfo(user_id);
       const room_id = body.room_id;
       const position = await this.chatUsersService.getUserPosition(user_id, room_id);
-  
+
+      for (let sid in this.socket_map) {
+        if (this.socket_map[sid].user_id == user_id) {// 이미 연결된 채팅 소켓이 있다면
+          delete this.socket_map[sid]; // 이전 소켓을 지운다
+        }
+      }
       this.socket_map[socket.id] = {
         room_id: room_id,
         user_id: user_id,
@@ -341,8 +346,21 @@ export class ChatGateway {
     
     // 3. 남은 유저들에게 채팅 보내기
     // 개선사항: socket.id와 user.id 를 묶어놓고 관리하면 getSocketIdFromUserId 함수를 매번 실행할 필요 없이 가능
+    // console.log('send message to', users2);
+
+
+    // socket.to(room_id).emit('message', {
+    //   nick: user_info.nick,
+    //   position: await this.chatUsersService.getUserPosition(user_id, room_id),
+    //   avatar_url: user_info.avatar_url,
+    //   time: Date.now(),
+    //   message: body.msg,
+    // })
+    // console.log(`my socket: ${socket.id}`);
     for (let user of users2) {
-      this.server.to(this.getSocketIdFromUserId(user.user_id)).emit('message', {
+      let socket_id = this.getSocketIdFromUserId(user.user_id);
+      // console.log(`${user} ${socket_id}`);
+      this.server.to(socket_id).emit('message', {
         nick: user_info.nick,
         position: await this.chatUsersService.getUserPosition(user_id, room_id),
         avatar_url: user_info.avatar_url,
