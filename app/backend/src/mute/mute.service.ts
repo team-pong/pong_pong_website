@@ -58,7 +58,7 @@ export class MuteService {
 
   // 특정 채널에서 뮤트 해제
   async unMute(user_id: string, room_id: number) {
-    console.log(`unmute query ${user_id}, ${room_id}`)
+    //console.log(`unmute query ${user_id}, ${room_id}`)
     await this.muteRepo.delete({user_id: user_id, channel_id: room_id});
   }
 }

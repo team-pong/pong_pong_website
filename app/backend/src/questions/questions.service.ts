@@ -57,7 +57,7 @@ export class QuestionsService {
     for(var i in questions) {
       if (questions[i].answer == "")  // 답변안된 문의사항 이면
         continue ;
-        console.log("id : ", questions[i].question_id);
+        //console.log("id : ", questions[i].question_id);
       questionsList.push(new QuestionsDto2());
       questionsList[++idx].question_id = questions[i].question_id;
       questionsList[idx].title = questions[i].title;
