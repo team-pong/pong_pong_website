@@ -152,7 +152,7 @@ export class GlobalGateway {
       id: dm.id,
       time: dm.created_at,
       msg: dm.content,
-      from: dm.sender_id,
+      from: (await this.usersRepo.findOne({user_id: dm.sender_id})).nick,
       type: dm.type
     });
   }
