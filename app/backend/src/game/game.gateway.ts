@@ -133,23 +133,26 @@ export class GameGateway {
 
 	async prepareNextRound(userInfo: MatchInfo, playerLeft: User, playerRight: User, gameLogic: GameLogic) {
 		gameLogic.initGame();
-		const room_id = this.socket_infos[playerLeft.socket.id].rid;
-		this.server.to(room_id).emit('setMatchInfo', userInfo);
-		clearInterval(this.games[room_id].interval);
-		if (userInfo.lPlayerScore == 3 || userInfo.rPlayerScore == 3 || (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
-			const winner = userInfo.lPlayerScore == 3 ? {user: playerLeft, score: userInfo.lPlayerScore} : {user: playerRight, score: userInfo.rPlayerScore};
-			const loser = userInfo.lPlayerScore == 3 ? {user: playerRight, score: userInfo.rPlayerScore} : {user: playerLeft, score: userInfo.lPlayerScore};
-			this.server.to(room_id).emit('matchEnd', {winner: winner.user.id, loser: loser.user.id});
-			//console.log('score', gameLogic._score);
-			await this.saveResult(winner.user, loser.user, winner.score, loser.score, room_id);
-			this.clearGame(playerLeft, playerRight, room_id, gameLogic);
-		} else {
-			this.server.to(room_id).emit("startCount");
-			this.games[room_id].timeout = setTimeout(() => {
-				this.games[room_id].interval = setInterval(() => {
-					this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
-				}, 20)
-			}, 3000)
+		const socket_info = this.socket_infos[playerLeft.socket.id];
+		if (socket_info) {
+			const room_id = socket_info.rid;
+			this.server.to(room_id).emit('setMatchInfo', userInfo);
+			clearInterval(this.games[room_id].interval);
+			if (userInfo.lPlayerScore == 3 || userInfo.rPlayerScore == 3 || (userInfo.lPlayerScore + userInfo.rPlayerScore) >= 5) {
+				const winner = userInfo.lPlayerScore == 3 ? {user: playerLeft, score: userInfo.lPlayerScore} : {user: playerRight, score: userInfo.rPlayerScore};
+				const loser = userInfo.lPlayerScore == 3 ? {user: playerRight, score: userInfo.rPlayerScore} : {user: playerLeft, score: userInfo.lPlayerScore};
+				this.server.to(room_id).emit('matchEnd', {winner: winner.user.id, loser: loser.user.id});
+				//console.log('score', gameLogic._score);
+				await this.saveResult(winner.user, loser.user, winner.score, loser.score, room_id);
+				this.clearGame(playerLeft, playerRight, room_id, gameLogic);
+			} else {
+				this.server.to(room_id).emit("startCount");
+				this.games[room_id].timeout = setTimeout(() => {
+					this.games[room_id].interval = setInterval(() => {
+						this.gameInterval(userInfo, playerLeft, playerRight, gameLogic);
+					}, 20)
+				}, 3000)
+			}
 		}
 	}
 
@@ -161,7 +164,7 @@ export class GameGateway {
 			userInfo.rPlayerScore++;
 			this.prepareNextRound(userInfo, playerLeft, playerRight, gameLogic);
 		} else {
-			// frontㅇㅔ서 준비 완료되면 시작(3, 2, 1, Start 메시지)
+			// front에서 준비 완료되면 시작(3, 2, 1, Start 메시지)
 			gameLogic.update();
 			if (this.socket_infos[playerLeft.socket.id]) {
 				// 인터벌이 돌면서 socket_infos를 참조하는데, 사용자가 연결을 끊어서 disconnect 이벤트가 발생하면 이 socket_infos에 정보가 삭제되고 인터벌이 제거된다.
@@ -172,18 +175,6 @@ export class GameGateway {
 			}
 		}
 	}
-
-	async GiveUpEventListener (playerLeft: User, playerRight: User, gameLogic: GameLogic, position: Position, userInfo: MatchInfo) {
-		 const room_id = this.socket_infos[playerLeft.socket.id].rid;
-		 const winner = position == 'l' ? {user: playerRight, score: userInfo.rPlayerScore} : {user: playerLeft, score: userInfo.lPlayerScore};
-		 const loser = position == 'l' ? {user: playerLeft, score: userInfo.lPlayerScore} : {user: playerRight, score: userInfo.rPlayerScore};
-		 
-		 await this.saveResult(winner.user, loser.user, winner.score, loser.score, room_id);
-		 this.server.to(room_id).emit('matchEnd', {winner: winner.user.id, loser: loser.user.id});
-		 this.clearGame(playerLeft, playerRight, room_id, gameLogic);
-		 this.usersService.updateStatus(playerLeft.id, 'online');
-		 this.usersService.updateStatus(playerRight.id, 'online');
-	 }
 
 	/*
 	 * @brief 게임에 할당된 자원 제거
@@ -203,16 +194,33 @@ export class GameGateway {
 		this.usersService.updateStatus(left_player.id, 'online');
 		this.usersService.updateStatus(right_player.id, 'online');
 	}
+  
+	async GiveUpEventListener (playerLeft: User, playerRight: User, gameLogic: GameLogic, position: Position, userInfo: MatchInfo) {
+		const socket_info = this.socket_infos[playerLeft.socket.id];
+		if (socket_info) {
+			const room_id = this.socket_infos[playerLeft.socket.id].rid;
+			const winner = position == 'l' ? {user: playerRight, score: userInfo.rPlayerScore} : {user: playerLeft, score: userInfo.lPlayerScore};
+			const loser = position == 'l' ? {user: playerLeft, score: userInfo.lPlayerScore} : {user: playerRight, score: userInfo.rPlayerScore};
+			
+			await this.saveResult(winner.user, loser.user, winner.score, loser.score, room_id);
+			this.server.to(room_id).emit('matchEnd', {winner: winner.user.id, loser: loser.user.id});
+			this.clearGame(playerLeft, playerRight, room_id, gameLogic);
+			this.usersService.updateStatus(playerLeft.id, 'online');
+			this.usersService.updateStatus(playerRight.id, 'online');
+		}
+	 }
 
 	async disconnectEvent(left_player: User, right_player: User, gameLogic: GameLogic, position: Position, userInfo: MatchInfo) {
-		if (this.socket_infos[left_player.socket.id]) {
-			const room_id = this.socket_infos[left_player.socket.id].rid;
+		const socket_info = position == 'l' ? this.socket_infos[right_player.socket.id] : this.socket_infos[left_player.socket.id];
+		if (socket_info) {
+			const room_id = socket_info.rid;
 			const winner = position == 'l' ? {user: right_player, score: userInfo.rPlayerScore} : {user: left_player, score: userInfo.lPlayerScore};
 			const loser = position == 'l' ? {user: left_player, score: userInfo.lPlayerScore} : {user: right_player, score: userInfo.rPlayerScore};
 	
 			await this.saveResult(winner.user, loser.user, winner.score, loser.score, room_id);
 			this.server.to(room_id).emit('matchEnd', {winner: winner.user.id, loser: loser.user.id});
 			this.clearGame(left_player, right_player, room_id, gameLogic);
+			delete this.socket_infos[socket_info.socket.id];
 		}
 		this.usersService.updateStatus(left_player.id, 'online');
 		this.usersService.updateStatus(right_player.id, 'online');
@@ -669,7 +677,8 @@ export class GameGateway {
 	
 				// 3. socket_info에서 제거
 				socket.leave(socket_info.rid);
-				delete this.socket_infos[socket.id];
+				if (socket_info.status != 'ingame')
+					delete this.socket_infos[socket.id];
 				this.usersService.updateStatus(user_id, 'online');
 			}
 		} catch (err) {
