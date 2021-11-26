@@ -194,7 +194,7 @@ export class GameGateway {
 		this.usersService.updateStatus(left_player.id, 'online');
 		this.usersService.updateStatus(right_player.id, 'online');
 	}
-
+  
 	async GiveUpEventListener (playerLeft: User, playerRight: User, gameLogic: GameLogic, position: Position, userInfo: MatchInfo) {
 		const socket_info = this.socket_infos[playerLeft.socket.id];
 		if (socket_info) {
