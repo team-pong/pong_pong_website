@@ -8,7 +8,7 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/AMATEURTOSS/pong_pong_website">
+  <a href="https://github.com/team-pong/pong_pong_website">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -17,9 +17,9 @@
   <p align="center">
     Cool Ping Pong Game Site
     <br />
-    <a href="https://github.com/AMATEURTOSS/pong_pong_website/issues">Report Bug</a>
+    <a href="https://github.com/team-pong/pong_pong_website/issues">Report Bug</a>
     ·
-    <a href="https://github.com/AMATEURTOSS/pong_pong_website/issues">Request Feature</a>
+    <a href="https://github.com/team-pong/pong_pong_website/issues">Request Feature</a>
   </p>
 </div>
 
@@ -98,8 +98,8 @@ This Project's goal is build a ping pong website.
 
 ### Contributors
 
-<a href="https://github.com/AMATEURTOSS/pong_pong_website/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=AMATEURTOSS/pong_pong_website" />
+<a href="https://github.com/team-pong/pong_pong_website/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=team-pong/pong_pong_website" />
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks).
@@ -127,7 +127,7 @@ To get a local copy up and running follow these simple example steps.
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/AMATEURTOSS/pong_pong_website.git
+   git clone https://github.com/team-pong/pong_pong_website.git
    ```
 2. Start Container
    ```sh
@@ -148,16 +148,16 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/AMATEURTOSS/pong_pong_website.svg?style=for-the-badge
-[contributors-url]: https://github.com/AMATEURTOSS/pong_pong_website/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/AMATEURTOSS/pong_pong_website.svg?style=for-the-badge
-[forks-url]: https://github.com/AMATEURTOSS/pong_pong_website/network/members
-[stars-shield]: https://img.shields.io/github/stars/AMATEURTOSS/pong_pong_website.svg?style=for-the-badge
-[stars-url]: https://github.com/AMATEURTOSS/pong_pong_website/stargazers
-[issues-shield]: https://img.shields.io/github/issues/AMATEURTOSS/pong_pong_website.svg?style=for-the-badge
-[issues-url]: https://github.com/AMATEURTOSS/pong_pong_website/issues
-[license-shield]: https://img.shields.io/github/license/AMATEURTOSS/pong_pong_website.svg?style=for-the-badge
-[license-url]: https://github.com/AMATEURTOSS/pong_pong_website/blob/master/LICENSE
+[contributors-shield]: https://img.shields.io/github/contributors/team-pong/pong_pong_website.svg?style=for-the-badge
+[contributors-url]: https://github.com/team-pong/pong_pong_website/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/team-pong/pong_pong_website.svg?style=for-the-badge
+[forks-url]: https://github.com/team-pong/pong_pong_website/network/members
+[stars-shield]: https://img.shields.io/github/stars/team-pong/pong_pong_website.svg?style=for-the-badge
+[stars-url]: https://github.com/team-pong/pong_pong_website/stargazers
+[issues-shield]: https://img.shields.io/github/issues/team-pong/pong_pong_website.svg?style=for-the-badge
+[issues-url]: https://github.com/team-pong/pong_pong_website/issues
+[license-shield]: https://img.shields.io/github/license/team-pong/pong_pong_website.svg?style=for-the-badge
+[license-url]: https://github.com/team-pong/pong_pong_website/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/linkedin_username
 [product-screenshot]: images/screenshot.png
