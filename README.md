@@ -47,7 +47,53 @@
 ## About The Project
 
 <img src="images/mainpageScreenShot.gif"/>
-
+This Project's goal is build a ping pong website.
+<h3>Features</h3>
+<ul>
+   <li>
+      Record
+      <ul>
+         <li>Search other's record</li>
+      </ul>
+   </li>
+   <li>
+      Chat
+      <ul>
+         <li>Basic Chat</li>
+         <li>Administrator</li>
+         <li>Mute</li>
+         <li>Kick</li>
+      </ul>
+   </li>
+   <li>
+      Game
+      <ul>
+         <li>Normal Match</li>
+         <li>Ladder Match</li>
+         <li>Match Making</li>
+         <li>Spectate Mode</li>
+      </ul>
+   </li>
+   <li>
+      Dm
+      <ul>
+         <li>Basic Direct Message</li>
+         <li>Invite Chat</li>
+         <li>Invite Game</li>
+      </ul>
+   </li>
+   <li>Profile</li>
+   <li>Block Users</li>
+   <li>Admin Page</li>
+   <li>
+      Friend
+      <ul>
+         <li>Add Friend</li>
+         <li>Delete Friend</li>
+         <li>See Friend's Status(e.g. online, offline, ongame)</li>
+      </ul>
+   </li>
+</ul>
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Contributors
