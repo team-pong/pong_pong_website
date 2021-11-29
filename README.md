@@ -46,7 +46,7 @@
 
 ## About The Project
 
-<img src="images/mainpageScreenShot.png"/>
+<img src="images/mainpageScreenShot.gif"/>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
