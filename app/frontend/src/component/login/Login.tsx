@@ -99,7 +99,7 @@ const Login = (): JSX.Element => {
   const [twoFactor, setTwoFactor] = useState(false);
 
   const loginOnClick = () => {
-    window.location.href = `${global.BE_HOST}/session/login`;
+    window.location.href = `${global.BE_HOST}/session/guest_login`;
   };
 
   useEffect(() => {

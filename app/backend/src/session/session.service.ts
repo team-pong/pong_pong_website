@@ -42,20 +42,31 @@ export class SessionService {
 		try {
       if (true) { // 중복 로그인을 시도하는 경우
         const sessions = await this.sessionRepo.query("SELECT * FROM session;"); // return list
-        for (let session of sessions) {
+       // console.log('sessions', sessions);
+		for (let session of sessions) {
           let parsed_id = JSON.parse(session.sess).userid;
           if (parsed_id == user_id) {
             this.sessionRepo.delete({sid: session.sid});
           }
         }
-      }
+      } 
+	  if (!await this.usersRepo.count({user_id: user_id})) {
+	    await this.usersRepo.save({
+		  user_id: user_id,
+		  nick: nickname,
+		  avatar_url: avatar_url,
+		  two_factor_login: false,
+		  email: 'hna@student.42seoul.kr'
+	    });
+	  }
       req.session.userid = user_id;
       req.session.token = 'test_token';
       req.session.loggedIn = true;
+	  //console.log('session', req.session);
       req.session.save();
-		} catch (err) {
-			//console.log('tester user login error:', err);
-		}
+	  } catch (err) {
+		//console.log('tester user login error:', err);
+	  }
 	}
 
   async getToken(loginCodeDto: LoginCodeDto) {

@@ -12,7 +12,7 @@ declare global {
   }
 }
 
-global.BE_HOST = window.location.origin;
+global.BE_HOST = "http://hangyeols.synology.me:8042";
 global.socket = io(`${global.BE_HOST}/global`);
 
 const element =

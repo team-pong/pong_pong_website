@@ -8,7 +8,7 @@ services:
     working_dir: /frontend
     entrypoint: >
       sh -c "npm install
-      && npm run dev"
+      && npm start"
 
   backend:
     build:
@@ -21,14 +21,12 @@ services:
       - ./app/frontend/dist:/backend/client    
     working_dir: /backend
     ports:
-      - 80:3001
+      - 8042:3001
     entrypoint: > 
       sh -c "npm install
-      && npm run schema:drop
       && npm run schema:sync
-      && npm run seed:run
       && npm run build
-      && npm run start:dev"
+      && npm run start"
 
   db:
     image: postgres:13.3-alpine
@@ -39,5 +37,5 @@ services:
       - ./app/db:/db
     working_dir: /db
     ports:
-      - 5432:5432
+      - 8043:5432
     entrypoint: sh -c "/db/init-user-db.sh; while true; do sleep 1; done;"

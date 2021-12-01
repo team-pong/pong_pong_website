@@ -15,6 +15,16 @@ function isNotTestUser(user_id: string) {
 	}
 }
 
+function makeRandomId(length) {
+   var result           = '';
+   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var charactersLength = characters.length;
+   for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
+}
+
 @ApiTags('Session')
 @Controller('session')
 export class SessionController {
@@ -32,15 +42,16 @@ export class SessionController {
 	// }
 
 	/*!
-	 * @brief 소켓 통신용 테스트 유저로 로그인하는 api
-	 * @todo production 환경에서 삭제되어야함
+	 * @brief Guest Login
 	 */
-	// @ApiOperation({ summary: '개발용 테스트유저2 로 로그인' })
-	// @Get("/test_user02")
-	// async tester_login02(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
-	// 	await this.sessionService.tester_login(request, 'tester02', 'tester02', 'https://gravatar.com/avatar/ppgw8831?s=400&d=robohash&r=x');
-	// 	return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
-	// }
+	@ApiOperation({ summary: '게스트 로 로그인' })
+	@Get("/guest_login")
+	async guest_login(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
+		const random_id = makeRandomId(6);
+		const res = await this.sessionService.tester_login(request, random_id, random_id, `https://www.gravatar.com/avatar/94d093eda664addd6e450d7e98${random_id}?s=32&d=identicon&r=PG`);
+		// console.log(random_id, res);
+		return response.redirect(`${process.env.BACKEND_SERVER_URL}/mainpage`)
+	}
 
 	/*!
 	 * @brief 소켓 통신용 테스트 유저로 로그인하는 api
